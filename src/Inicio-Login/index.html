@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+
+<head>
+  <meta charset="UTF-8" />
+  <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+  <meta
+    http-equiv="Content-Security-Policy"
+    content="
+    default-src 'self';     
+    font-src 'self' https://fonts.gstatic.com;
+    
+    connect-src 'self' https://identitytoolkit.googleapis.com;
+    
+    
+    style-src-elem 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net;
+    
+    script-src 'self' https://www.gstatic.com/firebasejs/ https://cdn.jsdelivr.net"
+    
+
+    
+  />
+
+  <meta
+    http-equiv="X-Content-Security-Policy"
+    content="default-src 'self'; 
+    script-src 'self';
+    font-src 'self' https://fonts.gstatic.com;
+    
+    connect-src 'self' https://identitytoolkit.googleapis.com
+
+    style-src-elem 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net;
+    script-src 'self' https://www.gstatic.com/firebasejs/ https://cdn.jsdelivr.net
+    "
+  />
+
+  <link rel="stylesheet" href="index.css" />
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script defer src="transicion.js"></script>
+  <script defer src="../modulos.js" type="module"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+</head>
+
+<div class="container" id="container">
+  <div class="form-container sign-up-container">
+    <form id="signUp-form">
+      <h1>Crear Cuenta</h1>
+      <div class="social-container"></div>
+      <input type="text" id="signUp-username" placeholder="Username"/>
+      <input type="email" placeholder="Correo" id="signUp-email"/>
+      <input type="password" placeholder="Contraseña" id="signUp-password" pattern=".{6}" title="Debe tener 6 caracteres" required/>
+      <button>Registro</button>
+    </form>
+  </div>
+  <div class="form-container sign-in-container">
+    <form action="#">
+      <h1>Inicio Sesión</h1>
+      <div class="social-container"></div>
+      <input type="email" placeholder="Correo" />
+      <input type="password" placeholder="Contraseña" />
+      <a href="#">¿Olvidaste la contraseña?</a>
+      <button>Iniciar Sesión</button>
+    </form>
+  </div>
+  <div class="overlay-container">
+    <div class="overlay">
+      <div class="overlay-panel overlay-left">
+        <h1>Bienvenido!</h1>
+        <p>Si ya tienes cuenta Inicia sesión con tu correo y contraseña</p>
+        <button class="ghost" id="signIn">Inicia Sesión</button>
+      </div>
+      <div class="overlay-panel overlay-right">
+        <h1>Bienvenido!</h1>
+        <p>No te has registrado? Regístrate para validar los empleados</p>
+        <button class="ghost" id="signUp">Regístrate</button>
+      </div>
+    </div>
+  </div>
+</div>
