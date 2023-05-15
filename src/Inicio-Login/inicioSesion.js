@@ -23,8 +23,8 @@ signInform.addEventListener('submit', async (e) => {
                 
         const perfil = docSnap.data().perfil;
         
-        if (perfil == 'Tesorero') {
-            localStorage.setItem('idUsuario', idUsuario);
+        localStorage.setItem('idUsuario', idUsuario);
+        if (perfil == 'Tesorero') {            
             window.location.href = "../app/Tesorero/tesorero.html";            
         }else if (perfil == 'Gerencia') {
             window.location.href = "../app/Gerencia/gerencia.html"; 
@@ -34,7 +34,7 @@ signInform.addEventListener('submit', async (e) => {
             window.location.href = "../app/Tienda/tienda.html";
         }
         else if (perfil == 'Coodinador') {
-            window.location.href = "../app/Coodinador/coodinador.html";
+            window.location.href = "../app/Coordinador/coordinador.html";
         }
         
         //window.location.href = "../app/Tesorero/tesorero.html";

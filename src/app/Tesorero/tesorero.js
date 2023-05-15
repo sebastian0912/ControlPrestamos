@@ -1,12 +1,12 @@
 
-import { doc, getDoc, setDoc} from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
+import { doc, getDoc,setDoc} from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
 import { db } from "../firebase.js";
 import { datosbase } from "../models/base.js";
 
 const idUsuario = localStorage.getItem("idUsuario");
 // MOSTRAR EN EL HTML EL NOMBRE DEL USUARIO LOGEADO
 const titulo = document.querySelector('#username');
-
+const ingresar = document.querySelector('#ingresar');
 let input = document.getElementById('archivoInput');
 
 let datosFinales = [];
@@ -28,12 +28,13 @@ input.addEventListener('change', () => {
         //console.log(datosFinales);
 
         guardarDatos(datosFinales);
-    }    // llamar a la funcion para guardar los datos en la base de datos    
+    }    // llamar a la funcion para guardar los datos en la base de datos
+    
 });
 
-async function guardarDatos(datosFinales) {
-    const totalDatos = datosFinales.length - 5; // Restamos 5 para excluir las filas de encabezado
-    let datosProcesados = 0;
+async function guardarDatos(datosFinales){
+    //console.log("entro a la funcion");
+    //console.log(datosFinales.length);
     for (let i = 4; i < datosFinales.length-1; i++) {
         let datos = datosFinales[i]; // Dividir la cadena por las tabulaciones
         
@@ -61,7 +62,7 @@ async function guardarDatos(datosFinales) {
         datosbase.anticipoLiquidacion = datos[21];
         datosbase.cuentas = datos[22];
         
-        await setDoc(doc(db, "Quincena", datosbase.cedula), datosbase);
+        const aux = await setDoc(doc(db, "Base", datosbase.cedula), datosbase);
     }
     
 }

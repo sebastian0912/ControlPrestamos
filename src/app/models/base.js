@@ -23,3 +23,8 @@ export let datosbase = {
     anticipoLiquidacion: '',
     cuentas : '',
 }
+
+export let codigo = {
+    codigo: '',
+    uid : '',
+}
