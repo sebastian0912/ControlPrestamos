@@ -1,0 +1,21 @@
+
+
+body {
+    background-image: linear-gradient(to left top, #1157fb, #008cff, #00a6e1, #00b580, #3dbc02);
+}
+
+.container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: -20px 0 50px;
+}
+
+.cuadro {
+    width : 200px;
+    height: 200px;
+    background: #1157fb;
+    margin-left: 50px;
+    border-radius: 50px;
+}
