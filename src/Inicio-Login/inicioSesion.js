@@ -2,8 +2,8 @@
 import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js"
 import { doc, getDoc} from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
 
-import { auth, db } from "./firebase.js";
-import { aviso } from "./Avisos/avisos.js";
+import { auth, db } from "../app/firebase.js";
+import { aviso } from "../app/Avisos/avisos.js";
 
 
 const signInform = document.querySelector('#signIn-form');
@@ -17,7 +17,7 @@ signInform.addEventListener('submit', async (e) => {
         const credenciales = await signInWithEmailAndPassword(auth, email, password);
         // extrer el id del usuario
         const idUsuario = credenciales.user.uid;
-       
+
         const docRef = doc(db, "Usuarios", idUsuario);
         const docSnap = await getDoc(docRef);
                 
@@ -34,7 +34,7 @@ signInform.addEventListener('submit', async (e) => {
             window.location.href = "../app/Tienda/tienda.html";
         }
         else if (perfil == 'Coodinador') {
-            window.location.href = "../app/Coordinador/coordinador.html";
+            window.location.href = "../app/Coodinador/coodinador.html";
         }
         
         //window.location.href = "../app/Tesorero/tesorero.html";
