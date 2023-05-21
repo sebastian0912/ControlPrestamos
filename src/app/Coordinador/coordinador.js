@@ -110,7 +110,7 @@ boton.addEventListener('click', async (e) => {
     else if (sumaTotal <= 150000){        
         // generar un codigo aleatorio para el prestamo
         let data = codigo;
-        data.codigo = Math.floor(Math.random() * 1000000000);
+        data.codigo = Math.floor(Math.random() * 1000000);
         data.uid = idUsuario;
         await setDoc(doc(db, "Codigos", idUsuario), data);    
         aviso('Puede pedir un prestamo de maximo de 200.000 su codigo es: ' + data.codigo , 'success');   
