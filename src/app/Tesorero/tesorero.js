@@ -1,7 +1,8 @@
 
-import { doc, getDoc,setDoc} from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
+import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
 import { db } from "../firebase.js";
 import { datosbase } from "../models/base.js";
+import { aviso } from "../Avisos/avisos.js";
 
 const idUsuario = localStorage.getItem("idUsuario");
 // MOSTRAR EN EL HTML EL NOMBRE DEL USUARIO LOGEADO
@@ -12,7 +13,7 @@ let input = document.getElementById('archivoInput');
 let datosFinales = [];
 
 
-input.addEventListener('change', () => {    
+input.addEventListener('change', () => {
     let archivo = input.files[0];
     let reader = new FileReader();
     /* leer archivo .csv */
@@ -20,24 +21,25 @@ input.addEventListener('change', () => {
     reader.onload = () => {
         let info = reader.result;
         /*separado split por tabulaciones*/
-        let datos = info.split('\n');      
-        
+        let datos = info.split('\n');
+
         datos.forEach(dato => {
             datosFinales.push(dato.split('\t'));
         });
         //console.log(datosFinales);
 
         guardarDatos(datosFinales);
+        aviso('Datos guardados correctamente', 'success');
     }    // llamar a la funcion para guardar los datos en la base de datos
-    
+
 });
 
-async function guardarDatos(datosFinales){
+async function guardarDatos(datosFinales) {
     //console.log("entro a la funcion");
     //console.log(datosFinales.length);
-    for (let i = 4; i < datosFinales.length-1; i++) {
+    for (let i = 4; i < datosFinales.length - 1; i++) {
         let datos = datosFinales[i]; // Dividir la cadena por las tabulaciones
-        
+
         datosbase.codigo = datos[0];
         datosbase.cedula = datos[1];
         datosbase.nombre = datos[2];
@@ -48,23 +50,23 @@ async function guardarDatos(datosFinales){
         datosbase.saldos = datos[7];
         datosbase.fondos = datos[8];
         datosbase.mercados = datos[9];
-        datosbase.cuotasPrestamos = datos[10];
+        datosbase.cuotasMercados = datos[10];
         datosbase.prestamoPaDescontar = datos[11];
-        datosbase.cuotasCasino = datos[12];
+        datosbase.cuotasPrestamos = datos[12];
         datosbase.casino = datos[13];
         datosbase.anchetas = datos[14];
-        datosbase.cuotasfondo = datos[15];
+        datosbase.cuotasAnchetas = datos[15];
         datosbase.fondo = datos[16];
         datosbase.carnet = datos[17];
         datosbase.seguroFunerario = datos[18];
         datosbase.prestamoPaHacer = datos[19];
-        datosbase.cuotasAnticipoLiquidacion = datos[20];
+        datosbase.cuotasPrestamoPahacer = datos[20];
         datosbase.anticipoLiquidacion = datos[21];
         datosbase.cuentas = datos[22];
-        
+
         const aux = await setDoc(doc(db, "Base", datosbase.cedula), datosbase);
     }
-    
+
 }
 
 const docRef = doc(db, "Usuarios", idUsuario);

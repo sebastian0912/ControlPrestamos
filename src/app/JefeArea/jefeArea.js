@@ -11,14 +11,8 @@ const titulo = document.querySelector('#username');
 
 const boton = document.querySelector('#boton');
 
-const docRef = doc(db, "Usuarios", idUsuario);
-const docSnap = await getDoc(docRef);
-// capturar username
-const username = docSnap.data().username;
-
-titulo.innerHTML = " ¡ BIENVENIDO " + username + " ! ";
-
 // darle click al boton para que se ejecute la funcion
+
 boton.addEventListener('click', async (e) => {
     e.preventDefault();
     // capturar los datos del formulario
@@ -108,54 +102,58 @@ boton.addEventListener('click', async (e) => {
         parseInt(datos.prestamoPaHacer) +
         parseInt(datos.anticipoLiquidacion) +
         parseInt(datos.cuentas);
-    console.log(sumaTotal);
+
 
     if (sumaTotal > 350000) {
         aviso('Ups no se pueden generar prestamos has pasado tu tope 350.0000', 'error');
     }
-    else {
-        if ((sumaTotal + parseInt(valor)) <= 350000) {
-            const querySnapshot = await getDocs(collection(db, "Codigos"));
-            querySnapshot.forEach(async (cod) => {
-                const docRef = doc(db, "Codigos", cod.id);
-                const docSnap = await getDoc(docRef);
-                // recorrer arreglo llamado prestamos para buscar el codigo
-                const prestamos = docSnap.data().prestamos;
-                //console.log(prestamos);
-                prestamos.forEach(async (p) => {
-                    if (p.codigo == codigoP) {
-                        if (p.estado == false) {
-                            aviso('El codigo ya fue usado', 'error');
-                        }
-                        else {
-                            await updateDoc(doc(db, "Base", cedulaEmpleado), {
-                                mercados: parseInt(datos.mercados) + parseInt(valor),
+    else if ((sumaTotal + parseInt(valor)) <= 350000) {
+        //console.log('entro al if');
 
-                                //cuotasMercados: 2,
-                            });
-                            // modificar la variable estado dentro del arreglo y subir cambios a firebase
-                            p.estado = false;
-                            p.lugar = "Mercado" + username;
-                            p.monto = valor;
-                            await updateDoc(doc(db, "Codigos", cod.id), {
-                                prestamos: prestamos
-                            });
-                            aviso('Acaba de pedir un prestamo de ' + valor, 'success');
-                        }
-
-
+        const querySnapshot = await getDocs(collection(db, "Codigos"));
+        querySnapshot.forEach(async (cod) => {
+            const docRef = doc(db, "Codigos", cod.id);
+            const docSnap = await getDoc(docRef);
+            // recorrer arreglo llamado prestamos para buscar el codigo
+            const prestamos = docSnap.data().prestamos;
+            //console.log(prestamos);
+            prestamos.forEach(async (p) => {
+                if (p.codigo == codigoP) {                    
+                    if (p.estado == false) {
+                        aviso('El codigo ya fue usado', 'error');
                     }
                     else {
-                        aviso('El codigo no existe', 'error');
+                        await updateDoc(doc(db, "Base", cedulaEmpleado), {
+                            mercados: parseInt(datos.mercados) + parseInt(valor),
+
+                            //cuotasMercados: 2,
+                        });
+                        // modificar la variable estado dentro del arreglo y subir cambios a firebase
+                        p.estado = false;
+                        await updateDoc(doc(db, "Codigos", cod.id), {
+                            prestamos: prestamos
+                        });
+                        aviso('Acaba de pedir un prestamo de ' + valor, 'success');
                     }
                 }
-                );
-            });
-        }
-        else {
-            aviso('Ups no se pueden generar prestamos has pasado tu tope 350.0000', 'error');
-        }
+                else {
+                    aviso('El codigo no existe', 'error');
+                }
+
+
+            }
+            );
+        });
+    }
+    else {
+        aviso('Ups no se pueden generar prestamos has pasado tu tope 350.0000', 'error');
     }
 });
 
 
+const docRef = doc(db, "Usuarios", idUsuario);
+const docSnap = await getDoc(docRef);
+// capturar username
+const username = docSnap.data().username;
+
+titulo.innerHTML = " ¡ BIENVENIDO " + username + " ! ";
