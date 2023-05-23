@@ -36,6 +36,9 @@ signInform.addEventListener('submit', async (e) => {
         else if (perfil == 'Coodinador') {
             window.location.href = "../app/Coordinador/coordinador.html";
         }
+        else if (perfil == 'Comercializadora') {
+            window.location.href = "../app/Comercializadora/comercializadora.html";
+        }
         
         //window.location.href = "../app/Tesorero/tesorero.html";
     }catch (error) {

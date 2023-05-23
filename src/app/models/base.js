@@ -32,3 +32,11 @@ export let codigo = {
     estado : true,
     lugar : 'Prestamo',
 }
+
+export let comercio = {
+    destino : '',
+    cantidadEnvio : '',
+    cantidadRecibida : '',
+    uidPersonaEnvia : '',
+    uidPersonaRecibe : '',
+}

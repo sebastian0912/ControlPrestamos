@@ -10,21 +10,21 @@ const titulo = document.querySelector('#username');
 
 
 
-const mercado = document.querySelector('#mercado');
-const prestamo = document.querySelector('#prestamo');
+const codigo = document.querySelector('#codigo');
+const permiso = document.querySelector('#permiso');
 
 
-prestamo.addEventListener('click', async (e) => {
+codigo.addEventListener('click', async (e) => {
     e.preventDefault();
     // darle click al boton para dirigir a la pagina de mercado
-    window.location.href = "Prestamo/prestamo.html";
+    window.location.href = "codigo/codigo.html";
 });
 
 
-mercado.addEventListener('click', async (e) => {
+permiso.addEventListener('click', async (e) => {
     e.preventDefault();
     // darle click al boton para dirigir a la pagina de mercado
-    window.location.href = "Mercado/mercado.html";
+    window.location.href = "editar/editar.html";
 });
 
 const docRef = doc(db, "Usuarios", idUsuario);

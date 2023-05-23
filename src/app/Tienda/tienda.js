@@ -110,8 +110,48 @@ boton.addEventListener('click', async (e) => {
         parseInt(datos.cuentas);
     console.log(sumaTotal);
 
-    if (sumaTotal > 350000) {
+    if (sumaTotal > 350000 && codigoP.charAt(0) != "G") {
         aviso('Ups no se pueden generar prestamos has pasado tu tope 350.0000', 'error');
+    }
+    else if (sumaTotal > 500000 && codigoP.charAt(0) == "G") {
+        if ((sumaTotal + parseInt(valor)) <= 350000) {
+            const querySnapshot = await getDocs(collection(db, "Codigos"));
+            querySnapshot.forEach(async (cod) => {
+                const docRef = doc(db, "Codigos", cod.id);
+                const docSnap = await getDoc(docRef);
+                // recorrer arreglo llamado prestamos para buscar el codigo
+                const prestamos = docSnap.data().prestamos;
+                //console.log(prestamos);
+                prestamos.forEach(async (p) => {
+                    if (p.codigo == codigoP) {
+                        if (p.estado == false) {
+                            aviso('El codigo ya fue usado', 'error');
+                        }
+                        else {
+                            await updateDoc(doc(db, "Base", cedulaEmpleado), {
+                                mercados: parseInt(datos.mercados) + parseInt(valor),
+                                //cuotasMercados: 2,
+                            });
+                            // modificar la variable estado dentro del arreglo y subir cambios a firebase
+                            p.estado = false;
+                            p.lugar = "Mercado" + username;
+                            p.monto = valor;
+                            await updateDoc(doc(db, "Codigos", cod.id), {
+                                prestamos: prestamos
+                            });
+                            aviso('Acaba de pedir un prestamo de ' + valor, 'success');
+                        }
+                    }
+                    else {
+                        aviso('El codigo no existe', 'error');
+                    }
+                }
+                );
+            });
+        }
+        else {
+            aviso('Ups no se pueden generar prestamos has pasado tu tope 350.0000', 'error');
+        }
     }
     else {
         if ((sumaTotal + parseInt(valor)) <= 350000) {
@@ -130,7 +170,6 @@ boton.addEventListener('click', async (e) => {
                         else {
                             await updateDoc(doc(db, "Base", cedulaEmpleado), {
                                 mercados: parseInt(datos.mercados) + parseInt(valor),
-
                                 //cuotasMercados: 2,
                             });
                             // modificar la variable estado dentro del arreglo y subir cambios a firebase
@@ -142,8 +181,6 @@ boton.addEventListener('click', async (e) => {
                             });
                             aviso('Acaba de pedir un prestamo de ' + valor, 'success');
                         }
-
-
                     }
                     else {
                         aviso('El codigo no existe', 'error');

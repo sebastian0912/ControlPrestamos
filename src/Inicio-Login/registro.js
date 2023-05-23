@@ -11,7 +11,7 @@ let datos = {
     email: '',
     password: '',
     id: '',
-    perfil: 'Gerencia',
+    perfil: 'Comercializadora',
 }
 
 signupForm.addEventListener('submit', async (e) => {
