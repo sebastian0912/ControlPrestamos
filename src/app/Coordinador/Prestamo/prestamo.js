@@ -194,7 +194,7 @@ boton.addEventListener('click', async (e) => {
             // si trabajo mas de 2 meses en adelante puede pedir prestamo
 
             if (anioActual == anio) {
-                if (parceInt(datos.saldos) >= 100000 && ((mesActual - mes) <= 2)) {
+                if (datos.saldos >= 100000 && ((mesActual - mes) <= 2)) {
                     aviso('¡Ups no puede tener el prestamo porque no tiene mas de 2 meses!', 'error');
                 }
                 else {
