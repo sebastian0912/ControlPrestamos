@@ -25,70 +25,6 @@ boton.addEventListener('click', async (e) => {
 
     const datos = docSnap.data();
 
-    if (datos.saldos == " - ") {
-        datos.saldos = 0;
-    }
-
-    if (datos.fondos == " - ") {
-        datos.fondos = 0;
-    }
-
-    if (datos.mercados == " - ") {
-        datos.mercados = 0;
-    }
-
-    if (datos.prestamoPaDescontar == " - ") {
-        datos.prestamoPaDescontar = 0;
-    }
-
-    if (datos.casino == " - ") {
-        datos.casino = 0;
-    }
-
-    if (datos.anchetas == " - ") {
-        datos.anchetas = 0;
-    }
-
-    if (datos.fondo == " - ") {
-        datos.fondo = 0;
-    }
-
-    if (datos.carnet == " - ") {
-        datos.carnet = 0;
-    }
-
-    if (datos.seguroFunerario == " - ") {
-        datos.seguroFunerario = 0;
-    }
-
-    if (datos.prestamoPaHacer == " - ") {
-        datos.prestamoPaHacer = 0;
-    }
-
-    if (datos.anticipoLiquidacion == " - ") {
-        datos.anticipoLiquidacion = 0;
-    }
-
-    if (datos.cuentas == " - ") {
-        datos.cuentas = 0;
-    }
-
-    if (datos.cuotasAnticipoLiquidacion == " - ") {
-        datos.cuotasAnticipoLiquidacion = 0;
-    }
-
-    if (datos.cuotasCasino == " - ") {
-        datos.cuotasCasino = 0;
-    }
-
-    if (datos.cuotasPrestamos == " - ") {
-        datos.cuotasPrestamos = 0;
-    }
-
-    if (datos.cuotasfondo == " - ") {
-        datos.cuotasfondo = 0;
-    }
-
     const sumaTotal =
         parseInt(datos.saldos) +
         parseInt(datos.fondos) +
@@ -124,7 +60,7 @@ boton.addEventListener('click', async (e) => {
                     }
                     else {
                         await updateDoc(doc(db, "Base", cedulaEmpleado), {
-                            mercados: parseInt(datos.mercados) + parseInt(valor),
+                            prestamoPaDescontar: parseInt(datos.mercados) + parseInt(valor),
 
                             //cuotasMercados: 2,
                         });

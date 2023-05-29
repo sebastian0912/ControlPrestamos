@@ -12,6 +12,7 @@ let datos = {
     password: '',
     id: '',
     perfil: 'Comercializadora',
+    estadoQuincena: true,
 }
 
 signupForm.addEventListener('submit', async (e) => {

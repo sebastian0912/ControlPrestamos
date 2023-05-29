@@ -1,5 +1,5 @@
 
-import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
+import { doc, getDoc, getDocs, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
 import { db } from "../firebase.js";
 import { datosbase } from "../models/base.js";
 import { aviso } from "../Avisos/avisos.js";
@@ -7,15 +7,26 @@ import { aviso } from "../Avisos/avisos.js";
 const idUsuario = localStorage.getItem("idUsuario");
 // MOSTRAR EN EL HTML EL NOMBRE DEL USUARIO LOGEADO
 const titulo = document.querySelector('#username');
+const perfil = document.querySelector('#perfil');
+const numeroTotal = document.querySelector('#numeroEmpleados');
+const numeroSolicitudesPendientes = document.querySelector('#numeroSolicitudesPendientes');
+const numeroDias = document.querySelector('#diasRestantes');
+
+
 const ingresar = document.querySelector('#ingresar');
 let input = document.getElementById('archivoInput');
 
 let datosFinales = [];
+const over = document.querySelector('#overlay');
+const loader = document.querySelector('#loader');
+var h1Elemento = document.querySelector('#cont');
 
 
 input.addEventListener('change', () => {
     let archivo = input.files[0];
     let reader = new FileReader();
+    //var h1Elemento = document.getElementById("cont");
+
     /* leer archivo .csv */
     reader.readAsText(archivo);
     reader.onload = () => {
@@ -26,20 +37,23 @@ input.addEventListener('change', () => {
         datos.forEach(dato => {
             datosFinales.push(dato.split('\t'));
         });
-        //console.log(datosFinales);
-
+        over.style.display = "block";
+        loader.style.display = "block";
+        h1Elemento.style.display = "block";
         guardarDatos(datosFinales);
-        aviso('Datos guardados correctamente', 'success');
-    }    // llamar a la funcion para guardar los datos en la base de datos
 
+        //aviso("Datos guardados correctamente", "success");
+
+    }
 });
 
 async function guardarDatos(datosFinales) {
     //console.log("entro a la funcion");
     //console.log(datosFinales.length);
+    console.log(datosFinales.length - 1);
     for (let i = 4; i < datosFinales.length - 1; i++) {
         let datos = datosFinales[i]; // Dividir la cadena por las tabulaciones
-
+        console.log(i - 3);
         datosbase.codigo = datos[0];
         datosbase.cedula = datos[1];
         datosbase.nombre = datos[2];
@@ -63,16 +77,65 @@ async function guardarDatos(datosFinales) {
         datosbase.cuotasPrestamoPahacer = datos[20];
         datosbase.anticipoLiquidacion = datos[21];
         datosbase.cuentas = datos[22];
-
+        (function (indice) {
+            setTimeout(function () {
+                h1Elemento.textContent = "Empleados cargados: " + indice - 3;
+            }, indice * 1);
+        })(i);
         const aux = await setDoc(doc(db, "Base", datosbase.cedula), datosbase);
     }
+    aviso("Datos guardados correctamente", "success");
+    over.style.display = "none";
+    loader.style.display = "none";
+    h1Elemento.style.display = "none";
 
 }
 
+
+
+/* obtener el numero de empleados y actulizar con onsnapshot*/
+const querySnapshot = await getDocs(collection(db, "Base"));
+numeroTotal.innerHTML = querySnapshot.size;
+
+
+/*Obtener el numero de solicitudes sin realizar*/
+const querySnapshot2 = await getDocs(collection(db, "Codigos"));
+const auxSolicitudes = 0;
+querySnapshot2.forEach(async (cod) => {
+    const docRef = doc(db, "Codigos", cod.id);
+    const docSnap = await getDoc(docRef);
+    // recorrer arreglo llamado prestamos para buscar el codigo
+    const prestamos = docSnap.data().prestamos;
+
+    prestamos.forEach(async (p) => {
+        if (p.estado == true) {
+            auxSolicitudes++;
+        }
+    });
+});
+numeroSolicitudesPendientes.innerHTML = auxSolicitudes;
+
+/*Captura nombre y perfil*/
 const docRef = doc(db, "Usuarios", idUsuario);
 const docSnap = await getDoc(docRef);
-// capturar username
+
 const username = docSnap.data().username;
+const perfilUsuario = docSnap.data().perfil;
 
-titulo.innerHTML = " ¡ BIENVENIDO " + username + " ! ";
+titulo.innerHTML = username;
+perfil.innerHTML = perfilUsuario;
 
+/*Calculo cuantos dias faltan*/
+
+const dias = 15 - new Date().getDate().dias;
+
+
+const colorSwitch = document.querySelector('#switch input[type="checkbox"]');
+function cambiaTema(ev) {
+    if (ev.target.checked) {
+        document.documentElement.setAttribute('tema', 'light');
+    } else {
+        document.documentElement.setAttribute('tema', 'dark');
+    }
+}
+colorSwitch.addEventListener('change', cambiaTema);

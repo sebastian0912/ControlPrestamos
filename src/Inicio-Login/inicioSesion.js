@@ -33,7 +33,7 @@ signInform.addEventListener('submit', async (e) => {
         }else if (perfil == 'Tienda') {
             window.location.href = "../app/Tienda/tienda.html";
         }
-        else if (perfil == 'Coodinador') {
+        else if (perfil == 'Coordinador') {
             window.location.href = "../app/Coordinador/coordinador.html";
         }
         else if (perfil == 'Comercializadora') {

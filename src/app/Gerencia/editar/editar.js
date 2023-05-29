@@ -15,12 +15,8 @@ const miSelect = document.getElementById('miSelect');
 
 const querySnapshot = await getDocs(collection(db, "Usuarios"));
 
-
-
 // crear un arreglo de tipo aux
 let datos = [];
-
-
 
 querySnapshot.forEach((doc) => {
     let aux = {

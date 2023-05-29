@@ -1,19 +1,88 @@
+<!DOCTYPE html>
+
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../reset.css" />
   <link rel="stylesheet" href="tesorero.css" />
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal@4/minimal.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+
   <script defer src="tesorero.js" type="module"></script>
+
 </head>
 
-<div class="container">
-  <h1 id="username" class="titulo"></h1>
-  <h1 class="titulo2">Que desea hacer hoy?</h1>
-  <div class="cuadro">
-    <img src="../assets/ingresando-datos.png" alt="ingresar" class="img" />
-    <h3>Ingresar datos</h3>
-    <input type="file" id="archivoInput" class="boton" />
+<body>
+
+  <div id="overlay" class="loader-overlay" style="display: none;"></div>
+
+  <div class="opciones">
+    <ul class="lista-Opciones">
+      <a href="#">
+        <li>
+          <img src="../assets/ingresando-datos.png" alt="logo" class="logo" />
+          Insertar datos
+          <input type="file" id="archivoInput" class="boton" />
+        </li>
+      </a>
+      <a href="#">
+        <li>
+          <img src="../assets/buscando.png" alt="logo" class="logo" />
+          <p>Extraer datos</p>
+        </li>
+      </a>
+      <li id="diasRestantes"></li>
+      <li>
+
+      </li>
+    </ul>
+
   </div>
-  <div class="cuadro">
-    <img src="../assets/buscando.png" alt="consultar" class="img" />
-    <h3>Consultar datos</h3>
+
+
+  <header>
+    <div class="cajontitulo">
+      <h1 class="titulo">Bienvenido</h1>
+    </div>
+    <div class="perfil">
+      <h1 clas class="titulo">Hola, <span id="username"></span></h1>
+      <h1 id="perfil" class="titulo"></h1>
+    </div>
+  </header>
+
+  <div class="contenido">
+    <div id="loader" class="cajaloader" style="display: none;">
+      <h1 id="cont" class="contador" style="display: none;"></h1>
+      <div class="custom-loader"></div>
+    </div>
+
+    <div class="cuadro">
+      <img src="../assets/empleados.png" style="width: 40px; 
+        margin-right: 10px; 
+        margin-top: 20px;     
+        padding-left: 20px;">
+      <h3 class="titulo-Opciones"> Numero total de datos</h3>
+      <h1 id="numeroEmpleados" class="titulo-Opciones"></h1>
+    </div>
+    <div class="cuadro">
+      <img src="../assets/solicitud.png" style="width: 40px; 
+        margin-right: 10px; 
+        margin-top: 20px;     
+        padding-left: 20px;">
+      <h3 class="titulo-Opciones"> Solicitudes sin efectuar</h3>
+      <h1 id="numeroSolicitudesPendientes" class="titulo-Opciones"></h1>
+    </div>
   </div>
-</div>
+
+
+
+
+
+</body>
+
+</html>
