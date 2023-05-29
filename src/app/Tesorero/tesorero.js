@@ -1,5 +1,5 @@
 
-import { doc, getDoc, getDocs, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
+import { doc, getDoc, getDocs, setDoc, updateDoc , collection } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
 import { db } from "../firebase.js";
 import { datosbase } from "../models/base.js";
 import { aviso } from "../Avisos/avisos.js";
@@ -91,14 +91,53 @@ async function guardarDatos(datosFinales) {
 
 }
 
+/*Inabilitar permisos*/
+document.getElementById("myonoffswitch").addEventListener("click", async function(event) {
+    const querySnapshot2 = await getDocs(collection(db, "Usuarios"));
 
+    if (this.checked) {
+        querySnapshot2.forEach(async (cod) => {
+            const docRef = doc(db, "Usuarios", cod.id);
+            const docSnap = await getDoc(docRef);  
+            if (docSnap.data().perfil == 'JefeArea' || docSnap.data().perfil == 'Coordinador' || docSnap.data().perfil == 'Tienda') {
+                await updateDoc(doc(db, "Usuarios", cod.id), {
+                    estadoQuincena: true
+                });
+                aviso('Se ha habilitado el acceso a la modificaciones de jefes de area, tiendas y coordinadores', 'success');
+            }            
+        });
+    } else {
+        querySnapshot2.forEach(async (cod) => {
+            const docRef = doc(db, "Usuarios", cod.id);
+            const docSnap = await getDoc(docRef);  
+            if (docSnap.data().perfil == 'JefeArea' || docSnap.data().perfil == 'Coordinador' || docSnap.data().perfil == 'Tienda') {
+                await updateDoc(doc(db, "Usuarios", cod.id), {
+                    estadoQuincena: false
+                });
+                aviso('Se ha deshabilitado el acceso a la modificaciones de jefes de area, tiendas y coordinadores', 'success');
+            }            
+        });
+    }
+});
+
+
+/*Calculo cuantos dias faltan*/
+const dias = new Date().getDate();
+if (dias == 13 || dias == 14 || dias == 28 || dias == 29) {
+    numeroDias.innerHTML = "0" ;
+}
+else if (dias < 13 || dias > 14) {
+    numeroDias.innerHTML = 14 - dias;
+}
 
 /* obtener el numero de empleados y actulizar con onsnapshot*/
+/*
 const querySnapshot = await getDocs(collection(db, "Base"));
-numeroTotal.innerHTML = querySnapshot.size;
+numeroTotal.innerHTML = querySnapshot.size;*/
 
 
 /*Obtener el numero de solicitudes sin realizar*/
+/*
 const querySnapshot2 = await getDocs(collection(db, "Codigos"));
 const auxSolicitudes = 0;
 querySnapshot2.forEach(async (cod) => {
@@ -112,10 +151,12 @@ querySnapshot2.forEach(async (cod) => {
             auxSolicitudes++;
         }
     });
-});
+});*/
+
+/*
 numeroSolicitudesPendientes.innerHTML = auxSolicitudes;
 
-/*Captura nombre y perfil*/
+/*Captura nombre y perfil
 const docRef = doc(db, "Usuarios", idUsuario);
 const docSnap = await getDoc(docRef);
 
@@ -123,19 +164,10 @@ const username = docSnap.data().username;
 const perfilUsuario = docSnap.data().perfil;
 
 titulo.innerHTML = username;
-perfil.innerHTML = perfilUsuario;
-
-/*Calculo cuantos dias faltan*/
-
-const dias = 15 - new Date().getDate().dias;
+perfil.innerHTML = perfilUsuario;*/
 
 
-const colorSwitch = document.querySelector('#switch input[type="checkbox"]');
-function cambiaTema(ev) {
-    if (ev.target.checked) {
-        document.documentElement.setAttribute('tema', 'light');
-    } else {
-        document.documentElement.setAttribute('tema', 'dark');
-    }
-}
-colorSwitch.addEventListener('change', cambiaTema);
+
+
+
+

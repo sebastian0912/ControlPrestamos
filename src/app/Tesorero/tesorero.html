@@ -13,6 +13,7 @@
   <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal@4/minimal.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
 
+  <script defer src="../logOut.js" type="module"></script>
   <script defer src="tesorero.js" type="module"></script>
 
 </head>
@@ -23,23 +24,42 @@
 
   <div class="opciones">
     <ul class="lista-Opciones">
-      <a href="#">
-        <li>
-          <img src="../assets/ingresando-datos.png" alt="logo" class="logo" />
-          Insertar datos
-          <input type="file" id="archivoInput" class="boton" />
-        </li>
-      </a>
-      <a href="#">
-        <li>
-          <img src="../assets/buscando.png" alt="logo" class="logo" />
-          <p>Extraer datos</p>
-        </li>
-      </a>
-      <li id="diasRestantes"></li>
-      <li>
 
+      <li>
+        <img src="../assets/ingresando-datos.png" alt="logo" class="logo" />
+        <p>Insertar datos </p>
+        <input type="file" id="archivoInput" class="boton" />
       </li>
+
+
+      <li>
+        <img src="../assets/buscando.png" alt="logo" class="logo" />
+        <p>Extraer datos</p>
+      </li>
+
+
+      <li id="logout">        
+        <img src="../assets/cerrar-sesion.png" alt="logo" class="logo" />
+        <p>Cerrar Sesion</p>       
+      </li>
+
+
+
+      <h1 class="diasT"> Dias restantes antes de cerrar quincena</h1>
+      <span class="dias" id="diasRestantes"></span>
+
+      <h1 class="diasT">Bloquea acceso de Jefes de Area y Tiendas</h1>
+      <div class="onoffswitch">
+        <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" tabindex="0" checked>
+        <label class="onoffswitch-label" for="myonoffswitch">
+          <span class="onoffswitch-inner"></span>
+          <span class="onoffswitch-switch"></span>
+        </label>
+      </div>
+
+
+
+
     </ul>
 
   </div>
@@ -50,8 +70,8 @@
       <h1 class="titulo">Bienvenido</h1>
     </div>
     <div class="perfil">
-      <h1 clas class="titulo">Hola, <span id="username"></span></h1>
-      <h1 id="perfil" class="titulo"></h1>
+      <!--<h1 clas class="titulo">Hola, <span id="username"></span></h1>
+      <h1 id="perfil" class="titulo"></h1>-->
     </div>
   </header>
 
@@ -75,7 +95,7 @@
         margin-top: 20px;     
         padding-left: 20px;">
       <h3 class="titulo-Opciones"> Solicitudes sin efectuar</h3>
-      <h1 id="numeroSolicitudesPendientes" class="titulo-Opciones"></h1>
+      <!-- <h1 id="numeroSolicitudesPendientes" class="titulo-Opciones"></h1>-->
     </div>
   </div>
 

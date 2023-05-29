@@ -5,7 +5,7 @@ const createWindow = () => {
     width: 1200,
     height: 900,
   });
-  win.loadFile("src/Inicio-Login/index.html");
+  win.loadFile("./src/app/Inicio-Login/index.html");
 };
 
 app.whenReady().then(() => {

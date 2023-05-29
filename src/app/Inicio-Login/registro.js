@@ -1,8 +1,8 @@
 
 import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
 import { doc, setDoc } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
-import { auth, db } from "../app/firebase.js";
-import { aviso } from "../app/Avisos/avisos.js";
+import { auth, db } from "../firebase.js";
+import { aviso } from "../Avisos/avisos.js";
 
 const signupForm = document.querySelector('#signUp-form');
 

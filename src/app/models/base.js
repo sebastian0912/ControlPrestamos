@@ -31,6 +31,7 @@ export let codigo = {
     cuotas : '',
     estado : true,
     lugar : 'Prestamo',
+    cedulaQuienPide : '',
 }
 
 export let comercio = {

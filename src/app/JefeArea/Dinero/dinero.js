@@ -61,8 +61,7 @@ boton.addEventListener('click', async (e) => {
                     else {
                         await updateDoc(doc(db, "Base", cedulaEmpleado), {
                             prestamoPaDescontar: parseInt(datos.mercados) + parseInt(valor),
-
-                            //cuotasMercados: 2,
+                            cuotasMercados: 2,
                         });
                         // modificar la variable estado dentro del arreglo y subir cambios a firebase
                         p.estado = false;

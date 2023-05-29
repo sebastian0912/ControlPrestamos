@@ -1,30 +1,111 @@
-<html>
+<!DOCTYPE html>
 
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../reset.css" />
   <link rel="stylesheet" href="coordinador.css" />
-  <script defer src="./coordinador.js" type="module"></script>
 
   <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal@4/minimal.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+
+  <script defer src="../logOut.js" type="module"></script>
+  <script defer src="coordinador.js" type="module"></script>
+
 </head>
 
 <body>
-  <div class="container">
-    <h1 class="titulo">Buen día</h1> <br> <br>
-    <h1 class="titulo">Seleccione el tipo de operacion a realizar</h1>
 
-    <div class="cuadro" id="mercado">
-      <img src="../assets/mercado.png" alt="ingresar" class="img" />
-      <h3>Mercado</h3>
-    </div>
-    <div class="cuadro" id="prestamo">
-      <img src="../assets/pedir-prestado.png" alt="consultar" class="img" />
-      <h3>Prestamo dinero</h3>
-    </div>
-    
+  <div class="opciones">
+    <ul class="lista-Opciones">
+
+
+      <li>
+        <a href="coordinador.html">
+          <img src="../assets/pagina-de-inicio.png" alt="logo" class="logo" />
+          <p> Inicio </p>
+        </a>
+      </li>
+
+
+      <li>
+        <a href="../Coordinador/PrestamoPorHacer/PrestamoPorHacer.html">
+          <img src="../assets/prestamo.png" alt="logo" class="logo" />
+          <p> Prestamo por hacer </p>
+        </a>
+      </li>
+
+
+      <li>
+          <a href="../Coordinador/PrestamoPaHacer/PrestamoPaHacer.html">
+          <img src="../assets/pagar.png" alt="logo" class="logo" />
+          <p>Prestamo para hacer</p>
+        </a>
+      </li>
+
+      <li>
+        <a href="./Mercado/mercado.html">
+          <img src="../assets/mercado.png" alt="logo" class="logo" />
+          <p>Mercado</p>
+        </a>
+      </li>
+
+
+      <li id="logout">
+        <a href="../Inicio-Login/index.html">
+          <img src="../assets/cerrar-sesion.png" alt="logo" class="logo" />
+          <p>Cerrar Sesion</p>
+        </a>
+      </li>
+
+
+
+      <h1 class="diasT"> Dias restantes antes de cerrar quincena</h1>
+      <span class="dias" id="diasRestantes"></span>
+
+
+    </ul>
+
   </div>
 
- 
+
+  <header>
+    <div class="cajontitulo">
+      <h1 class="titulo">Bienvenido</h1>
+    </div>
+    <div class="perfil">
+      <!--<h1 clas class="titulo">Hola, <span id="username"></span></h1>
+      <h1 id="perfil" class="titulo"></h1>-->
+    </div>
+  </header>
+
+  <div class="contenido">
+    <div id="loader" class="cajaloader" style="display: none;">
+      <h1 id="cont" class="contador" style="display: none;"></h1>
+      <div class="custom-loader"></div>
+    </div>
+
+    <div class="cuadro">
+      <img src="../assets/empleados.png" style="width: 40px; 
+        margin-right: 10px; 
+        margin-top: 20px;     
+        padding-left: 20px;">
+      <h3 class="titulo-Opciones"> Numero total de datos</h3>
+      <!--<h1 id="numeroEmpleados" class="titulo-Opciones"></h1>-->
+    </div>
+    <div class="cuadro">
+      <img src="../assets/solicitud.png" style="width: 40px; 
+        margin-right: 10px; 
+        margin-top: 20px;     
+        padding-left: 20px;">
+      <h3 class="titulo-Opciones"> Solicitudes sin efectuar</h3>
+      <!-- <h1 id="numeroSolicitudesPendientes" class="titulo-Opciones"></h1>-->
+    </div>
+  </div>
+
+
+
+
 
 </body>
 

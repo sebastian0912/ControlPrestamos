@@ -13,7 +13,24 @@ body {
 
 h1 {
     margin: 0;
-    padding: 0;
+    padding: 0;    
+}
+
+.diasT{
+    width: 100%;
+    margin: 50px 0 20px 50px;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 20pt;
+    font-weight: 400;
+}
+
+.dias{    
+    text-align: justify;    
+    margin: 10px 0 20px 120px;
+
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 20pt;
+    font-weight: 600;
 }
 
 a {
@@ -88,10 +105,9 @@ header {
     float: left;
     padding-left: 50px;
     padding-top: 20px;
-    /*font-family: 'Nunito Sans';*/
     font-size: 25pt;
     font-weight: 600;
-    font-style: italic;
+    /*font-style: italic;*/
 }
 
 span {
@@ -199,4 +215,83 @@ span {
 
 
 
-/*cambios */
+/* switch */
+
+.onoffswitch {
+    position: relative;
+    width: 90px;
+    margin: 50px 0 0 95px;
+}
+
+.onoffswitch-checkbox {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.onoffswitch-label {
+    display: block;
+    overflow: hidden;
+    cursor: pointer;
+    border:2px solid #1157FB;
+    border-radius: 21px;
+}
+
+.onoffswitch-inner {
+    display: block;
+    width: 200%;
+    margin-left: -100%;
+    transition: margin 0.3s ease-in 0s;
+}
+
+.onoffswitch-inner:before,
+.onoffswitch-inner:after {
+    display: block;
+    float: left;
+    width: 50%;
+    height: 30px;
+    padding: 0;
+    line-height: 30px;
+    font-size: 14px;
+    color: white;
+    font-family: Trebuchet, Arial, sans-serif;
+    font-weight: bold;
+    box-sizing: border-box;
+}
+
+.onoffswitch-inner:before {
+    content: "ON";
+    padding-left: 10px;
+    background-color: #1157FB;
+    color: #FFFFFF;
+}
+
+.onoffswitch-inner:after {
+    content: "OFF";
+    padding-right: 10px;
+    background-color: #EEEEEE;
+    color: #1157FB;
+    text-align: right;
+}
+
+.onoffswitch-switch {
+    display: block;
+    width: 18px;
+    margin: 6px;
+    background: #FFFFFF;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 56px;
+    border: 2px solid #1157FB;
+    border-radius: 20px;
+    transition: all 0.3s ease-in 0s;
+}
+
+.onoffswitch-checkbox:checked+.onoffswitch-label .onoffswitch-inner {
+    margin-left: 0;
+}
+
+.onoffswitch-checkbox:checked+.onoffswitch-label .onoffswitch-switch {
+    right: 0px;
+}
