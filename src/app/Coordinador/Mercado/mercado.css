@@ -67,7 +67,7 @@ li {
 
 }
 
-li:nth-child(3) {
+li:nth-child(4) {
     background: #bbd0ff;
     color: #000000;
     transform: scale(1.1);
@@ -231,7 +231,7 @@ span {
     border-style: solid;
     border-radius: 11px;
     box-shadow: 0px 0px 5px rgba(66, 66, 66, 0.75);
-    margin: 0 50px 0 -25px;
+    margin: 0 50px 0 -300px;
     position: relative;
 }
 

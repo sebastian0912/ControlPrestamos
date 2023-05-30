@@ -77,12 +77,44 @@ titulo.innerHTML = username;
 perfil.innerHTML = perfilUsuario;
 */
 
+async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor) {
+    const docCoordinador = doc(db, "Codigos", idUsuario);
+    const coordninador = await getDoc(docCoordinador);
+
+    if (coordninador.exists()) {
+        // generar un codigo aleatorio para el prestamo
+        data.codigo = Math.floor(Math.random() * 1000000);
+        data.codigo = 'M' + data.codigo;
+        data.uid = idUsuario;
+        data.monto = nuevovalor;
+        data.cuotas = 2;
+        data.cedulaQuienPide = cedulaEmpleado;
+        // Actualizar en la base de datos
+        await updateDoc(doc(db, "Codigos", idUsuario), {
+            prestamos: arrayUnion(data)
+        });
+        aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + data.codigo, 'success');
+    }
+    else {
+        data.codigo = Math.floor(Math.random() * 1000000);
+        data.codigo = 'M' + data.codigo;
+        data.uid = idUsuario;
+        data.monto = nuevovalor;
+        data.cuotas = 2;
+        data.cedulaQuienPide = cedulaEmpleado;
+        await setDoc(docCoordinador, {
+            prestamos: [data]
+        });
+        //await setDoc(doc(db, "Codigos", idUsuario), data);
+        aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + data.codigo, 'success');
+    }
+}
+
 
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
     const valor = document.querySelector('#valor').value;
     const nuevovalor = valor.replace(/\,/g, '');
-    const cuotas = document.querySelector('#cuotas').value;
 
     e.preventDefault();
     // capturar los datos del formulario
@@ -125,280 +157,58 @@ boton.addEventListener('click', async (e) => {
         if (datos.saldos >= 175000) {
             aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
         }
-        else if (datos.fondos > 0) {
-            aviso('Ups no se pueden generar prestamos perteneces al fondo', 'error');
-        }
         else {
-            // conseguir la fecha actual y separarla en dia, mes y año para poder compararla con la fecha de ingreso del empleado            
+            // conseguir la fecha actual y separarla en dia, mes y año para poder compararla con la fecha de ingreso del empleado   
+            let diaActual = fechaActual.getDate();
             let mesActual = fechaActual.getMonth() + 1;
             let anioActual = fechaActual.getFullYear();
-            if ((anioActual == anio) && ((mesActual - mes) >= 2)) {
-                if (sumaTotal >= 350000 || (sumaTotal + parseInt(nuevovalor)) >= 350000) {
-                    aviso('Ups no se pueden generar prestamos porque superas los 350.000 permitidos', 'error');
-                }
-                else if (nuevovalor >= 200000) {
-                    aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
-                }
-                else {
-                    const docCoordinador = doc(db, "Codigos", idUsuario);
-                    const coordninador = await getDoc(docCoordinador);
+            let fechaInicio = new Date(anio, mes, dia); // Asume que 'anio', 'mes', 'dia' representan la fecha de inicio del trabajador
+            let fechaActualCompara = new Date(anioActual, mesActual, diaActual); // Asume que 'anioActual', 'mesActual', 'diaActual' representan la fecha actual
+            let diferencia = Math.abs(fechaActualCompara - fechaInicio); // Diferencia en milisegundos
+            let diasTrabajados = Math.ceil(diferencia / (1000 * 60 * 60 * 24)); // Conversión de milisegundos a días
+
+            // Si ha trabajado entre 8 y 15 dias puede pedir prestamo de 150.000
+            if ((diasTrabajados > 8 && diasTrabajados < 15) && nuevovalor <= 150000) {
+                if ((sumaTotal + parseInt(nuevovalor) <= 150000) || parseInt(nuevovalor) <= 150000) {
                     let data = codigo;
-                    if (coordninador.exists()) {
-                        // generar un codigo aleatorio para el prestamo
-                        data.codigo = Math.floor(Math.random() * 1000000);
-                        data.codigo = 'PH' + data.codigo;
-                        data.uid = idUsuario;
-                        data.monto = nuevovalor;
-                        data.cuotas = cuotas;
-                        data.cedulaQuienPide = cedulaEmpleado;
-                        // Actualizar en la base de datos
-                        await updateDoc(doc(db, "Codigos", idUsuario), {
-                            prestamos: arrayUnion(data)
-                        });
-                        aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + data.codigo, 'success');
-                    }
-                    else {
-                        data.codigo = Math.floor(Math.random() * 1000000);
-                        data.codigo = 'PH' + data.codigo;
-                        data.uid = idUsuario;
-                        data.monto = nuevovalor;
-                        data.cuotas = cuotas;
-                        data.cedulaQuienPide = cedulaEmpleado;
-                        await setDoc(docCoordinador, {
-                            prestamos: [data]
-                        });
-                        //await setDoc(doc(db, "Codigos", idUsuario), data);
-                        aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + data.codigo, 'success');
-                    }
-                }
-            }
-            else if ((anioActual > anio)) {
-                if (sumaTotal >= 350000 || (sumaTotal + parseInt(nuevovalor)) >= 350000) {
-                    aviso('Ups no se pueden generar prestamos porque superas los 350.000 permitidos', 'error');
-                }
-                else if (nuevovalor >= 200000) {
-                    aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
+                    escribirCodigo(data, cedulaEmpleado, nuevovalor, valor);
                 }
                 else {
-                    const docCoordinador = doc(db, "Codigos", idUsuario);
-                    const coordninador = await getDoc(docCoordinador);
-                    let data = codigo;
-                    if (coordninador.exists()) {
-                        // generar un codigo aleatorio para el prestamo
-                        data.codigo = Math.floor(Math.random() * 1000000);
-                        // colocar una P al inicio del codigo para identificar que es un prestamo
-                        data.codigo = 'PH' + data.codigo;
-                        data.uid = idUsuario;
-                        data.monto = nuevovalor;
-                        data.cuotas = cuotas;
-                        data.cedulaQuienPide = cedulaEmpleado;
-                        // Actualizar en la base de datos
-                        await updateDoc(doc(db, "Codigos", idUsuario), {
-                            prestamos: arrayUnion(data)
-                        });
-                        aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + data.codigo, 'success');
-                    }
-                    else {
-                        data.codigo = Math.floor(Math.random() * 1000000);
-                        data.codigo = 'PH' + data.codigo;
-                        data.uid = idUsuario;
-                        data.monto = nuevovalor;
-                        data.cuotas = cuotas;
-                        data.cedulaQuienPide = cedulaEmpleado;
-                        await setDoc(docCoordinador, {
-                            prestamos: [data]
-                        });
-                        //await setDoc(doc(db, "Codigos", idUsuario), data);
-                        aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + data.codigo, 'success');
-                    }
+                    aviso('Ups no se pueden generar prestamos porque superas los 150000 de saldo permitido', 'error');
                 }
-            }       
-        }
-    }
-});
+            }
 
-
-
-/*
-import { codigo } from "../../models/base.js";
-import { aviso } from "../../Avisos/avisos.js";
-import { doc, getDoc, setDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
-import { db } from "../../firebase.js";
-
-const boton = document.querySelector('#boton');
-const idUsuario = localStorage.getItem("idUsuario");
-const valor = document.querySelector('#valor');
-const cuotas = document.querySelector('#cuotas');
-
-// darle click al boton para que se ejecute la funcion
-boton.addEventListener('click', async (e) => {
-    e.preventDefault();
-    // capturar los datos del formulario
-    const cedulaEmpleado = document.querySelector('#cedula').value;
-    const docRef = doc(db, "Base", cedulaEmpleado);
-    const docSnap = await getDoc(docRef);
-
-    const datos = docSnap.data();
-    /*
-        
-
-    // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
-    const fechaIngreso = datos.ingreso;
-    let dia = fechaIngreso.split('-')[0];
-    let mes = fechaIngreso.split('-')[1];
-    let anio = fechaIngreso.split('-')[2];
-
-    // el año esta en formato xxaa y se debe convertir a 20aa
-    let anioConvertido = '20' + anio;
-    anio = anioConvertido;
-
-    const sumaTotal =
-        parseInt(datos.saldos) +
-        parseInt(datos.fondos) +
-        parseInt(datos.mercados) +
-        parseInt(datos.prestamoPaDescontar) +
-        parseInt(datos.casino) +
-        parseInt(datos.anchetas) +
-        parseInt(datos.fondo) +
-        parseInt(datos.carnet) +
-        parseInt(datos.seguroFunerario) +
-        parseInt(datos.prestamoPaHacer) +
-        parseInt(datos.anticipoLiquidacion) +
-        parseInt(datos.cuentas);
-
-    if (datos.fondos > 0) {
-        aviso('Ups no se pueden generar prestamos perteneces al fondo', 'error');
-    }
-    else {
-        // conseguir la fecha actual y separarla en dia, mes y año para poder compararla con la fecha de ingreso del empleado
-        const fechaActual = new Date();
-        let diaActual = fechaActual.getDate();
-        let mesActual = fechaActual.getMonth() + 1;
-        let anioActual = fechaActual.getFullYear();
-
-        if (datos.mercados > 0 ||
-            datos.prestamoPaDescontar > 0 ||
-            datos.casino > 0 ||
-            datos.anchetas > 0 ||
-            datos.fondo > 0 ||
-            datos.carnet > 0 ||
-            datos.seguroFunerario > 0 ||
-            datos.saldos > 0) {
-            aviso('¡Ups no se puede realizar un mercado porque tiene saldos a descontar!', 'error');
-        }
-        else {
-
-            if (anioActual == anio) {
-                if (parseInt(datos.saldos) >= 100000 && ((mesActual - mes) <= 2)) {
-                    aviso('¡Ups no puede tener el prestamo porque no tiene mas de 2 meses!', 'error');
+            // Si ha trabajado entre 15 y 30 dias puede pedir prestamo de 250.000
+            else if ((diasTrabajados > 15 && diasTrabajados < 30) && nuevovalor <= 250000) {
+                if ((sumaTotal + parseInt(nuevovalor) <= 250000) || parseInt(nuevovalor) <= 250000) {
+                    if ((sumaTotal + parseInt(nuevovalor) <= 150000) || parseInt(nuevovalor) <= 150000) {
+                        let data = codigo;
+                        escribirCodigo(data, cedulaEmpleado, nuevovalor, valor);
+                    }
                 }
                 else {
-                    if ((mesActual == mes) && (diaActual - dia <= 15)) {
-                        const docRef = doc(db, "Codigos", idUsuario);
-                        const coordninador = await getDoc(docRef);
-                        let data = codigo;
-                        if (coordninador.exists()) {
-                            // generar un codigo aleatorio para el prestamo                        
-                            data.codigo = Math.floor(Math.random() * 1000000);
-                            data.uid = idUsuario;
-                            codigo.cuotas = 2;
-                            codigo.monto = 60000;
-                            //await setDoc(doc(db, "Codigos", idUsuario), data);
-                            await updateDoc(doc(db, "Codigos", idUsuario), {
-                                prestamos: arrayUnion(data)
-                            });
-                            aviso('Puede pedir un prestamo de maximo de 60.000 su codigo es: ' + data.codigo, 'success');                        /*valor.style.display = 'block';
-                            cuotas.style.display = 'block';
-                        }
-                        else {
-                            data.codigo = Math.floor(Math.random() * 1000000);
-                            data.uid = idUsuario;
-                            codigo.cuotas = 2;
-                            codigo.monto = 60000;
-                            await setDoc(docRef, {
-                                prestamos: [data]
-                            });
-                            //await setDoc(doc(db, "Codigos", idUsuario), data);
-                            aviso('Puede pedir un prestamo de maximo de 60.000 su codigo es: ' + data.codigo, 'success');
-                        }
-                    }
-                    else if (mesActual == mes && ((diaActual - dia) >= 15 && (diaActual - dia) <= 30)) {
-                        const docRef = doc(db, "Codigos", idUsuario);
-                        const coordninador = await getDoc(docRef);
-                        let data = codigo;
-                        if (coordninador.exists()) {
-                            // generar un codigo aleatorio para el prestamo                        
-                            data.codigo = Math.floor(Math.random() * 1000000);
-                            data.uid = idUsuario;
-                            codigo.cuotas = 2;
-                            codigo.monto = 135000;
-                            //await setDoc(doc(db, "Codigos", idUsuario), data);
-                            await updateDoc(doc(db, "Codigos", idUsuario), {
-                                prestamos: arrayUnion(data)
-                            });
-                            aviso('Puede pedir un prestamo de maximo de 135.000 su codigo es: ' + data.codigo, 'success');                        /*valor.style.display = 'block';
-                            cuotas.style.display = 'block';
-                        }
-                        else {
-                            data.codigo = Math.floor(Math.random() * 1000000);
-                            data.uid = idUsuario;
-                            codigo.cuotas = 2;
-                            codigo.monto = 135000;
-                            await setDoc(docRef, {
-                                prestamos: [data]
-                            });
-                            //await setDoc(doc(db, "Codigos", idUsuario), data);
-                            aviso('Puede pedir un prestamo de maximo de 135.000 su codigo es: ' + data.codigo, 'success');
-                        }
-                    }
-                    else if ((mesActual - mes >= 1) || ((mesActual > mes) && (diaActual - dia > 0))) {
-                        const docRef = doc(db, "Codigos", idUsuario);
-                        const coordninador = await getDoc(docRef);
-                        let data = codigo;                        
-                        if (coordninador.exists()) {
-                            // generar un codigo aleatorio para el prestamo                        
-                            data.codigo = Math.floor(Math.random() * 1000000);
-                            data.uid = idUsuario;
-                            codigo.cuotas = 2;
-                            codigo.monto = 200000;
-
-                            //await setDoc(doc(db, "Codigos", idUsuario), data);
-                            await updateDoc(doc(db, "Codigos", idUsuario), {
-                                prestamos: arrayUnion(data)
-                            });
-                            aviso('Puede pedir un prestamo de maximo de 200.000 su codigo es: ' + data.codigo, 'success');                        /*valor.style.display = 'block';
-                            cuotas.style.display = 'block';
-                        }
-                        else {
-                            data.codigo = Math.floor(Math.random() * 1000000);
-                            data.uid = idUsuario;
-                            codigo.cuotas = 2;
-                            codigo.monto = 200000;
-
-                            await setDoc(docRef, {
-                                prestamos: [data]
-                            });
-                            //await setDoc(doc(db, "Codigos", idUsuario), data);
-                            aviso('Puede pedir un prestamo de maximo de 200.000 su codigo es: ' + data.codigo, 'success');
-                        }
-                    }
+                    aviso('Ups no se pueden generar prestamos porque superas los 250000 de saldo permitido', 'error');
                 }
             }
-            else {
-                let data = codigo;
-                data.codigo = Math.floor(Math.random() * 1000000);
-                data.uid = idUsuario;
-                codigo.cuotas = 2;
-                codigo.monto = 200000;
-                //await setDoc(doc(db, "Codigos", idUsuario), data);
-                await updateDoc(doc(db, "Codigos", idUsuario), {
-                    prestamos: arrayUnion(data)
-                });
-                aviso('Puede pedir un prestamo de maximo de 200.000 su codigo es: ' + data.codigo, 'success');
+
+            // Si ha trabajado mas de 30 dias puede pedir prestamo de 350.000
+            else if ((diasTrabajados > 30) && nuevovalor <= 350000) {
+                if ((sumaTotal + parseInt(nuevovalor) <= 350000) || parseInt(nuevovalor) <= 350000) {
+                    if ((sumaTotal + parseInt(nuevovalor) <= 350000) || parseInt(nuevovalor) <= 350000) {
+                        let data = codigo;
+                        escribirCodigo(data, cedulaEmpleado, nuevovalor, valor);
+                    }
+                }
+                else {
+                    aviso('Ups no se pueden generar prestamos porque superas los 350000 de saldo permitido', 'error');
+                }
             }
         }
-        // si trabajo mas de 2 meses en adelante puede pedir prestamo
     }
+}
+);
+
+/*   
     const nombre = document.querySelector('#nombre');
     const cedula = document.querySelector('#cedulaM');
     const mercado = document.querySelector('#mercado');
@@ -421,5 +231,5 @@ boton.addEventListener('click', async (e) => {
     fondo.innerHTML = datos.fondo;
     carnet.innerHTML = datos.carnet;
     seguro.innerHTML = datos.seguroFunerario;
-});
+
 */
