@@ -25,19 +25,23 @@ export let datosbase = {
 }
 
 export let codigo = {
-    codigo: '',
-    uid : '',
+    codigo: '',    
     monto : '',
     cuotas : '',
     estado : true,
     lugar : 'Prestamo',
     cedulaQuienPide : '',
+    jefeArea : '',
+    coordinador : '',
+    fechaGenerado : '',
+    fechaEjecutado : '',
 }
 
 export let comercio = {
     destino : '',
     cantidadEnvio : '',
     cantidadRecibida : '',
-    uidPersonaEnvia : '',
-    uidPersonaRecibe : '',
+    cantidadTotal : '',
+    PersonaEnvia : '',
+    PersonaRecibe : '',
 }

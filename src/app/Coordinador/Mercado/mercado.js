@@ -19,14 +19,36 @@ const mercado = document.querySelector('#mercado');
 const prestamo = document.querySelector('#prestamo');
 
 /*Calculo cuantos dias faltan*/
-const dias = new Date().getDate();
-if (dias == 13 || dias == 14 || dias == 28 || dias == 29) {
-    numeroDias.innerHTML = "0";
+// Obtén la fecha actual
+var ahora = new Date();
+var anio = ahora.getFullYear();
+var mes = ahora.getMonth();
+var dia = 0;
+
+if (ahora.getDate() == 13 || ahora.getDate() == 14 || ahora.getDate() == 28 || ahora.getDate() == 29) {
+    dia = 0;
 }
-else if (dias < 13 || dias > 14) {
-    numeroDias.innerHTML = 14 - dias;
+else if (ahora.getDate() < 13 || ahora.getDate() > 14) {
+    dia = 13;
+}
+else if (ahora.getDate() < 28 || ahora.getDate() > 29) {
+    dia = 28;
 }
 
+// Comprueba si el día ya ha pasado este mes
+if (ahora.getDate() > dia) {
+    // Si es así, cambia al próximo mes
+    mes++;
+}
+// Crea la fecha objetivo
+var fechaObjetivo = new Date(anio, mes, dia);
+// Calcula la diferencia en milisegundos
+var diferencia = fechaObjetivo - ahora;
+// Convierte la diferencia en días
+var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
+numeroDias.innerHTML = dias;
+
+/*Convertir valor a separado por miles*/
 const numemoroM = document.querySelector('#valor');
 numemoroM.addEventListener('keyup', (e) => {
     var num = numemoroM.value.replace(/\,/g, '');
@@ -39,31 +61,6 @@ numemoroM.addEventListener('keyup', (e) => {
         numemoroM.value = numemoroM.value.replace(/[^\d\,]*/g, '');
     }
 });
-
-/* obtener el numero de empleados y actulizar con onsnapshot*/
-/*
-const querySnapshot = await getDocs(collection(db, "Base"));
-numeroTotal.innerHTML = querySnapshot.size;*/
-
-
-/*Obtener el numero de solicitudes sin realizar*/
-/*
-const querySnapshot2 = await getDocs(collection(db, "Codigos"));
-const auxSolicitudes = 0;
-querySnapshot2.forEach(async (cod) => {
-    const docRef = doc(db, "Codigos", cod.id);
-    const docSnap = await getDoc(docRef);
-    // recorrer arreglo llamado prestamos para buscar el codigo
-    const prestamos = docSnap.data().prestamos;
-
-    prestamos.forEach(async (p) => {
-        if (p.estado == true) {
-            auxSolicitudes++;
-        }
-    });
-});
-
-numeroSolicitudesPendientes.innerHTML = auxSolicitudes;*/
 
 /*Captura nombre y perfil*/
 /* 
@@ -89,6 +86,7 @@ async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor) {
         data.monto = nuevovalor;
         data.cuotas = 2;
         data.cedulaQuienPide = cedulaEmpleado;
+        data.fechaGenerado = new Date();
         // Actualizar en la base de datos
         await updateDoc(doc(db, "Codigos", idUsuario), {
             prestamos: arrayUnion(data)

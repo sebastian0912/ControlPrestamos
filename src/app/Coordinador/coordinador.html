@@ -37,7 +37,7 @@
 
 
       <li>
-          <a href="../Coordinador/PrestamoPaHacer/PrestamoPaHacer.html">
+        <a href="../Coordinador/PrestamoPaHacer/PrestamoPaHacer.html">
           <img src="../assets/pagar.png" alt="logo" class="logo" />
           <p>Prestamo para hacer</p>
         </a>
@@ -80,11 +80,6 @@
   </header>
 
   <div class="contenido">
-    <div id="loader" class="cajaloader" style="display: none;">
-      <h1 id="cont" class="contador" style="display: none;"></h1>
-      <div class="custom-loader"></div>
-    </div>
-
     <div class="cuadro">
       <img src="../assets/empleados.png" style="width: 40px; 
         margin-right: 10px; 
@@ -93,13 +88,30 @@
       <h3 class="titulo-Opciones"> Numero total de datos</h3>
       <!--<h1 id="numeroEmpleados" class="titulo-Opciones"></h1>-->
     </div>
+    
     <div class="cuadro">
       <img src="../assets/solicitud.png" style="width: 40px; 
         margin-right: 10px; 
         margin-top: 20px;     
         padding-left: 20px;">
       <h3 class="titulo-Opciones"> Solicitudes sin efectuar</h3>
-      <!-- <h1 id="numeroSolicitudesPendientes" class="titulo-Opciones"></h1>-->
+      <h1 id="numeroSolicitudesPendientes" class="titulo-Opciones"></h1>
+    </div>
+
+    <div class="tabla">
+      <table class="tabla-contenido">
+        <thead>
+          <tr>
+            <th>Codigo</th>
+            <th>Monto</th>
+            <th>Cuotas</th>
+            <th>Estado</th>
+            <th>Lugar</th>
+            <th>Cedula</th>
+          </tr>
+        </thead>
+        <tbody id="tabla"> </tbody>
+      </table>
     </div>
   </div>
 

@@ -139,7 +139,7 @@ numeroTotal.innerHTML = querySnapshot.size;*/
 /*Obtener el numero de solicitudes sin realizar*/
 /*
 const querySnapshot2 = await getDocs(collection(db, "Codigos"));
-const auxSolicitudes = 0;
+let auxSolicitudes = 0;
 querySnapshot2.forEach(async (cod) => {
     const docRef = doc(db, "Codigos", cod.id);
     const docSnap = await getDoc(docRef);

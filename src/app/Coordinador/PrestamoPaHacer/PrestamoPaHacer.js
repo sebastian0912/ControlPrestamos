@@ -19,14 +19,38 @@ const mercado = document.querySelector('#mercado');
 const prestamo = document.querySelector('#prestamo');
 
 /*Calculo cuantos dias faltan*/
-const dias = new Date().getDate();
-if (dias == 13 || dias == 14 || dias == 28 || dias == 29) {
-    numeroDias.innerHTML = "0";
+/*Calculo cuantos dias faltan*/
+// Obtén la fecha actual
+var ahora = new Date();
+var anio = ahora.getFullYear();
+var mes = ahora.getMonth();
+var dia = 0;
+
+if (ahora.getDate() == 13 || ahora.getDate() == 14 || ahora.getDate() == 28 || ahora.getDate() == 29) {
+    dia = 0;
 }
-else if (dias < 13 || dias > 14) {
-    numeroDias.innerHTML = 14 - dias;
+else if (ahora.getDate() < 13 || ahora.getDate() > 14) {
+    dia = 13 ;
+}
+else if (ahora.getDate() < 28 || ahora.getDate() > 29) {
+    dia = 28 ;
 }
 
+// Comprueba si el día ya ha pasado este mes
+if (ahora.getDate() > dia) {
+  // Si es así, cambia al próximo mes
+  mes++;
+}
+// Crea la fecha objetivo
+var fechaObjetivo = new Date(anio, mes, dia);
+// Calcula la diferencia en milisegundos
+var diferencia = fechaObjetivo - ahora;
+// Convierte la diferencia en días
+var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
+
+numeroDias.innerHTML = dias;
+
+/*Convertir valor a separado por miles*/
 const numemoroM = document.querySelector('#valor');
 numemoroM.addEventListener('keyup', (e) => {
     var num = numemoroM.value.replace(/\,/g, '');
@@ -40,31 +64,6 @@ numemoroM.addEventListener('keyup', (e) => {
     }
 });
 
-/* obtener el numero de empleados y actulizar con onsnapshot*/
-/*
-const querySnapshot = await getDocs(collection(db, "Base"));
-numeroTotal.innerHTML = querySnapshot.size;*/
-
-
-/*Obtener el numero de solicitudes sin realizar*/
-/*
-const querySnapshot2 = await getDocs(collection(db, "Codigos"));
-const auxSolicitudes = 0;
-querySnapshot2.forEach(async (cod) => {
-    const docRef = doc(db, "Codigos", cod.id);
-    const docSnap = await getDoc(docRef);
-    // recorrer arreglo llamado prestamos para buscar el codigo
-    const prestamos = docSnap.data().prestamos;
-
-    prestamos.forEach(async (p) => {
-        if (p.estado == true) {
-            auxSolicitudes++;
-        }
-    });
-});
-
-numeroSolicitudesPendientes.innerHTML = auxSolicitudes;*/
-
 /*Captura nombre y perfil*/
 /* 
 const docRef = doc(db, "Usuarios", idUsuario);
@@ -77,6 +76,43 @@ titulo.innerHTML = username;
 perfil.innerHTML = perfilUsuario;
 */
 
+async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas) {
+    const docCoordinador = doc(db, "Codigos", idUsuario);
+    const coordninador = await getDoc(docCoordinador);
+
+    if (coordninador.exists()) {
+        // generar un codigo aleatorio para el prestamo
+        data.codigo = Math.floor(Math.random() * 1000000);
+        data.codigo = 'PH' + data.codigo;
+        data.uid = idUsuario;
+        data.monto = nuevovalor;
+        data.cuotas = cuotas;
+        data.cedulaQuienPide = cedulaEmpleado;
+        data.fechaGenerado = new Date();
+        data.coordinador = username;
+        // Actualizar en la base de datos
+        await updateDoc(doc(db, "Codigos", idUsuario), {
+            prestamos: arrayUnion(data)
+        });
+        aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + data.codigo, 'success');
+    }
+    else {
+        data.codigo = Math.floor(Math.random() * 1000000);
+        data.codigo = 'PH' + data.codigo;
+        data.uid = idUsuario;
+        data.monto = nuevovalor;
+        data.cuotas = 2;
+        data.cedulaQuienPide = cedulaEmpleado;
+        data.fechaGenerado = new Date();
+        data.coordinador = username;
+        
+        await setDoc(docCoordinador, {
+            prestamos: [data]
+        });
+        //await setDoc(doc(db, "Codigos", idUsuario), data);
+        aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + data.codigo, 'success');
+    }
+}
 
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
@@ -140,36 +176,8 @@ boton.addEventListener('click', async (e) => {
                     aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
                 }
                 else {
-                    const docCoordinador = doc(db, "Codigos", idUsuario);
-                    const coordninador = await getDoc(docCoordinador);
                     let data = codigo;
-                    if (coordninador.exists()) {
-                        // generar un codigo aleatorio para el prestamo
-                        data.codigo = Math.floor(Math.random() * 1000000);
-                        data.codigo = 'PH' + data.codigo;
-                        data.uid = idUsuario;
-                        data.monto = nuevovalor;
-                        data.cuotas = cuotas;
-                        data.cedulaQuienPide = cedulaEmpleado;
-                        // Actualizar en la base de datos
-                        await updateDoc(doc(db, "Codigos", idUsuario), {
-                            prestamos: arrayUnion(data)
-                        });
-                        aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + data.codigo, 'success');
-                    }
-                    else {
-                        data.codigo = Math.floor(Math.random() * 1000000);
-                        data.codigo = 'PH' + data.codigo;
-                        data.uid = idUsuario;
-                        data.monto = nuevovalor;
-                        data.cuotas = cuotas;
-                        data.cedulaQuienPide = cedulaEmpleado;
-                        await setDoc(docCoordinador, {
-                            prestamos: [data]
-                        });
-                        //await setDoc(doc(db, "Codigos", idUsuario), data);
-                        aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + data.codigo, 'success');
-                    }
+                    escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas); 
                 }
             }
             else if ((anioActual > anio)) {
@@ -180,37 +188,8 @@ boton.addEventListener('click', async (e) => {
                     aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
                 }
                 else {
-                    const docCoordinador = doc(db, "Codigos", idUsuario);
-                    const coordninador = await getDoc(docCoordinador);
                     let data = codigo;
-                    if (coordninador.exists()) {
-                        // generar un codigo aleatorio para el prestamo
-                        data.codigo = Math.floor(Math.random() * 1000000);
-                        // colocar una P al inicio del codigo para identificar que es un prestamo
-                        data.codigo = 'PH' + data.codigo;
-                        data.uid = idUsuario;
-                        data.monto = nuevovalor;
-                        data.cuotas = cuotas;
-                        data.cedulaQuienPide = cedulaEmpleado;
-                        // Actualizar en la base de datos
-                        await updateDoc(doc(db, "Codigos", idUsuario), {
-                            prestamos: arrayUnion(data)
-                        });
-                        aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + data.codigo, 'success');
-                    }
-                    else {
-                        data.codigo = Math.floor(Math.random() * 1000000);
-                        data.codigo = 'PH' + data.codigo;
-                        data.uid = idUsuario;
-                        data.monto = nuevovalor;
-                        data.cuotas = cuotas;
-                        data.cedulaQuienPide = cedulaEmpleado;
-                        await setDoc(docCoordinador, {
-                            prestamos: [data]
-                        });
-                        //await setDoc(doc(db, "Codigos", idUsuario), data);
-                        aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + data.codigo, 'success');
-                    }
+                    escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas); 
                 }
             }       
         }
