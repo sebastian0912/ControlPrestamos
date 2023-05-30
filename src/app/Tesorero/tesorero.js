@@ -122,12 +122,41 @@ document.getElementById("myonoffswitch").addEventListener("click", async functio
 
 
 /*Calculo cuantos dias faltan*/
-const dias = new Date().getDate();
-if (dias == 13 || dias == 14 || dias == 28 || dias == 29) {
-    numeroDias.innerHTML = "0" ;
+// Obtén la fecha actual
+var ahora = new Date();
+var anio = ahora.getFullYear();
+var mes = ahora.getMonth();
+var dia = 0;
+
+if (ahora.getDate() == 13 || ahora.getDate() == 14 || ahora.getDate() == 28 || ahora.getDate() == 29) {
+    dia = 0;
 }
-else if (dias < 13 || dias > 14) {
-    numeroDias.innerHTML = 14 - dias;
+else if (ahora.getDate() < 13 || ahora.getDate() > 14) {
+    dia = 13;
+}
+else if (ahora.getDate() < 28 || ahora.getDate() > 29) {
+    dia = 28;
+}
+
+// Comprueba si el día ya ha pasado este mes
+if (ahora.getDate() > dia) {
+    // Si es así, cambia al próximo mes
+    mes++;
+}
+// Crea la fecha objetivo
+var fechaObjetivo = new Date(anio, mes, dia);
+// Calcula la diferencia en milisegundos
+var diferencia = fechaObjetivo - ahora;
+// Convierte la diferencia en días
+var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
+/*si el dia es 13 o 14 o 28 o 29 colocar numeroDias.innerHtml en rojo*/
+
+if (ahora.getDate() == 13 || ahora.getDate() == 14 || ahora.getDate() == 28 || ahora.getDate() == 29) {
+    numeroDias.style.color = "red";
+    numeroDias.innerHTML = dias;
+}
+else {
+    numeroDias.innerHTML = dias;
 }
 
 /* obtener el numero de empleados y actulizar con onsnapshot*/

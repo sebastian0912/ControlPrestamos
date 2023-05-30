@@ -47,7 +47,13 @@ var diferencia = fechaObjetivo - ahora;
 // Convierte la diferencia en días
 var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
 
-numeroDias.innerHTML = dias;
+if (ahora.getDate() == 13 || ahora.getDate() == 14 || ahora.getDate() == 28 || ahora.getDate() == 29) {
+    numeroDias.style.color = "red";
+    numeroDias.innerHTML = dias;
+}
+else {
+    numeroDias.innerHTML = dias;
+}
 
 /*Convertir valor a separado por miles*/
 const numemoroM = document.querySelector('#valor');

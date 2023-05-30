@@ -38,10 +38,13 @@ export let codigo = {
 }
 
 export let comercio = {
+    codigo: '',
+    concepto : '',
     destino : '',
     cantidadEnvio : '',
     cantidadRecibida : '',
-    cantidadTotal : '',
+    valorUnidad : '',
+    cantidadTotalEntregada : '',
     PersonaEnvia : '',
     PersonaRecibe : '',
 }

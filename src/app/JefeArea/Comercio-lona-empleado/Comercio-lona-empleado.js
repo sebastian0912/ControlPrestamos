@@ -76,6 +76,33 @@ var diferencia = fechaObjetivo - ahora;
 var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
 numeroDias.innerHTML = dias;
 
+
+// Mostar contenido en una tabla
+const tabla = document.querySelector('#tabla');
+
+const querySnapshot3 = await getDocs(collection(db, "Comercio"));
+querySnapshot3.forEach(async (cod) => {
+    const unsub = onSnapshot(doc(db, "Comercio", cod.id), (doc) => {
+        const p = doc.data();
+        tabla.innerHTML = '';
+        tabla.innerHTML += `
+            <tr>
+                <td>${p.codigo}</td>
+                <td>${p.concepto}</td>            
+                <td>${p.destino}</td>
+                <td>${p.cantidadEnvio}</td>
+                <td>${p.cantidadRecibida}</td>
+                <td>${p.valorUnidad}</td>
+                <td>${p.cantidadTotalEntregada}</td>
+                <td>${p.PersonaEnvia}</td>
+                <td>${p.PersonaRecibe}</td>
+            </tr>
+            `
+    });
+});
+
+
+
 /*
 // al darle click a cualquier opcion del select imprima el valor
 miSelect.addEventListener('change', async (e) => {
@@ -109,18 +136,23 @@ miSelect.addEventListener('change', async (e) => {
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
     const cantidad = document.querySelector('#cantidad').value;
-    //const valorUnidad = document.querySelector('#valorUnidad').value;
+    const cedula = document.querySelector('#cedula').value;
     const codigo = document.querySelector('#codigo').value;
-    ///const otro = document.querySelector('#otro').value;
 
     const docRef = doc(db, "Comercio", codigo);
     const docSnap = await getDoc(docRef);
-
     const datos = docSnap.data();
-
     await updateDoc(doc(db, "Comercio", codigo), {
-        cantidadRecibida: cantidad, 
+        cantidadRecibida: parseInt(datos.cantidadTotalEntregada) + parseInt(cantidad),
         PersonaRecibe: username,
     });
+
+    const doocRef = doc(db, "Base", cedula);
+    const doocSnap = await getDoc(doocRef);
+    const datos2 = doocSnap.data();
+    await updateDoc(doc(db, "Base", cedula), {
+        mercados: parseInt(datos2.mercados) + parceInt()
+    });
+
     aviso("Se ha cargado la informacion exitosamente", "success");
 });

@@ -1,28 +1,83 @@
-<html>
+<!DOCTYPE html>
 
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../../reset.css" />
   <link rel="stylesheet" href="comercializadora.css" />
-  <script defer src="comercializadora.js" type="module"></script>
 
   <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal@4/minimal.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+
+  <script defer src="../../logOut.js" type="module"></script>
+  <script defer src="comercializadora.js" type="module"></script>
+
 </head>
 
 <body>
-  <div class="container">
-    
-   <h1 class="titulo2"> Digite la cedula del empleado a validar </h1>
+  <div class="opciones">
+    <ul class="lista-Opciones">
 
-    
-    <div class="valor">
-      <input type="text" id="codigo" placeholder="Ingrese el codigo" class="input2" />
-      <input type="text" id="llegada" placeholder="Ingrese la cantidad recibida" class="input2" />
+      <li>
+        <a href="../jefeArea.html">
+          <img src="../../assets/prestamo.png" alt="logo" class="logo" />
+          <p> Prestamo </p>
+        </a>
+      </li>
+
+      <li>
+        <a href="comercializadora.html">
+          <img src="../../assets/cesta-de-la-compra.png" alt="logo" class="logo" />
+          <p>Recibir lonas</p>
+        </a>
+      </li>
+
+      <li>
+        <a href="../Comercio-lona-empleado/Comercio-lona-empleado.html">
+          <img src="../../assets/recibo.png" alt="logo" class="logo" />
+          <p>Entrega de lona a empleado</p>
+        </a>
+      </li>
+
+
+      <li id="logout">
+        <a href="../../Inicio-Login/index.html">
+          <img src="../../assets/cerrar-sesion.png" alt="logo" class="logo" />
+          <p>Cerrar Sesion</p>
+        </a>
+      </li>
+
+      <h1 class="diasT"> Dias restantes antes de cerrar quincena</h1>
+      <span class="dias" id="diasRestantes"></span>
+    </ul>
+  </div>
+
+  <header>
+    <div class="cajontitulo">
+      <h1 class="titulo">Bienvenido</h1>
+    </div>
+    <div class="perfil">
+      <!--<h1 clas class="titulo">Hola, <span id="username"></span></h1>
+            <h1 id="perfil" class="titulo"></h1>-->
+    </div>
+  </header>
+
+  <div class="contenido">
+    <div class="cuadroTexto">
+      <div class="valor">
+        <div class="valoresEscribir">
+          <h1 class="titulo"> Digite la cedula del empleado a validar </h1>
+          <input type="text" id="Cantidad" placeholder="Cantidad Lonas" class="input2" />
+          <!--<input type="text" id="valorUnidad" placeholder="Valor Unidad" class="input2" />
+          <select id="miSelect"></select>
+          <input type="text" id="otro" placeholder="Otra Sede" class="input2" style="display: none;" /> -->
+          <input type="text" id="codigo" placeholder="Codigo" class="input2" />
+          <button class="btn" id="boton">Cargar info</button>
+        </div>
+      </div>
     </div>
 
-  </div> 
-
+  </div>
 </body>
-<button class="btn" id="boton">Buscar</button> <br>
-
 
 </html>

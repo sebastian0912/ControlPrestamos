@@ -12,8 +12,6 @@ const idUsuario = localStorage.getItem("idUsuario");
 // MOSTRAR EN EL HTML EL NOMBRE DEL USUARIO LOGEADO
 const titulo = document.querySelector('#username');
 const perfil = document.querySelector('#perfil');
-const numeroTotal = document.querySelector('#numeroEmpleados');
-const numeroSolicitudesPendientes = document.querySelector('#numeroSolicitudesPendientes');
 const numeroDias = document.querySelector('#diasRestantes');
 
 
@@ -45,7 +43,15 @@ var fechaObjetivo = new Date(anio, mes, dia);
 var diferencia = fechaObjetivo - ahora;
 // Convierte la diferencia en días
 var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
-numeroDias.innerHTML = dias;
+/*si el dia es 13 o 14 o 28 o 29 colocar numeroDias.innerHtml en rojo*/
+
+if (ahora.getDate() == 13 || ahora.getDate() == 14 || ahora.getDate() == 28 || ahora.getDate() == 29) {
+    numeroDias.style.color = "red";
+    numeroDias.innerHTML = dias;
+}
+else {
+    numeroDias.innerHTML = dias;
+}
 
 /*Convertir valor a separado por miles*/
 const numemoroM = document.querySelector('#valor');
@@ -60,8 +66,8 @@ numemoroM.addEventListener('keyup', (e) => {
     }
 });
 
-
-/*Captura nombre y perfil
+/*
+//Captura nombre y perfil
 const docRef = doc(db, "Usuarios", idUsuario);
 const docSnap = await getDoc(docRef);
 
@@ -81,57 +87,58 @@ boton.addEventListener('click', async (e) => {
     const nuevovalor = valor.replace(/\,/g, '');
 
     const cedulaEmpleado = document.querySelector('#cedula').value;
-
-    /*si el campo codigoP esta vacio*/
-    if (codigoP == '') {
-        aviso('El campo codigo no puede estar vacio', 'error');
-    }
-    else {
-        const docRef = doc(db, "Base", cedulaEmpleado);
-        const docSnap = await getDoc(docRef);
-        const datos = docSnap.data();
-        const querySnapshot = await getDocs(collection(db, "Codigos"));
-        querySnapshot.forEach(async (cod) => {
-            const docRef = doc(db, "Codigos", cod.id);
+    if (ahora.getDate() == 13 || ahora.getDate() == 14 || ahora.getDate() == 28 || ahora.getDate() == 29) {
+        /*si el campo codigoP esta vacio*/
+        if (codigoP == '') {
+            aviso('El campo codigo no puede estar vacio', 'error');
+        }
+        else {
+            const docRef = doc(db, "Base", cedulaEmpleado);
             const docSnap = await getDoc(docRef);
-            // recorrer arreglo llamado prestamos para buscar el codigo
-            const prestamos = docSnap.data().prestamos;
-            prestamos.forEach(async (p) => {
-                if (p.cedulaQuienPide == cedulaEmpleado) {
-                    if (parseInt(p.monto) < parseInt(nuevovalor)) {
-                        if (p.codigo == codigoP) {
-                            if (p.estado == false) {
-                                aviso('El codigo ya fue usado', 'error');
+            const datos = docSnap.data();
+            const querySnapshot = await getDocs(collection(db, "Codigos"));
+            querySnapshot.forEach(async (cod) => {
+                const docRef = doc(db, "Codigos", cod.id);
+                const docSnap = await getDoc(docRef);
+                // recorrer arreglo llamado prestamos para buscar el codigo
+                const prestamos = docSnap.data().prestamos;
+                prestamos.forEach(async (p) => {
+                    if (p.cedulaQuienPide == cedulaEmpleado) {
+                        if (parseInt(p.monto) < parseInt(nuevovalor)) {
+                            if (p.codigo == codigoP) {
+                                if (p.estado == false) {
+                                    aviso('El codigo ya fue usado', 'error');
+                                }
+                                else {
+                                    await updateDoc(doc(db, "Base", cedulaEmpleado), {
+                                        prestamoPaDescontar: parseInt(datos.mercados) + parseInt(nuevovalor),
+                                        cuotasPrestamos: p.cuotas,
+                                    });
+                                    // modificar la variable estado dentro del arreglo y subir cambios a firebase
+                                    p.estado = false;
+                                    p.fechaEjecutado = new Date();
+                                    p.jefeArea = username;
+                                    await updateDoc(doc(db, "Codigos", cod.id), {
+                                        prestamos: prestamos
+                                    });
+                                    aviso('Acaba de pedir un prestamo de ' + valor, 'success');
+                                }
                             }
                             else {
-                                await updateDoc(doc(db, "Base", cedulaEmpleado), {
-                                    prestamoPaDescontar: parseInt(datos.mercados) + parseInt(nuevovalor),
-                                    cuotasPrestamos: p.cuotas,
-                                });
-                                // modificar la variable estado dentro del arreglo y subir cambios a firebase
-                                p.estado = false;
-                                p.fechaEjecutado = new Date();
-                                p.jefeArea = username;
-                                await updateDoc(doc(db, "Codigos", cod.id), {
-                                    prestamos: prestamos
-                                });
-                                aviso('Acaba de pedir un prestamo de ' + valor, 'success');
+                                aviso('El codigo no existe', 'error');
                             }
                         }
                         else {
-                            aviso('El codigo no existe', 'error');
+                            aviso('El monto del prestamo es mayor al permitido generado por el coodinador', 'error');
                         }
                     }
                     else {
-                        aviso('El monto del prestamo es mayor al permitido generado por el coodinador', 'error');
+                        aviso('El codigo no pertenece a este empleado', 'error');
                     }
                 }
-                else {
-                    aviso('El codigo no pertenece a este empleado', 'error');
-                }
-            }
-            );
-        });
+                );
+            });
+        }
     }
 });
 
