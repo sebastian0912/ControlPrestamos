@@ -30,9 +30,8 @@ export let codigo = {
     cuotas : '',
     estado : true,
     lugar : 'Prestamo',
-    cedulaQuienPide : '',
-    jefeArea : '',
-    coordinador : '',
+    cedulaQuienPide : '',    
+    generadoPor : '',
     fechaGenerado : '',
     fechaEjecutado : '',
 }
@@ -49,4 +48,22 @@ export let comercio = {
     PersonaRecibe : '',
     fechaEnviada : '',
     fechaRecibida : '',     
+}
+
+
+export let historial = {
+    cedula: '',
+    concepto : '',
+    fechaEfectuado : '',
+    valor : '',
+    cuotas : '',
+    nombreQuienEntrego : '',
+    timesStamp : '',
+}
+
+export let tienda = {
+    nombre : '',
+    codigo : '',
+    valorTotal : '',
+    numPersonasAtendidas : '',
 }

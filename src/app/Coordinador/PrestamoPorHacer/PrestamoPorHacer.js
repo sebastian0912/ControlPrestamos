@@ -69,7 +69,7 @@ numemoroM.addEventListener('keyup', (e) => {
 });
 
 /*Captura nombre y perfil*/
-/* 
+
 const docRef = doc(db, "Usuarios", idUsuario);
 const docSnap = await getDoc(docRef);
 
@@ -78,7 +78,7 @@ const perfilUsuario = docSnap.data().perfil;
 
 titulo.innerHTML = username;
 perfil.innerHTML = perfilUsuario;
-*/
+
 
 async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas) {
     const docCoordinador = doc(db, "Codigos", idUsuario);
@@ -93,7 +93,7 @@ async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas) {
         data.cuotas = cuotas;
         data.cedulaQuienPide = cedulaEmpleado;
         data.fechaGenerado = new Date().toLocaleDateString()
-        data.coordinador = username;
+        data.generadoPor = username;
         // Actualizar en la base de datos
         await updateDoc(doc(db, "Codigos", idUsuario), {
             prestamos: arrayUnion(data)
@@ -105,10 +105,10 @@ async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas) {
         data.codigo = 'OH' + data.codigo;
         data.uid = idUsuario;
         data.monto = nuevovalor;
-        data.cuotas = 2;
+        data.cuotas = cuotas;
         data.cedulaQuienPide = cedulaEmpleado;
-        data.fechaGenerado = new Date();
-        data.coordinador = username;
+        data.fechaGenerado = new Date().toLocaleDateString()
+        data.generadoPor = username;
         await setDoc(docCoordinador, {
             prestamos: [data]
         });

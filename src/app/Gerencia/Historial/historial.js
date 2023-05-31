@@ -1,21 +1,26 @@
+import { codigo } from "../../models/base.js";
+import { aviso } from "../../Avisos/avisos.js";
+import { doc, getDoc, getDocs, collection, setDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
+import { db } from "../../firebase.js";
 
-
-import { doc, getDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
-import { db } from "../firebase.js";
-
-
+const boton = document.querySelector('#boton');
 // capturar el id del usuario logeado del input
 const idUsuario = localStorage.getItem("idUsuario");
+
 // MOSTRAR EN EL HTML EL NOMBRE DEL USUARIO LOGEADO
 const titulo = document.querySelector('#username');
 const perfil = document.querySelector('#perfil');
-const numeroTotal = document.querySelector('#numeroEmpleados');
-const numeroCoordinadores = document.querySelector('#numeroCoordinadores');
-const numeroTiendas = document.querySelector('#numeroTiendas');
+
 const numeroDias = document.querySelector('#diasRestantes');
+
+
+const mercado = document.querySelector('#mercado');
+const prestamo = document.querySelector('#prestamo');
 let extraeT = document.getElementById("extraeT");
 
 
+/*Calculo cuantos dias faltan*/
+/*Calculo cuantos dias faltan*/
 // Obtén la fecha actual
 var ahora = new Date();
 var anio = ahora.getFullYear();
@@ -26,16 +31,16 @@ if (ahora.getDate() == 13 || ahora.getDate() == 14 || ahora.getDate() == 28 || a
     dia = 0;
 }
 else if (ahora.getDate() < 13 || ahora.getDate() > 14) {
-    dia = 13;
+    dia = 13 ;
 }
 else if (ahora.getDate() < 28 || ahora.getDate() > 29) {
-    dia = 28;
+    dia = 28 ;
 }
 
 // Comprueba si el día ya ha pasado este mes
 if (ahora.getDate() > dia) {
-    // Si es así, cambia al próximo mes
-    mes++;
+  // Si es así, cambia al próximo mes
+  mes++;
 }
 // Crea la fecha objetivo
 var fechaObjetivo = new Date(anio, mes, dia);
@@ -52,34 +57,7 @@ else {
     numeroDias.innerHTML = dias;
 }
 
-
-/* obtener el numero de empleados y actulizar con onsnapshot*/
-
-const querySnapshot = await getDocs(collection(db, "Base"));
-numeroTotal.innerHTML = querySnapshot.size;
-
-
-/*Obtener el numero de solicitudes sin realizar*/
-let auxCoordinadores = 0;
-const querySnapshot2 = await getDocs(collection(db, "Usuarios"));
-querySnapshot2.forEach((doc) => {
-    if (doc.data().perfil == "Coordinador") {
-        auxCoordinadores++;
-    }
-});
-numeroCoordinadores.innerHTML = auxCoordinadores;
-
-
-/*Obtener el numero de solicitudes sin realizar*/
-let auxTiendas = 0;
-const querySnapshot3 = await getDocs(collection(db, "Usuarios"));
-querySnapshot3.forEach((doc) => {
-    if (doc.data().perfil == "Tienda") {
-        auxCoordinadores++;
-    }
-});
-numeroTiendas.innerHTML = auxTiendas;
-
+/*Captura nombre y perfil*/
 
 const docRef = doc(db, "Usuarios", idUsuario);
 const docSnap = await getDoc(docRef);
@@ -90,6 +68,29 @@ const perfilUsuario = docSnap.data().perfil;
 titulo.innerHTML = username;
 perfil.innerHTML = perfilUsuario;
 
+// darle click al boton para que se ejecute la funcion
+boton.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const oculto = document.querySelector('#oculto');
+    oculto.style.display = "block";
+    // capturar los datos del formulario
+    const cedulaEmpleado = document.querySelector('#cedula').value;
+    const docRef = doc(db, "Historial", cedulaEmpleado);
+    const docSnap = await getDoc(docRef);
+    let data = docSnap.data().historia;  
+    data.forEach(async (p) => {
+        tabla.innerHTML += `
+            <tr>
+                <td>${p.cedula}</td>
+                <td>${p.concepto}</td>            
+                <td>${p.fechaEfectuado}</td>
+                <td>${p.valor}</td>
+                <td>${p.cuotas}</td>
+                <td>${p.nombreQuienEntrego}</td>
+            </tr>
+            `
+    }); 
+});
 
 extraeT.addEventListener('click', async () => {
     const querySnapshot = await getDocs(collection(db, "Tienda"));

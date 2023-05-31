@@ -16,7 +16,7 @@ const perfil = document.querySelector('#perfil');
 const numeroDias = document.querySelector('#diasRestantes');
 
 
-/*
+
 //Captura nombre y perfil
 const docRef = doc(db, "Usuarios", idUsuario);
 const docSnap = await getDoc(docRef);
@@ -25,15 +25,14 @@ const username = docSnap.data().username;
 const perfilUsuario = docSnap.data().perfil;
 
 titulo.innerHTML = username;
-perfil.innerHTML = perfilUsuario;*/
+perfil.innerHTML = perfilUsuario;
 
 /*Calculo cuantos dias faltan*/
 // Obtén la fecha actual
 
-
 const querySnapshot3 = await getDocs(collection(db, "Comercio"));
 
-querySnapshot3.forEach(async (cod) => {
+querySnapshot3.forEach( (cod) => {
     const unsub = onSnapshot(doc(db, "Comercio", cod.id), (doc) => {
         const p = doc.data();
         tabla.innerHTML += `

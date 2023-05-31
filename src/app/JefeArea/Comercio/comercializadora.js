@@ -15,7 +15,7 @@ const perfil = document.querySelector('#perfil');
 const numeroDias = document.querySelector('#diasRestantes');
 const querySnapshot = await getDocs(collection(db, "Sedes"));
 
-/*Captura nombre y perfil
+//Captura nombre y perfil
 const docRef = doc(db, "Usuarios", idUsuario);
 const docSnap = await getDoc(docRef);
 
@@ -23,7 +23,7 @@ const username = docSnap.data().username;
 const perfilUsuario = docSnap.data().perfil;
 
 titulo.innerHTML = username;
-perfil.innerHTML = perfilUsuario;*/
+perfil.innerHTML = perfilUsuario;
 
 let datos = [];
 

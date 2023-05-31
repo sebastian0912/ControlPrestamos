@@ -1,7 +1,7 @@
 
-import { doc, getDoc, getDocs, setDoc, updateDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
+import { doc, getDoc, getDocs, setDoc, updateDoc, collection, onSnapshot, arrayUnion } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
 import { db } from "../firebase.js";
-import { codigo } from "../models/base.js";
+import { codigo, historial } from "../models/base.js";
 import { aviso } from "../Avisos/avisos.js";
 
 
@@ -66,7 +66,7 @@ numemoroM.addEventListener('keyup', (e) => {
     }
 });
 
-/*
+
 //Captura nombre y perfil
 const docRef = doc(db, "Usuarios", idUsuario);
 const docSnap = await getDoc(docRef);
@@ -75,12 +75,13 @@ const username = docSnap.data().username;
 const perfilUsuario = docSnap.data().perfil;
 
 titulo.innerHTML = username;
-perfil.innerHTML = perfilUsuario;*/
+perfil.innerHTML = perfilUsuario;
 
 
 
 boton.addEventListener('click', async (e) => {
     e.preventDefault();
+
     // capturar los datos del formulario
     const codigoP = document.querySelector('#codigo').value;
     const valor = document.querySelector('#valor').value;
@@ -89,10 +90,14 @@ boton.addEventListener('click', async (e) => {
     const cedulaEmpleado = document.querySelector('#cedula').value;
     if (ahora.getDate() == 13 || ahora.getDate() == 14 || ahora.getDate() == 28 || ahora.getDate() == 29) {
         /*si el campo codigoP esta vacio*/
+        aviso('No se pueden dar prestamos en este momento', 'error');
+    }
+    else {
         if (codigoP == '') {
             aviso('El campo codigo no puede estar vacio', 'error');
         }
         else {
+
             const docRef = doc(db, "Base", cedulaEmpleado);
             const docSnap = await getDoc(docRef);
             const datos = docSnap.data();
@@ -102,25 +107,81 @@ boton.addEventListener('click', async (e) => {
                 const docSnap = await getDoc(docRef);
                 // recorrer arreglo llamado prestamos para buscar el codigo
                 const prestamos = docSnap.data().prestamos;
+                let encontrado = false;
                 prestamos.forEach(async (p) => {
                     if (p.cedulaQuienPide == cedulaEmpleado) {
-                        if (parseInt(p.monto) < parseInt(nuevovalor)) {
+                        if (parseInt(p.monto) >= parseInt(nuevovalor)) {
                             if (p.codigo == codigoP) {
                                 if (p.estado == false) {
                                     aviso('El codigo ya fue usado', 'error');
                                 }
                                 else {
-                                    await updateDoc(doc(db, "Base", cedulaEmpleado), {
-                                        prestamoPaDescontar: parseInt(datos.mercados) + parseInt(nuevovalor),
-                                        cuotasPrestamos: p.cuotas,
-                                    });
-                                    // modificar la variable estado dentro del arreglo y subir cambios a firebase
-                                    p.estado = false;
-                                    p.fechaEjecutado = new Date();
-                                    p.jefeArea = username;
-                                    await updateDoc(doc(db, "Codigos", cod.id), {
-                                        prestamos: prestamos
-                                    });
+                                    let concepto;
+                                    if (p.codigo.startsWith('PH')) {
+                                        concepto = 'Prestamo para hacer';
+                                        encontrado = true;
+                                        await updateDoc(doc(db, "Base", cedulaEmpleado), {
+                                            prestamoPaHacer: parseInt(datos.prestamoPaHacer) + parseInt(nuevovalor),
+                                            cuotasPrestamoPahacer: parseInt(p.cuotas) + parseInt(datos.cuotasPrestamos),
+                                        });
+                                    }
+                                    else if (p.codigo.startsWith('OH')) {
+                                        encontrado = true;
+                                        concepto = 'Prestamo para descontar';
+                                        await updateDoc(doc(db, "Base", cedulaEmpleado), {
+                                            prestamoPaDescontar: parseInt(datos.prestamoPaDescontar) + parseInt(nuevovalor),
+                                            cuotasPrestamos: parseInt(p.cuotas) + parseInt(datos.cuotasPrestamos),
+                                        });
+                                    }
+                                    else if (p.codigo.startsWith('G')) {
+                                        encontrado = true;
+                                        concepto = 'Prestamo otorgado por gerencia';
+                                        await updateDoc(doc(db, "Base", cedulaEmpleado), {
+                                            prestamoPaDescontar: parseInt(datos.prestamoPaDescontar) + parseInt(nuevovalor),
+                                            cuotasPrestamos: parseInt(p.cuotas) + parseInt(datos.cuotasPrestamos),
+                                        });
+                                    }
+                                    else {
+                                        aviso('El codigo no es valido', 'error');
+                                    }
+                                    if (encontrado == true) {
+                                        // modificar la variable estado dentro del arreglo y subir cambios a firebase
+                                        p.estado = false;
+                                        p.fechaEjecutado = new Date().toLocaleDateString()
+                                        p.jefeArea = username;
+                                        await updateDoc(doc(db, "Codigos", cod.id), {
+                                            prestamos: prestamos
+                                        });
+
+                                        // crear un nuevo registro en la coleccion historial
+                                        const docEmpleado = doc(db, "Historial", cedulaEmpleado);
+                                        const empleadoRef = await getDoc(docEmpleado);
+                                        let data = historial;
+                                        if (empleadoRef.exists()) {
+                                            data.cedula = cedulaEmpleado;
+                                            data.concepto = concepto;
+                                            data.fechaEfectuado = new Date().toLocaleDateString()
+                                            data.valor = nuevovalor;
+                                            data.cuotas = p.cuotas;
+                                            data.nombreQuienEntrego = username;
+                                            data.timesStamp = new Date().getTime();
+                                            await updateDoc(doc(db, "Historial", cedulaEmpleado), {
+                                                historia: arrayUnion(data)
+                                            });
+                                        }
+                                        else {
+                                            data.cedula = cedulaEmpleado;
+                                            data.concepto = concepto;
+                                            data.fechaEfectuado = new Date().toLocaleDateString()
+                                            data.valor = nuevovalor;
+                                            data.cuotas = p.cuotas;
+                                            data.nombreQuienEntrego = username;
+                                            data.timesStamp = new Date().getTime();
+                                            await setDoc(docEmpleado, {
+                                                historia: [data]
+                                            });
+                                        }
+                                    }
                                     aviso('Acaba de pedir un prestamo de ' + valor, 'success');
                                 }
                             }

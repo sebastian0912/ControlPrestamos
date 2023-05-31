@@ -63,7 +63,7 @@ numemoroM.addEventListener('keyup', (e) => {
 });
 
 /*Captura nombre y perfil*/
-/* 
+ 
 const docRef = doc(db, "Usuarios", idUsuario);
 const docSnap = await getDoc(docRef);
 
@@ -72,7 +72,7 @@ const perfilUsuario = docSnap.data().perfil;
 
 titulo.innerHTML = username;
 perfil.innerHTML = perfilUsuario;
-*/
+
 
 async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor) {
     const docCoordinador = doc(db, "Codigos", idUsuario);
@@ -84,9 +84,10 @@ async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor) {
         data.codigo = 'M' + data.codigo;
         data.uid = idUsuario;
         data.monto = nuevovalor;
-        data.cuotas = 2;
+        data.cuotas = cuotas;
         data.cedulaQuienPide = cedulaEmpleado;
         data.fechaGenerado = new Date().toLocaleDateString()
+        data.generadoPor = username;
         // Actualizar en la base de datos
         await updateDoc(doc(db, "Codigos", idUsuario), {
             prestamos: arrayUnion(data)
@@ -98,8 +99,10 @@ async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor) {
         data.codigo = 'M' + data.codigo;
         data.uid = idUsuario;
         data.monto = nuevovalor;
-        data.cuotas = 2;
+        data.cuotas = cuotas;
         data.cedulaQuienPide = cedulaEmpleado;
+        data.fechaGenerado = new Date().toLocaleDateString()
+        data.generadoPor = username;
         await setDoc(docCoordinador, {
             prestamos: [data]
         });
@@ -206,28 +209,3 @@ boton.addEventListener('click', async (e) => {
 }
 );
 
-/*   
-    const nombre = document.querySelector('#nombre');
-    const cedula = document.querySelector('#cedulaM');
-    const mercado = document.querySelector('#mercado');
-    const prestamo = document.querySelector('#prestamo');
-    const casino = document.querySelector('#casino');
-    const ancheta = document.querySelector('#ancheta');
-    const fondo = document.querySelector('#fondo');
-    const carnet = document.querySelector('#carnet');
-    const seguro = document.querySelector('#seguro');
-    const saldos = document.querySelector('#saldos');
-
-
-    nombre.innerHTML = datos.nombre;
-    cedula.innerHTML = datos.cedula;
-    saldos.innerHTML = datos.saldos;
-    mercado.innerHTML = datos.mercados;
-    prestamo.innerHTML = datos.prestamoPaDescontar;
-    casino.innerHTML = datos.casino;
-    ancheta.innerHTML = datos.anchetas;
-    fondo.innerHTML = datos.fondo;
-    carnet.innerHTML = datos.carnet;
-    seguro.innerHTML = datos.seguroFunerario;
-
-*/

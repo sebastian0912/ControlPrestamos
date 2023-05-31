@@ -11,7 +11,7 @@ let datos = {
     email: '',
     password: '',
     id: '',
-    perfil: 'Comercializadora',
+    perfil: 'Visitante',
     estadoQuincena: true,
 }
 

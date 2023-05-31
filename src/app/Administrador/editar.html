@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../reset.css" />
-    <link rel="stylesheet" href="tienda.css" />
+    <link rel="stylesheet" href="editar.css" />
 
     <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal@4/minimal.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
 
     <script defer src="../logOut.js" type="module"></script>
-    <script defer src="tienda.js" type="module"></script>
+    <script defer src="editar.js" type="module"></script>
 
 </head>
 
@@ -20,9 +20,16 @@
         <ul class="lista-Opciones">
 
             <li>
-                <a href="../coordinador.html">
+                <a href="./editar.html">
                     <img src="../assets/pagina-de-inicio.png" alt="logo" class="logo" />
                     <p>Inicio</p>
+                </a>
+            </li>
+
+            <li>
+                <a href="./eliminar.html">
+                    <img src="../assets/basura.png" alt="logo" class="logo" />
+                    <p>Eliminar</p>
                 </a>
             </li>
 
@@ -52,15 +59,12 @@
 
     <div class="contenido">
         <div class="cuadroTexto">
-            <div class="cajaCedula">
-                <h1 class="titulo"> Digite la cedula del empleado a validar </h1>
-                <input type="text" id="cedula" placeholder="Ingrese el numero de cedula a buscar" class="input" />
-                <button class="btn" id="boton">Buscar</button>
-            </div>
-
             <div class="valor">
-                <input type="text" id="valor" placeholder="Valor" class="input2" />
-                <input type="text" id="codigo" placeholder="Codigo" class="input2" />
+                <div class="valoresEscribir">
+                    <h1 class="titulo"> Seleccione el nombre del empleado a modificar </h1>
+                    <select id="miSelect"></select>
+                    <button class="btn" id="boton" style="display: none;">Editar</button>
+                </div>
             </div>
         </div>
 
@@ -68,3 +72,26 @@
 </body>
 
 </html>
+
+
+<!--
+    <head>
+        <link rel="stylesheet" href="editar.css" />
+        <script defer src="editar.js" type="module"></script>
+        
+        <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal@4/minimal.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    </head>
+    
+    <div class="container">
+        
+        <h1 id="username" class="titulo"></h1>
+        <h1 class="titulo2"> Seleccione el usuario a modificar </h1>
+        <select id="miSelect" ></select>
+        
+    </div>
+    <div class="valor">
+        <input type="text" id="cargo" placeholder="" style="display: none;" class="input2" />
+        <button class="btn" id="boton" style="display: none;">Buscar</button>
+    </div>
+-->

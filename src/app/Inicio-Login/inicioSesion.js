@@ -45,6 +45,12 @@ signInform.addEventListener('submit', async (e) => {
             else if (perfil == 'Comercializadora') {
                 window.location.href = "../Comercializadora/comercializadora.html";
             }
+            else if (perfil == 'Admin') {
+                window.location.href = "../Administrador/editar.html";
+            }
+            else {
+                aviso('No tienes acceso todavia, comunicate con el administrador', 'error');
+            }
         }
 
 

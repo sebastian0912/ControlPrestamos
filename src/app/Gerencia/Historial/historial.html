@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../../reset.css" />
-    <link rel="stylesheet" href="mercado.css" />
+    <link rel="stylesheet" href="historial.css" />
 
     <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal@4/minimal.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
 
     <script defer src="../../logOut2.js" type="module"></script>
-    <script defer src="mercado.js" type="module"></script>
+    <script defer src="historial.js" type="module"></script>
 
 </head>
 
@@ -19,36 +19,37 @@
     <div class="opciones">
         <ul class="lista-Opciones">
 
+
             <li>
-                <a href="../coordinador.html">
+                <a href="../gerencia.html">
                     <img src="../../assets/pagina-de-inicio.png" alt="logo" class="logo" />
-                    <p>Inicio</p>
+                    <p> Inicio </p>
                 </a>
             </li>
 
+
             <li>
-                <a href="../PrestamoPorHacer/PrestamoPorHacer.html">
+                <a href="../codigo/codigo.html">
                     <img src="../../assets/prestamo.png" alt="logo" class="logo" />
-                    <p> Prestamo para hacer </p>
+                    <p> Generar codigo </p>
                 </a>
             </li>
 
+
             <li>
-                <a href="../PrestamoPaHacer/PrestamoPaHacer.html">
-                    <img src="../../assets/pagar.png" alt="logo" class="logo" />
-                    <p> Prestamo para descontar </p>
+                <a href="#">
+                    <img src="../../assets/historial-medico.png" alt="logo" class="logo" />
+                    <p>Historial</p>
                 </a>
             </li>
 
-            <li>
-                <a href="mercado.html">
-                    <img src="../../assets/mercado.png" alt="logo" class="logo" />
-                    <p>Mercado</p>
-                </a>
+            <li id="extraeT">
+                <img src="../../assets/tienda.png" alt="logo" class="logo" />
+                <p>Extraer datos tienda</p>
             </li>
 
             <li id="logout">
-                <a href="">
+                <a href="#">
                     <img src="../../assets/cerrar-sesion.png" alt="logo" class="logo" />
                     <p>Cerrar Sesion</p>
                 </a>
@@ -67,12 +68,11 @@
         </div>
         <div class="perfil">
             <h1 clas class="titulo">Hola, <span id="username"></span></h1>
-      <h1 id="perfil" class="titulo"></h1>
+            <h1 id="perfil" class="titulo"></h1>
         </div>
     </header>
 
     <div class="contenido">
-
         <div class="cuadroTexto">
             <div class="cajaCedula">
                 <h1 class="titulo"> Digite la cedula del empleado a validar </h1>
@@ -80,11 +80,31 @@
                 <button class="btn" id="boton">Buscar</button>
             </div>
 
-            <div class="valor">
-                <input type="text" id="valor" placeholder="Valor" class="input2" />
-            </div>
         </div>
-    </div>
-</body>
-</html>
 
+        <div class="tabla" style="display: none;" id="oculto">
+            <table class="tabla-contenido">
+                <thead>
+                    <tr>
+                        <th>Cedula</th>
+                        <th>Concepto</th>
+                        <th>Fecha Efectuada</th>
+                        <th>Valor</th>
+                        <th>Cuotas</th>
+                        <th>Nombre quien atendio</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla"> </tbody>
+            </table>
+        </div>
+
+
+    </div>
+
+
+
+
+
+</body>
+
+</html>

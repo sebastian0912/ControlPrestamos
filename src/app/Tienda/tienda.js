@@ -1,198 +1,205 @@
 
-import { collection, doc, getDoc, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
+import { doc, getDoc, getDocs, setDoc, updateDoc, collection, onSnapshot, arrayUnion } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
 import { db } from "../firebase.js";
-import { codigo } from "../models/base.js";
+import { codigo, historial, tienda } from "../models/base.js";
 import { aviso } from "../Avisos/avisos.js";
 
-const idUsuario = localStorage.getItem("idUsuario");
-// MOSTRAR EN EL HTML EL NOMBRE DEL USUARIO LOGEADO
-const titulo = document.querySelector('#username');
-// capturar el id del usuario logeado del input
 
 const boton = document.querySelector('#boton');
+// capturar el id del usuario logeado del input
+const idUsuario = localStorage.getItem("idUsuario");
 
-const docRef = doc(db, "Usuarios", idUsuario);
-const docSnap = await getDoc(docRef);
-// capturar username
-const username = docSnap.data().username;
+// MOSTRAR EN EL HTML EL NOMBRE DEL USUARIO LOGEADO
+const titulo = document.querySelector('#username');
+const perfil = document.querySelector('#perfil');
+const numeroDias = document.querySelector('#diasRestantes');
 
-titulo.innerHTML = " ¡ BIENVENIDO " + username + " ! ";
 
-// darle click al boton para que se ejecute la funcion
-boton.addEventListener('click', async (e) => {
-    e.preventDefault();
-    // capturar los datos del formulario
-    const codigoP = document.querySelector('#codigo').value;
-    const valor = document.querySelector('#valor').value;
+/*Calculo cuantos dias faltan*/
+// Obtén la fecha actual
+var ahora = new Date();
+var anio = ahora.getFullYear();
+var mes = ahora.getMonth();
+var dia = 0;
 
-    const cedulaEmpleado = document.querySelector('#cedula').value;
-    const docRef = doc(db, "Base", cedulaEmpleado);
-    const docSnap = await getDoc(docRef);
+if (ahora.getDate() == 13 || ahora.getDate() == 14 || ahora.getDate() == 28 || ahora.getDate() == 29) {
+    dia = 0;
+}
+else if (ahora.getDate() < 13 || ahora.getDate() > 14) {
+    dia = 13;
+}
+else if (ahora.getDate() < 28 || ahora.getDate() > 29) {
+    dia = 28;
+}
 
-    const datos = docSnap.data();
+// Comprueba si el día ya ha pasado este mes
+if (ahora.getDate() > dia) {
+    // Si es así, cambia al próximo mes
+    mes++;
+}
+// Crea la fecha objetivo
+var fechaObjetivo = new Date(anio, mes, dia);
+// Calcula la diferencia en milisegundos
+var diferencia = fechaObjetivo - ahora;
+// Convierte la diferencia en días
+var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
+/*si el dia es 13 o 14 o 28 o 29 colocar numeroDias.innerHtml en rojo*/
 
-    if (datos.saldos == " - ") {
-        datos.saldos = 0;
-    }
+if (ahora.getDate() == 13 || ahora.getDate() == 14 || ahora.getDate() == 28 || ahora.getDate() == 29) {
+    numeroDias.style.color = "red";
+    numeroDias.innerHTML = dias;
+}
+else {
+    numeroDias.innerHTML = dias;
+}
 
-    if (datos.fondos == " - ") {
-        datos.fondos = 0;
-    }
-
-    if (datos.mercados == " - ") {
-        datos.mercados = 0;
-    }
-
-    if (datos.prestamoPaDescontar == " - ") {
-        datos.prestamoPaDescontar = 0;
-    }
-
-    if (datos.casino == " - ") {
-        datos.casino = 0;
-    }
-
-    if (datos.anchetas == " - ") {
-        datos.anchetas = 0;
-    }
-
-    if (datos.fondo == " - ") {
-        datos.fondo = 0;
-    }
-
-    if (datos.carnet == " - ") {
-        datos.carnet = 0;
-    }
-
-    if (datos.seguroFunerario == " - ") {
-        datos.seguroFunerario = 0;
-    }
-
-    if (datos.prestamoPaHacer == " - ") {
-        datos.prestamoPaHacer = 0;
-    }
-
-    if (datos.anticipoLiquidacion == " - ") {
-        datos.anticipoLiquidacion = 0;
-    }
-
-    if (datos.cuentas == " - ") {
-        datos.cuentas = 0;
-    }
-
-    if (datos.cuotasAnticipoLiquidacion == " - ") {
-        datos.cuotasAnticipoLiquidacion = 0;
-    }
-
-    if (datos.cuotasCasino == " - ") {
-        datos.cuotasCasino = 0;
-    }
-
-    if (datos.cuotasPrestamos == " - ") {
-        datos.cuotasPrestamos = 0;
-    }
-
-    if (datos.cuotasfondo == " - ") {
-        datos.cuotasfondo = 0;
-    }
-
-    const sumaTotal =
-        parseInt(datos.saldos) +
-        parseInt(datos.fondos) +
-        parseInt(datos.mercados) +
-        parseInt(datos.prestamoPaDescontar) +
-        parseInt(datos.casino) +
-        parseInt(datos.anchetas) +
-        parseInt(datos.fondo) +
-        parseInt(datos.carnet) +
-        parseInt(datos.seguroFunerario) +
-        parseInt(datos.prestamoPaHacer) +
-        parseInt(datos.anticipoLiquidacion) +
-        parseInt(datos.cuentas);
-    console.log(sumaTotal);
-
-    if (sumaTotal > 350000 && codigoP.charAt(0) != "G") {
-        aviso('Ups no se pueden generar prestamos has pasado tu tope 350.0000', 'error');
-    }
-    else if (sumaTotal > 500000 && codigoP.charAt(0) == "G") {
-        if ((sumaTotal + parseInt(valor)) <= 350000) {
-            const querySnapshot = await getDocs(collection(db, "Codigos"));
-            querySnapshot.forEach(async (cod) => {
-                const docRef = doc(db, "Codigos", cod.id);
-                const docSnap = await getDoc(docRef);
-                // recorrer arreglo llamado prestamos para buscar el codigo
-                const prestamos = docSnap.data().prestamos;
-                //console.log(prestamos);
-                prestamos.forEach(async (p) => {
-                    if (p.codigo == codigoP) {
-                        if (p.estado == false) {
-                            aviso('El codigo ya fue usado', 'error');
-                        }
-                        else {
-                            await updateDoc(doc(db, "Base", cedulaEmpleado), {
-                                mercados: parseInt(datos.mercados) + parseInt(valor),
-                                //cuotasMercados: 2,
-                            });
-                            // modificar la variable estado dentro del arreglo y subir cambios a firebase
-                            p.estado = false;
-                            p.lugar = "Mercado" + username;
-                            p.monto = valor;
-                            await updateDoc(doc(db, "Codigos", cod.id), {
-                                prestamos: prestamos
-                            });
-                            aviso('Acaba de pedir un prestamo de ' + valor, 'success');
-                        }
-                    }
-                    else {
-                        aviso('El codigo no existe', 'error');
-                    }
-                }
-                );
-            });
-        }
-        else {
-            aviso('Ups no se pueden generar prestamos has pasado tu tope 350.0000', 'error');
-        }
-    }
-    else {
-        if ((sumaTotal + parseInt(valor)) <= 350000) {
-            const querySnapshot = await getDocs(collection(db, "Codigos"));
-            querySnapshot.forEach(async (cod) => {
-                const docRef = doc(db, "Codigos", cod.id);
-                const docSnap = await getDoc(docRef);
-                // recorrer arreglo llamado prestamos para buscar el codigo
-                const prestamos = docSnap.data().prestamos;
-                //console.log(prestamos);
-                prestamos.forEach(async (p) => {
-                    if (p.codigo == codigoP) {
-                        if (p.estado == false) {
-                            aviso('El codigo ya fue usado', 'error');
-                        }
-                        else {
-                            await updateDoc(doc(db, "Base", cedulaEmpleado), {
-                                mercados: parseInt(datos.mercados) + parseInt(valor),
-                                //cuotasMercados: 2,
-                            });
-                            // modificar la variable estado dentro del arreglo y subir cambios a firebase
-                            p.estado = false;
-                            p.lugar = "Mercado" + username;
-                            p.monto = valor;
-                            await updateDoc(doc(db, "Codigos", cod.id), {
-                                prestamos: prestamos
-                            });
-                            aviso('Acaba de pedir un prestamo de ' + valor, 'success');
-                        }
-                    }
-                    else {
-                        aviso('El codigo no existe', 'error');
-                    }
-                }
-                );
-            });
-        }
-        else {
-            aviso('Ups no se pueden generar prestamos has pasado tu tope 350.0000', 'error');
-        }
+/*Convertir valor a separado por miles*/
+const numemoroM = document.querySelector('#valor');
+numemoroM.addEventListener('keyup', (e) => {
+    var num = numemoroM.value.replace(/\,/g, '');
+    if (!isNaN(num)) {
+        num = num.toString().split('').reverse().join('').replace(/(?=\d*\.?)(\d{3})/g, '$1,');
+        num = num.split('').reverse().join('').replace(/^[\,]/, '');
+        numemoroM.value = num;
+    } else {
+        alert('Solo se permiten números');
     }
 });
 
+
+//Captura nombre y perfil
+const docRef = doc(db, "Usuarios", idUsuario);
+const docSnap = await getDoc(docRef);
+
+const username = docSnap.data().username;
+const perfilUsuario = docSnap.data().perfil;
+
+titulo.innerHTML = username;
+perfil.innerHTML = perfilUsuario;
+
+
+
+boton.addEventListener('click', async (e) => {
+    e.preventDefault();
+
+    // capturar los datos del formulario
+    const codigoP = document.querySelector('#codigo').value;
+    const valor = document.querySelector('#valor').value;
+    const nuevovalor = valor.replace(/\,/g, '');
+
+    const cedulaEmpleado = document.querySelector('#cedula').value;
+    if (ahora.getDate() == 13 || ahora.getDate() == 14 || ahora.getDate() == 28 || ahora.getDate() == 29) {
+        /*si el campo codigoP esta vacio*/
+        aviso('No se pueden dar prestamos en este momento', 'error');
+    }
+    else {
+        if (codigoP == '') {
+            aviso('El campo codigo no puede estar vacio', 'error');
+        }
+        else {
+            const docRef = doc(db, "Base", cedulaEmpleado);
+            const docSnap = await getDoc(docRef);
+            const datos = docSnap.data();
+            const querySnapshot = await getDocs(collection(db, "Codigos"));
+            querySnapshot.forEach(async (cod) => {
+                const docRef = doc(db, "Codigos", cod.id);
+                const docSnap = await getDoc(docRef);
+                // recorrer arreglo llamado prestamos para buscar el codigo
+                const prestamos = docSnap.data().prestamos;
+                prestamos.forEach(async (p) => {
+                    if (p.cedulaQuienPide == cedulaEmpleado) {
+                        if (parseInt(p.monto) >= parseInt(nuevovalor)) {
+                            if (p.codigo == codigoP) {
+                                if (p.estado == false) {
+                                    aviso('El codigo ya fue usado', 'error');
+                                }
+                                else {
+                                    let concepto;
+                                    if (p.codigo.startsWith('M')) {
+                                        concepto = 'Mercado' + username;
+                                        await updateDoc(doc(db, "Base", cedulaEmpleado), {
+                                            mercados: parseInt(datos.mercados) + parseInt(nuevovalor),
+                                            cuotasMercados: parseInt(p.cuotas) + parseInt(datos.cuotasMercados),
+                                        });
+                                        // modificar la variable estado dentro del arreglo y subir cambios a firebase
+                                        p.estado = false;
+                                        p.fechaEjecutado = new Date().toLocaleDateString()
+                                        p.jefeArea = username;
+                                        p.lugar = 'Tienda ' + username;
+                                        await updateDoc(doc(db, "Codigos", cod.id), {
+                                            prestamos: prestamos
+                                        });
+                                        // modificamos los datos de la tienda
+                                        const docTienda = doc(db, "Tienda", idUsuario);
+                                        // datos de la tienda
+                                        const tiendaRef = await getDoc(docTienda);
+                                        if (!tiendaRef.exists()) {
+                                            await setDoc(docTienda, {
+                                                nombre: username,
+                                                codigo: idUsuario,
+                                                valorTotal: parseInt(nuevovalor),
+                                                numPersonasAtendidas: 1,
+                                            });
+                                        } else {
+                                            await updateDoc(doc(db, "Tienda", idUsuario), {
+                                                nombre: username,
+                                                codigo: idUsuario,
+                                                valorTotal: parseInt(tiendaRef.data().valorTotal) + parseInt(nuevovalor),
+                                                numPersonasAtendidas: parseInt(tiendaRef.data().numPersonasAtendidas) + 1,
+                                            });
+                                        }
+                                        // crear un nuevo registro en la coleccion historial
+                                        const docEmpleado = doc(db, "Historial", cedulaEmpleado);
+                                        const empleadoRef = await getDoc(docEmpleado);
+                                        let data = historial;
+                                        if (empleadoRef.exists()) {
+                                            data.cedula = cedulaEmpleado;
+                                            data.concepto = concepto;
+                                            data.fechaEfectuado = new Date().toLocaleDateString()
+                                            data.valor = nuevovalor;
+                                            data.cuotas = p.cuotas;
+                                            data.nombreQuienEntrego = username;
+                                            data.timesStamp = new Date().getTime();
+                                            await updateDoc(doc(db, "Historial", cedulaEmpleado), {
+                                                historia: arrayUnion(data)
+                                            });
+                                        }
+
+                                        else {
+                                            data.cedula = cedulaEmpleado;
+                                            data.concepto = concepto;
+                                            data.fechaEfectuado = new Date().toLocaleDateString()
+                                            data.valor = nuevovalor;
+                                            data.cuotas = p.cuotas;
+                                            data.nombreQuienEntrego = username;
+                                            data.timesStamp = new Date().getTime();
+                                            await setDoc(docEmpleado, {
+                                                historia: [data]
+                                            });
+                                        }
+                                    }
+                                    else {
+                                        aviso('El codigo no es valido', 'error');
+                                    }
+
+                                    aviso('Acaba de pedir un mercado de ' + valor, 'success');
+                                }
+                            }
+                            else {
+                                aviso('El codigo no existe', 'error');
+                            }
+                        }
+                        else {
+                            aviso('El monto del prestamo es mayor al permitido generado por el coodinador', 'error');
+                        }
+                    }
+                    else {
+                        aviso('El codigo no pertenece a este empleado', 'error');
+                    }
+                }
+                );
+            });
+        }
+    }
+});
 

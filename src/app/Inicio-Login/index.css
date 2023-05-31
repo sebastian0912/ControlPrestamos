@@ -15,8 +15,14 @@ body {
   /* Esto evitará que la imagen se repita. */
   background-position: center;
   /* Esto centrará la imagen en el elemento. */
-
 }
+
+@media (min-height: 850px) {
+  body {
+    height: 947px
+  }
+}
+
 
 .contenedor {
   display: flex;
