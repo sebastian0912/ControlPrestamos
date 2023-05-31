@@ -5,13 +5,20 @@
 }
 
 body {
-  background: #f6f5f7;
-  
+  background-image: url("../assets/descargar-bosque-montanas-atardecer-clima-fresco-minimalismo-1024x600-1-scaled.jpg");
+  ;
+  height: 845px;
   font-family: "Montserrat", sans-serif;
+  background-size: cover;
+  /* Esto hará que la imagen se ajuste para cubrir todo el elemento, en este caso el body. */
+  background-repeat: no-repeat;
+  /* Esto evitará que la imagen se repita. */
+  background-position: center;
+  /* Esto centrará la imagen en el elemento. */
 
 }
 
-.contenedor{
+.contenedor {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -104,7 +111,7 @@ input:focus {
   overflow: hidden;
   width: 768px;
   max-width: 100%;
-  min-height: 480px;  
+  min-height: 480px;
 }
 
 .form-container {
@@ -139,6 +146,7 @@ input:focus {
 }
 
 @keyframes show {
+
   0%,
   49.99% {
     opacity: 0;
@@ -219,16 +227,16 @@ input:focus {
 
 
 .social-container {
-	margin: 20px 0;
+  margin: 20px 0;
 }
 
 .social-container a {
-	border: 1px solid #DDDDDD;
-	border-radius: 50%;
-	display: inline-flex;
-	justify-content: center;
-	align-items: center;
-	margin: 0 5px;
-	height: 40px;
-	width: 40px;
+  border: 1px solid #DDDDDD;
+  border-radius: 50%;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 5px;
+  height: 40px;
+  width: 40px;
 }

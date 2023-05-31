@@ -86,7 +86,7 @@ async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor) {
         data.monto = nuevovalor;
         data.cuotas = 2;
         data.cedulaQuienPide = cedulaEmpleado;
-        data.fechaGenerado = new Date();
+        data.fechaGenerado = new Date().toLocaleDateString()
         // Actualizar en la base de datos
         await updateDoc(doc(db, "Codigos", idUsuario), {
             prestamos: arrayUnion(data)

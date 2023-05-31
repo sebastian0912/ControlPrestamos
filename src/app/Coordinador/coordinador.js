@@ -21,7 +21,7 @@ const prestamo = document.querySelector('#prestamo');
 const tabla = document.querySelector('#tabla');
 /*
 const unsub = onSnapshot(doc(db, "Codigos", idUsuario), (doc) => {    
-    const prestamos = doc.data().prestamos;
+    let prestamos = doc.data().prestamos;
     tabla.innerHTML = '';
     prestamos.forEach((p) => {
         tabla.innerHTML += `

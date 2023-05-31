@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../reset.css" />
+    <link rel="stylesheet" href="Enviar-lonas.css" />
+
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal@4/minimal.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+
+    <script defer src="../../logOut2.js" type="module"></script>
+    <script defer src="Enviar-lonas.js" type="module"></script>
+
+</head>
+
+<body>
+
+    <div class="opciones">
+        <ul class="lista-Opciones">
+
+            <li>
+                <a href="../comercializadora.html">
+                    <img src="../../assets/pagina-de-inicio.png" alt="logo" class="logo" />
+                    <p> Inicio </p>
+                </a>
+            </li>
+
+            <li>
+                <a href="Enviar-lonas.html">
+                    <img src="../../assets/camion-de-reparto.png" alt="logo" class="logo" />
+                    <p> Enviar lonas </p>
+                </a>
+            </li>
+
+            <li id="logout">
+                <a href="../Inicio-Login/index.html">
+                    <img src="../../assets/cerrar-sesion.png" alt="logo" class="logo" />
+                    <p>Cerrar Sesion</p>
+                </a>
+            </li>
+
+            <h1 class="diasT"> Dias restantes antes de cerrar quincena</h1>
+            <span class="dias" id="diasRestantes"></span>
+        </ul>
+    </div>
+
+    <header>
+        <div class="cajontitulo">
+            <h1 class="titulo">Bienvenido</h1>
+        </div>
+        <div class="perfil">
+            <h1 clas class="titulo">Hola, <span id="username"></span></h1>
+            <h1 id="perfil" class="titulo"></h1>
+        </div>
+    </header>
+
+    <div class="contenido">
+        <div class="cuadroTexto">
+            <div class="valor">
+                <div class="valoresEscribir">
+                    <h1 class="titulo"> Digite los campos del cargamento a subir </h1>
+                    <input type="text" id="cantidad" placeholder="Cantidad Lonas" class="input2" />
+                    <input type="text" id="valorUnidad" placeholder="Valor Unidad" class="input2" />
+                    <select id="miSelect2"></select>
+                    <input type="text" id="otro2" placeholder="Otro concepto" class="input2" style="display: none;" />
+                    <select id="miSelect"></select>
+                    <input type="text" id="otro" placeholder="Otra Sede" class="input2" style="display: none;" />
+                    <button class="btn" id="boton">Cargar info</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

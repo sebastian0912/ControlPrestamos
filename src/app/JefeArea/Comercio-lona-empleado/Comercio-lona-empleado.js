@@ -1,7 +1,7 @@
 
 import { codigo } from "../../models/base.js";
 import { aviso } from "../../Avisos/avisos.js";
-import { doc, getDoc, setDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
+import { doc, getDoc, setDoc, updateDoc, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
 import { db } from "../../firebase.js";
 
 const boton = document.querySelector('#boton');
@@ -37,14 +37,7 @@ querySnapshot.forEach((doc) => {
     aux.nombre = doc.data().barrio;
     datos.push(aux);
 });
-/*
-// rellenar el select con los datos de la base de datos
-datos.forEach((opcion) => {
-    const option = document.createElement('option');
-    option.text = opcion.nombre;
-    option.value = opcion.codigo;
-    miSelect.appendChild(option);
-});*/
+
 
 /*Calculo cuantos dias faltan*/
 // Obtén la fecha actual
@@ -79,12 +72,13 @@ numeroDias.innerHTML = dias;
 
 // Mostar contenido en una tabla
 const tabla = document.querySelector('#tabla');
+tabla.innerHTML = '';
 
 const querySnapshot3 = await getDocs(collection(db, "Comercio"));
+
 querySnapshot3.forEach(async (cod) => {
     const unsub = onSnapshot(doc(db, "Comercio", cod.id), (doc) => {
         const p = doc.data();
-        tabla.innerHTML = '';
         tabla.innerHTML += `
             <tr>
                 <td>${p.codigo}</td>
@@ -101,38 +95,6 @@ querySnapshot3.forEach(async (cod) => {
     });
 });
 
-
-
-/*
-// al darle click a cualquier opcion del select imprima el valor
-miSelect.addEventListener('change', async (e) => {
-    const querySnapshot = await getDocs(collection(db, "Sedes"));
-    const otro = document.querySelector('#otro');
-
-    console.log(e.target.value);
-    const boton = document.querySelector('#boton');
-    // capturar otro    
-    if (e.target.value == "6") {
-        let data = [ 
-            {
-                codigo: '',
-                barrio: '',
-            }
-        ]
-        otro.style.display = "block";
-        data.barrio = otro.value;   
-        /* insertar con el codigo de la sede 
-        boton.addEventListener('click', async (e) => {
-            await setDoc(doc(db, "Sedes", querySnapshot + 1), {
-                barrio: otro.value,
-            });
-            aviso("Se ha cargado la informacion exitosamente", "success");
-        }
-        );       
-    }
-}
-);*/
-
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
     const cantidad = document.querySelector('#cantidad').value;
@@ -143,15 +105,18 @@ boton.addEventListener('click', async (e) => {
     const docSnap = await getDoc(docRef);
     const datos = docSnap.data();
     await updateDoc(doc(db, "Comercio", codigo), {
-        cantidadRecibida: parseInt(datos.cantidadTotalEntregada) + parseInt(cantidad),
+        cantidadRecibida: parseInt(cantidad),
         PersonaRecibe: username,
+        cantidadTotalVendida : parseInt(datos.cantidadTotalVendida) + parseInt(cantidad),
+        fechaRecibida: new Date().toLocaleDateString()
     });
 
     const doocRef = doc(db, "Base", cedula);
     const doocSnap = await getDoc(doocRef);
     const datos2 = doocSnap.data();
     await updateDoc(doc(db, "Base", cedula), {
-        mercados: parseInt(datos2.mercados) + parceInt()
+        mercados: parseInt(datos2.mercados) + parceInt(),
+        cuotasMercados: parceInt(bases.cuotasMercados) + 2
     });
 
     aviso("Se ha cargado la informacion exitosamente", "success");

@@ -44,7 +44,9 @@ export let comercio = {
     cantidadEnvio : '',
     cantidadRecibida : '',
     valorUnidad : '',
-    cantidadTotalEntregada : '',
+    cantidadTotalVendida : 0,
     PersonaEnvia : '',
     PersonaRecibe : '',
+    fechaEnviada : '',
+    fechaRecibida : '',     
 }

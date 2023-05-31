@@ -1,27 +1,99 @@
-<html>
+<!DOCTYPE html>
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../reset.css" />
     <link rel="stylesheet" href="comercializadora.css" />
-    <script defer src="comercializadora.js" type="module"></script>
 
     <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal@4/minimal.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+
+    <script defer src="../logOut.js" type="module"></script>
+    <script defer src="comercializadora.js" type="module"></script>
+
 </head>
 
 <body>
-    <div class="container">
 
-        <h1 class="titulo2"> Digite para donde va la mercancia </h1>
-        
-        <div class="valor">
-            <input type="text" id="nombre" placeholder="Ingrese el nombre de la sede para donde va la mercancia" class="input" />
-            <input type="text" id="cantidad" placeholder="Ingrese cuantas lonas envia" class="input2" />
-        </div>
-        <button class="btn" id="boton">Buscar</button> <br>
+    <div class="opciones">
+        <ul class="lista-Opciones">
+
+            <li>
+                <a href="comercializadora.html">
+                    <img src="../assets/pagina-de-inicio.png" alt="logo" class="logo" />
+                    <p> Inicio </p>
+                </a>
+            </li>
+
+            <li>
+                <a href="./Enviar-lonas/Enviar-lonas.html">
+                    <img src="../assets/camion-de-reparto.png" alt="logo" class="logo" />
+                    <p> Enviar lonas </p>
+                </a>
+            </li>
+
+            <li id="logout">
+                <a href="../Inicio-Login/index.html">
+                    <img src="../assets/cerrar-sesion.png" alt="logo" class="logo" />
+                    <p>Cerrar Sesion</p>
+                </a>
+            </li>
+
+            <h1 class="diasT"> Dias restantes antes de cerrar quincena</h1>
+            <span class="dias" id="diasRestantes"></span>
+        </ul>
     </div>
 
+    <header>
+        <div class="cajontitulo">
+            <h1 class="titulo">Bienvenido</h1>
+        </div>
+        <div class="perfil">
+            <h1 clas class="titulo">Hola, <span id="username"></span></h1>
+            <h1 id="perfil" class="titulo"></h1>
+        </div>
+    </header>
 
+    <div class="contenido">
 
+        <div class="tabla">
+            <table class="tabla-contenido">
+                <thead>
+                    <tr>
+                        <th>Concepto</th>
+                        <th>Lugar</th>
+                        <th>Cantidad enviada</th>
+                        <th>Cantidad recibida</th>
+                        <th>Valor unidad</th>
+                        <th>Cantidad vendida</th>
+                        <th>Persona quien lo envio</th>
+                        <th>Persona quien recibe</th>
+                        <th>Fecha de envio</th>
+                        <th>Fecha de recepcion</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla"> </tbody>
+            </table>
+        </div>
+
+        <div class="tabla">
+            <table class="tabla-contenido">
+                <thead>
+                    <tr>
+                        <th>Concepto</th>
+                        <th>Lugar</th>
+                        <th>Cantidad enviada</th>
+                        <th>Cantidad recibida</th>
+                        <th>Valor unidad</th>
+                        <th>Cantidad vendida</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla2"> </tbody>
+            </table>
+        </div>
+
+    </div>
 </body>
 
 </html>
