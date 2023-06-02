@@ -28,49 +28,35 @@ const perfilUsuario = docSnap.data().perfil;
 titulo.innerHTML = username;
 perfil.innerHTML = perfilUsuario;
 
-let datos = [];
-const querySnapshot = await getDocs(collection(db, "Sedes"));
-let datos2 = [];
-const querySnapshot2 = await getDocs(collection(db, "Conceptos"));
-
-// consultar en las base de datos los conceptos y rellenar datos
-querySnapshot2.forEach((doc) => {
-    let aux = {
-        codigo: '',
-        concepto: '',
-    };
-    aux.codigo = doc.id;
-    aux.concepto = doc.data().concepto;
-    datos2.push(aux);
-});
-
-// rellenar el select con los datos de las sedes de la base de datos
-datos2.forEach((opcion) => {
-    const option = document.createElement('option');
-    option.text = opcion.concepto;
-    option.value = opcion.codigo;
-    miSelect2.appendChild(option);
-});
-
-// consultar en las base de datos las sedes y rellenar datos
-querySnapshot.forEach((doc) => {
-    let aux = {
-        codigo: '',
-        sede: '',
-    };
-    aux.codigo = doc.id;
-    aux.sede = doc.data().barrio;
-    datos.push(aux);
-});
+let datos = ["Faca Principal", "Faca Centro", "Rosal", "Cartagenita", "Madrid", "Funza", "Soacha", "Fontibón", "Suba", "Tocancipá", "Bosa"];
+let datos2 = ["Mercado", "Kit escolar", "Kit aseo", "Anchetas", "Matrimonios", "Kit velitas", "Kit amor y amistad", "Kit Día de las Madres", "Juguetes", "Kit dulces", "Otro"];
 
 
-// rellenar el select con los datos de las sedes de la base de datos
-datos.forEach((opcion) => {
-    const option = document.createElement('option');
-    option.text = opcion.sede;
-    option.value = opcion.codigo;
-    miSelect.appendChild(option);
-});
+// capturar el select
+let miSelect = document.querySelector('#miSelect');
+
+// capturar el select
+let miSelect2 = document.querySelector('#miSelect2');
+
+// recorrer el arreglo y mostrarlo en el select
+for (let i = 0; i < datos.length; i++) {
+    let opcion = document.createElement("option");
+    opcion.value = i + 1;
+    opcion.text = datos[i];
+    miSelect.appendChild(opcion);
+}
+
+// recorrer el arreglo y mostrarlo en el select
+for (let i = 0; i < datos2.length; i++) {
+    let opcion = document.createElement("option");
+    opcion.value = i + 1;
+    opcion.text = datos2[i];
+    miSelect2.appendChild(opcion);
+}
+
+
+
+
 
 /*Calculo cuantos dias faltan*/
 // Obtén la fecha actual
@@ -103,39 +89,6 @@ var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
 numeroDias.innerHTML = dias;
 
 // al darle click a cualquier opcion del select imprima el valor
-/*
-miSelect.addEventListener('change', async (e) => {
-    const querySnapshot = await getDocs(collection(db, "Sedes"));
-    const otro = document.querySelector('#otro');
-
-    const boton = document.querySelector('#boton');
-    // capturar otro    
-    if (e.target.value == "2") {
-        let data = {
-            barrio: '',
-            codigo: '',
-        };
-        otro.style.display = "inline-block";
-        boton.addEventListener('click', async (e) => {
-            data.codigo = querySnapshot.size + 1;
-            const otro2 = document.querySelector('#otro');
-            if (otro2.value == "") {
-                aviso("No se ha ingresado ningun valor", "error");
-            }
-            else {
-                data.barrio = otro2.value;
-                /* insertar con el codigo de la sede 
-                await setDoc(doc(db, "Sedes", (querySnapshot.size + 1).toString()), data);
-                aviso("Se ha cargado la informacion exitosamente", "success");
-            }
-        }
-        );
-    }
-    else {
-        otro.style.display = "none";
-    }
-}
-);*/
 
 
 let mostrarAviso = false;
@@ -143,7 +96,7 @@ miSelect2.addEventListener('change', async (e) => {
     const querySnapshot = await getDocs(collection(db, "Conceptos"));
     const otro = document.querySelector('#otro2');
 
-    if (e.target.value == "2") {
+    if (e.target.value == "11") {
         mostrarAviso = true;
         otro.style.display = "inline-block";
     } else {
@@ -157,20 +110,9 @@ boton.addEventListener('click', async (e) => {
         const otro2 = document.querySelector('#otro2');
         if (otro2.value == "") {
             aviso("No se ha ingresado ningun valor", "error");
-        } else {
-            let data = {
-                codigo: querySnapshot.size + 1,
-                concepto: otro2.value,
-            };
-
-            /* insertar con el codigo de la sede */
-            await setDoc(doc(db, "Conceptos", (querySnapshot.size + 1).toString()), data);
-            aviso("Se ha cargado la informacion exitosamente", "success");
-        }
+        } 
     }
 });
-
-
 
 
 // darle click al boton para que se ejecute la funcion
@@ -178,24 +120,18 @@ boton.addEventListener('click', async (e) => {
     e.preventDefault();
     const cantidad = document.querySelector('#cantidad').value;
     const valorUnidad = document.querySelector('#valorUnidad').value;
-    const otro = document.querySelector('#otro').value;
     const otro2 = document.querySelector('#otro2').value;
     let miSelect = document.querySelector('#miSelect').value;
     let miSelect2 = document.querySelector('#miSelect2').value;
 
-    if (otro != "") {
-        miSelect = otro;
-    }
-    else {
-        //acceder a la posicion 4 de datos
-        miSelect = datos[parseInt(miSelect) - 1].sede;
-    }
     if (otro2 != "") {
         miSelect2 = otro2;
-    }
+    }    
     else {
-        miSelect2 = datos2[parseInt(miSelect2) - 1].concepto;
+        miSelect2 = datos2[parseInt(miSelect2) - 1];
     }
+
+    miSelect = datos[parseInt(miSelect) - 1];
 
 
     let aux = comercio;
@@ -221,6 +157,7 @@ boton.addEventListener('click', async (e) => {
     aux.PersonaEnvia = username;
     aux.valorUnidad = valorUnidad;
     aux.fechaEnviada = new Date().toLocaleDateString();
+    console.log(aux);
     await setDoc(doc(db, "Comercio", uid.toString()), aux);
     aviso("Se ha cargado la informacion exitosamente, el codigo es: " + uid, "success");
 });

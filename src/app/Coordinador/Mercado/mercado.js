@@ -84,7 +84,8 @@ async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor) {
         data.codigo = 'M' + data.codigo;
         data.uid = idUsuario;
         data.monto = nuevovalor;
-        data.cuotas = cuotas;
+        data.cuotas = 2;
+        data.concepto = 'Mercado';
         data.cedulaQuienPide = cedulaEmpleado;
         data.fechaGenerado = new Date().toLocaleDateString()
         data.generadoPor = username;
@@ -99,7 +100,8 @@ async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor) {
         data.codigo = 'M' + data.codigo;
         data.uid = idUsuario;
         data.monto = nuevovalor;
-        data.cuotas = cuotas;
+        data.cuotas = 2;
+        data.concepto = 'Mercado';
         data.cedulaQuienPide = cedulaEmpleado;
         data.fechaGenerado = new Date().toLocaleDateString()
         data.generadoPor = username;
@@ -151,10 +153,7 @@ boton.addEventListener('click', async (e) => {
 
     const fechaActual = new Date();
 
-    if (fechaActual.getDate() == 13 || fechaActual.getDate() == 14 || fechaActual.getDate() == 28 /*|| fechaActual.getDate() == 29*/) {
-        aviso('¡ Ups no se pueden generar prestamos porque son el 13, 14, 28, 29 son dias bloqueados !', 'error');
-    }
-    else {
+
         if (datos.saldos >= 175000) {
             aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
         }
@@ -205,7 +204,7 @@ boton.addEventListener('click', async (e) => {
                 }
             }
         }
-    }
+    
 }
 );
 

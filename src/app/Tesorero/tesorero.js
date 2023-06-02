@@ -117,6 +117,8 @@ input.addEventListener('change', () => {
         loader.style.display = "block";
         h1Elemento.style.display = "block";
         guardarDatos(datosFinales);
+        over.style.display = "none";
+        loader.style.display = "none";
     }
 });
 

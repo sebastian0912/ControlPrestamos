@@ -75,7 +75,7 @@ let auxTiendas = 0;
 const querySnapshot3 = await getDocs(collection(db, "Usuarios"));
 querySnapshot3.forEach((doc) => {
     if (doc.data().perfil == "Tienda") {
-        auxCoordinadores++;
+        auxTiendas++;
     }
 });
 numeroTiendas.innerHTML = auxTiendas;

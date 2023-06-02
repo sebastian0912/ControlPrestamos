@@ -29,16 +29,16 @@ if (ahora.getDate() == 13 || ahora.getDate() == 14 || ahora.getDate() == 28 || a
     dia = 0;
 }
 else if (ahora.getDate() < 13 || ahora.getDate() > 14) {
-    dia = 13 ;
+    dia = 13;
 }
 else if (ahora.getDate() < 28 || ahora.getDate() > 29) {
-    dia = 28 ;
+    dia = 28;
 }
 
 // Comprueba si el día ya ha pasado este mes
 if (ahora.getDate() > dia) {
-  // Si es así, cambia al próximo mes
-  mes++;
+    // Si es así, cambia al próximo mes
+    mes++;
 }
 // Crea la fecha objetivo
 var fechaObjetivo = new Date(anio, mes, dia);
@@ -110,7 +110,7 @@ async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas) {
         data.cedulaQuienPide = cedulaEmpleado;
         data.fechaGenerado = new Date().toLocaleDateString()
         data.generadoPor = username;
-        
+
         await setDoc(docCoordinador, {
             prestamos: [data]
         });
@@ -159,44 +159,40 @@ boton.addEventListener('click', async (e) => {
 
     const fechaActual = new Date();
 
-    if (fechaActual.getDate() == 13 || fechaActual.getDate() == 14 || fechaActual.getDate() == 28 /*|| fechaActual.getDate() == 29*/) {
-        aviso('¡ Ups no se pueden generar prestamos porque son el 13, 14, 28, 29 son dias bloqueados !', 'error');
+    if (datos.saldos >= 175000) {
+        aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
+    }
+    else if (datos.fondos > 0) {
+        aviso('Ups no se pueden generar prestamos perteneces al fondo', 'error');
     }
     else {
-        if (datos.saldos >= 175000) {
-            aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
-        }
-        else if (datos.fondos > 0) {
-            aviso('Ups no se pueden generar prestamos perteneces al fondo', 'error');
-        }
-        else {
-            // conseguir la fecha actual y separarla en dia, mes y año para poder compararla con la fecha de ingreso del empleado            
-            let mesActual = fechaActual.getMonth() + 1;
-            let anioActual = fechaActual.getFullYear();
-            if ((anioActual == anio) && ((mesActual - mes) >= 2)) {
-                if (sumaTotal >= 350000 || (sumaTotal + parseInt(nuevovalor)) >= 350000) {
-                    aviso('Ups no se pueden generar prestamos porque superas los 350.000 permitidos', 'error');
-                }
-                else if (nuevovalor >= 200000) {
-                    aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
-                }
-                else {
-                    let data = codigo;
-                    escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas); 
-                }
+        // conseguir la fecha actual y separarla en dia, mes y año para poder compararla con la fecha de ingreso del empleado            
+        let mesActual = fechaActual.getMonth() + 1;
+        let anioActual = fechaActual.getFullYear();
+        if ((anioActual == anio) && ((mesActual - mes) >= 2)) {
+            if (sumaTotal >= 350000 || (sumaTotal + parseInt(nuevovalor)) >= 350000) {
+                aviso('Ups no se pueden generar prestamos porque superas los 350.000 permitidos', 'error');
             }
-            else if ((anioActual > anio)) {
-                if (sumaTotal >= 350000 || (sumaTotal + parseInt(nuevovalor)) >= 350000) {
-                    aviso('Ups no se pueden generar prestamos porque superas los 350.000 permitidos', 'error');
-                }
-                else if (nuevovalor >= 200000) {
-                    aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
-                }
-                else {
-                    let data = codigo;
-                    escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas); 
-                }
-            }       
+            else if (nuevovalor >= 200000) {
+                aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
+            }
+            else {
+                let data = codigo;
+                escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas);
+            }
+        }
+        else if ((anioActual > anio)) {
+            if (sumaTotal >= 350000 || (sumaTotal + parseInt(nuevovalor)) >= 350000) {
+                aviso('Ups no se pueden generar prestamos porque superas los 350.000 permitidos', 'error');
+            }
+            else if (nuevovalor >= 200000) {
+                aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
+            }
+            else {
+                let data = codigo;
+                escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas);
+            }
         }
     }
+
 });

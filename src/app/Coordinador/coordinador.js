@@ -17,27 +17,6 @@ const mercado = document.querySelector('#mercado');
 const prestamo = document.querySelector('#prestamo');
 
 
-// Mostar contenido en una tabla
-const tabla = document.querySelector('#tabla');
-/*
-const unsub = onSnapshot(doc(db, "Codigos", idUsuario), (doc) => {    
-    let prestamos = doc.data().prestamos;
-    tabla.innerHTML = '';
-    prestamos.forEach((p) => {
-        tabla.innerHTML += `
-        <tr>
-            <td>${p.codigo}</td>            
-            <td>${p.monto}</td>
-            <td>${p.cuotas}</td>
-            <td>${p.estado}</td>
-            <td>${p.lugar}</td>
-            <td>${p.cedulaQuienPide}</td>
-        </tr>
-        `
-    }
-    );
-});*/
-
 
 /*Calculo cuantos dias faltan*/
 // Obtén la fecha actual
@@ -61,7 +40,6 @@ if (ahora.getDate() > dia) {
     // Si es así, cambia al próximo mes
     mes++;
 }
-// Crea la fecha objetivo
 var fechaObjetivo = new Date(anio, mes, dia);
 // Calcula la diferencia en milisegundos
 var diferencia = fechaObjetivo - ahora;
@@ -78,32 +56,53 @@ else {
 
 
 /* obtener el numero de empleados y actulizar con onsnapshot*/
-/*
+
 const querySnapshot = await getDocs(collection(db, "Base"));
-numeroTotal.innerHTML = querySnapshot.size;*/
+numeroTotal.innerHTML = querySnapshot.size;
 
 
-/*Obtener el numero de solicitudes sin realizar
+/*Obtener el numero de solicitudes sin realizar*/
 let auxSolicitudes = 0;
 const docRef = doc(db, "Codigos", idUsuario);
 const docSnap = await getDoc(docRef);
 // recorrer arreglo llamado prestamos para buscar el codigo
 const prestamos = docSnap.data().prestamos;
 prestamos.forEach(async (p) => {
-    console.log('entro al for');
     if (p.estado == true) {
         auxSolicitudes++;
     }
 });
-numeroSolicitudesPendientes.innerHTML = auxSolicitudes;*/
+numeroSolicitudesPendientes.innerHTML = auxSolicitudes;
 
-/*Captura nombre y perfil
-const docRef = doc(db, "Usuarios", idUsuario);
-const docSnap = await getDoc(docRef);
+/*Captura nombre y perfil*/
+const docRef2 = doc(db, "Usuarios", idUsuario);
+const docSnap2 = await getDoc(docRef2);
 
-const username = docSnap.data().username;
-const perfilUsuario = docSnap.data().perfil;
+const username = docSnap2.data().username;
+const perfilUsuario = docSnap2.data().perfil;
 
 titulo.innerHTML = username;
-perfil.innerHTML = perfilUsuario;*/
+perfil.innerHTML = perfilUsuario;
 
+// Mostar contenido en una tabla
+const tabla = document.querySelector('#tabla');
+
+const unsub = onSnapshot(doc(db, "Codigos", idUsuario), (doc) => {    
+    let prestamos = doc.data().prestamos;
+    tabla.innerHTML = '';
+    prestamos.forEach((p) => {
+        tabla.innerHTML += `
+        <tr>
+            <td>${p.codigo}</td>            
+            <td>${p.monto}</td>
+            <td>${p.cuotas}</td>
+            <td>${p.estado}</td>
+            <td>${p.Concepto}</td>
+            <td>${p.cedulaQuienPide}</td>
+        </tr>
+        `
+    }
+    );
+});
+
+// Crea la fecha objetivo

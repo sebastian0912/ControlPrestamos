@@ -13,7 +13,6 @@ const idUsuario = localStorage.getItem("idUsuario");
 const titulo = document.querySelector('#username');
 const perfil = document.querySelector('#perfil');
 const numeroDias = document.querySelector('#diasRestantes');
-const querySnapshot = await getDocs(collection(db, "Sedes"));
 
 ///Captura nombre y perfil
 const docRef = doc(db, "Usuarios", idUsuario);
@@ -25,18 +24,6 @@ const perfilUsuario = docSnap.data().perfil;
 titulo.innerHTML = username;
 perfil.innerHTML = perfilUsuario;
 
-let datos = [];
-
-// consultar en las base de datos las sedes y rellenar datos
-querySnapshot.forEach((doc) => {
-    let aux = {
-        codigo: '',
-        nombre: '',
-    };
-    aux.codigo = doc.id;
-    aux.nombre = doc.data().barrio;
-    datos.push(aux);
-});
 
 
 /*Calculo cuantos dias faltan*/
@@ -87,7 +74,7 @@ querySnapshot3.forEach(async (cod) => {
                 <td>${p.cantidadEnvio}</td>
                 <td>${p.cantidadRecibida}</td>
                 <td>${p.valorUnidad}</td>
-                <td>${p.cantidadTotalEntregada}</td>
+                <td>${p.cantidadTotalVendida}</td>
                 <td>${p.PersonaEnvia}</td>
                 <td>${p.PersonaRecibe}</td>
             </tr>
@@ -105,10 +92,7 @@ boton.addEventListener('click', async (e) => {
     const docSnap = await getDoc(docRef);
     const datos = docSnap.data();
     await updateDoc(doc(db, "Comercio", codigo), {
-        cantidadRecibida: parseInt(cantidad),
-        PersonaRecibe: username,
         cantidadTotalVendida : parseInt(datos.cantidadTotalVendida) + parseInt(cantidad),
-        fechaRecibida: new Date().toLocaleDateString()
     });
 
     const doocRef = doc(db, "Base", cedula);

@@ -11,8 +11,9 @@ let datos = {
     email: '',
     password: '',
     id: '',
-    perfil: 'Visitante',
+    perfil: 'Admin',
     estadoQuincena: true,
+    
 }
 
 signupForm.addEventListener('submit', async (e) => {

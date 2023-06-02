@@ -29,7 +29,7 @@ export let codigo = {
     monto : '',
     cuotas : '',
     estado : true,
-    lugar : 'Prestamo',
+    Concepto : 'Prestamo',
     cedulaQuienPide : '',    
     generadoPor : '',
     fechaGenerado : '',

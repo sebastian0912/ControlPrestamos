@@ -51,11 +51,7 @@ signInform.addEventListener('submit', async (e) => {
             else {
                 aviso('No tienes acceso todavia, comunicate con el administrador', 'error');
             }
-        }
-
-
-
-        //window.location.href = "../app/Tesorero/tesorero.html";
+        }        
     } catch (error) {
         console.log(error.message);
         if (error.code === 'auth/wrong-password') {

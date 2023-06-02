@@ -88,7 +88,7 @@ async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas) {
     if (coordninador.exists()) {
         // generar un codigo aleatorio para el prestamo
         data.codigo = Math.floor(Math.random() * 1000000);
-        data.codigo = 'GOH' + data.codigo;
+        data.codigo = 'GPH' + data.codigo;
         data.uid = idUsuario;
         data.monto = nuevovalor;
         data.cuotas = cuotas;
@@ -103,7 +103,7 @@ async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas) {
     }
     else {
         data.codigo = Math.floor(Math.random() * 1000000);
-        data.codigo = 'GOH' + data.codigo;
+        data.codigo = 'GPH' + data.codigo;
         data.uid = idUsuario;
         data.monto = nuevovalor;
         data.cuotas = 2;

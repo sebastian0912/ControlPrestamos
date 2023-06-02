@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../reset.css" />
-    <link rel="stylesheet" href="jefeArea.css" />
+    <link rel="stylesheet" href="../../reset.css" />
+    <link rel="stylesheet" href="historial.css" />
 
     <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal@4/minimal.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
 
-    <script defer src="../logOut.js" type="module"></script>
-    <script defer src="jefeArea.js" type="module"></script>
+    <script defer src="../../logOut2.js" type="module"></script>
+    <script defer src="historial.js" type="module"></script>
 
 </head>
 
@@ -20,31 +20,31 @@
         <ul class="lista-Opciones">
 
             <li>
-                <a href="jefeArea.html">
-                    <img src="../assets/prestamo.png" alt="logo" class="logo" />
-                    <p> Prestamo </p>
+                <a href="../tesorero.html">
+                    <img src="../../assets/pagina-de-inicio.png" alt="logo" class="logo" />
+                    <p>Inicio </p>
                 </a>
             </li>
 
-            <li>
-                <a href="./Comercio/comercializadora.html">
-                    <img src="../assets/cesta-de-la-compra.png" alt="logo" class="logo" />
-                    <p>Comercializadora</p>
+            <li id="extrae">
+                <a href="./historial.html">
+                    <img src="../../assets/historial-medico.png" alt="logo" class="logo" />
+                    <p>Historial</p>
                 </a>
             </li>
 
 
             <li id="logout">
-                <a href="../Inicio-Login/index.html">
-                    <img src="../assets/cerrar-sesion.png" alt="logo" class="logo" />
-                    <p>Cerrar Sesion</p>
-                </a>
+                <img src="../../assets/cerrar-sesion.png" alt="logo" class="logo" />
+                <p>Cerrar Sesion</p>
             </li>
 
             <h1 class="diasT"> Dias restantes antes de liquidacion</h1>
             <span class="dias" id="diasRestantes"></span>
+
         </ul>
     </div>
+
 
     <header>
         <div class="cajontitulo">
@@ -64,13 +64,31 @@
                 <button class="btn" id="boton">Buscar</button>
             </div>
 
-            <div class="valor">
-                <input type="text" id="valor" placeholder="Valor" class="input2" />
-                <input type="text" id="codigo" placeholder="Codigo" class="input2" />
-            </div>
         </div>
 
+        <div class="tabla" style="display: none;" id="oculto">
+            <table class="tabla-contenido">
+                <thead>
+                    <tr>
+                        <th>Cedula</th>
+                        <th>Concepto</th>
+                        <th>Fecha Efectuada</th>
+                        <th>Valor</th>
+                        <th>Cuotas</th>
+                        <th>Nombre quien atendio</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla"> </tbody>
+            </table>
+        </div>
+
+
     </div>
+
+
+
+
+
 </body>
 
 </html>

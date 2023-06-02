@@ -13,7 +13,6 @@ const idUsuario = localStorage.getItem("idUsuario");
 const titulo = document.querySelector('#username');
 const perfil = document.querySelector('#perfil');
 const numeroDias = document.querySelector('#diasRestantes');
-const querySnapshot = await getDocs(collection(db, "Sedes"));
 
 //Captura nombre y perfil
 const docRef = doc(db, "Usuarios", idUsuario);
@@ -25,26 +24,6 @@ const perfilUsuario = docSnap.data().perfil;
 titulo.innerHTML = username;
 perfil.innerHTML = perfilUsuario;
 
-let datos = [];
-
-// consultar en las base de datos las sedes y rellenar datos
-querySnapshot.forEach((doc) => {
-    let aux = {
-        codigo: '',
-        nombre: '',
-    };
-    aux.codigo = doc.id;
-    aux.nombre = doc.data().barrio;
-    datos.push(aux);
-});
-/*
-// rellenar el select con los datos de la base de datos
-datos.forEach((opcion) => {
-    const option = document.createElement('option');
-    option.text = opcion.nombre;
-    option.value = opcion.codigo;
-    miSelect.appendChild(option);
-});*/
 
 /*Calculo cuantos dias faltan*/
 // Obtén la fecha actual
@@ -76,39 +55,10 @@ var diferencia = fechaObjetivo - ahora;
 var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
 numeroDias.innerHTML = dias;
 
-/*
-// al darle click a cualquier opcion del select imprima el valor
-miSelect.addEventListener('change', async (e) => {
-    const querySnapshot = await getDocs(collection(db, "Sedes"));
-    const otro = document.querySelector('#otro');
-
-    console.log(e.target.value);
-    const boton = document.querySelector('#boton');
-    // capturar otro    
-    if (e.target.value == "6") {
-        let data = [ 
-            {
-                codigo: '',
-                barrio: '',
-            }
-        ]
-        otro.style.display = "block";
-        data.barrio = otro.value;   
-        /* insertar con el codigo de la sede 
-        boton.addEventListener('click', async (e) => {
-            await setDoc(doc(db, "Sedes", querySnapshot + 1), {
-                barrio: otro.value,
-            });
-            aviso("Se ha cargado la informacion exitosamente", "success");
-        }
-        );       
-    }
-}
-);*/
 
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
-    const cantidad = document.querySelector('#cantidad').value;
+    const cantidad = document.querySelector('#Cantidad').value;
     //const valorUnidad = document.querySelector('#valorUnidad').value;
     const codigo = document.querySelector('#codigo').value;
     ///const otro = document.querySelector('#otro').value;

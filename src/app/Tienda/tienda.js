@@ -88,118 +88,111 @@ boton.addEventListener('click', async (e) => {
     const nuevovalor = valor.replace(/\,/g, '');
 
     const cedulaEmpleado = document.querySelector('#cedula').value;
-    if (ahora.getDate() == 13 || ahora.getDate() == 14 || ahora.getDate() == 28 || ahora.getDate() == 29) {
-        /*si el campo codigoP esta vacio*/
-        aviso('No se pueden dar prestamos en este momento', 'error');
+    if (codigoP == '') {
+        aviso('El campo codigo no puede estar vacio', 'error');
     }
     else {
-        if (codigoP == '') {
-            aviso('El campo codigo no puede estar vacio', 'error');
-        }
-        else {
-            const docRef = doc(db, "Base", cedulaEmpleado);
+        const docRef = doc(db, "Base", cedulaEmpleado);
+        const docSnap = await getDoc(docRef);
+        const datos = docSnap.data();
+        const querySnapshot = await getDocs(collection(db, "Codigos"));
+        querySnapshot.forEach(async (cod) => {
+            const docRef = doc(db, "Codigos", cod.id);
             const docSnap = await getDoc(docRef);
-            const datos = docSnap.data();
-            const querySnapshot = await getDocs(collection(db, "Codigos"));
-            querySnapshot.forEach(async (cod) => {
-                const docRef = doc(db, "Codigos", cod.id);
-                const docSnap = await getDoc(docRef);
-                // recorrer arreglo llamado prestamos para buscar el codigo
-                const prestamos = docSnap.data().prestamos;
-                prestamos.forEach(async (p) => {
-                    if (p.cedulaQuienPide == cedulaEmpleado) {
-                        if (parseInt(p.monto) >= parseInt(nuevovalor)) {
-                            if (p.codigo == codigoP) {
-                                if (p.estado == false) {
-                                    aviso('El codigo ya fue usado', 'error');
-                                }
-                                else {
-                                    let concepto;
-                                    if (p.codigo.startsWith('M')) {
-                                        concepto = 'Mercado' + username;
-                                        await updateDoc(doc(db, "Base", cedulaEmpleado), {
-                                            mercados: parseInt(datos.mercados) + parseInt(nuevovalor),
-                                            cuotasMercados: parseInt(p.cuotas) + parseInt(datos.cuotasMercados),
-                                        });
-                                        // modificar la variable estado dentro del arreglo y subir cambios a firebase
-                                        p.estado = false;
-                                        p.fechaEjecutado = new Date().toLocaleDateString()
-                                        p.jefeArea = username;
-                                        p.lugar = 'Tienda ' + username;
-                                        await updateDoc(doc(db, "Codigos", cod.id), {
-                                            prestamos: prestamos
-                                        });
-                                        // modificamos los datos de la tienda
-                                        const docTienda = doc(db, "Tienda", idUsuario);
-                                        // datos de la tienda
-                                        const tiendaRef = await getDoc(docTienda);
-                                        if (!tiendaRef.exists()) {
-                                            await setDoc(docTienda, {
-                                                nombre: username,
-                                                codigo: idUsuario,
-                                                valorTotal: parseInt(nuevovalor),
-                                                numPersonasAtendidas: 1,
-                                            });
-                                        } else {
-                                            await updateDoc(doc(db, "Tienda", idUsuario), {
-                                                nombre: username,
-                                                codigo: idUsuario,
-                                                valorTotal: parseInt(tiendaRef.data().valorTotal) + parseInt(nuevovalor),
-                                                numPersonasAtendidas: parseInt(tiendaRef.data().numPersonasAtendidas) + 1,
-                                            });
-                                        }
-                                        // crear un nuevo registro en la coleccion historial
-                                        const docEmpleado = doc(db, "Historial", cedulaEmpleado);
-                                        const empleadoRef = await getDoc(docEmpleado);
-                                        let data = historial;
-                                        if (empleadoRef.exists()) {
-                                            data.cedula = cedulaEmpleado;
-                                            data.concepto = concepto;
-                                            data.fechaEfectuado = new Date().toLocaleDateString()
-                                            data.valor = nuevovalor;
-                                            data.cuotas = p.cuotas;
-                                            data.nombreQuienEntrego = username;
-                                            data.timesStamp = new Date().getTime();
-                                            await updateDoc(doc(db, "Historial", cedulaEmpleado), {
-                                                historia: arrayUnion(data)
-                                            });
-                                        }
-
-                                        else {
-                                            data.cedula = cedulaEmpleado;
-                                            data.concepto = concepto;
-                                            data.fechaEfectuado = new Date().toLocaleDateString()
-                                            data.valor = nuevovalor;
-                                            data.cuotas = p.cuotas;
-                                            data.nombreQuienEntrego = username;
-                                            data.timesStamp = new Date().getTime();
-                                            await setDoc(docEmpleado, {
-                                                historia: [data]
-                                            });
-                                        }
-                                    }
-                                    else {
-                                        aviso('El codigo no es valido', 'error');
-                                    }
-
-                                    aviso('Acaba de pedir un mercado de ' + valor, 'success');
-                                }
+            // recorrer arreglo llamado prestamos para buscar el codigo
+            const prestamos = docSnap.data().prestamos;
+            for (let i = 0; i < prestamos.length; i++) {
+                let p = prestamos[i];
+                if (p.cedulaQuienPide == cedulaEmpleado) {
+                    if (parseInt(p.monto) >= parseInt(nuevovalor)) {
+                        if (p.codigo == codigoP) {
+                            if (p.estado == false) {
+                                aviso('El codigo ya fue usado', 'error');
                             }
                             else {
-                                aviso('El codigo no existe', 'error');
+                                let concepto;
+                                if (p.codigo.startsWith("M")) {
+                                    concepto = 'Mercado' + username;
+                                    await updateDoc(doc(db, "Base", cedulaEmpleado), {
+                                        mercados: parseInt(datos.mercados) + parseInt(nuevovalor),
+                                        cuotasMercados: parseInt(p.cuotas) + parseInt(datos.cuotasMercados),
+                                    });
+                                    // modificar la variable estado dentro del arreglo y subir cambios a firebase
+                                    p.estado = false;
+                                    p.fechaEjecutado = new Date().toLocaleDateString()
+                                    p.jefeArea = username;
+                                    p.lugar = 'Tienda ' + username;
+                                    await updateDoc(doc(db, "Codigos", cod.id), {
+                                        prestamos: prestamos
+                                    });
+                                    // modificamos los datos de la tienda
+                                    const docTienda = doc(db, "Tienda", idUsuario);
+                                    // datos de la tienda
+                                    const tiendaRef = await getDoc(docTienda);
+                                    if (!tiendaRef.exists()) {
+                                        await setDoc(docTienda, {
+                                            nombre: username,
+                                            codigo: idUsuario,
+                                            valorTotal: parseInt(nuevovalor),
+                                            numPersonasAtendidas: 1,
+                                        });
+                                    } else {
+                                        await updateDoc(doc(db, "Tienda", idUsuario), {
+                                            nombre: username,
+                                            codigo: idUsuario,
+                                            valorTotal: parseInt(tiendaRef.data().valorTotal) + parseInt(nuevovalor),
+                                            numPersonasAtendidas: parseInt(tiendaRef.data().numPersonasAtendidas) + 1,
+                                        });
+                                    }
+                                    // crear un nuevo registro en la coleccion historial
+                                    const docEmpleado = doc(db, "Historial", cedulaEmpleado);
+                                    const empleadoRef = await getDoc(docEmpleado);
+                                    let data = historial;
+                                    if (empleadoRef.exists()) {
+                                        data.cedula = cedulaEmpleado;
+                                        data.concepto = concepto;
+                                        data.fechaEfectuado = new Date().toLocaleDateString()
+                                        data.valor = nuevovalor;
+                                        data.cuotas = p.cuotas;
+                                        data.nombreQuienEntrego = username;
+                                        data.timesStamp = new Date().getTime();
+                                        await updateDoc(doc(db, "Historial", cedulaEmpleado), {
+                                            historia: arrayUnion(data)
+                                        });
+                                    }
+
+                                    else {
+                                        data.cedula = cedulaEmpleado;
+                                        data.concepto = concepto;
+                                        data.fechaEfectuado = new Date().toLocaleDateString()
+                                        data.valor = nuevovalor;
+                                        data.cuotas = p.cuotas;
+                                        data.nombreQuienEntrego = username;
+                                        data.timesStamp = new Date().getTime();
+                                        await setDoc(docEmpleado, {
+                                            historia: [data]
+                                        });
+                                    }
+                                    aviso('Acaba de pedir un mercado de ' + valor, 'success');
+                                }
+                                else {
+                                    aviso('El codigo no es valido', 'error');
+                                }
+
                             }
-                        }
-                        else {
-                            aviso('El monto del prestamo es mayor al permitido generado por el coodinador', 'error');
-                        }
+                        }                        
                     }
                     else {
-                        aviso('El codigo no pertenece a este empleado', 'error');
+                        aviso('El monto del prestamo es mayor al permitido generado por el coodinador', 'error');
                     }
                 }
-                );
-            });
-        }
+                else {
+                    aviso('El codigo no pertenece a este empleado', 'error');
+                }
+            }
+
+        });
     }
+
 });
 
