@@ -8,15 +8,15 @@ const boton = document.querySelector('#boton');
 const idUsuario = localStorage.getItem("idUsuario");
 
 // MOSTRAR EN EL HTML EL NOMBRE DEL USUARIO LOGEADO
+// Capturar el h1 del titulo y perfil
 const titulo = document.querySelector('#username');
 const perfil = document.querySelector('#perfil');
-const numeroTotal = document.querySelector('#numeroEmpleados');
-const numeroSolicitudesPendientes = document.querySelector('#numeroSolicitudesPendientes');
-const numeroDias = document.querySelector('#diasRestantes');
-
-
-const mercado = document.querySelector('#mercado');
-const prestamo = document.querySelector('#prestamo');
+// Capturar el PERFIL y el USERNAME del local storage
+const perfilLocal = localStorage.getItem("perfil");
+const usernameLocal = localStorage.getItem("username");
+//Muestra en la parte superior el nombre y el perfil
+titulo.innerHTML = usernameLocal;
+perfil.innerHTML = perfilLocal;
 
 /*Calculo cuantos dias faltan*/
 // Obtén la fecha actual
@@ -25,14 +25,15 @@ var anio = ahora.getFullYear();
 var mes = ahora.getMonth();
 var dia = 0;
 
-if (ahora.getDate() == 13 || ahora.getDate() == 14 || ahora.getDate() == 28 || ahora.getDate() == 29) {
+if (ahora.getDate() == 15 || ahora.getDate() == 30) {
     dia = 0;
+    numeroDias.style.color = "red";
 }
-else if (ahora.getDate() < 13 || ahora.getDate() > 14) {
-    dia = 13;
+else if (ahora.getDate() < 15) {
+    dia = 15;
 }
-else if (ahora.getDate() < 28 || ahora.getDate() > 29) {
-    dia = 28;
+else if (ahora.getDate() < 30) {
+    dia = 30;
 }
 
 // Comprueba si el día ya ha pasado este mes
@@ -46,13 +47,27 @@ var fechaObjetivo = new Date(anio, mes, dia);
 var diferencia = fechaObjetivo - ahora;
 // Convierte la diferencia en días
 var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
+diasRestantes.innerHTML = dias;
 
-if (ahora.getDate() == 13 || ahora.getDate() == 14 || ahora.getDate() == 28 || ahora.getDate() == 29) {
-    numeroDias.style.color = "red";
-    numeroDias.innerHTML = dias;
-}
-else {
-    numeroDias.innerHTML = dias;
+
+// Mostrar en el html el numero de dias Restantes de liquidacion
+var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05']
+// Recorre el arreglo y muestra los dias restantes deacuerdo a la fecha
+for (let i = 0; i < fechaObjetivo2.length; i++) {
+    // separar por año, mes y dia
+    var fechaObjetivo3 = new Date(fechaObjetivo2[i]);
+    if (fechaObjetivo3.getFullYear() == ahora.getFullYear() &&
+        fechaObjetivo3.getMonth() == ahora.getMonth() &&
+        fechaObjetivo3.getDate() >= ahora.getDate()) {
+
+        var diferencia2 = fechaObjetivo3 - ahora;
+        var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
+        if (dias2 == 0) {
+            diasLi.style.color = "red";
+        }
+        diasLi.innerHTML = dias2;
+        break;
+    }
 }
 
 /*Convertir valor a separado por miles*/
@@ -65,35 +80,26 @@ numemoroM.addEventListener('keyup', (e) => {
         numemoroM.value = num;
     } else {
         alert('Solo se permiten números');
+        numemoroM.value = numemoroM.value.replace(/[^\d\,]*/g, '');
     }
 });
 
-/*Captura nombre y perfil*/
 
-const docRef = doc(db, "Usuarios", idUsuario);
-const docSnap = await getDoc(docRef);
-
-const username = docSnap.data().username;
-const perfilUsuario = docSnap.data().perfil;
-
-titulo.innerHTML = username;
-perfil.innerHTML = perfilUsuario;
-
-
-async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas) {
+async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor) {
     const docCoordinador = doc(db, "Codigos", idUsuario);
     const coordninador = await getDoc(docCoordinador);
-
+    
     if (coordninador.exists()) {
         // generar un codigo aleatorio para el prestamo
         data.codigo = Math.floor(Math.random() * 1000000);
-        data.codigo = 'OH' + data.codigo;
+        data.codigo = 'M' + data.codigo;
         data.uid = idUsuario;
         data.monto = nuevovalor;
-        data.cuotas = cuotas;
+        data.cuotas = 2;
+        data.concepto = 'Mercado';
         data.cedulaQuienPide = cedulaEmpleado;
         data.fechaGenerado = new Date().toLocaleDateString()
-        data.generadoPor = username;
+        data.generadoPor = usernameLocal;
         // Actualizar en la base de datos
         await updateDoc(doc(db, "Codigos", idUsuario), {
             prestamos: arrayUnion(data)
@@ -102,13 +108,14 @@ async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas) {
     }
     else {
         data.codigo = Math.floor(Math.random() * 1000000);
-        data.codigo = 'OH' + data.codigo;
+        data.codigo = 'M' + data.codigo;
         data.uid = idUsuario;
         data.monto = nuevovalor;
-        data.cuotas = cuotas;
+        data.cuotas = 2;
+        data.concepto = 'Mercado';
         data.cedulaQuienPide = cedulaEmpleado;
         data.fechaGenerado = new Date().toLocaleDateString()
-        data.generadoPor = username;
+        data.generadoPor = usernameLocal;
         await setDoc(docCoordinador, {
             prestamos: [data]
         });
@@ -122,7 +129,6 @@ async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas) {
 boton.addEventListener('click', async (e) => {
     const valor = document.querySelector('#valor').value;
     const nuevovalor = valor.replace(/\,/g, '');
-    const cuotas = document.querySelector('#cuotas').value;
 
     e.preventDefault();
     // capturar los datos del formulario
@@ -158,40 +164,56 @@ boton.addEventListener('click', async (e) => {
 
     const fechaActual = new Date();
 
-    if (datos.saldos >= 175000) {
+
+    if (parseInt(datos.saldos) >= 175000) {
         aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
     }
-    else if (datos.fondos > 0) {
-        aviso('Ups no se pueden generar prestamos perteneces al fondo', 'error');
-    }
     else {
-        // conseguir la fecha actual y separarla en dia, mes y año para poder compararla con la fecha de ingreso del empleado            
+        // conseguir la fecha actual y separarla en dia, mes y año para poder compararla con la fecha de ingreso del empleado   
+        let diaActual = fechaActual.getDate();
         let mesActual = fechaActual.getMonth() + 1;
         let anioActual = fechaActual.getFullYear();
-        if ((anioActual == anio) && ((mesActual - mes) >= 2)) {
-            if (sumaTotal >= 350000 || (sumaTotal + parseInt(nuevovalor)) >= 350000) {
-                aviso('Ups no se pueden generar prestamos porque superas los 350.000 permitidos', 'error');
-            }
-            else if (nuevovalor >= 200000) {
-                aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
+        let fechaInicio = new Date(anio, mes, dia); // Asume que 'anio', 'mes', 'dia' representan la fecha de inicio del trabajador
+        let fechaActualCompara = new Date(anioActual, mesActual, diaActual); // Asume que 'anioActual', 'mesActual', 'diaActual' representan la fecha actual
+        let diferencia = Math.abs(fechaActualCompara - fechaInicio); // Diferencia en milisegundos
+        let diasTrabajados = Math.ceil(diferencia / (1000 * 60 * 60 * 24)); // Conversión de milisegundos a días
+
+        // Si ha trabajado entre 8 y 15 dias puede pedir prestamo de 150.000
+        if ((diasTrabajados > 8 && diasTrabajados < 15) && parseInt(nuevovalor) <= 150001) {
+            if ((sumaTotal + parseInt(nuevovalor) <= 150001) || parseInt(nuevovalor) <= 150001) {
+                let data = codigo;
+                escribirCodigo(data, cedulaEmpleado, nuevovalor, valor);
             }
             else {
-                let data = codigo;
-                escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas);
+                aviso('Ups no se pueden generar prestamos porque superas los 150000 de saldo permitido', 'error');
             }
         }
-        else if ((anioActual > anio)) {
-            if (sumaTotal >= 350000 || (sumaTotal + parseInt(nuevovalor)) >= 350000) {
-                aviso('Ups no se pueden generar prestamos porque superas los 350.000 permitidos', 'error');
-            }
-            else if (nuevovalor >= 200000) {
-                aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
+
+        // Si ha trabajado entre 15 y 30 dias puede pedir prestamo de 250.000
+        else if ((diasTrabajados > 15 && diasTrabajados < 30) && parseInt(nuevovalor) <= 250001) {
+            if ((sumaTotal + parseInt(nuevovalor) <= 250000) || parseInt(nuevovalor) <= 250001) {
+                let data = codigo;
+                escribirCodigo(data, cedulaEmpleado, nuevovalor, valor);
             }
             else {
-                let data = codigo;
-                escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas);
+                aviso('Ups no se pueden generar prestamos porque superas los 250000 de saldo permitido', 'error');
+            }
+        }
+
+        // Si ha trabajado mas de 30 dias puede pedir prestamo de 350.000
+        else if ((diasTrabajados > 30) && parseInt(nuevovalor) <= 350001) {
+            if ((sumaTotal + parseInt(nuevovalor) <= 350001) || parseInt(nuevovalor) <= 350001) {
+                if ((sumaTotal + parseInt(nuevovalor) <= 350001) || parseInt(nuevovalor) <= 350001) {
+                    let data = codigo;
+                    escribirCodigo(data, cedulaEmpleado, nuevovalor, valor);
+                }
+            }
+            else {
+                aviso('Ups no se pueden generar prestamos porque superas los 350000 de saldo permitido', 'error');
             }
         }
     }
 
-});
+}
+);
+

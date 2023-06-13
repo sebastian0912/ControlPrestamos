@@ -3,8 +3,7 @@
 
 body {
     background-size: 100%;
-    height: auto;
-    min-height: 840px;
+    min-height: 100vh;
     background: linear-gradient(120deg, #eeeeee 50%, #FEBB2E 40%);
     background-repeat: no-repeat;
     font-family: 'Poppins', sans-serif;
@@ -19,7 +18,7 @@ h1 {
 
 .diasT {
     width: 100%;
-    margin: 50px 0 20px 30px;
+    margin: 20px 0 20px 30px;
     font-family: 'Nunito Sans', sans-serif;
     font-size: 20pt;
     font-weight: 400;
@@ -27,7 +26,7 @@ h1 {
 
 .dias {
     text-align: justify;
-    margin: 10px 0 20px 120px;
+    margin: 0px 0 20px 120px;
 
     font-family: 'Nunito Sans', sans-serif;
     font-size: 20pt;
@@ -68,7 +67,7 @@ li {
 
 }
 
-li:nth-child(2) {
+li:nth-child(3) {
     background: #bbd0ff;
     color: #000000;
     transform: scale(1.1);
@@ -154,16 +153,6 @@ span {
     flex-direction: column;
 }
 
-.cuadro {
-    width: 250px;
-    height: 150px;
-    background: #ffffff;
-    margin: 50px 0 0 80px;
-    border-radius: 15px;
-    box-shadow: 0px 0px 12px 8px rgba(0, 0, 0, 0.1);
-    font-size: 16pt;
-    font-weight: 700;
-}
 
 .titulo-Opciones {
     padding-left: 20px;
@@ -174,7 +163,7 @@ span {
 
 .cuadroTexto {
     width: 800px;
-    height: 300px;
+    height: 350px;
     background: #ffffff;
     margin: 50px 0 0 80px;
     border-radius: 15px;
@@ -188,10 +177,9 @@ span {
 }
 
 .cajaCedula .titulo {
-    margin-top: 30px;
+    margin: 30px 320px 30px 0;
     float: left;
 }
-
 
 
 .input {
@@ -215,9 +203,20 @@ span {
 
 .valor {
     flex: 1 100%;
+    width: 1000px;
     height: auto;
     text-align: center;
     margin-left: -150px;
+}
+
+.cajaCedula .input2:nth-of-type(1){
+    margin-left: 25px;
+    float: left;    
+}
+
+.cajaCedula .input2:nth-of-type(2){
+    margin-left: -18px;
+    float: left;    
 }
 
 .input2 {

@@ -26,6 +26,7 @@ export let datosbase = {
 
 export let codigo = {
     codigo: '',    
+    codigoDescontado : '',
     monto : '',
     cuotas : '',
     estado : true,
@@ -34,6 +35,8 @@ export let codigo = {
     generadoPor : '',
     fechaGenerado : '',
     fechaEjecutado : '',
+    ejecutadoPor : '',
+    uid: '',
 }
 
 export let comercio = {

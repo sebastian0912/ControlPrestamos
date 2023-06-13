@@ -4,13 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../../reset.css" />
-    <link rel="stylesheet" href="mercado.css" />
+    <link rel="stylesheet" href="PrestamoPorHacer.css" />
 
     <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal@4/minimal.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
 
     <script defer src="../../logOut2.js" type="module"></script>
-    <script defer src="mercado.js" type="module"></script>
+    <script defer src="PrestamoPorHacer.js" type="module"></script>
+
+    <script defer type="text/javascript" src="./jspdf.es.min.js.js" type="module"></script>
+
 
 </head>
 
@@ -20,28 +23,53 @@
         <ul class="lista-Opciones">
 
             <li>
-                <a href="../coordinador.html">
+                <a href="../jefeArea.html">
                     <img src="../../assets/pagina-de-inicio.png" alt="logo" class="logo" />
-                    <p>Inicio</p>
+                    <p> Inicio </p>
                 </a>
             </li>
 
             <li>
-                <a href="../PrestamoPaHacer/PrestamoPaHacer.html">
+                <a href="../PrestamoParaHacer/PrestamoParaHacer.html">
                     <img src="../../assets/prestamo.png" alt="logo" class="logo" />
-                    <p> Autorizacion prestamo </p>
+                    <p> Prestamo para hacer</p>
+                </a>
+            </li>
+
+
+            <li>
+                <a href="PrestamoPorHacer.html">
+                    <img src="../../assets/pagar.png" alt="logo" class="logo" />
+                    <p> Prestamo para descontar</p>
                 </a>
             </li>
 
             <li>
-                <a href="mercado.html">
+                <a href="../mercadoPaHacer/mercadoPaHacer.html">
                     <img src="../../assets/mercado.png" alt="logo" class="logo" />
-                    <p> Autorizacion mercado</p>
+                    <p>Mercado para hacer</p>
                 </a>
             </li>
+            <!--
+
+                <li>
+                    <a href="../mercadoPaDescontar/mercadoPaDescontar.html">
+                        <img src="../../assets/campesino.png" alt="logo" class="logo" />
+                        <p>Mercado para descontar</p>
+                    </a>
+                </li>
+            -->
+
+            <li>
+                <a href="../Comercio/comercializadora.html">
+                    <img src="../../assets/cesta-de-la-compra.png" alt="logo" class="logo" />
+                    <p>Comercializadora</p>
+                </a>
+            </li>
+
 
             <li id="logout">
-                <a href="">
+                <a href="../../Inicio-Login/index.html">
                     <img src="../../assets/cerrar-sesion.png" alt="logo" class="logo" />
                     <p>Cerrar Sesion</p>
                 </a>
@@ -49,11 +77,11 @@
 
             <h1 class="diasT"> Días restantes antes cerrar nómina </h1>
             <span class="dias" id="diasRestantes"></span>
-      
+
             <h1 class="diasT"> Días restantes antes de liquidación </h1>
             <span class="dias" id="diasLi"></span>
-
         </ul>
+
     </div>
 
 
@@ -72,13 +100,25 @@
         <div class="cuadroTexto">
             <div class="cajaCedula">
                 <h1 class="titulo"> Digite la cedula del empleado a validar </h1>
-                <input type="text" id="cedula" placeholder="Ingrese el numero de cedula a buscar" class="input" />
+                <input type="text" id="cedula" placeholder="Ingrese el numero de cedula a buscar" class="input2" />
+                <input type="text" id="codigo" placeholder="Ingrese el codigo" class="input2" />
                 <button class="btn" id="boton">Buscar</button>
             </div>
 
             <div class="valor">
                 <input type="text" id="valor" placeholder="Valor" class="input2" />
+                <input type="text" id="cuotas" placeholder="Numero de cuotas" class="input2" /><br><br>
+                <input type="text" id="celular" placeholder="Numero de celular" class="input2" 
+                    style="margin-left: -32px;"/>
+                <select name="tipo" id="tipo" class="input2">
+                    <option value="0">Forma Pago</option>
+                    <option value="Daviplata">Daviplata</option>
+                    <option value="Davivienda">Davivienda</option>
+                </select>                
             </div>
+
+
+
         </div>
     </div>
 </body>

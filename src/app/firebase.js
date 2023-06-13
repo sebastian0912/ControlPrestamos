@@ -28,7 +28,7 @@ const firebaseConfig = {
   appId: "1:804649224739:web:2d2d38b9290e2bf6057f96"
 };*/
 
-/*personal 2*/
+/*personal 2
 const firebaseConfig = {
   apiKey: "AIzaSyCt4pD1Y1_EfscIMgYNwWMT1UswMt7wdzc",
   authDomain: "tu-alianza-9ced7.firebaseapp.com",
@@ -36,9 +36,9 @@ const firebaseConfig = {
   storageBucket: "tu-alianza-9ced7.appspot.com",
   messagingSenderId: "542709938155",
   appId: "1:542709938155:web:99cd72068aa00c8d364bae"
-};
+};*/
 
-/*personal 3
+/*personal 3*/
 const firebaseConfig = {
   apiKey: "AIzaSyCWW0coeS1cYcLFfoZ1DLBNrTbkTnSGoYw",
   authDomain: "tu-alianza-42d48.firebaseapp.com",
@@ -46,7 +46,7 @@ const firebaseConfig = {
   storageBucket: "tu-alianza-42d48.appspot.com",
   messagingSenderId: "963436341676",
   appId: "1:963436341676:web:090d2e1bbf874e97783209"
-};*/
+};
 
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);

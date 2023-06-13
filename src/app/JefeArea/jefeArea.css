@@ -3,8 +3,7 @@
 
 body {
     background-size: 100%;
-    height: auto;
-    min-height: 765px;
+    min-height: 100vh;
     background: linear-gradient(120deg, #eeeeee 50%, #FEBB2E 40%);
     background-repeat: no-repeat;
     font-family: 'Poppins', sans-serif;
@@ -17,7 +16,7 @@ h1 {
 
 .diasT {
     width: 100%;
-    margin: 50px 0 20px 30px;
+    margin: 20px 0 20px 30px;
     font-family: 'Nunito Sans', sans-serif;
     font-size: 20pt;
     font-weight: 400;
@@ -25,7 +24,7 @@ h1 {
 
 .dias {
     text-align: justify;
-    margin: 10px 0 20px 120px;
+    margin: 0px 0 20px 120px;
 
     font-family: 'Nunito Sans', sans-serif;
     font-size: 20pt;

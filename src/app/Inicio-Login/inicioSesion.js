@@ -15,16 +15,17 @@ signInform.addEventListener('submit', async (e) => {
 
     try {
         const credenciales = await signInWithEmailAndPassword(auth, email, password);
-        // extrer el id del usuario
-        const idUsuario = credenciales.user.uid;
 
-        const docRef = doc(db, "Usuarios", idUsuario);
+
+        const docRef = doc(db, "Usuarios", credenciales.user.uid);
         const docSnap = await getDoc(docRef);
 
-        const perfil = docSnap.data().perfil;
         const estadoQuincena = docSnap.data().estadoQuincena;
-
-        localStorage.setItem('idUsuario', idUsuario);
+        const perfil = docSnap.data().perfil;
+        localStorage.setItem('idUsuario', credenciales.user.uid);
+        localStorage.setItem('perfil', perfil);
+        localStorage.setItem('username', docSnap.data().username);
+        localStorage.setItem('sede', docSnap.data().sede);
 
         if (estadoQuincena == false) {
             aviso('No puedes ingresar, ya se ha cerrado la quincena', 'error');

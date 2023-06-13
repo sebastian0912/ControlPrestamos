@@ -2,54 +2,95 @@
 
 import { comercio } from "../models/base.js";
 import { aviso } from "../Avisos/avisos.js";
-import { doc, getDoc, setDoc, updateDoc, collection, getDocs,onSnapshot } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
+import { doc, getDoc, collection, getDocs,onSnapshot } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
 import { db } from "../firebase.js";
 
 const boton = document.querySelector('#boton');
 
-// capturar el id del usuario logeado del input
-const idUsuario = localStorage.getItem("idUsuario");
-
-// MOSTRAR EN EL HTML EL NOMBRE DEL USUARIO LOGEADO
+// Capturar el h1 del titulo y perfil
 const titulo = document.querySelector('#username');
 const perfil = document.querySelector('#perfil');
-const numeroDias = document.querySelector('#diasRestantes');
-
-
-
-//Captura nombre y perfil
-const docRef = doc(db, "Usuarios", idUsuario);
-const docSnap = await getDoc(docRef);
-
-const username = docSnap.data().username;
-const perfilUsuario = docSnap.data().perfil;
-
-titulo.innerHTML = username;
-perfil.innerHTML = perfilUsuario;
+// Capturar el PERFIL y el USERNAME del local storage
+const perfilLocal = localStorage.getItem("perfil");
+const usernameLocal = localStorage.getItem("username");
+//Muestra en la parte superior el nombre y el perfil
+titulo.innerHTML = usernameLocal;
+perfil.innerHTML = perfilLocal;
 
 /*Calculo cuantos dias faltan*/
 // Obtén la fecha actual
 
-const querySnapshot3 = await getDocs(collection(db, "Comercio"));
+var ahora = new Date();
+var anio = ahora.getFullYear();
+var mes = ahora.getMonth();
+var dia = 0;
 
-querySnapshot3.forEach( (cod) => {
-    const unsub = onSnapshot(doc(db, "Comercio", cod.id), (doc) => {
-        const p = doc.data();
-        tabla.innerHTML += `
-            <tr>
-                <td>${p.concepto}</td>            
-                <td>${p.destino}</td>
-                <td>${p.cantidadEnvio}</td>
-                <td>${p.cantidadRecibida}</td>
-                <td>${p.valorUnidad}</td>
-                <td>${p.cantidadTotalVendida}</td>
-                <td>${p.PersonaEnvia}</td>
-                <td>${p.PersonaRecibe}</td>
-                <td>${p.fechaEnviada}</td>
-                <td>${p.fechaRecibida}</td>
-            </tr>
-            `
-    });
+if (ahora.getDate() == 15 || ahora.getDate() == 30) {
+    dia = 0;
+    diasRestantes.style.color = "red";
+}
+else if (ahora.getDate() < 15) {
+    dia = 15;
+}
+else if (ahora.getDate() < 30 ) {
+    dia = 30;
+}
+
+// Comprueba si el día ya ha pasado este mes
+if (ahora.getDate() > dia) {
+    // Si es así, cambia al próximo mes
+    mes++;
+}
+// Crea la fecha objetivo
+var fechaObjetivo = new Date(anio, mes, dia);
+// Calcula la diferencia en milisegundos
+var diferencia = fechaObjetivo - ahora;
+// Convierte la diferencia en días
+var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
+diasRestantes.innerHTML = dias;
+
+
+// Mostrar en el html el numero de dias Restantes de liquidacion
+var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05']
+// Recorre el arreglo y muestra los dias restantes deacuerdo a la fecha
+for (let i = 0; i < fechaObjetivo2.length; i++) {
+    // separar por año, mes y dia
+    var fechaObjetivo3 = new Date(fechaObjetivo2[i]);
+    if (fechaObjetivo3.getFullYear() == 
+        ahora.getFullYear() && fechaObjetivo3.getMonth() == 
+        ahora.getMonth() 
+        && fechaObjetivo3.getDate() >= ahora.getDate()) {
+        var diferencia2 = fechaObjetivo3 - ahora;        
+        var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
+        if (dias2 == 0){
+            diasRestantesLi.style.color = "red";
+        }
+        diasRestantesLi.innerHTML = dias2;
+        break;
+    }
+}
+
+
+
+const querySnapshot = await getDocs(collection(db, "Comercio"));
+
+let datosComercializadoraGeneral = querySnapshot.docs.map(doc => doc.data());
+
+datosComercializadoraGeneral.forEach((p) => {
+    tabla.innerHTML += `
+        <tr>
+            <td>${p.concepto}</td>
+            <td>${p.destino}</td>
+            <td>${p.cantidadEnvio}</td>
+            <td>${p.cantidadRecibida}</td>
+            <td>${p.valorUnidad}</td>
+            <td>${p.cantidadTotalVendida}</td>
+            <td>${p.PersonaEnvia}</td>
+            <td>${p.PersonaRecibe}</td>
+            <td>${p.fechaEnviada}</td>
+            <td>${p.fechaRecibida}</td>
+        </tr>
+    `
 });
 
 const querySnapshot4 = await getDocs(collection(db, "Comercio"));
@@ -93,32 +134,3 @@ agrupado.forEach((p) => {
         </tr>
     `;
 });
-
-var ahora = new Date();
-var anio = ahora.getFullYear();
-var mes = ahora.getMonth();
-var dia = 0;
-
-if (ahora.getDate() == 13 || ahora.getDate() == 14 || ahora.getDate() == 28 || ahora.getDate() == 29) {
-    dia = 0;
-}
-else if (ahora.getDate() < 13 || ahora.getDate() > 14) {
-    dia = 13;
-}
-else if (ahora.getDate() < 28 || ahora.getDate() > 29) {
-    dia = 28;
-}
-
-// Comprueba si el día ya ha pasado este mes
-if (ahora.getDate() > dia) {
-    // Si es así, cambia al próximo mes
-    mes++;
-}
-// Crea la fecha objetivo
-var fechaObjetivo = new Date(anio, mes, dia);
-// Calcula la diferencia en milisegundos
-var diferencia = fechaObjetivo - ahora;
-// Convierte la diferencia en días
-var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
-numeroDias.innerHTML = dias;
-

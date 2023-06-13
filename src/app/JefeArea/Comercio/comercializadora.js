@@ -10,20 +10,15 @@ const boton = document.querySelector('#boton');
 const idUsuario = localStorage.getItem("idUsuario");
 
 // MOSTRAR EN EL HTML EL NOMBRE DEL USUARIO LOGEADO
+// Capturar el h1 del titulo y perfil
 const titulo = document.querySelector('#username');
 const perfil = document.querySelector('#perfil');
-const numeroDias = document.querySelector('#diasRestantes');
-
-//Captura nombre y perfil
-const docRef = doc(db, "Usuarios", idUsuario);
-const docSnap = await getDoc(docRef);
-
-const username = docSnap.data().username;
-const perfilUsuario = docSnap.data().perfil;
-
-titulo.innerHTML = username;
-perfil.innerHTML = perfilUsuario;
-
+// Capturar el PERFIL y el USERNAME del local storage
+const perfilLocal = localStorage.getItem("perfil");
+const usernameLocal = localStorage.getItem("username");
+//Muestra en la parte superior el nombre y el perfil
+titulo.innerHTML = usernameLocal;
+perfil.innerHTML = perfilLocal;
 
 /*Calculo cuantos dias faltan*/
 // Obtén la fecha actual
@@ -32,14 +27,15 @@ var anio = ahora.getFullYear();
 var mes = ahora.getMonth();
 var dia = 0;
 
-if (ahora.getDate() == 13 || ahora.getDate() == 14 || ahora.getDate() == 28 || ahora.getDate() == 29) {
+if (ahora.getDate() == 15 || ahora.getDate() == 30) {
     dia = 0;
+    numeroDias.style.color = "red";
 }
-else if (ahora.getDate() < 13 || ahora.getDate() > 14) {
-    dia = 13;
+else if (ahora.getDate() < 15) {
+    dia = 15;
 }
-else if (ahora.getDate() < 28 || ahora.getDate() > 29) {
-    dia = 28;
+else if (ahora.getDate() < 30) {
+    dia = 30;
 }
 
 // Comprueba si el día ya ha pasado este mes
@@ -53,7 +49,28 @@ var fechaObjetivo = new Date(anio, mes, dia);
 var diferencia = fechaObjetivo - ahora;
 // Convierte la diferencia en días
 var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
-numeroDias.innerHTML = dias;
+diasRestantes.innerHTML = dias;
+
+
+// Mostrar en el html el numero de dias Restantes de liquidacion
+var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05']
+// Recorre el arreglo y muestra los dias restantes deacuerdo a la fecha
+for (let i = 0; i < fechaObjetivo2.length; i++) {
+    // separar por año, mes y dia
+    var fechaObjetivo3 = new Date(fechaObjetivo2[i]);
+    if (fechaObjetivo3.getFullYear() == ahora.getFullYear() &&
+        fechaObjetivo3.getMonth() == ahora.getMonth() &&
+        fechaObjetivo3.getDate() >= ahora.getDate()) {
+
+        var diferencia2 = fechaObjetivo3 - ahora;
+        var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
+        if (dias2 == 0) {
+            diasLi.style.color = "red";
+        }
+        diasLi.innerHTML = dias2;
+        break;
+    }
+}
 
 
 // darle click al boton para que se ejecute la funcion
@@ -70,7 +87,7 @@ boton.addEventListener('click', async (e) => {
 
     await updateDoc(doc(db, "Comercio", codigo), {
         cantidadRecibida: cantidad, 
-        PersonaRecibe: username,
+        PersonaRecibe: usernameLocal,
     });
     aviso("Se ha cargado la informacion exitosamente", "success");
 });

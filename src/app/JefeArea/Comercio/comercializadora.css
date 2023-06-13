@@ -3,8 +3,7 @@
 
 body {
   background-size: 100%;
-  height: auto;
-  min-height: 760px;
+  min-height: 100vh;
   background: linear-gradient(120deg, #eeeeee 50%, #FEBB2E 40%);
   background-repeat: no-repeat;
   font-family: 'Poppins', sans-serif;
@@ -66,7 +65,7 @@ li {
 
 }
 
-li:nth-child(2) {
+li:nth-child(3) {
   background: #bbd0ff;
   color: #000000;
   transform: scale(1.1);
