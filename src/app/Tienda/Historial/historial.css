@@ -10,7 +10,6 @@ body {
 }
 
 
-
 h1 {
     margin: 0;
     padding: 0;
@@ -66,7 +65,7 @@ li {
     cursor: pointer;
 }
 
-li:nth-child(4) {
+li:nth-child(2) {
     background: #bbd0ff;
     color: #000000;
     transform: scale(1.1);
@@ -238,9 +237,9 @@ span {
 
 .tabla {
     width: 900px;
-    height: 40%;
+    height: 400px;
     overflow: auto;
-    max-height: 50%;
+    
     background: #ffffff;
     margin: 50px 0 0 80px;
     border-radius: 15px;

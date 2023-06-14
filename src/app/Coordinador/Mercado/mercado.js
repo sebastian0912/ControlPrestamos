@@ -90,8 +90,8 @@ async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor) {
     const coordninador = await getDoc(docCoordinador);
     
     if (coordninador.exists()) {
-        // generar un codigo aleatorio para el prestamo
-        data.codigo = Math.floor(Math.random() * 1000000);
+        // generar un codigo aleatorio unico
+        data.codigo = Math.floor(Math.random()-1 * 1000000);
         data.codigo = 'M' + data.codigo;
         data.uid = idUsuario;
         data.monto = nuevovalor;
@@ -205,11 +205,9 @@ boton.addEventListener('click', async (e) => {
 
         // Si ha trabajado mas de 30 dias puede pedir prestamo de 350.000
         else if ((diasTrabajados > 30) && parseInt(nuevovalor) <= 350001) {
-            if ((sumaTotal + parseInt(nuevovalor) <= 350001) || parseInt(nuevovalor) <= 350001) {
-                if ((sumaTotal + parseInt(nuevovalor) <= 350001) || parseInt(nuevovalor) <= 350001) {
+            if ((sumaTotal + parseInt(nuevovalor) <= 350001) || parseInt(nuevovalor) <= 350001) {                
                     let data = codigo;
-                    escribirCodigo(data, cedulaEmpleado, nuevovalor, valor);
-                }
+                    escribirCodigo(data, cedulaEmpleado, nuevovalor, valor);                
             }
             else {
                 aviso('Ups no se pueden generar prestamos porque superas los 350000 de saldo permitido', 'error');

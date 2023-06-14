@@ -2,7 +2,7 @@
 
 import { comercio } from "../models/base.js";
 import { aviso } from "../Avisos/avisos.js";
-import { doc, getDoc, collection, getDocs,onSnapshot } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
+import { doc, getDoc, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
 import { db } from "../firebase.js";
 
 const boton = document.querySelector('#boton');
@@ -13,6 +13,7 @@ const perfil = document.querySelector('#perfil');
 // Capturar el PERFIL y el USERNAME del local storage
 const perfilLocal = localStorage.getItem("perfil");
 const usernameLocal = localStorage.getItem("username");
+const datosComercializadoraGeneral = localStorage.getItem("datosComercializadoraGeneral");
 //Muestra en la parte superior el nombre y el perfil
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
@@ -32,7 +33,7 @@ if (ahora.getDate() == 15 || ahora.getDate() == 30) {
 else if (ahora.getDate() < 15) {
     dia = 15;
 }
-else if (ahora.getDate() < 30 ) {
+else if (ahora.getDate() < 30) {
     dia = 30;
 }
 
@@ -56,13 +57,13 @@ var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2
 for (let i = 0; i < fechaObjetivo2.length; i++) {
     // separar por año, mes y dia
     var fechaObjetivo3 = new Date(fechaObjetivo2[i]);
-    if (fechaObjetivo3.getFullYear() == 
-        ahora.getFullYear() && fechaObjetivo3.getMonth() == 
-        ahora.getMonth() 
+    if (fechaObjetivo3.getFullYear() ==
+        ahora.getFullYear() && fechaObjetivo3.getMonth() ==
+        ahora.getMonth()
         && fechaObjetivo3.getDate() >= ahora.getDate()) {
-        var diferencia2 = fechaObjetivo3 - ahora;        
+        var diferencia2 = fechaObjetivo3 - ahora;
         var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
-        if (dias2 == 0){
+        if (dias2 == 0) {
             diasRestantesLi.style.color = "red";
         }
         diasRestantesLi.innerHTML = dias2;
@@ -70,13 +71,10 @@ for (let i = 0; i < fechaObjetivo2.length; i++) {
     }
 }
 
+const miArray = JSON.parse(datosComercializadoraGeneral);
 
-
-const querySnapshot = await getDocs(collection(db, "Comercio"));
-
-let datosComercializadoraGeneral = querySnapshot.docs.map(doc => doc.data());
-
-datosComercializadoraGeneral.forEach((p) => {
+miArray.forEach((p) => {
+    if (p.PersonaEnvia == usernameLocal) {
     tabla.innerHTML += `
         <tr>
             <td>${p.concepto}</td>
@@ -91,11 +89,11 @@ datosComercializadoraGeneral.forEach((p) => {
             <td>${p.fechaRecibida}</td>
         </tr>
     `
+    }
 });
 
-const querySnapshot4 = await getDocs(collection(db, "Comercio"));
 let datos = [];
-datos = querySnapshot4.docs.map(doc => doc.data());
+datos = miArray
 
 let agrupado = datos.reduce((acumulador, item) => {
     // Creamos una llave única para cada grupo de 'concepto' y 'destino'
@@ -122,8 +120,9 @@ agrupado = Object.values(agrupado);
 
 // Ahora puedes usar 'agrupado' para generar tu tabla:
 agrupado.forEach((p) => {
-    p.resultado = p.cantidadEnvio - p.cantidadTotalVendida; // Restamos las cantidades sumadas anteriormente
-    tabla2.innerHTML += `
+    p.resultado = Math.abs(p.cantidadEnvio - p.cantidadTotalVendida); // Restamos las cantidades sumadas anteriormente
+    if (p.PersonaEnvia == usernameLocal) {
+        tabla2.innerHTML += `
         <tr>
             <td>${p.concepto}</td>            
             <td>${p.destino}</td>
@@ -133,4 +132,5 @@ agrupado.forEach((p) => {
             <td>${p.resultado}</td>    <!-- Aquí mostramos el resultado de la resta -->
         </tr>
     `;
+    }
 });

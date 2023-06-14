@@ -25,8 +25,8 @@ perfil.innerHTML = perfilLocal;
 
 
 // Arreglo con las sedes y conceptos
-let datos = ["Faca Principal", "Faca Centro", "Rosal", "Cartagenita", "Madrid", "Funza", "Soacha", "Fontibón", "Suba", "Tocancipá", "Bosa"];
-let datos2 = ["Mercado", "Kit escolar", "Kit aseo", "Anchetas", "Matrimonios", "Kit velitas", "Kit amor y amistad", "Kit Día de las Madres", "Juguetes", "Kit dulces", "Otro"];
+let datos = ["Sede","Faca Principal", "Faca Centro", "Rosal", "Cartagenita", "Madrid", "Funza", "Soacha", "Fontibón", "Suba", "Tocancipá", "Bosa"];
+let datos2 = ["Concepto","Fruver", "Verdura", "Carne"];
 
 // recorrer el arreglo y mostrarlo en el select
 for (let i = 0; i < datos.length; i++) {
@@ -121,6 +121,7 @@ boton.addEventListener('click', async (e) => {
     }
 });
 
+
 /*Convertir valor a separado por miles*/
 const numemoroM = document.querySelector('#valorUnidad');
 numemoroM.addEventListener('keyup', (e) => {
@@ -135,9 +136,9 @@ numemoroM.addEventListener('keyup', (e) => {
 });
 
 
-
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
+    
     e.preventDefault();
     const cantidad = document.querySelector('#cantidad').value;
     const valorUnidad = document.querySelector('#valorUnidad').value;
@@ -158,6 +159,8 @@ boton.addEventListener('click', async (e) => {
 
     let aux = comercio;
     let uid;
+    uid = Math.floor(Math.random() * 10000000);
+
     aux.codigo = uid;
     aux.destino = miSelect;
     aux.concepto = miSelect2;

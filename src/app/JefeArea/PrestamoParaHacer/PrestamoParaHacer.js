@@ -89,6 +89,7 @@ async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas) {
         // generar un codigo aleatorio para el prestamo        
         data.codigo = 'PH' + Math.floor(Math.random() * 1000000);      
         data.monto = nuevovalor;
+        data.uid = idUsuario;
         data.cuotas = cuotas;
         data.cedulaQuienPide = cedulaEmpleado;
         data.fechaGenerado = new Date().toLocaleDateString()

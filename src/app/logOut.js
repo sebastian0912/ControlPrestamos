@@ -8,9 +8,7 @@ logout.addEventListener('click', async (e) => {
     e.preventDefault();
     await auth.signOut();       
     /*borrar local storage*/
-    localStorage.removeItem("idUsuario");
-    localStorage.removeItem("perfil");
-    localStorage.removeItem("username");
+    localStorage.clear();
     window.location.href = "../Inicio-Login/index.html";
 }
 );

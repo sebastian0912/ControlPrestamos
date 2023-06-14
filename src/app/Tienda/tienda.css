@@ -3,12 +3,12 @@
 
 body {
     background-size: 100%;
-    height: auto;
-    min-height: 840px;
+    min-height: 100vh;
     background: linear-gradient(120deg, #eeeeee 50%, #FEBB2E 40%);
     background-repeat: no-repeat;
     font-family: 'Poppins', sans-serif;
 }
+
 
 h1 {
     margin: 0;

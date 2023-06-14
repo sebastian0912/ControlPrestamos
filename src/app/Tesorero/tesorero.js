@@ -5,13 +5,18 @@ import { datosbase } from "../models/base.js";
 import { aviso } from "../Avisos/avisos.js";
 
 
-const idUsuario = localStorage.getItem("idUsuario");
-// MOSTRAR EN EL HTML EL NOMBRE DEL USUARIO LOGEADO
+// Capturar el h1 del titulo y perfil
 const titulo = document.querySelector('#username');
 const perfil = document.querySelector('#perfil');
+// Capturar el PERFIL y el USERNAME del local storage
+const perfilLocal = localStorage.getItem("perfil");
+const usernameLocal = localStorage.getItem("username");
+//Muestra en la parte superior el nombre y el perfil
+titulo.innerHTML = usernameLocal;
+perfil.innerHTML = perfilLocal;
+
 const numeroTotal = document.querySelector('#numeroEmpleados');
 const numeroSolicitudesPendientes = document.querySelector('#numeroSolicitudesPendientes');
-const numeroDias = document.querySelector('#diasRestantes');
 let extrae = document.getElementById("extrae");
 let extraeT = document.getElementById("extraeT");
 
@@ -194,7 +199,6 @@ document.getElementById("myonoffswitch").addEventListener("click", async functio
     }
 });
 
-
 /*Calculo cuantos dias faltan*/
 // Obtén la fecha actual
 var ahora = new Date();
@@ -202,14 +206,15 @@ var anio = ahora.getFullYear();
 var mes = ahora.getMonth();
 var dia = 0;
 
-if (ahora.getDate() == 13 || ahora.getDate() == 14 || ahora.getDate() == 28 || ahora.getDate() == 29) {
+if (ahora.getDate() == 15 || ahora.getDate() == 30) {
     dia = 0;
+    numeroDias.style.color = "red";
 }
-else if (ahora.getDate() < 13 || ahora.getDate() > 14) {
-    dia = 13;
+else if (ahora.getDate() < 15) {
+    dia = 15;
 }
-else if (ahora.getDate() < 28 || ahora.getDate() > 29) {
-    dia = 28;
+else if (ahora.getDate() < 30) {
+    dia = 30;
 }
 
 // Comprueba si el día ya ha pasado este mes
@@ -223,52 +228,59 @@ var fechaObjetivo = new Date(anio, mes, dia);
 var diferencia = fechaObjetivo - ahora;
 // Convierte la diferencia en días
 var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
-/*si el dia es 13 o 14 o 28 o 29 colocar numeroDias.innerHtml en rojo*/
-
-if (ahora.getDate() == 13 || ahora.getDate() == 14 || ahora.getDate() == 28 || ahora.getDate() == 29) {
-    numeroDias.style.color = "red";
-    numeroDias.innerHTML = dias;
-}
-else {
-    numeroDias.innerHTML = dias;
-}
-
-/* obtener el numero de empleados y actulizar con onsnapshot*/
-
-const querySnapshot = await getDocs(collection(db, "Base"));
-numeroTotal.innerHTML = querySnapshot.size;
+diasRestantes.innerHTML = dias;
 
 
-/*Obtener el numero de solicitudes sin realizar*/
+// Mostrar en el html el numero de dias Restantes de liquidacion
+var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05']
+// Recorre el arreglo y muestra los dias restantes deacuerdo a la fecha
+for (let i = 0; i < fechaObjetivo2.length; i++) {
+    // separar por año, mes y dia
+    var fechaObjetivo3 = new Date(fechaObjetivo2[i]);
+    if (fechaObjetivo3.getFullYear() == ahora.getFullYear() &&
+        fechaObjetivo3.getMonth() == ahora.getMonth() &&
+        fechaObjetivo3.getDate() >= ahora.getDate()) {
 
-const querySnapshot2 = await getDocs(collection(db, "Codigos"));
-let auxSolicitudes = 0;
-querySnapshot2.forEach(async (cod) => {
-    const docRef = doc(db, "Codigos", cod.id);
-    const docSnap = await getDoc(docRef);
-    // recorrer arreglo llamado prestamos para buscar el codigo
-    const prestamos = docSnap.data().prestamos;
-
-    prestamos.forEach(async (p) => {
-        if (p.estado == true) {
-            auxSolicitudes++;
+        var diferencia2 = fechaObjetivo3 - ahora;
+        var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
+        if (dias2 == 0) {
+            diasLi.style.color = "red";
         }
+        diasLi.innerHTML = dias2;
+        break;
+    }
+}
+
+function verificarCodigoEstado(datos) {
+    let encontrado = 0;
+    datos.forEach(doc => {
+        const cod = doc.data();
+        const prestamos = cod.prestamos;
+        prestamos.forEach(p => {
+            if (p.estado == true) {
+                encontrado++;
+            }
+        });
     });
-});
+    return encontrado;
+}
 
 
+/* obtener el numero de empleados y actulizar con getDocs*/
+const querySnapshot = await getDocs(collection(db, "Base"));
+const Base = querySnapshot.docs.map((doc) => doc.data());
+
+// Base total de empleados
+numeroTotal.innerHTML = Base.length;
+
+
+/* Obtener codigos de la base de datos */
+const datos = await getDocs(collection(db, "Codigos"));
+
+
+// Numero de codigos activos de la base de datos del coodinador
+let auxSolicitudes = verificarCodigoEstado(datos);
 numeroSolicitudesPendientes.innerHTML = auxSolicitudes;
-
-/*Captura nombre y perfil*/
-const docRef = doc(db, "Usuarios", idUsuario);
-const docSnap = await getDoc(docRef);
-
-const username = docSnap.data().username;
-const perfilUsuario = docSnap.data().perfil;
-
-titulo.innerHTML = username;
-perfil.innerHTML = perfilUsuario;
-
 
 
 

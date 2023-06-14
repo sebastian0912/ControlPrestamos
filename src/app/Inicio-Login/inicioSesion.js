@@ -1,7 +1,6 @@
 
 import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js"
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
-
+import { doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
 import { auth, db } from "../firebase.js";
 import { aviso } from "../Avisos/avisos.js";
 
@@ -20,6 +19,9 @@ signInform.addEventListener('submit', async (e) => {
         const docRef = doc(db, "Usuarios", credenciales.user.uid);
         const docSnap = await getDoc(docRef);
 
+        const querySnapshot = await getDocs(collection(db, "Base"));
+        const Base = querySnapshot.docs.map((doc) => doc.data());
+
         const estadoQuincena = docSnap.data().estadoQuincena;
         const perfil = docSnap.data().perfil;
         localStorage.setItem('idUsuario', credenciales.user.uid);
@@ -27,11 +29,14 @@ signInform.addEventListener('submit', async (e) => {
         localStorage.setItem('username', docSnap.data().username);
         localStorage.setItem('sede', docSnap.data().sede);
 
+        localStorage.setItem('sede', docSnap.data().sede);
+
         if (estadoQuincena == false) {
             aviso('No puedes ingresar, ya se ha cerrado la quincena', 'error');
         }
         else {
             if (perfil == 'Tesorero') {
+                localStorage.setItem('NumeroEmpleados',);
                 window.location.href = "../Tesorero/tesorero.html";
             } else if (perfil == 'Gerencia') {
                 window.location.href = "../Gerencia/gerencia.html";
@@ -44,6 +49,10 @@ signInform.addEventListener('submit', async (e) => {
                 window.location.href = "../Coordinador/coordinador.html";
             }
             else if (perfil == 'Comercializadora') {
+                const querySnapshot = await getDocs(collection(db, "Comercio"));
+                let datosComercializadoraGeneral = querySnapshot.docs.map(doc => doc.data());
+                const arrayString = JSON.stringify(datosComercializadoraGeneral);
+                localStorage.setItem('datosComercializadoraGeneral', arrayString);
                 window.location.href = "../Comercializadora/comercializadora.html";
             }
             else if (perfil == 'Admin') {
@@ -52,7 +61,7 @@ signInform.addEventListener('submit', async (e) => {
             else {
                 aviso('No tienes acceso todavia, comunicate con el administrador', 'error');
             }
-        }        
+        }
     } catch (error) {
         console.log(error.message);
         if (error.code === 'auth/wrong-password') {
@@ -64,3 +73,8 @@ signInform.addEventListener('submit', async (e) => {
         }
     }
 });
+
+function cuantosEmpleados() {
+
+}
+

@@ -3,13 +3,11 @@
 
 body {
     background-size: 100%;
-    height: auto;
-    min-height: 760px;
+    min-height: 100vh;
     background: linear-gradient(120deg, #eeeeee 50%, #FEBB2E 40%);
     background-repeat: no-repeat;
     font-family: 'Poppins', sans-serif;
 }
-
 
 
 h1 {
@@ -67,7 +65,7 @@ li {
     cursor: pointer;
 }
 
-li:nth-child(2) {
+li:nth-child(3) {
     background: #bbd0ff;
     color: #000000;
     transform: scale(1.1);
@@ -239,9 +237,9 @@ span {
 
 .tabla {
     width: 900px;
-    height: 40%;
+    height: 400px;
     overflow: auto;
-    max-height: 50%;
+    
     background: #ffffff;
     margin: 50px 0 0 80px;
     border-radius: 15px;

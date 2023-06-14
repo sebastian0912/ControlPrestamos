@@ -404,7 +404,7 @@ boton.addEventListener('click', async (e) => {
             docPdf.text('Codigo de descuento nomina: ' + cod.codigoDescontado, 10, 130);
             docPdf.setFont('Helvetica', 'bold');
             docPdf.setFontSize(5);
-            docPdf.text('Huella Indice Derecho', 130, 115);
+            docPdf.text('Huella Indice Derecho', 130, 105);
 
             docPdf.save('PrestamoDescontar'+'_'+usuario.nombre+'.pdf');
         }
