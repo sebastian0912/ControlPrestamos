@@ -3,7 +3,7 @@
 
 body {
     background-size: 100%;
-    min-height: 765px;
+    min-height: 100vh;
     background: linear-gradient(120deg, #eeeeee 50%, #FEBB2E 40%);
     background-repeat: no-repeat;
     font-family: 'Poppins', sans-serif;

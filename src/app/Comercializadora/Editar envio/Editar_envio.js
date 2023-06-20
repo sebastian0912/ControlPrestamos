@@ -1,8 +1,8 @@
 
 
-import { comercio } from "../../models/base.js";
+import { comercio, historialModificaciones } from "../../models/base.js";
 import { aviso } from "../../Avisos/avisos.js";
-import { doc, getDoc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
+import { doc, getDoc, setDoc, collection, getDocs, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
 import { db } from "../../firebase.js";
 
 const boton = document.querySelector('#boton');
@@ -83,13 +83,13 @@ var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2
 for (let i = 0; i < fechaObjetivo2.length; i++) {
     // separar por año, mes y dia
     var fechaObjetivo3 = new Date(fechaObjetivo2[i]);
-    if (fechaObjetivo3.getFullYear() == 
-        ahora.getFullYear() && fechaObjetivo3.getMonth() == 
-        ahora.getMonth() 
+    if (fechaObjetivo3.getFullYear() ==
+        ahora.getFullYear() && fechaObjetivo3.getMonth() ==
+        ahora.getMonth()
         && fechaObjetivo3.getDate() >= ahora.getDate()) {
-        var diferencia2 = fechaObjetivo3 - ahora;        
+        var diferencia2 = fechaObjetivo3 - ahora;
         var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
-        if (dias2 == 0){
+        if (dias2 == 0) {
             diasRestantesLi.style.color = "red";
         }
         diasRestantesLi.innerHTML = dias2;
@@ -100,7 +100,6 @@ for (let i = 0; i < fechaObjetivo2.length; i++) {
 
 let mostrarAviso = false;
 miSelect2.addEventListener('change', async (e) => {
-    const querySnapshot = await getDocs(collection(db, "Conceptos"));
     const otro = document.querySelector('#otro2');
 
     if (e.target.value == "11") {
@@ -112,7 +111,7 @@ miSelect2.addEventListener('change', async (e) => {
     }
 });
 
-boton.addEventListener('click', async (e) => {
+boton2.addEventListener('click', async (e) => {
     if (mostrarAviso) {
         const otro2 = document.querySelector('#otro2');
         if (otro2.value == "") {
@@ -139,34 +138,91 @@ numemoroM.addEventListener('keyup', (e) => {
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
     e.preventDefault();
-    const cantidad = document.querySelector('#cantidad').value;
-    const valorUnidad = document.querySelector('#valorUnidad').value;
-    const nuevovalor = valorUnidad.replace(/\,/g, '');
+    const codigo = document.querySelector('#Codigo').value;
+    const cantidad = document.querySelector('#cantidad');
+    const valorUnidad = document.querySelector('#valorUnidad');
+    //
     const otro2 = document.querySelector('#otro2').value;
-    let miSelect = document.querySelector('#miSelect').value;
-    let miSelect2 = document.querySelector('#miSelect2').value;
+    let miSelect = document.querySelector('#miSelect');
+    let miSelect2 = document.querySelector('#miSelect2');
+    
 
-    if (otro2 != "") {
-        miSelect2 = otro2;
+    const datosCodigo = await getDoc(doc(db, "Comercio", codigo));
+    if (datosCodigo.exists()) {
+        if (datosCodigo.data().cantidadRecibida == "") {
+            const codigo2 = document.querySelector('#Codigo');
+            
+            boton.style.display = "none";
+            codigo2.style.display = "none";
+            cantidad.style.display = "inline-block";
+            valorUnidad.style.display = "inline-block";
+            miSelect.style.display = "inline-block";
+            miSelect2.style.display = "inline-block";
+            boton2.style.display = "inline-block";
+            if (otro2 != "") {
+                miSelect2 = otro2;
+            }
+            cantidad.placeholder = datosCodigo.data().cantidadEnvio;
+            valorUnidad.placeholder = datosCodigo.data().valorUnidad;
+            miSelect.value = datosCodigo.data().destino;
+            miSelect2.value = datosCodigo.data().concepto;
+            
+            boton2.addEventListener('click', async (e) => {                
+                const nuevovalor = valorUnidad.value.replace(/\,/g, '');
+                await updateDoc(doc(db, "Comercio", codigo), {
+                    cantidadEnvio: cantidad.value,
+                    valorUnidad: nuevovalor,
+                    destino: miSelect.value,
+                    concepto: miSelect2.value,
+                });
+
+                aviso("Se ha actualizado correctamente", "success");
+            });
+           
+
+
+            // crear un nuevo registro en la coleccion historial
+            const docHistorial = doc(db, "HistorialModificaciones", codigo);
+            const HistorialRef = await getDoc(docHistorial);
+            let aux = historialModificaciones;
+            if (HistorialRef.exists()) {
+                aux.codigo = datosCodigo.data().codigo;
+                aux.concepto = "Editar envio";
+                let fecha = new Date();
+                var fechaHoraString = fecha.getFullYear() + '-' + fecha.getMonth()+1 + '-' + fecha.getDay() + ' ' + fecha.getHours() + ':' + fecha.getMinutes() + ':' + fecha.getMinutes();
+                aux.fechaEfectuado = fechaHoraString;
+                aux.username = usernameLocal;
+                await updateDoc(doc(db, "HistorialModificaciones", codigo), {
+                    historia: arrayUnion(aux)
+                });
+            }
+            else {
+                aux.codigo = datosCodigo.data().codigo;
+                aux.concepto = "Editar envio";
+                let fecha = new Date();
+                var fechaHoraString = fecha.getFullYear() + '-' + fecha.getMonth()+1 + '-' + fecha.getDay() + ' ' + fecha.getHours() + ':' + fecha.getMinutes() + ':' + fecha.getMinutes();
+                aux.fechaEfectuado = fechaHoraString;
+                aux.username = usernameLocal;
+                await setDoc(docHistorial, {
+                    historia: [aux]
+                });
+            }
+
+        }
+        else {
+            aviso("El envio ya fue recibido", "error");
+        }
     }
 
-    // Verificar que los campos requeridos están llenos
-    if (!miSelect || !miSelect2 || !cantidad || !valorUnidad) {
-        aviso("Por favor, completa todos los campos requeridos.", "warning");
-        return;
-    }
 
-    let aux = comercio;
-    let uid = Math.floor(Math.random() * (9999999999 - 1000000000)) + 1000000000;
-    aux.codigo = uid;
-    aux.destino = miSelect;
-    aux.concepto = miSelect2;
-    aux.cantidadEnvio = cantidad;
-    aux.PersonaEnvia = usernameLocal;
-    aux.valorUnidad = nuevovalor;
-    aux.fechaEnviada = new Date().toLocaleDateString();
-    await setDoc(doc(db, "Comercio", uid.toString()), aux);
-    aviso("Se ha cargado la informacion exitosamente, el codigo es: " + uid, "success");
+
+
+
+
+
+
+
+
 });
 
 

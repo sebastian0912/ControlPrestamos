@@ -11,6 +11,8 @@
 
     <script defer src="../../logOut2.js" type="module"></script>
     <script defer src="Comercio-lona-empleado.js" type="module"></script>
+    <script defer type="text/javascript" src="./jspdf.es.min.js.js" type="module"></script>
+
 
 </head>
 
@@ -53,7 +55,7 @@
                 </a>
             </li>
 
-            <h1 class="diasT"> Días restantes antes cerrar nómina </h1>
+            <h1 class="diasT"> Dias restantes antes de fecha cierre de novedades de nomina </h1>
             <span class="dias" id="diasRestantes"></span>
       
             <h1 class="diasT"> Días restantes antes de liquidación </h1>
@@ -81,6 +83,15 @@
                     <input type="text" id="codigo" placeholder="Codigo comercializadora?" class="input2" />
                     <input type="text" id="codigoA" placeholder="Codigo autorización" class="input2" 
                     style="margin-top: 20px;"/>
+                    <input type="text" id="celular" placeholder="Numero" class="input2" 
+                    style="margin-left: 32px;"/>
+                    <select name="tipo" id="tipo" class="input2" style="margin-top: 20px;">
+                        <option value="0">Forma Pago</option>
+                        <option value="Daviplata">Daviplata</option>
+                        <option value="Davivienda">Efectivo</option>
+                        <option value="Master">Mastercard</option>
+    
+                    </select>
                     <button class="btn" id="boton">Cargar info</button>
                 </div>
             </div>

@@ -25,15 +25,15 @@ var anio = ahora.getFullYear();
 var mes = ahora.getMonth();
 var dia = 0;
 
-if (ahora.getDate() == 15 || ahora.getDate() == 30) {
+if (ahora.getDate() == 13 || ahora.getDate() == 27) {
     dia = 0;
     numeroDias.style.color = "red";
 }
-else if (ahora.getDate() < 15) {
-    dia = 15;
+else if (ahora.getDate() < 13) {
+    dia = 13;
 }
-else if (ahora.getDate() < 30) {
-    dia = 30;
+else if (ahora.getDate() < 27) {
+    dia = 27;
 }
 
 // Comprueba si el día ya ha pasado este mes
@@ -88,10 +88,10 @@ numemoroM.addEventListener('keyup', (e) => {
 async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor) {
     const docCoordinador = doc(db, "Codigos", idUsuario);
     const coordninador = await getDoc(docCoordinador);
-    
+
     if (coordninador.exists()) {
         // generar un codigo aleatorio unico
-        data.codigo = Math.floor(Math.random()-1 * 1000000);
+        data.codigo = Math.floor(Math.random() - 1 * 1000000);
         data.codigo = 'M' + data.codigo;
         data.uid = idUsuario;
         data.monto = nuevovalor;
@@ -104,7 +104,7 @@ async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor) {
         await updateDoc(doc(db, "Codigos", idUsuario), {
             prestamos: arrayUnion(data)
         });
-        aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + data.codigo, 'success');
+        aviso('Acaba de pedir un mercado de ' + valor + ' su codigo es: ' + data.codigo, 'success');
     }
     else {
         data.codigo = Math.floor(Math.random() * 1000000);
@@ -120,7 +120,7 @@ async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor) {
             prestamos: [data]
         });
         //await setDoc(doc(db, "Codigos", idUsuario), data);
-        aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + data.codigo, 'success');
+        aviso('Acaba de pedir un mercado de ' + valor + ' su codigo es: ' + data.codigo, 'success');
     }
 }
 
@@ -166,7 +166,7 @@ boton.addEventListener('click', async (e) => {
 
 
     if (parseInt(datos.saldos) >= 175000) {
-        aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
+        aviso('Ups no se pueden generar mercado porque superas los 175000 de saldo permitido', 'error');
         return;
     }
     else {
@@ -179,41 +179,43 @@ boton.addEventListener('click', async (e) => {
         let diferencia = Math.abs(fechaActualCompara - fechaInicio); // Diferencia en milisegundos
         let diasTrabajados = Math.ceil(diferencia / (1000 * 60 * 60 * 24)); // Conversión de milisegundos a días
 
-        // Si ha trabajado entre 8 y 15 dias puede pedir prestamo de 150.000
-        if ((diasTrabajados > 8 && diasTrabajados < 15) && parseInt(nuevovalor) <= 150001) {
-            if ((sumaTotal + parseInt(nuevovalor) <= 150001) || parseInt(nuevovalor) <= 150001) {
+        // Si ha trabajado entre 8 y 15 dias puede pedir mercado de 150.000
+        if ((diasTrabajados > 8 && diasTrabajados < 15) ) {
+            if ((sumaTotal + parseInt(nuevovalor) <= 15000)) {
                 let data = codigo;
                 escribirCodigo(data, cedulaEmpleado, nuevovalor, valor);
             }
             else {
-                aviso('Ups no se pueden generar prestamos porque superas los 150000 de saldo permitido', 'error');
+                aviso('Ups no se pueden generar mercado, puede sacar maximo ' + (150000 - (sumaTotal)), 'error');
                 return;
             }
         }
 
-        // Si ha trabajado entre 15 y 30 dias puede pedir prestamo de 250.000
-        else if ((diasTrabajados > 15 && diasTrabajados < 30) && parseInt(nuevovalor) <= 250001) {
-            if ((sumaTotal + parseInt(nuevovalor) <= 250000) || parseInt(nuevovalor) <= 250001) {
+        // Si ha trabajado entre 15 y 30 dias puede pedir mercado de 250.000
+        else if ((diasTrabajados > 15 && diasTrabajados < 30) ) {
+            if ((sumaTotal + parseInt(nuevovalor) <= 250000)) {
                 let data = codigo;
                 escribirCodigo(data, cedulaEmpleado, nuevovalor, valor);
             }
             else {
-                aviso('Ups no se pueden generar prestamos porque superas los 250000 de saldo permitido', 'error');
+                aviso('Ups no se pueden generar mercado, puede sacar maximo ' + (250000 - (sumaTotal)), 'error');
                 return;
             }
         }
 
-        // Si ha trabajado mas de 30 dias puede pedir prestamo de 350.000
-        else if ((diasTrabajados > 30) && parseInt(nuevovalor) <= 350001) {
-            if ((sumaTotal + parseInt(nuevovalor) <= 350001) || parseInt(nuevovalor) <= 350001) {                
-                    let data = codigo;
-                    escribirCodigo(data, cedulaEmpleado, nuevovalor, valor);                
+        // Si ha trabajado mas de 30 dias puede pedir mercado de 350.000
+        else if ((diasTrabajados > 30) ) {
+            if ((sumaTotal + parseInt(nuevovalor) <= 350000)) {
+                let data = codigo;
+                console.log("Entro");
+                //escribirCodigo(data, cedulaEmpleado, nuevovalor, valor);
             }
             else {
-                aviso('Ups no se pueden generar prestamos porque superas los 350000 de saldo permitido', 'error');
+                aviso('Ups no se pueden generar mercado, puede sacar maximo ' + (350000 - (sumaTotal)), 'error');
                 return;
             }
         }
+
     }
 
 }

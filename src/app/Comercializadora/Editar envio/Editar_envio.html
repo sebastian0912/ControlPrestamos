@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../../reset.css" />
-    <link rel="stylesheet" href="Enviar-lonas.css" />
+    <link rel="stylesheet" href="Editar_envio.css" />
 
     <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal@4/minimal.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
 
     <script defer src="../../logOut2.js" type="module"></script>
-    <script defer src="Enviar-lonas.js" type="module"></script>
+    <script defer src="Editar_envio.js" type="module"></script>
 
 </head>
 
@@ -20,31 +20,38 @@
         <ul class="lista-Opciones">
 
             <li>
-                <a href="../tienda.html">
+                <a href="../comercializadora.html">
                     <img src="../../assets/pagina-de-inicio.png" alt="logo" class="logo" />
-                    <p>Cargo de mercado</p>
+                    <p> Inicio </p>
                 </a>
             </li>
 
             <li>
-                <a href="../Historial/historial.html">
-                    <img src="../../assets/historial-medico.png" alt="logo" class="logo" />
-                    <p>Historial Empleado</p>
-                </a>
-            </li>
-
-            <li>
-                <a href="./Enviar-lonas.html">
+                <a href="../Enviar-lonas/Enviar-lonas.html">
                     <img src="../../assets/camion-de-reparto.png" alt="logo" class="logo" />
-                    <p>Enviar mercado</p>
+                    <p> Enviar lonas </p>
+                </a>
+            </li>
+
+            <li>
+                <a href="./Editar_envio.html">
+                    <img src="../../assets/camion-de-reparto.png" alt="logo" class="logo" />
+                    <p> Editar envio </p>
+                </a>
+            </li>
+
+            <li>
+                <a href="../HistorialM/HistorialM.html">
+                    <img src="../../assets/historial-medico.png" alt="logo" class="logo" />
+                    <p> Historial Modificaciones </p>
                 </a>
             </li>
 
             <li id="logout">
-                <a href="../Inicio-Login/index.html">
+                
                     <img src="../../assets/cerrar-sesion.png" alt="logo" class="logo" />
                     <p>Cerrar Sesión</p>
-                </a>
+                
             </li>
 
             <h1 class="diasT"> Dias restantes antes de fecha cierre de novedades de nomina </h1>
@@ -70,12 +77,16 @@
             <div class="valor">
                 <div class="valoresEscribir">
                     <h1 class="titulo"> Digite los campos del cargamento a subir </h1>
-                    <input type="text" id="cantidad" placeholder="Cantidad Lonas" class="input2" />
-                    <input type="text" id="valorUnidad" placeholder="Valor Unidad" class="input2" />
-                    <select id="miSelect2"></select>
+                    <input type="text" id="Codigo" placeholder="Codigo de envio" class="input2" />
+
+                    <button class="btn" id="boton" style="margin-bottom: 15px;">Buscar envio</button>
+                    <input type="text" id="cantidad" placeholder="" class="input2" style="display: none;" />
+                    <input type="text" id="valorUnidad" placeholder="" class="input2" style="display: none;"/>
+                    <select id="miSelect2" style="display: none;"></select>
                     <input type="text" id="otro2" placeholder="Otro concepto" class="input2" style="display: none;" />
-                    <select id="miSelect"></select>
-                    <button class="btn" id="boton">Cargar info</button>
+                    <select id="miSelect" style="display: none;"></select>
+                    <button class="btn" id="boton2" style="display: none; margin-bottom: 15px;">Modificar datos</button>
+
                 </div>
             </div>
         </div>

@@ -29,15 +29,15 @@ var anio = ahora.getFullYear();
 var mes = ahora.getMonth();
 var dia = 0;
 
-if (ahora.getDate() == 15 || ahora.getDate() == 30) {
+if (ahora.getDate() == 13 || ahora.getDate() == 27) {
     dia = 0;
     numeroDias.style.color = "red";
 }
-else if (ahora.getDate() < 15) {
-    dia = 15;
+else if (ahora.getDate() < 13) {
+    dia = 13;
 }
-else if (ahora.getDate() < 30) {
-    dia = 30;
+else if (ahora.getDate() < 27) {
+    dia = 27;
 }
 
 // Comprueba si el día ya ha pasado este mes
@@ -209,12 +209,12 @@ function verificaCondiciones(datos,nuevovalor) {
         let mesActual = fechaActual.getMonth() + 1;
         let anioActual = fechaActual.getFullYear();
         if ((anioActual == anio) && ((mesActual - mes) >= 2)) {
-            if (sumaTotal >= 350001 || (sumaTotal + parseInt(nuevovalor)) >= 350001) {
-                aviso('Ups no se pueden generar prestamos porque superas los 350.000 permitidos', 'error');
+            if (parseInt(nuevovalor) >= 200000) {
+                aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
                 return false;
             }
-            else if (parseInt(nuevovalor) >= 200001) {
-                aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
+            else if ((sumaTotal + parseInt(nuevovalor)) >= 350000) {
+                aviso('Ups no se pueden generar prestamos, puede sacar maximo ' + (  350000 - (sumaTotal ) ), 'error');                
                 return false;
             }
             else {
@@ -222,12 +222,12 @@ function verificaCondiciones(datos,nuevovalor) {
             }
         }
         else if ((anioActual > anio)) {
-            if (sumaTotal >= 350000 || (sumaTotal + parseInt(nuevovalor)) >= 350000) {
-                aviso('Ups no se pueden generar prestamos porque superas los 350.000 permitidos', 'error');
+            if (parseInt(nuevovalor) >= 200000) {
+                aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
                 return false;
             }
-            else if (parseInt(nuevovalor) >= 200001) {
-                aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
+            else if ((sumaTotal + parseInt(nuevovalor)) >= 350000) {
+                aviso('Ups no se pueden generar prestamos, puede sacar maximo ' + (  350000 - (sumaTotal ) ), 'error');                
                 return false;
             }
             else {
@@ -366,7 +366,7 @@ boton.addEventListener('click', async (e) => {
             docPdf.text('______________________________________________________________________________________________________________' , 10, 10);
             docPdf.setFontSize(24);
             docPdf.setFont('Helvetica', 'bold');
-            docPdf.text('TU ALIANZA S.A.S', 30, 19);
+            docPdf.text('TU ALIANZA S.A.S', 35, 19);
             docPdf.setFont('Helvetica', 'normal');
             docPdf.setFontSize(9);
             docPdf.text('AUTORIZACION DE DESCUENTO' , 132, 15);
@@ -393,17 +393,18 @@ boton.addEventListener('click', async (e) => {
 
             docPdf.text('Fecha de ingreso: ' + usuario.ingreso , 10, 90);
             docPdf.text('Forma de pago: ' + tipo.value , 10, 95);
+            docPdf.text('Telefono: ' + celular, 130, 95);
             docPdf.setFont('Helvetica', 'bold');
             docPdf.text('Cordialmente ' , 10, 110);
             docPdf.setFont('Helvetica', 'normal');
             docPdf.text('Firma de Autorización ' , 10, 115);
             docPdf.text('C.C. '+ usuario.cedula  , 10, 120);
-            docPdf.text('Telefono: ' + celular, 10, 125);
+            
             // realizar un cuadro para colocar la huella dactilar
             docPdf.rect(130, 110, 35, 45);
             docPdf.text('Codigo de descuento nomina: ' + cod.codigoDescontado, 10, 130);
             docPdf.setFont('Helvetica', 'bold');
-            docPdf.setFontSize(5);
+            docPdf.setFontSize(6);
             docPdf.text('Huella Indice Derecho', 130, 105);
 
             docPdf.save('PrestamoDescontar'+'_'+usuario.nombre+'.pdf');

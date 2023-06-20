@@ -36,16 +36,38 @@ signInform.addEventListener('submit', async (e) => {
         }
         else {
             if (perfil == 'Tesorero') {
-                localStorage.setItem('NumeroEmpleados',);
+                localStorage.setItem('empleados', Base.length);
+                const datos = await getDocs(collection(db, "Codigos"));
+                localStorage.setItem('codigos', verificarCodigoEstado(datos));
+                const datosU = await getDocs(collection(db, "Usuarios"));
+                localStorage.setItem('coordinadores', numCoordinadoresConestadoSolicitudesTrue(datosU));
+
                 window.location.href = "../Tesorero/tesorero.html";
             } else if (perfil == 'Gerencia') {
+                const datos = await getDocs(collection(db, "Usuarios"));
+                localStorage.setItem('empleados', Base.length);
+                localStorage.setItem('coordinadores', numCoordinador(datos));
+                localStorage.setItem('tiendas', numTiendas(datos));
                 window.location.href = "../Gerencia/gerencia.html";
+
             } else if (perfil == 'JefeArea') {
                 window.location.href = "../JefeArea/jefeArea.html";
             } else if (perfil == 'Tienda') {
                 window.location.href = "../Tienda/tienda.html";
             }
             else if (perfil == 'Coordinador') {
+                const docRef = doc(db, "Codigos", credenciales.user.uid);
+                const docSnap2 = await getDoc(docRef);
+                let codigos;
+                if (docSnap2.data() != undefined) {
+                    codigos = docSnap2.data().prestamos;
+                }
+                else {
+                    codigos = [];
+                }
+                const arrayString = JSON.stringify(codigos);
+                localStorage.setItem('estado', docSnap.data().estadoSolicitudes);                
+                localStorage.setItem('codigos', arrayString);
                 window.location.href = "../Coordinador/coordinador.html";
             }
             else if (perfil == 'Comercializadora') {
@@ -74,7 +96,47 @@ signInform.addEventListener('submit', async (e) => {
     }
 });
 
-function cuantosEmpleados() {
+function verificarCodigoEstado(datos) {
+    let encontrado = 0;
+    datos.forEach(doc => {
+        const cod = doc.data();
+        const prestamos = cod.prestamos;
+        prestamos.forEach(p => {
+            if (p.estado == true) {
+                encontrado++;
+            }
+        });
+    });
+    return encontrado;
+}
 
+function numCoordinadoresConestadoSolicitudesTrue(datos) {
+    let auxCoordinadores = 0;
+    datos.forEach((doc) => {
+        if (doc.data().perfil == "Coordinador" && doc.data().estadoSolicitudes == true) {
+            auxCoordinadores++;
+        }
+    });
+    return auxCoordinadores;
+}
+
+function numCoordinador(datos) {
+    let auxCoordinadores = 0;
+    datos.forEach((doc) => {
+        if (doc.data().perfil == "Coordinador") {
+            auxCoordinadores++;
+        }
+    });
+    return auxCoordinadores;
+}
+
+function numTiendas(datos) {
+    let auxTiendas = 0;
+    datos.forEach((doc) => {
+        if (doc.data().perfil == "Tienda") {
+            auxTiendas++;
+        }
+    });
+    return auxTiendas;
 }
 

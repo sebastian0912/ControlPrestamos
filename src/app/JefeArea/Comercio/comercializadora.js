@@ -27,15 +27,15 @@ var anio = ahora.getFullYear();
 var mes = ahora.getMonth();
 var dia = 0;
 
-if (ahora.getDate() == 15 || ahora.getDate() == 30) {
+if (ahora.getDate() == 13 || ahora.getDate() == 27) {
     dia = 0;
     numeroDias.style.color = "red";
 }
-else if (ahora.getDate() < 15) {
-    dia = 15;
+else if (ahora.getDate() < 13) {
+    dia = 13;
 }
-else if (ahora.getDate() < 30) {
-    dia = 30;
+else if (ahora.getDate() < 27) {
+    dia = 27;
 }
 
 // Comprueba si el día ya ha pasado este mes
@@ -79,7 +79,16 @@ boton.addEventListener('click', async (e) => {
     //const valorUnidad = document.querySelector('#valorUnidad').value;
     const codigo = document.querySelector('#codigo').value;
     ///const otro = document.querySelector('#otro').value;
-
+    
+    if (codigo == "") {
+        aviso("Por favor ingrese el codigo generado por la comercializadora", "error");
+        return;
+    }
+    if (cantidad == "") {
+        aviso("Por favor ingrese la cantidad recibida", "error");
+        return;
+    }
+    
     const docRef = doc(db, "Comercio", codigo);
     const docSnap = await getDoc(docRef);
 

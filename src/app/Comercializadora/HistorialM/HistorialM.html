@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../reset.css" />
-    <link rel="stylesheet" href="comercializadora.css" />
+    <link rel="stylesheet" href="../../reset.css" />
+    <link rel="stylesheet" href="HistorialM.css" />
 
     <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal@4/minimal.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
 
-    <script defer src="../logOut.js" type="module"></script>
-    <script defer src="comercializadora.js" type="module"></script>
+    <script defer src="../../logOut2.js" type="module"></script>
+    <script defer src="HistorialM.js" type="module"></script>
 
 </head>
 
@@ -20,36 +20,36 @@
         <ul class="lista-Opciones">
 
             <li>
-                <a href="comercializadora.html">
-                    <img src="../assets/pagina-de-inicio.png" alt="logo" class="logo" />
+                <a href="../comercializadora.html">
+                    <img src="../../assets/pagina-de-inicio.png" alt="logo" class="logo" />
                     <p> Inicio </p>
                 </a>
             </li>
 
             <li>
-                <a href="./Enviar-lonas/Enviar-lonas.html">
-                    <img src="../assets/camion-de-reparto.png" alt="logo" class="logo" />
+                <a href="../Enviar-lonas/Enviar-lonas.html">
+                    <img src="../../assets/camion-de-reparto.png" alt="logo" class="logo" />
                     <p> Enviar lonas </p>
                 </a>
             </li>
 
             <li>
-                <a href="./Editar envio/Editar_envio.html">
-                    <img src="../assets/camion-de-reparto.png" alt="logo" class="logo" />
+                <a href="../Editar envio/Editar_envio.html">
+                    <img src="../../assets/camion-de-reparto.png" alt="logo" class="logo" />
                     <p> Editar envio </p>
                 </a>
             </li>
 
             <li>
-                <a href="./HistorialM/HistorialM.html">
-                    <img src="../assets/historial-medico.png" alt="logo" class="logo" />
+                <a href="./HistorialM.html">
+                    <img src="../../assets/historial-medico.png" alt="logo" class="logo" />
                     <p> Historial Modificaciones </p>
                 </a>
             </li>
 
             <li id="logout">
                 <a href="../Inicio-Login/index.html">
-                    <img src="../assets/cerrar-sesion.png" alt="logo" class="logo" />
+                    <img src="../../assets/cerrar-sesion.png" alt="logo" class="logo" />
                     <p>Cerrar Sesión</p>
                 </a>
             </li>
@@ -73,44 +73,21 @@
     </header>
 
     <div class="contenido">
-
+        <h1 style="font-weight: bold; margin: 50px 0 0 150px; font-size: 16pt;">Historial de moficaciones</h1>
         <div class="tabla">
             <table class="tabla-contenido">
                 <thead>
                     <tr>
                         <th>Codigo</th>
                         <th>Concepto</th>
-                        <th>Lugar</th>
-                        <th>Cantidad enviada</th>
-                        <th>Cantidad recibida</th>
-                        <th>Valor unidad</th>
-                        <th>Cantidad vendida</th>
-                        <th>Persona quien lo envió</th>
-                        <th>Persona quien recibe</th>
-                        <th>Fecha de envió</th>
-                        <th>Fecha de recepción</th>
+                        <th>Fecha</th>
+                        <th>Usuario</th>
                     </tr>
                 </thead>
                 <tbody id="tabla"> </tbody>
             </table>
         </div>
-
-        <div class="tabla">
-            <table class="tabla-contenido">
-                <thead>
-                    <tr>
-                        <th>Concepto</th>
-                        <th>Lugar</th>
-                        <th>Cantidad enviada</th>
-                        <th>Cantidad recibida</th>
-                        <th>Valor unidad</th>
-                        <th>Cantidad vendida</th>
-                    </tr>
-                </thead>
-                <tbody id="tabla2"> </tbody>
-            </table>
-        </div>
-
+        
     </div>
 </body>
 

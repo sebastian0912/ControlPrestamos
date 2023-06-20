@@ -70,3 +70,10 @@ export let tienda = {
     valorTotal : '',
     numPersonasAtendidas : '',
 }
+
+export let historialModificaciones = {
+    codigo : '',
+    concepto : '',
+    fechaEfectuado : '',
+    username : '',
+}

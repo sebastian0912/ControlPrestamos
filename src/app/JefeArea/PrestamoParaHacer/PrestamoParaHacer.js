@@ -21,15 +21,15 @@ var anio = ahora.getFullYear();
 var mes = ahora.getMonth();
 var dia = 0;
 
-if (ahora.getDate() == 15 || ahora.getDate() == 30) {
+if (ahora.getDate() == 13 || ahora.getDate() == 27) {
     dia = 0;
     numeroDias.style.color = "red";
 }
-else if (ahora.getDate() < 15) {
-    dia = 15;
+else if (ahora.getDate() < 13) {
+    dia = 13;
 }
-else if (ahora.getDate() < 30) {
-    dia = 30;
+else if (ahora.getDate() < 27) {
+    dia = 27;
 }
 
 // Comprueba si el día ya ha pasado este mes
@@ -168,11 +168,13 @@ boton.addEventListener('click', async (e) => {
         let mesActual = fechaActual.getMonth() + 1;
         let anioActual = fechaActual.getFullYear();
         if ((anioActual == anio) && ((mesActual - mes) >= 2)) {
-            if (sumaTotal >= 350001 || (sumaTotal + parseInt(nuevovalor)) >= 350001) {
-                aviso('Ups no se pueden generar prestamos porque superas los 350.000 permitidos', 'error');
-            }
-            else if (parseInt(nuevovalor) >= 200001) {
+            if (parseInt(nuevovalor) >= 200001) {
                 aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
+                return;
+            }
+            else if (sumaTotal >= 350001 || (sumaTotal + parseInt(nuevovalor)) >= 350001) {
+                aviso('Ups no se pueden generar prestamos, puede sacar maximo ' + (  350000 - (sumaTotal ) ), 'error');                
+                return;
             }
             else {
                 let data = codigo;
@@ -180,11 +182,13 @@ boton.addEventListener('click', async (e) => {
             }
         }
         else if ((anioActual > anio)) {
-            if (sumaTotal >= 350000 || (sumaTotal + parseInt(nuevovalor)) >= 350000) {
-                aviso('Ups no se pueden generar prestamos porque superas los 350.000 permitidos', 'error');
-            }
-            else if (parseInt(nuevovalor) >= 200001) {
+            if (parseInt(nuevovalor) >= 200001) {
                 aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
+                return;
+            }
+            else if (sumaTotal >= 350001 || (sumaTotal + parseInt(nuevovalor)) >= 350001) {
+                aviso('Ups no se pueden generar prestamos, puede sacar maximo ' + (  350000 - (sumaTotal ) ), 'error');                
+                return;
             }
             else {
                 let data = codigo;

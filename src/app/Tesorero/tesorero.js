@@ -11,55 +11,60 @@ const perfil = document.querySelector('#perfil');
 // Capturar el PERFIL y el USERNAME del local storage
 const perfilLocal = localStorage.getItem("perfil");
 const usernameLocal = localStorage.getItem("username");
+const empleados = localStorage.getItem("empleados");
+const codigos = localStorage.getItem("codigos");
+const numCoordinadoresConestadoSolicitudesTrue = localStorage.getItem("coordinadores");
 //Muestra en la parte superior el nombre y el perfil
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
 
 const numeroTotal = document.querySelector('#numeroEmpleados');
 const numeroSolicitudesPendientes = document.querySelector('#numeroSolicitudesPendientes');
+
 let extrae = document.getElementById("extrae");
 let extraeT = document.getElementById("extraeT");
 
-const ingresar = document.querySelector('#ingresar');
 let input = document.getElementById('archivoInput');
 
 let datosFinales = [];
+
 const over = document.querySelector('#overlay');
 const loader = document.querySelector('#loader');
+
 var h1Elemento = document.querySelector('#cont');
 
 
 extrae.addEventListener('click', async () => {
     const querySnapshot = await getDocs(collection(db, "Base"));
-    
+
     let dataString = '\t\t\t\t\t\t\tANTERIOR\t\tPARA DESCONTAR\t\t\t\t\t\t\t\t\t\tPARA HACER\t\t\t\nCÓDIGO\tCÉDULA\tNOMBRE\tINGRESO\tTEMPORAL\tFINCA\tSALARIO\tSALDOS\tFONDOS\tMERCADOS\tCUOTAS\tPRESTAMO\tCUOTAS\tCASINO\tANCHETAS\tCUOTAS\tFONDO\tCARNET\tSEGURO FUNERARIO\tPRESTAMO\tCUOTAS\tANTICIPO LIQ\tCUENTAS\n';
-    
+
     querySnapshot.forEach((doc) => {
-        const docData = doc.data();        
-        dataString += 
-        docData.codigo + '\t' +
-        docData.cedula + '\t' +
-        docData.nombre + '\t' +
-        docData.ingreso + '\t' +
-        docData.temporal + '\t' +
-        docData.finca + '\t' +
-        docData.salario + '\t' +
-        docData.saldos + '\t' +
-        docData.fondos + '\t' +
-        docData.mercados + '\t' +
-        docData.cuotasMercados + '\t' +
-        docData.prestamoPaDescontar + '\t' +
-        docData.cuotasPrestamos + '\t' +
-        docData.casino + '\t' +
-        docData.anchetas + '\t' +
-        docData.cuotasAnchetas + '\t' +
-        docData.fondo + '\t' +
-        docData.carnet + '\t' +
-        docData.seguroFunerario + '\t' +
-        docData.prestamoPaHacer + '\t' +
-        docData.cuotasPrestamoPahacer + '\t' +
-        docData.anticipoLiquidacion + '\t' +
-        docData.cuentas + '\n' ;        
+        const docData = doc.data();
+        dataString +=
+            docData.codigo + '\t' +
+            docData.cedula + '\t' +
+            docData.nombre + '\t' +
+            docData.ingreso + '\t' +
+            docData.temporal + '\t' +
+            docData.finca + '\t' +
+            docData.salario + '\t' +
+            docData.saldos + '\t' +
+            docData.fondos + '\t' +
+            docData.mercados + '\t' +
+            docData.cuotasMercados + '\t' +
+            docData.prestamoPaDescontar + '\t' +
+            docData.cuotasPrestamos + '\t' +
+            docData.casino + '\t' +
+            docData.anchetas + '\t' +
+            docData.cuotasAnchetas + '\t' +
+            docData.fondo + '\t' +
+            docData.carnet + '\t' +
+            docData.seguroFunerario + '\t' +
+            docData.prestamoPaHacer + '\t' +
+            docData.cuotasPrestamoPahacer + '\t' +
+            docData.anticipoLiquidacion + '\t' +
+            docData.cuentas + '\n';
     });
 
     // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
@@ -75,18 +80,59 @@ extrae.addEventListener('click', async () => {
     document.body.removeChild(element);
 });
 
+extraeC.addEventListener('click', async () => {
+    datosFinales = [];
+    const querySnapshot = await getDocs(collection(db, "Codigos"));
+    querySnapshot.forEach((doc) => {
+        const cod = doc.data();
+        const prestamos = cod.prestamos;
+        prestamos.forEach(p => {
+            if (p.estado == true) {
+                datosFinales.push(p);
+            }
+        });
+    });
+    let dataString = 'Código\tCédula quien pidio\tNombre persona quien dio el codigo\tValor\tCuotas\tFecha\n';
+
+    datosFinales.forEach((doc) => {
+        dataString +=
+            doc.codigo + '\t' +
+            doc.cedulaQuienPide + '\t' +
+            doc.generadoPor + '\t' +
+            doc.monto + '\t' +
+            doc.cuotas + '\t' +
+            doc.fechaGenerado + '\n';
+    });
+
+    // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
+    const element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
+    element.setAttribute('download', 'datosCodigos.txt');
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+
+
+    // borrar la coleccion de codigos
+
+});
+
 
 extraeT.addEventListener('click', async () => {
     const querySnapshot = await getDocs(collection(db, "Tienda"));
-    
+
     let dataString = 'nombre\tMonto Total\t Numero de compras en la tienda\n';
-    
+
     querySnapshot.forEach((doc) => {
-        const docData = doc.data();        
-        dataString += 
-        docData.nombre + '\t' +
-        docData.valorTotal + '\t' +
-        docData.numPersonasAtendidas + '\n';        
+        const docData = doc.data();
+        dataString +=
+            docData.nombre + '\t' +
+            docData.valorTotal + '\t' +
+            docData.numPersonasAtendidas + '\n';
     });
 
     // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
@@ -122,18 +168,15 @@ input.addEventListener('change', () => {
         loader.style.display = "block";
         h1Elemento.style.display = "block";
         guardarDatos(datosFinales);
-        over.style.display = "none";
-        loader.style.display = "none";
+
     }
 });
 
 async function guardarDatos(datosFinales) {
     //console.log("entro a la funcion");
     //console.log(datosFinales.length);
-    console.log(datosFinales.length - 1);
     for (let i = 4; i < datosFinales.length - 1; i++) {
         let datos = datosFinales[i]; // Dividir la cadena por las tabulaciones
-        console.log(i - 3);
         datosbase.codigo = datos[0];
         datosbase.cedula = datos[1];
         datosbase.nombre = datos[2];
@@ -161,8 +204,13 @@ async function guardarDatos(datosFinales) {
             setTimeout(function () {
                 h1Elemento.textContent = "Empleados cargados: " + indice;
             }, indice * 1);
-        })(i);
-        const aux = await setDoc(doc(db, "Base", datosbase.cedula), datosbase);
+        })(i-3);
+        if(datos.cedula == ""){
+            break;
+        }
+        else{
+            const aux = await setDoc(doc(db, "Base", datosbase.cedula), datosbase);
+        }
     }
     aviso("Datos guardados correctamente", "success");
     over.style.display = "none";
@@ -206,15 +254,15 @@ var anio = ahora.getFullYear();
 var mes = ahora.getMonth();
 var dia = 0;
 
-if (ahora.getDate() == 15 || ahora.getDate() == 30) {
+if (ahora.getDate() == 13 || ahora.getDate() == 27) {
     dia = 0;
     numeroDias.style.color = "red";
 }
-else if (ahora.getDate() < 15) {
-    dia = 15;
+else if (ahora.getDate() < 13) {
+    dia = 13;
 }
-else if (ahora.getDate() < 30) {
-    dia = 30;
+else if (ahora.getDate() < 27) {
+    dia = 27;
 }
 
 // Comprueba si el día ya ha pasado este mes
@@ -251,38 +299,19 @@ for (let i = 0; i < fechaObjetivo2.length; i++) {
     }
 }
 
-function verificarCodigoEstado(datos) {
-    let encontrado = 0;
-    datos.forEach(doc => {
-        const cod = doc.data();
-        const prestamos = cod.prestamos;
-        prestamos.forEach(p => {
-            if (p.estado == true) {
-                encontrado++;
-            }
-        });
-    });
-    return encontrado;
-}
 
 
-/* obtener el numero de empleados y actulizar con getDocs*/
-const querySnapshot = await getDocs(collection(db, "Base"));
-const Base = querySnapshot.docs.map((doc) => doc.data());
 
 // Base total de empleados
-numeroTotal.innerHTML = Base.length;
+numeroTotal.innerHTML = empleados;
 
 
 /* Obtener codigos de la base de datos */
-const datos = await getDocs(collection(db, "Codigos"));
-
-
 // Numero de codigos activos de la base de datos del coodinador
-let auxSolicitudes = verificarCodigoEstado(datos);
-numeroSolicitudesPendientes.innerHTML = auxSolicitudes;
+
+numeroSolicitudesPendientes.innerHTML = codigos;
 
 
-
+numeroCoordinadores.innerHTML = numCoordinadoresConestadoSolicitudesTrue;
 
 

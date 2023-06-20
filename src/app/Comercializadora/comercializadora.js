@@ -26,15 +26,15 @@ var anio = ahora.getFullYear();
 var mes = ahora.getMonth();
 var dia = 0;
 
-if (ahora.getDate() == 15 || ahora.getDate() == 30) {
+if (ahora.getDate() == 13 || ahora.getDate() == 27) {
     dia = 0;
     diasRestantes.style.color = "red";
 }
-else if (ahora.getDate() < 15) {
-    dia = 15;
+else if (ahora.getDate() < 13) {
+    dia = 13;
 }
-else if (ahora.getDate() < 30) {
-    dia = 30;
+else if (ahora.getDate() < 27) {
+    dia = 27;
 }
 
 // Comprueba si el día ya ha pasado este mes
@@ -77,6 +77,7 @@ miArray.forEach((p) => {
     if (p.PersonaEnvia == usernameLocal) {
     tabla.innerHTML += `
         <tr>
+            <td>${p.codigo}</td>
             <td>${p.concepto}</td>
             <td>${p.destino}</td>
             <td>${p.cantidadEnvio}</td>

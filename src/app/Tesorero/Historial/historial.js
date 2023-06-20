@@ -24,15 +24,15 @@ var anio = ahora.getFullYear();
 var mes = ahora.getMonth();
 var dia = 0;
 
-if (ahora.getDate() == 15 || ahora.getDate() == 30) {
+if (ahora.getDate() == 13 || ahora.getDate() == 27) {
     dia = 0;
     numeroDias.style.color = "red";
 }
-else if (ahora.getDate() < 15) {
-    dia = 15;
+else if (ahora.getDate() < 13) {
+    dia = 13;
 }
-else if (ahora.getDate() < 30) {
-    dia = 30;
+else if (ahora.getDate() < 27) {
+    dia = 27;
 }
 
 // Comprueba si el día ya ha pasado este mes
@@ -95,3 +95,41 @@ boton.addEventListener('click', async (e) => {
     }); 
 });
 
+
+extraeC.addEventListener('click', async () => {
+    datosFinales = [];
+    const querySnapshot = await getDocs(collection(db, "Codigos"));
+    querySnapshot.forEach((doc) => {
+        const cod = doc.data();
+        const prestamos = cod.prestamos;
+        prestamos.forEach(p => {
+            if (p.estado == false) {
+                datosFinales.push(p);
+            }
+        });
+    });
+    let dataString = 'Código\tCédula quien pidio\tNombre persona quien dio el codigo\tValor\tCuotas\tFecha\n';
+
+    datosFinales.forEach((doc) => {
+        dataString +=
+            doc.codigo + '\t' +
+            doc.cedulaQuienPide + '\t' +
+            doc.generadoPor + '\t' +
+            doc.monto + '\t' +
+            doc.cuotas + '\t' +
+            doc.fechaGenerado + '\n';
+    });
+
+    // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
+    const element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
+    element.setAttribute('download', 'datosCodigos.txt');
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+
+});

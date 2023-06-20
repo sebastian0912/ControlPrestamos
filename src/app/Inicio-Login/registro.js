@@ -11,10 +11,10 @@ let datos = {
     email: '',
     password: '',
     id: '',
-    perfil: 'Gerencia',
+    perfil: 'JefeArea',
     estadoQuincena: true,
     estadoSolicitudes: true,
-    sede: 'Fontibon',
+    sede: 'Tocancipá',
 }
 
 signupForm.addEventListener('submit', async (e) => {

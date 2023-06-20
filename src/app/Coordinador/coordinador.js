@@ -1,6 +1,9 @@
 
 import { doc, getDoc, getDocs, setDoc, updateDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
 import { db } from "../firebase.js";
+import { aviso } from "../Avisos/avisos.js";
+
+const uid = localStorage.getItem("idUsuario");
 
 // Capturar el h1 del titulo y perfil
 const titulo = document.querySelector('#username');
@@ -8,6 +11,9 @@ const perfil = document.querySelector('#perfil');
 // Capturar el PERFIL y el USERNAME del local storage
 const perfilLocal = localStorage.getItem("perfil");
 const usernameLocal = localStorage.getItem("username");
+const NumeroEmpleados = localStorage.getItem("empleados");
+const codigos = localStorage.getItem("codigos");
+const estado = localStorage.getItem("estadoSolicitudes");
 //Muestra en la parte superior el nombre y el perfil
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
@@ -26,15 +32,15 @@ var anio = ahora.getFullYear();
 var mes = ahora.getMonth();
 var dia = 0;
 
-if (ahora.getDate() == 15 || ahora.getDate() == 30) {
+if (ahora.getDate() == 13 || ahora.getDate() == 27) {
     dia = 0;
     numeroDias.style.color = "red";
 }
-else if (ahora.getDate() < 15) {
-    dia = 15;
+else if (ahora.getDate() < 13) {
+    dia = 13;
 }
-else if (ahora.getDate() < 30) {
-    dia = 30;
+else if (ahora.getDate() < 27) {
+    dia = 27;
 }
 
 // Comprueba si el día ya ha pasado este mes
@@ -71,31 +77,21 @@ for (let i = 0; i < fechaObjetivo2.length; i++) {
     }
 }
 
-/* obtener el numero de empleados y actulizar con getDocs*/
-const querySnapshot = await getDocs(collection(db, "Base"));
-const Base = querySnapshot.docs.map((doc) => doc.data());
+
+
 /* Obtener codigos de la base de datos */
-const docRef = doc(db, "Codigos", idUsuario);
-const docSnap = await getDoc(docRef);
-let codigos;
-if (!docSnap.data() == undefined) {
-    codigos = docSnap.data().prestamos;
-}
-else {
-    codigos = [];
-}
-// Base total de empleados
-numeroTotal.innerHTML = Base.length;
+const arrayCodigos = JSON.parse(codigos);
+
 
 // Numero de codigos activos de la base de datos del coodinador
 let auxSolicitudes = 0;
-if (codigos.length == 0) {
+if (arrayCodigos.length == 0) {
     numeroSolicitudesPendientes.innerHTML = 0;
 }
 else {
     /*Obtener el numero de solicitudes sin realizar*/
-    for (let i = 0; i < codigos.length; i++) {
-        if (codigos[i].estado == true) {
+    for (let i = 0; i < arrayCodigos.length; i++) {
+        if (arrayCodigos[i].estado == true) {
             auxSolicitudes++;
         }
     }
@@ -103,7 +99,7 @@ else {
 numeroSolicitudesPendientes.innerHTML = auxSolicitudes;
 
 // Mostar contenido en una tabla
-codigos.forEach((c) => {
+arrayCodigos.forEach((c) => {
     tabla.innerHTML += `
     <tr>
         <td>${c.codigo}</td>
@@ -116,6 +112,31 @@ codigos.forEach((c) => {
     `
 });
 
+if (estado == 'true') {
+    document.getElementById("myonoffswitch").checked = false;
+}
+else {
+    document.getElementById("myonoffswitch").checked = true;
+}
+
+/*Inabilitar permisos*/
+document.getElementById("myonoffswitch").addEventListener("click", async function (event) {
+    const querySnapshot2 = await getDocs(collection(db, "Usuarios"));
+
+    if (this.checked) {
+        await updateDoc(doc(db, "Usuarios", uid), {
+            estadoSolicitudes: true
+        });
+        aviso('Se ha notificado que va a publicar mas codigos para hacer', 'success');
+
+
+    } else {
+        await updateDoc(doc(db, "Usuarios", uid), {
+            estadoSolicitudes: false
+        });
+        aviso('Se ha notificado que no va a publicar mas codigos para hacer', 'success');
+    }
+});
 
 
 

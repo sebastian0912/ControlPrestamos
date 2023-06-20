@@ -28,15 +28,15 @@ var anio = ahora.getFullYear();
 var mes = ahora.getMonth();
 var dia = 0;
 
-if (ahora.getDate() == 15 || ahora.getDate() == 30) {
+if (ahora.getDate() == 13 || ahora.getDate() == 27) {
     dia = 0;
     numeroDias.style.color = "red";
 }
-else if (ahora.getDate() < 15) {
-    dia = 15;
+else if (ahora.getDate() < 13) {
+    dia = 13;
 }
-else if (ahora.getDate() < 30) {
-    dia = 30;
+else if (ahora.getDate() < 27) {
+    dia = 27;
 }
 
 // Comprueba si el día ya ha pasado este mes
@@ -138,7 +138,7 @@ function verificaMonto(monto, datos) {
         const cod = doc.data();
         const prestamos = cod.prestamos;
         prestamos.forEach(p => {
-            if ( parseInt(p.monto) >= monto) {
+            if (parseInt(p.monto) >= monto) {
                 encontrado = true;
             }
         });
@@ -168,7 +168,7 @@ function verificaSiesUnPrestamo(codigo) {
     }
 }
 
-function verificaSelect(select){
+function verificaSelect(select) {
     let encontrado = false;
     if (select.value == '0') {
         aviso('Debe seleccionar una forma de pago', 'error');
@@ -204,7 +204,7 @@ boton.addEventListener('click', async (e) => {
         let todas = false;
         console.log(datosUsuario)
         if (!verificarCodigo(codigoP, datos)) {
-            aviso('El codigo no existe', 'error');            
+            aviso('El codigo no existe', 'error');
             return;
         }
         if (!verificarCodigoEstado(codigoP, datos)) {
@@ -228,7 +228,7 @@ boton.addEventListener('click', async (e) => {
         }
         else {
 
-            
+
             const cod = obtenerCodigo(codigoP, datos);
             concepto = 'Prestamo para hacer';
             encontrado = true;
@@ -248,7 +248,7 @@ boton.addEventListener('click', async (e) => {
             // modificar la variable estado dentro del arreglo y subir cambios a firebase
             cod.estado = false;
             cod.fechaEjecutado = new Date().toLocaleDateString()
-            cod.ejecutadoPor = usernameLocal;            
+            cod.ejecutadoPor = usernameLocal;
             // generar codigo solo numeros aleatorios
             cod.codigoDescontado = 'OH' + Math.floor(Math.random() * (999999 - 100000)) + 100000;
 
@@ -285,28 +285,28 @@ boton.addEventListener('click', async (e) => {
                     historia: [data]
                 });
             }
-            
+
             aviso('Acaba de pedir un prestamo de ' + valor, 'success');
 
             var docPdf = new jsPDF();
-           
+
             docPdf.addFont('Helvetica-Bold', 'Helvetica', 'bold');
-            
+
 
             docPdf.setFontSize(9);
-            docPdf.text('______________________________________________________________________________________________________________' , 10, 10);
+            docPdf.text('______________________________________________________________________________________________________________', 10, 10);
             docPdf.setFontSize(24);
             docPdf.setFont('Helvetica', 'bold');
             docPdf.text('TU ALIANZA S.A.S', 30, 19);
             docPdf.setFont('Helvetica', 'normal');
             docPdf.setFontSize(9);
-            docPdf.text('AUTORIZACION DE DESCUENTO' , 132, 15);
-            docPdf.text('TU ALIANZA SAS NIT 900864596 - 1' , 130, 20);
-            docPdf.text('CRA 2 N 8- 156 FACATATIVA' , 135, 25);
-            docPdf.text('______________________________________________________________________________________________________________' , 10, 27);
-            docPdf.text('______________________________________________________________________________________________________________' , 10, 29);
-            
-            
+            docPdf.text('AUTORIZACION DE DESCUENTO', 132, 15);
+            docPdf.text('TU ALIANZA SAS NIT 900864596 - 1', 130, 20);
+            docPdf.text('CRA 2 N 8- 156 FACATATIVA', 135, 25);
+            docPdf.text('______________________________________________________________________________________________________________', 10, 27);
+            docPdf.text('______________________________________________________________________________________________________________', 10, 29);
+
+
             docPdf.text('Fecha de Solicitud: ' + new Date().toLocaleDateString(), 10, 40);
             // salto de linea
             docPdf.setFont('Helvetica', 'bold');
@@ -315,20 +315,20 @@ boton.addEventListener('click', async (e) => {
             docPdf.setFont('Helvetica', 'normal');
 
 
-            docPdf.text('Yo, ' + usuario.nombre + ' mayor de edad,  identificado con la cedula de ciudadania No. ' 
-            + usuario.cedula +' autorizo', 10, 55);
-            docPdf.text('expresa e irrevocablemente para que del sueldo, salario, prestaciones sociales o de cualquier suma de la sea acreedor; me sean', 10, 60); 
-            docPdf.text('descontados la cantidad de ' + valor + ' (Letras)  ' + NumeroALetras(nuevovalor) + 'por concepto de' +' PRESTAMO, en '+cuotas+' cuota(s), ', 10, 65);
-            docPdf.text('quincenal del credito del que soy deudor ante Tu alianza S.A.S. , aun en el evento de encontrarme disfrutando de mis licencias ', 10, 70);            
-            docPdf.text('o incapacidades. ', 10, 75 );
+            docPdf.text('Yo, ' + usuario.nombre + ' mayor de edad,  identificado con la cedula de ciudadania No. '
+                + usuario.cedula + ' autorizo', 10, 55);
+            docPdf.text('expresa e irrevocablemente para que del sueldo, salario, prestaciones sociales o de cualquier suma de la sea acreedor; me sean', 10, 60);
+            docPdf.text('descontados la cantidad de ' + valor + ' (Letras)  ' + NumeroALetras(nuevovalor) + 'por concepto de' + ' PRESTAMO, en ' + cuotas + ' cuota(s), ', 10, 65);
+            docPdf.text('quincenal del credito del que soy deudor ante Tu alianza S.A.S. , aun en el evento de encontrarme disfrutando de mis licencias ', 10, 70);
+            docPdf.text('o incapacidades. ', 10, 75);
 
-            docPdf.text('Fecha de ingreso: ' + usuario.ingreso , 10, 90);
-            docPdf.text('Forma de pago: ' + tipo.value , 10, 95);
+            docPdf.text('Fecha de ingreso: ' + usuario.ingreso, 10, 90);
+            docPdf.text('Forma de pago: ' + tipo.value, 10, 95);
             docPdf.setFont('Helvetica', 'bold');
-            docPdf.text('Cordialmente ' , 10, 110);
+            docPdf.text('Cordialmente ', 10, 110);
             docPdf.setFont('Helvetica', 'normal');
-            docPdf.text('Firma de Autorización ' , 10, 115);
-            docPdf.text('C.C. '+ usuario.cedula  , 10, 120);
+            docPdf.text('Firma de Autorización ', 10, 115);
+            docPdf.text('C.C. ' + usuario.cedula, 10, 120);
             docPdf.text('Telefono: ' + celular, 10, 125);
             // realizar un cuadro para colocar la huella dactilar
             docPdf.rect(130, 110, 35, 45);
@@ -337,7 +337,7 @@ boton.addEventListener('click', async (e) => {
             docPdf.setFontSize(5);
             docPdf.text('Huella Indice Derecho', 130, 105);
 
-            docPdf.save('PrestamoDescontar'+'_'+usuario.nombre+'.pdf');
+            docPdf.save('PrestamoDescontar' + '_' + usuario.nombre + "_" + cod.codigoDescontado + '.pdf');
         }
     }
 });
@@ -370,10 +370,9 @@ boton.addEventListener('click', async (e) => {
 // @author Rodolfo Carmona
 // @contributor Jean (jpbadoino@gmail.com)
 /*************************************************************/
-function Unidades(num){
+function Unidades(num) {
 
-    switch(num)
-    {
+    switch (num) {
         case 1: return "UN";
         case 2: return "DOS";
         case 3: return "TRES";
@@ -388,16 +387,14 @@ function Unidades(num){
     return "";
 }//Unidades()
 
-function Decenas(num){
+function Decenas(num) {
 
-    let decena = Math.floor(num/10);
+    let decena = Math.floor(num / 10);
     let unidad = num - (decena * 10);
 
-    switch(decena)
-    {
+    switch (decena) {
         case 1:
-            switch(unidad)
-            {
+            switch (unidad) {
                 case 0: return "DIEZ";
                 case 1: return "ONCE";
                 case 2: return "DOCE";
@@ -407,8 +404,7 @@ function Decenas(num){
                 default: return "DIECI" + Unidades(unidad);
             }
         case 2:
-            switch(unidad)
-            {
+            switch (unidad) {
                 case 0: return "VEINTE";
                 default: return "VEINTI" + Unidades(unidad);
             }
@@ -425,7 +421,7 @@ function Decenas(num){
 
 function DecenasY(strSin, numUnidades) {
     if (numUnidades > 0)
-    return strSin + " Y " + Unidades(numUnidades)
+        return strSin + " Y " + Unidades(numUnidades)
 
     return strSin;
 }//DecenasY()
@@ -434,8 +430,7 @@ function Centenas(num) {
     let centenas = Math.floor(num / 100);
     let decenas = num - (centenas * 100);
 
-    switch(centenas)
-    {
+    switch (centenas) {
         case 1:
             if (decenas > 0)
                 return "CIENTO " + Decenas(decenas);
@@ -479,7 +474,7 @@ function Miles(num) {
     let strMiles = Seccion(num, divisor, "MIL", "MIL");
     let strCentenas = Centenas(resto);
 
-    if(strMiles == "")
+    if (strMiles == "")
         return strCentenas;
 
     return strMiles + " " + strCentenas;
@@ -493,7 +488,7 @@ function Millones(num) {
     let strMillones = Seccion(num, divisor, "UN MILLON DE", "MILLONES DE");
     let strMiles = Miles(resto);
 
-    if(strMillones == "")
+    if (strMillones == "")
         return strMiles;
 
     return strMillones + " " + strMiles;
@@ -513,15 +508,15 @@ function NumeroALetras(num) {
     };
 
     if (data.centavos > 0) {
-        data.letrasCentavos = "CON " + (function (){
+        data.letrasCentavos = "CON " + (function () {
             if (data.centavos == 1)
                 return Millones(data.centavos) + " " + data.letrasMonedaCentavoSingular;
             else
                 return Millones(data.centavos) + " " + data.letrasMonedaCentavoPlural;
-            })();
+        })();
     };
 
-    if(data.enteros == 0)
+    if (data.enteros == 0)
         return "CERO " + data.letrasMonedaPlural + " " + data.letrasCentavos;
     if (data.enteros == 1)
         return Millones(data.enteros) + " " + data.letrasMonedaSingular + " " + data.letrasCentavos;
@@ -533,15 +528,15 @@ function NumeroALetras(num) {
 
 extraeT.addEventListener('click', async () => {
     const querySnapshot = await getDocs(collection(db, "Tienda"));
-    
+
     let dataString = 'nombre\tMonto Total\t Numero de compras en la tienda\n';
-    
+
     querySnapshot.forEach((doc) => {
-        const docData = doc.data();        
-        dataString += 
-        docData.nombre + '\t' +
-        docData.valorTotal + '\t' +
-        docData.numPersonasAtendidas + '\n';        
+        const docData = doc.data();
+        dataString +=
+            docData.nombre + '\t' +
+            docData.valorTotal + '\t' +
+            docData.numPersonasAtendidas + '\n';
     });
 
     // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
@@ -558,7 +553,41 @@ extraeT.addEventListener('click', async () => {
 });
 
 
+extrae.addEventListener('click', async () => {
+    const querySnapshot = await getDocs(collection(db, "Historial"));
+    let historial = [];
+    querySnapshot.forEach(doc => {
+        const cod = doc.data();
+        const historia = cod.historia;
 
+        historia.forEach(p => {
+            if (p.concepto.startsWith("Compra")) {
+                historial.push(p);
+            }
+        });
+    });
+
+    let dataString = 'Cedula\tconcepto\tcuotas\fechaEfectuado\tnombreQuienEntrego\tvalor\n';
+    historial.forEach((doc) => {
+        dataString +=
+            doc.cedula + '\t' +
+            doc.concepto + '\t' +
+            doc.cuotas + '\t' +
+            doc.fechaEfectuado + '\t' +
+            doc.nombreQuienEntrego + '\t' +
+            doc.valor + '\n';
+    }
+    );
+    // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
+    const element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
+    element.setAttribute('download', 'datosHistorialDetallado.txt');
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+});
 
 
 

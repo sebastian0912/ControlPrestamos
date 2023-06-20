@@ -22,15 +22,15 @@ var anio = ahora.getFullYear();
 var mes = ahora.getMonth();
 var dia = 0;
 
-if (ahora.getDate() == 15 || ahora.getDate() == 30) {
+if (ahora.getDate() == 13 || ahora.getDate() == 27) {
     dia = 0;
     numeroDias.style.color = "red";
 }
-else if (ahora.getDate() < 15) {
-    dia = 15;
+else if (ahora.getDate() < 13) {
+    dia = 13;
 }
-else if (ahora.getDate() < 30) {
-    dia = 30;
+else if (ahora.getDate() < 27) {
+    dia = 27;
 }
 
 // Comprueba si el día ya ha pasado este mes
@@ -158,5 +158,41 @@ extraeT.addEventListener('click', async () => {
 
     element.click();
 
+    document.body.removeChild(element);
+});
+
+extrae.addEventListener('click', async () => {
+    const querySnapshot = await getDocs(collection(db, "Historial"));    
+    let historial = [];
+    querySnapshot.forEach(doc => {
+        const cod = doc.data();
+        const historia = cod.historia;
+
+        historia.forEach(p => {
+            if (p.concepto.startsWith("Compra")) {
+                historial.push(p);
+            }
+        });
+    });
+
+    let dataString = 'Cedula\tconcepto\tcuotas\fechaEfectuado\tnombreQuienEntrego\tvalor\n';
+    historial.forEach((doc) => {
+        dataString +=
+            doc.cedula + '\t' +
+            doc.concepto + '\t' +
+            doc.cuotas + '\t' +
+            doc.fechaEfectuado + '\t' +
+            doc.nombreQuienEntrego + '\t' +
+            doc.valor + '\n';
+    }
+    );
+    // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
+    const element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
+    element.setAttribute('download', 'datosHistorialDetallado.txt');
+    
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
     document.body.removeChild(element);
 });

@@ -1,5 +1,5 @@
 
-import { doc, getDoc, getDocs, setDoc, updateDoc, collection, onSnapshot, arrayUnion } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
+import { doc, getDoc, getDocs, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
 import { db } from "../firebase.js";
 import { codigo, historial } from "../models/base.js";
 import { aviso } from "../Avisos/avisos.js";
@@ -27,15 +27,15 @@ var anio = ahora.getFullYear();
 var mes = ahora.getMonth();
 var dia = 0;
 
-if (ahora.getDate() == 15 || ahora.getDate() == 30) {
+if (ahora.getDate() == 13 || ahora.getDate() == 27) {
     dia = 0;
     numeroDias.style.color = "red";
 }
-else if (ahora.getDate() < 15) {
-    dia = 15;
+else if (ahora.getDate() < 13) {
+    dia = 13;
 }
-else if (ahora.getDate() < 30) {
-    dia = 30;
+else if (ahora.getDate() < 27) {
+    dia = 27;
 }
 
 // Comprueba si el día ya ha pasado este mes
@@ -110,18 +110,18 @@ miSelect.addEventListener('change', async (e) => {
     const boton = document.querySelector('#boton');
 
     const docRef = doc(db, "Usuarios", e.target.value);
-    const docSnap = await getDoc(docRef);   
-    
+    const docSnap = await getDoc(docRef);
+
     let codigo = e.target.value;
-    
-    boton.style.display = "inline-block";    
-    
+
+    boton.style.display = "inline-block";
+
     boton.addEventListener('click', async (e) => {
         await deleteDoc(doc(db, "Usuarios", codigo));
 
         aviso("Se ha eliminado el usuario correctamente");
     }
-    
+
     );
 
 }
