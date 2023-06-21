@@ -8,7 +8,7 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/9.21.0/firebase
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // usuario tu alianza
-/**/
+/*
 const firebaseConfig = {
   apiKey: "AIzaSyBHvh-gq4WDxhzVeCNP2F8QCSGnwwFEE60",
   authDomain: "tu-alianza.firebaseapp.com",
@@ -16,7 +16,7 @@ const firebaseConfig = {
   storageBucket: "tu-alianza.appspot.com",
   messagingSenderId: "219112231329",
   appId: "1:219112231329:web:6b13a458b731b403a0fbe0"
-};
+};*/
 
 /*personal uno
 const firebaseConfig = {
@@ -28,7 +28,7 @@ const firebaseConfig = {
   appId: "1:804649224739:web:2d2d38b9290e2bf6057f96"
 };*/
 
-/*personal 2
+/*personal 2*/
 const firebaseConfig = {
   apiKey: "AIzaSyCt4pD1Y1_EfscIMgYNwWMT1UswMt7wdzc",
   authDomain: "tu-alianza-9ced7.firebaseapp.com",
@@ -36,7 +36,7 @@ const firebaseConfig = {
   storageBucket: "tu-alianza-9ced7.appspot.com",
   messagingSenderId: "542709938155",
   appId: "1:542709938155:web:99cd72068aa00c8d364bae"
-};*/
+};
 
 /*personal 3
 const firebaseConfig = {

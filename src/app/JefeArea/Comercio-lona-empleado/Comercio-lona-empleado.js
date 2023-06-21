@@ -374,8 +374,8 @@ boton.addEventListener("click", async (e) => {
 
 
         await updateDoc(doc(db, "Base", cedula), {
-            mercados: parseInt(datos2.mercados) + sumaVentas,
-            cuotasMercados: 2
+            anchetas: parseInt(datos2.anchetas) + sumaVentas,
+            cuotasAnchetas: 2
         });
 
 
