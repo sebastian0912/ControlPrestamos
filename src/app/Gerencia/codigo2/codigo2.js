@@ -53,13 +53,13 @@ var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2
 for (let i = 0; i < fechaObjetivo2.length; i++) {
     // separar por año, mes y dia
     var fechaObjetivo3 = new Date(fechaObjetivo2[i]);
-    if (fechaObjetivo3.getFullYear() == ahora.getFullYear() && 
-        fechaObjetivo3.getMonth() == ahora.getMonth() && 
+    if (fechaObjetivo3.getFullYear() == ahora.getFullYear() &&
+        fechaObjetivo3.getMonth() == ahora.getMonth() &&
         fechaObjetivo3.getDate() >= ahora.getDate()) {
-            
-        var diferencia2 = fechaObjetivo3 - ahora;        
+
+        var diferencia2 = fechaObjetivo3 - ahora;
         var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
-        if (dias2 == 0){
+        if (dias2 == 0) {
             diasLi.style.color = "red";
         }
         diasLi.innerHTML = dias2;
@@ -83,21 +83,51 @@ numemoroM.addEventListener('keyup', (e) => {
     }
 });
 
+let tipo = document.querySelector('#tipo');
+tipo.addEventListener('change', (e) => {
+    const valor = document.querySelector('#valor');
+    const cuotas = document.querySelector('#cuotas');
 
-async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas) {
+    if (e.target.value == "Otro" || e.target.value == "Dinero") {
+        valor.style.display = "inline-block";
+        cuotas.style.display = "inline-block";
+    }
+    else if (e.target.value == "Seguro Funerario") {
+        valor.style.display = "block";
+        cuotas.style.display = "none";
+    }
+    else {
+        valor.style.display = "none";
+        cuotas.style.display = "none";
+    }
+});
+
+function verificaSelect(select) {
+    let encontrado = false;
+    if (select.value == '0') {
+        aviso('Debe seleccionar una forma de pago', 'error');
+        return false;
+    }
+    else {
+        encontrado = true;
+        return encontrado;
+    }
+}
+
+async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas, tipo) {
+
     const docCoordinador = doc(db, "Codigos", idUsuario);
     const coordninador = await getDoc(docCoordinador);
+    data.codigo = tipo;
+    data.monto = nuevovalor;
+    data.uid = idUsuario;
+    data.cuotas = cuotas;
+    data.cedulaQuienPide = cedulaEmpleado;
+    data.fechaGenerado = new Date().toLocaleDateString()
+    data.generadoPor = usernameLocal;
 
     if (coordninador.exists()) {
-        // generar un codigo aleatorio para el prestamo
-        data.codigo = Math.floor(Math.random() * 1000000);
-        data.codigo = 'GPH' + data.codigo;
-        data.uid = idUsuario;
-        data.monto = nuevovalor;
-        data.cuotas = cuotas;
-        data.cedulaQuienPide = cedulaEmpleado;
-        data.fechaGenerado = new Date().toLocaleDateString()
-        data.generadoPor = usernameLocal;
+        // generar un codigo aleatorio para el prestamo        
         // Actualizar en la base de datos
         await updateDoc(doc(db, "Codigos", idUsuario), {
             prestamos: arrayUnion(data)
@@ -105,15 +135,6 @@ async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas) {
         aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + data.codigo, 'success');
     }
     else {
-        data.codigo = Math.floor(Math.random() * 1000000);
-        data.codigo = 'GPH' + data.codigo;
-        data.uid = idUsuario;
-        data.monto = nuevovalor;
-        data.cuotas = 2;
-        data.cedulaQuienPide = cedulaEmpleado;
-        data.fechaGenerado = new Date().toLocaleDateString()
-        data.coordinador = usernameLocal;
-        
         await setDoc(docCoordinador, {
             prestamos: [data]
         });
@@ -124,28 +145,124 @@ async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas) {
 
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
-    const valor = document.querySelector('#valor').value;
-    const nuevovalor = valor.replace(/\,/g, '');
-    const cuotas = document.querySelector('#cuotas').value;
-
     e.preventDefault();
-    // capturar los datos del formulario
-    const cedulaEmpleado = document.querySelector('#cedula').value;
-    let data = codigo;
-    escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas);    
+    let valor = document.querySelector('#valor').value;
+    let nuevovalor = valor.replace(/\,/g, '');
+    let cuotas = document.querySelector('#cuotas').value;
+    let tipo = document.querySelector('#tipo').value;
+    let cedulaEmpleado = document.querySelector('#cedula').value;
+    let codigoOH = null; 
+    let bandera = false;
+
+    if (!verificaSelect(formaPago)) {
+        return;
+    }
+    if (valor != '' && tipo != '0') {
+        bandera = true;
+        if (tipo == "Seguro Funerario") {
+            codigoOH = 'SF' + Math.floor(Math.random() * 1000000);
+            cuotas = 1;
+        }
+        else if (tipo == "Dinero") {
+            codigoOH = 'PH' + Math.floor(Math.random() * 1000000);
+        }
+        else if (tipo == "Otro") {
+            codigoOH = 'OT' + Math.floor(Math.random() * 1000000);
+        }
+
+        // capturar los datos del formulario
+        let data = codigo;
+        escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas, codigoOH)
+
+        if (bandera == true) {
+            const datosUsuario = await getDoc(doc(db, "Base", cedulaEmpleado));
+            const usuario = datosUsuario.data();
+            let empresa = null;
+            let NIT = null;
+            let direcccion = null;
+            if (usuario.temporal.startsWith("Apoyo") || usuario.temporal.startsWith("APOYO")) {
+                empresa = "APOYO LABORAL TS SAS";
+                NIT = "NIT 900814587"
+                direcccion = "CALLE 112 A No. 18 A -05"
+            }
+            else if (usuario.temporal.startsWith("Tu") || usuario.temporal.startsWith("TU")) {
+                empresa = "TU ALIANZA SAS";
+                NIT = "NIT 900864596 - 1"
+                direcccion = "CRA 2 N 8- 156 FACATATIVA'"
+            }
+            else if (usuario.temporal.startsWith("Comercializadora") || usuario.temporal.startsWith("COMERCIALIZADORA")) {
+                empresa = "COMERCIALIZADORA TS";
+            }
+            var docPdf = new jsPDF();
+
+            docPdf.addFont('Helvetica-Bold', 'Helvetica', 'bold');
+
+
+            docPdf.setFontSize(9);
+            docPdf.text('______________________________________________________________________________________________________________', 10, 10);
+            docPdf.setFontSize(24);
+            docPdf.setFont('Helvetica', 'bold');
+            docPdf.text(empresa, 15, 22);
+            docPdf.setFont('Helvetica', 'normal');
+            docPdf.setFontSize(9);
+            docPdf.text('AUTORIZACION DE LIBRANZA', 132, 15);
+            docPdf.text(NIT, 145, 20);
+            docPdf.text(direcccion, 135, 25);
+            docPdf.text('______________________________________________________________________________________________________________', 10, 27);
+            docPdf.text('______________________________________________________________________________________________________________', 10, 29);
+
+
+            docPdf.text('Fecha de Solicitud: ' + new Date().toLocaleDateString(), 10, 40);
+            // salto de linea
+            docPdf.setFont('Helvetica', 'bold');
+
+            docPdf.text('ASUNTO: CREDITO (PRESTAMO)', 10, 50);
+            docPdf.setFont('Helvetica', 'normal');
+
+
+            docPdf.text('Yo, ' + usuario.nombre + ' mayor de edad,  identificado con la cedula de ciudadania No. '
+                + usuario.cedula + ' autorizo', 10, 55);
+            docPdf.text('expresa e irrevocablemente para que del sueldo, salario, prestaciones sociales o de cualquier suma de la sea acreedor; me sean', 10, 60);
+            docPdf.text('descontados la cantidad de ' + valor + ' (Letras)  ' + NumeroALetras(nuevovalor) + 'por concepto de' + ' PRESTAMO, en ' + cuotas + ' cuota(s), ', 10, 65);
+            docPdf.text('quincenal del credito del que soy deudor ante Tu alianza S.A.S. , aun en el evento de encontrarme disfrutando de mis licencias ', 10, 70);
+            docPdf.text('o incapacidades. ', 10, 75);
+
+            docPdf.text('Fecha de ingreso: ' + usuario.ingreso, 10, 90);
+            docPdf.text('Centro de Costo: ' + usuario.finca, 130, 90);
+            docPdf.text('Forma de pago: ' + formaPago.value, 10, 95);
+            docPdf.text('Telefono: ' + celular.value, 130, 95);
+            docPdf.setFont('Helvetica', 'bold');
+            docPdf.text('Cordialmente ', 10, 110);
+            docPdf.setFont('Helvetica', 'normal');
+            docPdf.text('Firma de Autorización ', 10, 115);
+            docPdf.text('C.C. ' + usuario.cedula, 10, 120);
+
+            // realizar un cuadro para colocar la huella dactilar
+            docPdf.rect(130, 110, 35, 45);
+            docPdf.text('Codigo de autorización nomina: ' + codigoOH, 10, 130);
+            docPdf.setFont('Helvetica', 'bold');
+            docPdf.setFontSize(6);
+            docPdf.text('Huella Indice Derecho', 130, 105);
+
+            docPdf.save('PrestamoDescontar' + '_' + usuario.nombre + "_" + codigoOH + '.pdf');
+        }
+    }
+    valor = '';
+    cuotas = '';
+    cedulaEmpleado = '';
 });
 
 extraeT.addEventListener('click', async () => {
     const querySnapshot = await getDocs(collection(db, "Tienda"));
-    
+
     let dataString = 'nombre\tMonto Total\t Numero de compras en la tienda\n';
-    
+
     querySnapshot.forEach((doc) => {
-        const docData = doc.data();        
-        dataString += 
-        docData.nombre + '\t' +
-        docData.valorTotal + '\t' +
-        docData.numPersonasAtendidas + '\n';        
+        const docData = doc.data();
+        dataString +=
+            docData.nombre + '\t' +
+            docData.valorTotal + '\t' +
+            docData.numPersonasAtendidas + '\n';
     });
 
     // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
@@ -162,7 +279,7 @@ extraeT.addEventListener('click', async () => {
 });
 
 extrae.addEventListener('click', async () => {
-    const querySnapshot = await getDocs(collection(db, "Historial"));    
+    const querySnapshot = await getDocs(collection(db, "Historial"));
     let historial = [];
     querySnapshot.forEach(doc => {
         const cod = doc.data();
@@ -190,9 +307,191 @@ extrae.addEventListener('click', async () => {
     const element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
     element.setAttribute('download', 'datosHistorialDetallado.txt');
-    
+
     element.style.display = 'none';
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
 });
+
+/*************************************************************/
+// NumeroALetras
+// The MIT License (MIT)
+// 
+// Copyright (c) 2015 Luis Alfredo Chee 
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
+// @author Rodolfo Carmona
+// @contributor Jean (jpbadoino@gmail.com)
+/*************************************************************/
+function Unidades(num) {
+
+    switch (num) {
+        case 1: return "UN";
+        case 2: return "DOS";
+        case 3: return "TRES";
+        case 4: return "CUATRO";
+        case 5: return "CINCO";
+        case 6: return "SEIS";
+        case 7: return "SIETE";
+        case 8: return "OCHO";
+        case 9: return "NUEVE";
+    }
+
+    return "";
+}//Unidades()
+
+function Decenas(num) {
+
+    let decena = Math.floor(num / 10);
+    let unidad = num - (decena * 10);
+
+    switch (decena) {
+        case 1:
+            switch (unidad) {
+                case 0: return "DIEZ";
+                case 1: return "ONCE";
+                case 2: return "DOCE";
+                case 3: return "TRECE";
+                case 4: return "CATORCE";
+                case 5: return "QUINCE";
+                default: return "DIECI" + Unidades(unidad);
+            }
+        case 2:
+            switch (unidad) {
+                case 0: return "VEINTE";
+                default: return "VEINTI" + Unidades(unidad);
+            }
+        case 3: return DecenasY("TREINTA", unidad);
+        case 4: return DecenasY("CUARENTA", unidad);
+        case 5: return DecenasY("CINCUENTA", unidad);
+        case 6: return DecenasY("SESENTA", unidad);
+        case 7: return DecenasY("SETENTA", unidad);
+        case 8: return DecenasY("OCHENTA", unidad);
+        case 9: return DecenasY("NOVENTA", unidad);
+        case 0: return Unidades(unidad);
+    }
+}//Unidades()
+
+function DecenasY(strSin, numUnidades) {
+    if (numUnidades > 0)
+        return strSin + " Y " + Unidades(numUnidades)
+
+    return strSin;
+}//DecenasY()
+
+function Centenas(num) {
+    let centenas = Math.floor(num / 100);
+    let decenas = num - (centenas * 100);
+
+    switch (centenas) {
+        case 1:
+            if (decenas > 0)
+                return "CIENTO " + Decenas(decenas);
+            return "CIEN";
+        case 2: return "DOSCIENTOS " + Decenas(decenas);
+        case 3: return "TRESCIENTOS " + Decenas(decenas);
+        case 4: return "CUATROCIENTOS " + Decenas(decenas);
+        case 5: return "QUINIENTOS " + Decenas(decenas);
+        case 6: return "SEISCIENTOS " + Decenas(decenas);
+        case 7: return "SETECIENTOS " + Decenas(decenas);
+        case 8: return "OCHOCIENTOS " + Decenas(decenas);
+        case 9: return "NOVECIENTOS " + Decenas(decenas);
+    }
+
+    return Decenas(decenas);
+}//Centenas()
+
+function Seccion(num, divisor, strSingular, strPlural) {
+    let cientos = Math.floor(num / divisor)
+    let resto = num - (cientos * divisor)
+
+    let letras = "";
+
+    if (cientos > 0)
+        if (cientos > 1)
+            letras = Centenas(cientos) + " " + strPlural;
+        else
+            letras = strSingular;
+
+    if (resto > 0)
+        letras += "";
+
+    return letras;
+}//Seccion()
+
+function Miles(num) {
+    let divisor = 1000;
+    let cientos = Math.floor(num / divisor)
+    let resto = num - (cientos * divisor)
+
+    let strMiles = Seccion(num, divisor, "MIL", "MIL");
+    let strCentenas = Centenas(resto);
+
+    if (strMiles == "")
+        return strCentenas;
+
+    return strMiles + " " + strCentenas;
+}//Miles()
+
+function Millones(num) {
+    let divisor = 1000000;
+    let cientos = Math.floor(num / divisor)
+    let resto = num - (cientos * divisor)
+
+    let strMillones = Seccion(num, divisor, "UN MILLON DE", "MILLONES DE");
+    let strMiles = Miles(resto);
+
+    if (strMillones == "")
+        return strMiles;
+
+    return strMillones + " " + strMiles;
+}//Millones()
+
+function NumeroALetras(num) {
+    var data = {
+        numero: num,
+        enteros: Math.floor(num),
+        centavos: (((Math.round(num * 100)) - (Math.floor(num) * 100))),
+        letrasCentavos: "",
+        letrasMonedaPlural: 'Pesos',//"PESOS", 'Dólares', 'Bolívares', 'etcs'
+        letrasMonedaSingular: 'Peso', //"PESO", 'Dólar', 'Bolivar', 'etc'
+
+        letrasMonedaCentavoPlural: "CENTAVOS",
+        letrasMonedaCentavoSingular: "CENTAVO"
+    };
+
+    if (data.centavos > 0) {
+        data.letrasCentavos = "CON " + (function () {
+            if (data.centavos == 1)
+                return Millones(data.centavos) + " " + data.letrasMonedaCentavoSingular;
+            else
+                return Millones(data.centavos) + " " + data.letrasMonedaCentavoPlural;
+        })();
+    };
+
+    if (data.enteros == 0)
+        return "CERO " + data.letrasMonedaPlural + " " + data.letrasCentavos;
+    if (data.enteros == 1)
+        return Millones(data.enteros) + " " + data.letrasMonedaSingular + " " + data.letrasCentavos;
+    else
+        return Millones(data.enteros) + " " + data.letrasMonedaPlural + " " + data.letrasCentavos;
+}
+

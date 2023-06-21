@@ -127,17 +127,17 @@ async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor) {
 
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
-    const valor = document.querySelector('#valor').value;
-    const nuevovalor = valor.replace(/\,/g, '');
+    let valor = document.querySelector('#valor').value;
+    let nuevovalor = valor.replace(/\,/g, '');
 
     e.preventDefault();
     // capturar los datos del formulario
-    const cedulaEmpleado = document.querySelector('#cedula').value;
+    let cedulaEmpleado = document.querySelector('#cedula').value;
     const docRef = doc(db, "Base", cedulaEmpleado);
     const docSnap = await getDoc(docRef);
 
     const datos = docSnap.data();
-
+    
     // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
     const fechaIngreso = datos.ingreso;
     let dia = fechaIngreso.split('-')[0];
@@ -215,6 +215,9 @@ boton.addEventListener('click', async (e) => {
             }
         }
     }
+    
+    valor= ""
+    cedulaEmpleado = ""
 
 }
 );

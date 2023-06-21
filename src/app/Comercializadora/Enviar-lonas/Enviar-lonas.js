@@ -100,7 +100,6 @@ for (let i = 0; i < fechaObjetivo2.length; i++) {
 
 let mostrarAviso = false;
 miSelect2.addEventListener('change', async (e) => {
-    const querySnapshot = await getDocs(collection(db, "Conceptos"));
     const otro = document.querySelector('#otro2');
 
     if (e.target.value == "11") {

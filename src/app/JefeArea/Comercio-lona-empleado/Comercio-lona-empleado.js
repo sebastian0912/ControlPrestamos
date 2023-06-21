@@ -217,7 +217,7 @@ function verificaCondiciones(datos, nuevovalor) {
     }
 }
 
-function verificaSelect(select){
+function verificaSelect(select) {
     let encontrado = false;
     if (select.value == '0') {
         aviso('Debe seleccionar una forma de pago', 'error');
@@ -236,7 +236,7 @@ function verificarCodigoEstado(codigo, datos) {
         const cod = doc.data();
         const prestamos = cod.prestamos;
         prestamos.forEach(p => {
-            if (p.estado == true) {
+            if (p.codigo == codigo && p.estado == true) {
                 encontrado = true;
             }
         });
@@ -276,11 +276,13 @@ function verificaMonto(monto, datos) {
 
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener("click", async (e) => {
-    const cantidad = document.querySelector("#Cantidad").value;
-    const cedula = document.querySelector("#cedula").value;
-    const codigo = document.querySelector("#codigo").value;
-    const codigoA = document.querySelector("#codigoA").value;
-    const celular = document.querySelector("#celular").value;
+    let cantidad = document.querySelector("#Cantidad").value;
+    let cedula = document.querySelector("#cedula").value;
+    let codigo = document.querySelector("#codigo").value;
+    let codigoA = document.querySelector("#codigoA").value;
+    let celular = document.querySelector("#celular").value;
+
+
 
     const CodigosMercado = await getDocs(collection(db, "Codigos"));
     const CodigosComercio = await getDocs(collection(db, "Comercio"));
@@ -297,9 +299,9 @@ boton.addEventListener("click", async (e) => {
     let sumaCantidad = parseInt(cantidad) + parseInt(datos.cantidadTotalVendida);
 
 
-    
-    if (sumaCantidad > datos.cantidadRecibida) {        
-        aviso("No se puede cargar el mercado porque no hay inventario lo maximo a sacar es " + (datos.cantidadRecibida - datos.cantidadTotalVendida) , "error");
+
+    if (sumaCantidad > datos.cantidadRecibida) {
+        aviso("No se puede cargar el mercado porque no hay inventario lo maximo a sacar es " + (datos.cantidadRecibida - datos.cantidadTotalVendida), "error");
         return;
     }
 
@@ -328,7 +330,7 @@ boton.addEventListener("click", async (e) => {
         return;
     }
 
-    if (!verificaSelect(tipo)) {        
+    if (!verificaSelect(tipo)) {
         return;
     }
 
@@ -407,6 +409,22 @@ boton.addEventListener("click", async (e) => {
         }
 
         aviso("Se ha cargado la informacion exitosamente", "success");
+        let empresa = null;
+        let NIT = null;
+        let direcccion = null;
+        if (usuario.temporal.startsWith("Apoyo") || usuario.temporal.startsWith("APOYO")) {
+            empresa = "APOYO LABORAL TS SAS";
+            NIT = "NIT 900814587"
+            direcccion = "CALLE 112 A No. 18 A -05"
+        }
+        else if (usuario.temporal.startsWith("Tu") || usuario.temporal.startsWith("TU")) {
+            empresa = "TU ALIANZA SAS";
+            NIT = "NIT 900864596 - 1"
+            direcccion = "CRA 2 N 8- 156 FACATATIVA'"
+        }
+        else if (usuario.temporal.startsWith("Comercializadora") || usuario.temporal.startsWith("COMERCIALIZADORA")) {
+            empresa = "COMERCIALIZADORA TS";
+        }
 
         var docPdf = new jsPDF();
 
@@ -417,12 +435,12 @@ boton.addEventListener("click", async (e) => {
         docPdf.text("______________________________________________________________________________________________________________", 10, 10);
         docPdf.setFontSize(24);
         docPdf.setFont("Helvetica", "bold");
-        docPdf.text("TU ALIANZA S.A.S", 35, 19);
-        docPdf.setFont("Helvetica", "normal");
+        docPdf.text(empresa, 35, 19);
+        docPdf.setFont('Helvetica', 'normal');
         docPdf.setFontSize(9);
-        docPdf.text("AUTORIZACION DE DESCUENTO", 132, 15);
-        docPdf.text("TU ALIANZA SAS NIT 900864596 - 1", 130, 20);
-        docPdf.text("CRA 2 N 8- 156 FACATATIVA", 135, 25);
+        docPdf.text('AUTORIZACION DE LIBRANZA', 132, 15);
+        docPdf.text(NIT, 130, 20);
+        docPdf.text(direcccion, 135, 25);
         docPdf.text("______________________________________________________________________________________________________________", 10, 27);
         docPdf.text("______________________________________________________________________________________________________________", 10, 29);
 
@@ -444,6 +462,8 @@ boton.addEventListener("click", async (e) => {
 
         docPdf.text("Fecha de ingreso: " + datos2.ingreso, 10, 90);
         docPdf.text("Forma de pago: " + tipo.value, 10, 95);
+        docPdf.text('Centro de Costo: ' + datos2.finca, 130, 90);
+
         docPdf.text("Telefono: " + celular, 130, 95);
         docPdf.setFont("Helvetica", "bold");
         docPdf.text("Cordialmente ", 10, 110);
@@ -464,7 +484,11 @@ boton.addEventListener("click", async (e) => {
         aviso("El codigo de autorizacion no existe", "error");
     }
 
-
+    cantidad = ""
+    cedula = ""
+    codigo = ""
+    codigoA = ""
+    celular = ""
 
 
 

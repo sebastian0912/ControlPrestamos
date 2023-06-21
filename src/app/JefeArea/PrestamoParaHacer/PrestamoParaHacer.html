@@ -11,6 +11,7 @@
 
     <script defer src="../../logOut2.js" type="module"></script>
     <script defer src="PrestamoParaHacer.js" type="module"></script>
+    <script defer type="text/javascript" src="./jspdf.es.min.js.js" type="module"></script>
 
 </head>
 
@@ -29,7 +30,7 @@
             <li>
                 <a href="./PrestamoParaHacer.html">
                     <img src="../../assets/prestamo.png" alt="logo" class="logo" />
-                    <p> Prestamo para hacer</p>
+                    <p> Descuento para realizar </p>
                 </a>
             </li>
 
@@ -74,10 +75,10 @@
 
             <h1 class="diasT"> Dias restantes antes de fecha cierre de novedades de nomina </h1>
             <span class="dias" id="diasRestantes"></span>
-      
+
             <h1 class="diasT"> Días restantes antes de liquidación </h1>
             <span class="dias" id="diasLi"></span>
-            
+
         </ul>
     </div>
 
@@ -93,15 +94,29 @@
 
     <div class="contenido">
         <div class="cuadroTexto">
-            <div class="cajaCedula">
-                <h1 class="titulo"> Digite la cedula del empleado a validar </h1>
-                <input type="text" id="cedula" placeholder="Ingrese el numero de cedula a buscar" class="input" />
-                <button class="btn" id="boton">Buscar</button>
-            </div>
-
             <div class="valor">
-                <input type="text" id="valor" placeholder="Valor" class="input2" />
-                <input type="text" id="cuotas" placeholder="Numero de cuotas" class="input2" />
+                <div class="valoresEscribir">
+                    <h1 class="titulo" style="margin-right: 10px;"> Digite la cedula del empleado a validar </h1>
+                    <input type="text" id="cedula" placeholder="Ingrese el numero de cedula a buscar" class="input2" />
+                    <select name="tipo" id="tipo" class="input2">
+                        <option value="0">Concepto</option>
+                        <option value="Dinero">Dinero</option>
+                        <option value="Seguro Funerario">Seguro Funerario</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                    <input type="text" id="valor" placeholder="Valor" class="input2" style="display: none;" />
+                    <input type="text" id="cuotas" placeholder="Numero de cuotas" class="input2"
+                        style="display: none;" />
+                    <select name="tipo" id="formaPago" class="input2">
+                        <option value="0">Forma Pago</option>
+                        <option value="Daviplata">Daviplata</option>
+                        <option value="Davivienda">Efectivo</option>
+                        <option value="Master">Mastercard</option>
+                    </select>
+                    <input type="text" id="celular" placeholder="Numero para pago" class="input2"
+                        style="margin-left: 40px;" />
+                    <button class="btn" id="boton">Buscar</button>
+                </div>
             </div>
         </div>
 

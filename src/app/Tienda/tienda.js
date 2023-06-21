@@ -134,7 +134,7 @@ function verificarCodigoEstado(codigo, datos) {
         const cod = doc.data();
         const prestamos = cod.prestamos;
         prestamos.forEach(p => {
-            if (p.estado == true) {
+            if (p.codigo == codigo && p.estado == true) {
                 encontrado = true;
             }
         });

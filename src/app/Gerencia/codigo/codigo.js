@@ -124,7 +124,7 @@ function verificarCodigoEstado(codigo, datos) {
         const cod = doc.data();
         const prestamos = cod.prestamos;
         prestamos.forEach(p => {
-            if (p.estado == true) {
+            if (p.codigo == codigo && p.estado == true) {
                 encontrado = true;
             }
         });
@@ -184,15 +184,16 @@ boton.addEventListener('click', async (e) => {
     e.preventDefault();
 
     // capturar los datos del formulario
-    const cedulaEmpleado = document.querySelector('#cedula').value;
-    const codigoP = document.querySelector('#codigo').value;
-    const valor = document.querySelector('#valor').value;
-    const nuevovalor = valor.replace(/\,/g, '');
-    const cuotas = document.querySelector('#cuotas').value;
-    const celular = document.querySelector('#celular').value;
+    let cedulaEmpleado = document.querySelector('#cedula').value;
+    let codigoP = document.querySelector('#codigo').value;
+    let valor = document.querySelector('#valor').value;
+    let nuevovalor = valor.replace(/\,/g, '');
+    let cuotas = document.querySelector('#cuotas').value;
+    let celular = document.querySelector('#celular').value;
 
     let encontrado = false;
     let concepto;
+
 
     if (codigoP == '') {
         aviso('El campo codigo no puede estar vacio', 'error');
@@ -287,6 +288,22 @@ boton.addEventListener('click', async (e) => {
             }
 
             aviso('Acaba de pedir un prestamo de ' + valor, 'success');
+            let empresa = null;
+            let NIT = null;
+            let direcccion = null;
+            if (usuario.temporal.startsWith("Apoyo") || usuario.temporal.startsWith("APOYO")) {
+                empresa = "APOYO LABORAL TS SAS";
+                NIT = "NIT 900814587"
+                direcccion = "CALLE 112 A No. 18 A -05"
+            }
+            else if (usuario.temporal.startsWith("Tu") || usuario.temporal.startsWith("TU")) {
+                empresa = "TU ALIANZA SAS";
+                NIT = "NIT 900864596 - 1"
+                direcccion = "CRA 2 N 8- 156 FACATATIVA'"
+            }
+            else if (usuario.temporal.startsWith("Comercializadora") || usuario.temporal.startsWith("COMERCIALIZADORA")) {
+                empresa = "COMERCIALIZADORA TS";
+            }
 
             var docPdf = new jsPDF();
 
@@ -297,12 +314,12 @@ boton.addEventListener('click', async (e) => {
             docPdf.text('______________________________________________________________________________________________________________', 10, 10);
             docPdf.setFontSize(24);
             docPdf.setFont('Helvetica', 'bold');
-            docPdf.text('TU ALIANZA S.A.S', 30, 19);
+            docPdf.text(empresa, 15, 22);
             docPdf.setFont('Helvetica', 'normal');
             docPdf.setFontSize(9);
-            docPdf.text('AUTORIZACION DE DESCUENTO', 132, 15);
-            docPdf.text('TU ALIANZA SAS NIT 900864596 - 1', 130, 20);
-            docPdf.text('CRA 2 N 8- 156 FACATATIVA', 135, 25);
+            docPdf.text('AUTORIZACION DE LIBRANZA', 132, 15);
+            docPdf.text(NIT, 145, 20);
+            docPdf.text(direcccion, 135, 25);
             docPdf.text('______________________________________________________________________________________________________________', 10, 27);
             docPdf.text('______________________________________________________________________________________________________________', 10, 29);
 
@@ -323,6 +340,7 @@ boton.addEventListener('click', async (e) => {
             docPdf.text('o incapacidades. ', 10, 75);
 
             docPdf.text('Fecha de ingreso: ' + usuario.ingreso, 10, 90);
+            docPdf.text('Centro de Costo: ' + usuario.finca, 130, 90);
             docPdf.text('Forma de pago: ' + tipo.value, 10, 95);
             docPdf.setFont('Helvetica', 'bold');
             docPdf.text('Cordialmente ', 10, 110);
@@ -340,6 +358,13 @@ boton.addEventListener('click', async (e) => {
             docPdf.save('PrestamoDescontar' + '_' + usuario.nombre + "_" + cod.codigoDescontado + '.pdf');
         }
     }
+
+    codigoP = ""
+    cedulaEmpleado = ""
+    valor = ""
+    cuotas = ""
+    celular = ""
+    
 });
 
 
