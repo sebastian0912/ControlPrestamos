@@ -4,7 +4,7 @@ import { comercio, historialModificaciones } from "../../models/base.js";
 import { aviso } from "../../Avisos/avisos.js";
 import { doc, getDoc, setDoc, collection, getDocs, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
 import { db } from "../../firebase.js";
-
+import axios from 'axios';
 const boton = document.querySelector('#boton');
 
 // Capturar el h1 del titulo y perfil
@@ -139,19 +139,29 @@ numemoroM.addEventListener('keyup', (e) => {
 boton.addEventListener('click', async (e) => {
     e.preventDefault();
     const codigo = document.querySelector('#Codigo').value;
+    
+
+
     const cantidad = document.querySelector('#cantidad');
     const valorUnidad = document.querySelector('#valorUnidad');
     //
     const otro2 = document.querySelector('#otro2').value;
     let miSelect = document.querySelector('#miSelect');
     let miSelect2 = document.querySelector('#miSelect2');
-    
+
+
+
+
+
+
+
+
 
     const datosCodigo = await getDoc(doc(db, "Comercio", codigo));
     if (datosCodigo.exists()) {
         if (datosCodigo.data().cantidadRecibida == "") {
             const codigo2 = document.querySelector('#Codigo');
-            
+
             boton.style.display = "none";
             codigo2.style.display = "none";
             cantidad.style.display = "inline-block";
@@ -166,22 +176,24 @@ boton.addEventListener('click', async (e) => {
             valorUnidad.placeholder = datosCodigo.data().valorUnidad;
             miSelect.value = datosCodigo.data().destino;
             miSelect2.value = datosCodigo.data().concepto;
-            
-            boton2.addEventListener('click', async (e) => {                
+
+            boton2.addEventListener('click', async (e) => {
                 const nuevovalor = valorUnidad.value.replace(/\,/g, '');
                 await updateDoc(doc(db, "Comercio", codigo), {
                     cantidadEnvio: cantidad.value,
                     valorUnidad: nuevovalor,
                     destino: miSelect.value,
                     concepto: miSelect2.value,
-                });
+                });// se hace peticion post con el id del comercioComercio.objects.filter(codigo=id)
 
                 aviso("Se ha actualizado correctamente", "success");
             });
-           
 
 
-            // crear un nuevo registro en la coleccion historial
+
+
+
+            /*// crear un nuevo registro en la coleccion historial
             const docHistorial = doc(db, "HistorialModificaciones", codigo);
             const HistorialRef = await getDoc(docHistorial);
             let aux = historialModificaciones;
@@ -206,7 +218,7 @@ boton.addEventListener('click', async (e) => {
                 await setDoc(docHistorial, {
                     historia: [aux]
                 });
-            }
+            }*/
 
         }
         else {

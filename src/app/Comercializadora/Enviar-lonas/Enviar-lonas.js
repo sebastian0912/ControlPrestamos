@@ -1,12 +1,14 @@
 
 
-import { comercio } from "../../models/base.js";
+import { comercio, urlBack } from "../../models/base.js";
 import { aviso } from "../../Avisos/avisos.js";
+
 import { doc, getDoc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
 import { db } from "../../firebase.js";
 
-const boton = document.querySelector('#boton');
 
+
+const boton = document.querySelector('#boton');
 // Capturar el h1 del titulo y perfil
 const titulo = document.querySelector('#username');
 const perfil = document.querySelector('#perfil');
@@ -83,13 +85,13 @@ var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2
 for (let i = 0; i < fechaObjetivo2.length; i++) {
     // separar por año, mes y dia
     var fechaObjetivo3 = new Date(fechaObjetivo2[i]);
-    if (fechaObjetivo3.getFullYear() == 
-        ahora.getFullYear() && fechaObjetivo3.getMonth() == 
-        ahora.getMonth() 
+    if (fechaObjetivo3.getFullYear() ==
+        ahora.getFullYear() && fechaObjetivo3.getMonth() ==
+        ahora.getMonth()
         && fechaObjetivo3.getDate() >= ahora.getDate()) {
-        var diferencia2 = fechaObjetivo3 - ahora;        
+        var diferencia2 = fechaObjetivo3 - ahora;
         var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
-        if (dias2 == 0){
+        if (dias2 == 0) {
             diasRestantesLi.style.color = "red";
         }
         diasRestantesLi.innerHTML = dias2;
@@ -135,9 +137,13 @@ numemoroM.addEventListener('keyup', (e) => {
 
 
 
+
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
     e.preventDefault();
+
+    console.log("jhhjkjhkjkhkjh");
+
     const cantidad = document.querySelector('#cantidad').value;
     const valorUnidad = document.querySelector('#valorUnidad').value;
     const nuevovalor = valorUnidad.replace(/\,/g, '');
@@ -164,7 +170,36 @@ boton.addEventListener('click', async (e) => {
     aux.PersonaEnvia = usernameLocal;
     aux.valorUnidad = nuevovalor;
     aux.fechaEnviada = new Date().toLocaleDateString();
-    await setDoc(doc(db, "Comercio", uid.toString()), aux);
+    //await setDoc(doc(db, "Comercio", uid.toString()), aux);
+    const urlcompleta = urlBack.url + '/Comercio/comercio'; // Reemplaza 'URL_DEL_ENDPOINT' con la URL del endpoint donde quieres hacer la petición PUT
+    const jwt = localStorage.getItem('jwt');
+    aux.jwt = jwt;
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',// para el resto de peticiónes HTTP le cambias a GET, POST, PUT, DELETE, etc.
+            body: JSON.stringify(aux)// Aquí va el body de tu petición tiene que ser asi en json para que el back lo pueda leer y procesar y hay algun problema me dices
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    } catch (error) {
+        console.error('Error en la petición HTTP PUT');
+        console.error(error);
+    }
+
+
+
     aviso("Se ha cargado la informacion exitosamente, el codigo es: " + uid, "success");
 });
 

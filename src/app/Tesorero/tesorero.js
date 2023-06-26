@@ -1,7 +1,7 @@
 
 import { doc, getDoc, getDocs, setDoc, updateDoc, collection } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
 import { db } from "../firebase.js";
-import { datosbase } from "../models/base.js";
+import { datosbase, urlBack } from "../models/base.js";
 import { aviso } from "../Avisos/avisos.js";
 
 
@@ -175,6 +175,7 @@ input.addEventListener('change', () => {
 async function guardarDatos(datosFinales) {
     //console.log("entro a la funcion");
     //console.log(datosFinales.length);
+    const arrayDatosBase = [];
     for (let i = 4; i < datosFinales.length - 1; i++) {
         let datos = datosFinales[i]; // Dividir la cadena por las tabulaciones
         datosbase.codigo = datos[0];
@@ -200,18 +201,47 @@ async function guardarDatos(datosFinales) {
         datosbase.cuotasPrestamoPahacer = datos[20];
         datosbase.anticipoLiquidacion = datos[21];
         datosbase.cuentas = datos[22];
-        (function (indice) {
-            setTimeout(function () {
-                h1Elemento.textContent = "Empleados cargados: " + indice;
-            }, indice * 1);
-        })(i-3);
-        if(datos.cedula == ""){
-            break;
-        }
-        else{
-            const aux = await setDoc(doc(db, "Base", datosbase.cedula), datosbase);
-        }
+
+        arrayDatosBase.push(datosbase);
     }
+    const dataArrayName = 'datos'; // Nombre del array en el título de datos
+
+    const requestData = {
+        [dataArrayName]: arrayData
+    };
+    const jwtToken = localStorage.getItem('jwt');
+    const bodyData = {
+        jwt: jwtToken,
+        requestData
+    };
+
+    const urlcompleta = urlBack.url + '/Datosbase/datosbase';
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',// para el resto de peticiónes HTTP le cambias a GET, POST, PUT, DELETE, etc.
+            body: JSON.stringify(bodyData)// Aquí va el body de tu petición tiene que ser asi en json para que el back lo pueda leer y procesar y hay algun problema me dices
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    } catch (error) {
+        console.error('Error en la petición HTTP PUT');
+        console.error(error);
+    }
+
+
+
     aviso("Datos guardados correctamente", "success");
     over.style.display = "none";
     loader.style.display = "none";
@@ -222,6 +252,34 @@ async function guardarDatos(datosFinales) {
 document.getElementById("myonoffswitch").addEventListener("click", async function (event) {
     const querySnapshot2 = await getDocs(collection(db, "Usuarios"));
 
+    const jwtToken = localStorage.getItem('jwt');
+    const urlcompleta = urlBack.url + '/usuarios/usuario';
+    try {
+        fetch(urlcompleta, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: jwtToken
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición GET');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+    }
     if (this.checked) {
         querySnapshot2.forEach(async (cod) => {
             const docRef = doc(db, "Usuarios", cod.id);

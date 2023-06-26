@@ -24,6 +24,11 @@ export let datosbase = {
     cuentas : '',
 }
 
+export let urlBack = {
+    url: 'http://www.tualianza.co/'
+    //url: 'http://192.168.1.10:8080'// no borres esta que es cuando quiero hacer pruebas locales despues en prod se borra
+}
+
 export let codigo = {
     codigo: '',    
     codigoDescontado : '',
