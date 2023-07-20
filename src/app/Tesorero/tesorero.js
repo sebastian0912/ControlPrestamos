@@ -209,6 +209,7 @@ async function guardarDatos(datosFinales) {
     const requestData = {
         [dataArrayName]: arrayData
     };
+    
     const jwtToken = localStorage.getItem('jwt');
     const bodyData = {
         jwt: jwtToken,

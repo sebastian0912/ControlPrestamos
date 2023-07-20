@@ -1,8 +1,5 @@
-
-import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js"
-import { doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
-import { auth, db } from "../firebase.js";
 import { aviso } from "../Avisos/avisos.js";
+import { urlBack, usuarioR } from "../models/base.js";
 
 
 const signInform = document.querySelector('#signIn-form');
@@ -11,19 +8,50 @@ signInform.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = signInform['signIn-email'].value;
     const password = signInform['signIn-password'].value;
+    const urlcompleta = urlBack.url + '/usuarios/ingresar';
+    let currentUser = null;
+    fetch(urlcompleta, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ email: email, password: password }),
+    })
+        .then(response => response.text())
+        .then(responseBody => {
+            console.log(responseBody);
+            window.sessionStorage.setItem('key', responseBody);
+            var body = window.sessionStorage.getItem('key');
+            console.log(body);
+            const obj = JSON.parse(body);
+            if (responseBody != null) {
+                if (obj.jwt != null) {
+                    getUserbyUsername(responseBody).then(values => {
+                        if (values != null) {
+                            currentUser = values;
+                            console.log(currentUser);
+                            return true;
+                        }
+                        return true;
+                    });
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        })
+        .catch(error => {
+            console.error(error);
+            return false;
+        });
 
-    try {
-        const credenciales = await signInWithEmailAndPassword(auth, email, password);
 
 
-        const docRef = doc(db, "Usuarios", credenciales.user.uid);
-        const docSnap = await getDoc(docRef);
-
-        const querySnapshot = await getDocs(collection(db, "Base"));
-        const Base = querySnapshot.docs.map((doc) => doc.data());
-
-        const estadoQuincena = docSnap.data().estadoQuincena;
-        const perfil = docSnap.data().perfil;
+    /*try {
+       
         localStorage.setItem('idUsuario', credenciales.user.uid);
         localStorage.setItem('perfil', perfil);
         localStorage.setItem('username', docSnap.data().username);
@@ -93,7 +121,7 @@ signInform.addEventListener('submit', async (e) => {
         } else {
             aviso('El correo  no es valido', 'error');
         }
-    }
+    }*/
 });
 
 function verificarCodigoEstado(datos) {
@@ -140,3 +168,43 @@ function numTiendas(datos) {
     return auxTiendas;
 }
 
+async function getUserbyUsername(jwt) {
+
+    var user = usuarioR;
+    var body = window.sessionStorage.getItem("key");
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/usuarios/usuario';
+    try {
+        const response = await fetch(urlcompleta, {
+            headers: headers
+        });
+        const json = await response.json();
+        if (json.message !== "sessionOut") {
+            if (json !== null) {
+                usuarioR.Numero_de_documento = json.numero_de_documento;
+                usuarioR.Primernombre = json.primer_nombre;
+                usuarioR.Celular = json.celular;
+                usuarioR.Primerapellido = json.primer_apellido;
+                usuarioR.Localizacion = json.localizacion;
+                usuarioR.Edad = json.edad;
+                usuarioR.Tipodedocumento = json.tipodedocumento;
+                usuarioR.Correo_electronico = json.correo_electronico;
+                usuarioR.Avatar = json.avatar;
+                usuarioR.Empladode = json.empleadode;
+                usuarioR.Rol = json.rol;
+            }
+        } else {
+            this.currentUser = null;
+            window.sessionStorage.removeItem('key');
+            window.location.href = "/Login";
+        }
+        return user;
+    } catch (error) {
+        return null;
+    }
+}

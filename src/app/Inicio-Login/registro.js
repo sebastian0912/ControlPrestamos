@@ -1,57 +1,52 @@
 
-import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js";
-import { doc, setDoc } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
-import { auth, db } from "../firebase.js";
 import { aviso } from "../Avisos/avisos.js";
+import { usuarioR, urlBack } from "../models/base.js";
 
 const signupForm = document.querySelector('#signUp-form');
 
-let datos = {
-    username: '',
-    email: '',
-    password: '',
-    id: '',
-    perfil: 'JefeArea',
-    estadoQuincena: true,
-    estadoSolicitudes: true,
-    sede: 'Tocancipá',
-}
-
 signupForm.addEventListener('submit', async (e) => {
-
     e.preventDefault();
 
-    datos.username = signupForm['signUp-username'].value;
-    datos.email = signupForm['signUp-email'].value;
+    let datos = usuarioR;
+    datos.primer_nombre = signupForm['PNombre'].value;
+    datos.segundo_nombre = signupForm['SNombre'].value;
+    datos.primer_apellido = signupForm['PApellido'].value;
+    datos.segundo_apellido = signupForm['SApellido'].value;
+    datos.numero_de_documento = signupForm['NDocumento'].value;
+
+    datos.correo_electronico = signupForm['signUp-email'].value;
     datos.password = signupForm['signUp-password'].value;
-
-    try {
-        const registro = await createUserWithEmailAndPassword(auth, datos.email, datos.password);
-
-        const idRegistro = registro.user.uid;
-        const path = 'Usuarios';
-        datos.id = idRegistro;
-        datos.password = null;
-
-        await setDoc(doc(db, path, idRegistro), datos);
+    
+    console.log(datos);
+        datos.username = signupForm['signUp-email'].value;
+        const urlcompleta = urlBack.url + '/usuarios/registro';
+        fetch(urlcompleta, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify(datos),
+        })
+            .then(response => response.text())
+            .then(responseBody => {
+                console.log(responseBody);
+                window.sessionStorage.setItem('key', responseBody);
+                var body = window.sessionStorage.getItem('key');
+                console.log(body);
+                const obj = JSON.parse(body);
+                return true;
+                
+            })
+            .catch(error => {
+                console.error(error);
+                return false;
+            });
         aviso('Usuario registrado correctamente', 'success');
-    } catch (error) {
 
-        if (error.code == 'auth/invalid-email') {
-            aviso('El correo  no es valido', 'error');
-        }
-        else if (error.code == 'auth/weak-password') {
-            aviso('La contraseña debe tener al menos 6 caracteres', 'error');
-        }
-        else if (error.code == 'auth/email-already-in-use') {
-            aviso('El correo ya existe, escoja otro', 'error');
-        }
-        else if (error.code) {
-            aviso('¡ Ups sucedio un error !', 'error');
+       
 
-        }
-
-    }
+    
 
 });
 

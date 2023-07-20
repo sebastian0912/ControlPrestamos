@@ -34,7 +34,8 @@
 
   <script defer src="transicion.js"></script>
 
-  <script defer src="../../modulos.js" type="module"></script>
+  <script defer src="inicioSesion.js" type="module"></script>
+  <script defer src="registro.js" type="module"></script>
 
   <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal@4/minimal.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
@@ -48,7 +49,11 @@
         <form id="signUp-form">
           <h1>Crear Cuenta</h1>
           <div class="social-container"></div>
-          <input type="text" id="signUp-username" placeholder="Username" />
+          <input type="text" id="PNombre" placeholder="Primer Nombre" style="margin-top: -30px;" />
+          <input type="text" id="SNombre" placeholder="Segundo Nombre" />
+          <input type="text" id="PApellido" placeholder="Primer Apellido" />
+          <input type="text" id="SApellido" placeholder="Segundo Apellido" />
+          <input type="text" id="NDocumento" placeholder="Numero de documento" />
           <input type="email" placeholder="Correo" id="signUp-email" />
           <input type="password" placeholder="Contraseña" id="signUp-password" />
           <button>Registrate</button>

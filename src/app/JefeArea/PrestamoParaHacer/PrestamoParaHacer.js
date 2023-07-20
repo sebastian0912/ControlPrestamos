@@ -162,9 +162,10 @@ boton.addEventListener('click', async (e) => {
 
     // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
     const fechaIngreso = datos.ingreso;
-    let dia = fechaIngreso.split('-')[0];
+    
     let mes = fechaIngreso.split('-')[1];
     let anio = fechaIngreso.split('-')[2];
+    let dia = fechaIngreso.split('-')[0];
 
     // el año esta en formato xxaa y se debe convertir a 20aa
     let anioConvertido = '20' + anio;
