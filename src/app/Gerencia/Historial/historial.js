@@ -1,4 +1,4 @@
-import { doc, getDoc, getDocs, collection} from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
+import { doc, getDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
 import { db } from "../../firebase.js";
 
 const boton = document.querySelector('#boton');
@@ -83,7 +83,7 @@ boton.addEventListener('click', async (e) => {
     const cedulaEmpleado = document.querySelector('#cedula').value;
     const docRef = doc(db, "Historial", cedulaEmpleado);
     const docSnap = await getDoc(docRef);
-    let data = docSnap.data().historia;  
+    let data = docSnap.data().historia;
     data.forEach(async (p) => {
         tabla.innerHTML += `
             <tr>
@@ -95,20 +95,20 @@ boton.addEventListener('click', async (e) => {
                 <td>${p.nombreQuienEntrego}</td>
             </tr>
             `
-    }); 
+    });
 });
 
 extraeT.addEventListener('click', async () => {
     const querySnapshot = await getDocs(collection(db, "Tienda"));
-    
+
     let dataString = 'nombre\tMonto Total\t Numero de compras en la tienda\n';
-    
+
     querySnapshot.forEach((doc) => {
-        const docData = doc.data();        
-        dataString += 
-        docData.nombre + '\t' +
-        docData.valorTotal + '\t' +
-        docData.numPersonasAtendidas + '\n';        
+        const docData = doc.data();
+        dataString +=
+            docData.nombre + '\t' +
+            docData.valorTotal + '\t' +
+            docData.numPersonasAtendidas + '\n';
     });
 
     // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
@@ -125,7 +125,7 @@ extraeT.addEventListener('click', async () => {
 });
 
 extrae.addEventListener('click', async () => {
-    const querySnapshot = await getDocs(collection(db, "Historial"));    
+    const querySnapshot = await getDocs(collection(db, "Historial"));
     let historial = [];
     querySnapshot.forEach(doc => {
         const cod = doc.data();
@@ -153,7 +153,7 @@ extrae.addEventListener('click', async () => {
     const element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
     element.setAttribute('download', 'datosHistorialDetallado.txt');
-    
+
     element.style.display = 'none';
     document.body.appendChild(element);
     element.click();

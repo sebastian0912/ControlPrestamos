@@ -220,8 +220,8 @@ function verificaCondiciones(datos, nuevovalor) {
         let diasTrabajados = Math.ceil(diferencia / (1000 * 60 * 60 * 24)); // Conversión de milisegundos a días
 
         // Si ha trabajado entre 8 y 15 dias puede pedir prestamo de 150.000
-        if ((diasTrabajados > 8 && diasTrabajados < 15) ) {
-            if ((sumaTotal + parseInt(nuevovalor) >= 150000) ) {
+        if ((diasTrabajados > 8 && diasTrabajados < 15)) {
+            if ((sumaTotal + parseInt(nuevovalor) >= 150000)) {
                 aviso('Ups no se pueden generar mercado, puede sacar maximo ' + (150000 - (sumaTotal)), 'error');
                 return false;
             }
@@ -232,8 +232,8 @@ function verificaCondiciones(datos, nuevovalor) {
         }
 
         // Si ha trabajado entre 15 y 30 dias puede pedir prestamo de 250.000
-        else if ((diasTrabajados > 15 && diasTrabajados < 30) ) {
-            if ((sumaTotal + parseInt(nuevovalor) >= 250000) ) {
+        else if ((diasTrabajados > 15 && diasTrabajados < 30)) {
+            if ((sumaTotal + parseInt(nuevovalor) >= 250000)) {
                 aviso('Ups no se pueden generar mercado, puede sacar maximo ' + (250000 - (sumaTotal)), 'error');
                 return false;
             }
@@ -243,8 +243,8 @@ function verificaCondiciones(datos, nuevovalor) {
         }
 
         // Si ha trabajado mas de 30 dias puede pedir prestamo de 350.000
-        else if ((diasTrabajados > 30) ) {
-            if (  (sumaTotal + parseInt(nuevovalor) >= 350000) ) {
+        else if ((diasTrabajados > 30)) {
+            if ((sumaTotal + parseInt(nuevovalor) >= 350000)) {
                 aviso('Ups no se pueden generar mercado, puede sacar maximo ' + (350000 - (sumaTotal)), 'error');
                 return false;
             }
@@ -291,10 +291,7 @@ boton.addEventListener('click', async (e) => {
             aviso('El monto del prestamo es mayor al permitido generado por el coodinador', 'error');
             return;
         }
-        if (!verificaSiesUnPrestamo(codigoP)) {
-            aviso('El codigo no es valido solo se admiten prestamos', 'error');
-            return;
-        }
+
         if (!verificaCondiciones(datosUsuario.data(), parseInt(nuevovalor))) {
             return;
         }

@@ -364,7 +364,7 @@ boton.addEventListener('click', async (e) => {
     valor = ""
     cuotas = ""
     celular = ""
-    
+
 });
 
 

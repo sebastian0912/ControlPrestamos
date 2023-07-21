@@ -1,4 +1,4 @@
-import { doc, getDoc, getDocs, collection} from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
+import { doc, getDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
 import { db } from "../../firebase.js";
 
 const boton = document.querySelector('#boton');
@@ -88,7 +88,7 @@ boton.addEventListener('click', async (e) => {
     const cedulaEmpleado = document.querySelector('#cedula').value;
     const docRef = doc(db, "Historial", cedulaEmpleado);
     const docSnap = await getDoc(docRef);
-    let data = docSnap.data().historia;  
+    let data = docSnap.data().historia;
     data.forEach(async (p) => {
         tabla.innerHTML += `
             <tr>
@@ -100,6 +100,6 @@ boton.addEventListener('click', async (e) => {
                 <td>${p.nombreQuienEntrego}</td>
             </tr>
             `
-    }); 
+    });
 });
 

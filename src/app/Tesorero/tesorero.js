@@ -157,85 +157,46 @@ input.addEventListener('change', () => {
 
     reader.onload = () => {
         let info = reader.result;
-        /*separado split por tabulaciones*/
+        /* Separar por saltos de línea */
         let datos = info.split('\n');
 
+        // Array para almacenar los datos finales
+        let datosFinales = [];
+
         datos.forEach(dato => {
-            datosFinales.push(dato.split('\t'));
+            // Separar por tabulaciones y remplazar espacios vacíos por "0"
+            let fila = dato.split('\t').map(item => item.trim() === '' ? "0" : item.trim());
+            datosFinales.push(fila);
         });
+
+        // Mostrar elementos ocultos
         over.style.display = "block";
         loader.style.display = "block";
         h1Elemento.style.display = "block";
-        let chunksize = Math.ceil(datosFinales.length / 25);
 
-        for (let i = 0; i < datosFinales.length; i += chunksize) {
-            let temparray = datosFinales.slice(i, i + chunksize);
-            guardarDatos(temparray);
-        }
-    }
+        // Eliminar las primeras 4 filas (si es necesario)
+        console.log(datosFinales);
+        datosFinales.splice(0, 4);
+
+        // Guardar los datos finales
+        guardarDatos(datosFinales);
+    };
 });
+
+
 
 async function guardarDatos(datosFinales) {
 
-    const arrayDatosBase = [];
-    for (let i = 4; i < datosFinales.length - 1; i++) {
-        let datos = datosFinales[i]; // Dividir la cadena por las tabulaciones
-        datosbase.codigo = datos[0];
-        datosbase.numero_de_documento = datos[1];
-        datosbase.nombre = datos[2];
-        const fechaIngreso = datos[3];
-        let dia = fechaIngreso.split('-')[0];
-        let mes = fechaIngreso.split('-')[1];
-        let anio = fechaIngreso.split('-')[2];
-        // el año esta en formato xxaa y se debe convertir a 20aa
-        let anioConvertido = '20' + anio;        
-        anio = anioConvertido;
-        datosbase.ingreso = anio + '-' + mes + '-' + dia;        
-        datosbase.temporal = datos[4];
-        datosbase.finca = datos[5];
-        datosbase.salario = datos[6];
-        datosbase.saldos = datos[7];
-        datosbase.fondos = datos[8];
-        datosbase.mercados = datos[9];
-        datosbase.cuotasMercados = datos[10];
-        datosbase.prestamoParaDescontar = datos[11];
-        datosbase.cuotasPrestamos = datos[12];
-        datosbase.casino = datos[13];
-        datosbase.anchetas = datos[14];
-        datosbase.cuotasAnchetas = datos[15];
-        datosbase.fondo = datos[16];
-        datosbase.carnet = datos[17];
-        datosbase.seguroFunerario = datos[18];
-        datosbase.prestamoPaHacer = datos[19];
-        datosbase.cuotasPrestamoPahacer = datos[20];
-        datosbase.anticipoLiquidacion = datos[21];
-        datosbase.cuentas = datos[22];
-
-        (function (indice) {
-            setTimeout(function () {
-                h1Elemento.textContent = "Empleados cargados: " + indice - 3;
-            }, indice * 1);
-        })(i);
-        
-        arrayDatosBase.push(datosbase);
-    }
-
-    console.log(arrayDatosBase);
-    const dataArrayName = 'datos'; // Nombre del array en el título de datos
-
-    const requestData = {
-        [dataArrayName]: arrayDatosBase
-    };
-
-    var body = localStorage.getItem('jwt');
+    var body = localStorage.getItem('key');
+    console.log(body);
     const obj = JSON.parse(body);
     const jwtKey = obj.jwt;
-    
-    
+
+
     const bodyData = {
         jwt: jwtKey,
-        mensaje:"muchos",
-        datos: arrayDatosBase
+        mensaje: "muchos",
+        datos: datosFinales
     };
 
     const headers = {
@@ -247,12 +208,16 @@ async function guardarDatos(datosFinales) {
         fetch(urlcompleta, {
             method: 'POST',// para el resto de peticiónes HTTP le cambias a GET, POST, PUT, DELETE, etc.
             body: JSON.stringify(bodyData),// Aquí va el body de tu petición tiene que ser asi en json para que el back lo pueda leer y procesar y hay algun problema me dices
-            
+
         })
             .then(response => {
                 if (response.ok) {
-                    return response.json();
+                    aviso("Datos guardados correctamente", "success");
+                    over.style.display = "none";
+                    loader.style.display = "none";
+                    h1Elemento.style.display = "none";
                     //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                    return response.json();
                 } else {
                     throw new Error('Error en la petición POST');
                 }
@@ -268,10 +233,7 @@ async function guardarDatos(datosFinales) {
         console.error(error);
     }
 
-    aviso("Datos guardados correctamente", "success");
-    over.style.display = "none";
-    loader.style.display = "none";
-    h1Elemento.style.display = "none";
+
 }
 
 /*Inabilitar permisos*/

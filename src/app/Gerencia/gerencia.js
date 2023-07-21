@@ -117,7 +117,7 @@ extraeT.addEventListener('click', async () => {
 
 
 extrae.addEventListener('click', async () => {
-    const querySnapshot = await getDocs(collection(db, "Historial"));    
+    const querySnapshot = await getDocs(collection(db, "Historial"));
     let historial = [];
     querySnapshot.forEach(doc => {
         const cod = doc.data();
@@ -145,7 +145,7 @@ extrae.addEventListener('click', async () => {
     const element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
     element.setAttribute('download', 'datosHistorialDetallado.txt');
-    
+
     element.style.display = 'none';
     document.body.appendChild(element);
     element.click();

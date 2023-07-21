@@ -75,7 +75,7 @@ const miArray = JSON.parse(datosComercializadoraGeneral);
 
 miArray.forEach((p) => {
     if (p.PersonaEnvia == usernameLocal) {
-    tabla.innerHTML += `
+        tabla.innerHTML += `
         <tr>
             <td>${p.codigo}</td>
             <td>${p.concepto}</td>

@@ -76,7 +76,7 @@ let datos
 datosHistorial.forEach((doc) => {
     const datos = doc.data().historia;
     datos.forEach((doc2) => {
-    tabla.innerHTML += `
+        tabla.innerHTML += `
         <tr>
             <td>${doc2.codigo}</td>
             <td>${doc2.concepto}</td>
@@ -90,15 +90,15 @@ datosHistorial.forEach((doc) => {
 
 extraeT.addEventListener('click', async () => {
     const querySnapshot = await getDocs(collection(db, "Tienda"));
-    
+
     let dataString = 'nombre\tMonto Total\t Numero de compras en la tienda\n';
-    
+
     querySnapshot.forEach((doc) => {
-        const docData = doc.data();        
-        dataString += 
-        docData.nombre + '\t' +
-        docData.valorTotal + '\t' +
-        docData.numPersonasAtendidas + '\n';        
+        const docData = doc.data();
+        dataString +=
+            docData.nombre + '\t' +
+            docData.valorTotal + '\t' +
+            docData.numPersonasAtendidas + '\n';
     });
 
     // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
@@ -115,7 +115,7 @@ extraeT.addEventListener('click', async () => {
 });
 
 extrae.addEventListener('click', async () => {
-    const querySnapshot = await getDocs(collection(db, "Historial"));    
+    const querySnapshot = await getDocs(collection(db, "Historial"));
     let historial = [];
     querySnapshot.forEach(doc => {
         const cod = doc.data();
@@ -143,7 +143,7 @@ extrae.addEventListener('click', async () => {
     const element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
     element.setAttribute('download', 'datosHistorialDetallado.txt');
-    
+
     element.style.display = 'none';
     document.body.appendChild(element);
     element.click();

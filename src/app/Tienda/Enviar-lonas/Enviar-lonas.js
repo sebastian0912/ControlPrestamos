@@ -25,8 +25,8 @@ perfil.innerHTML = perfilLocal;
 
 
 // Arreglo con las sedes y conceptos
-let datos = ["Sede","Faca Principal", "Faca Centro", "Rosal", "Cartagenita", "Madrid", "Funza", "Soacha", "Fontibón", "Suba", "Tocancipá", "Bosa"];
-let datos2 = ["Concepto","Fruver", "Verdura", "Carne"];
+let datos = ["Sede", "Faca Principal", "Faca Centro", "Rosal", "Cartagenita", "Madrid", "Funza", "Soacha", "Fontibón", "Suba", "Tocancipá", "Bosa"];
+let datos2 = ["Concepto", "Fruver", "Verdura", "Carne"];
 
 // recorrer el arreglo y mostrarlo en el select
 for (let i = 0; i < datos.length; i++) {
@@ -83,13 +83,13 @@ var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2
 for (let i = 0; i < fechaObjetivo2.length; i++) {
     // separar por año, mes y dia
     var fechaObjetivo3 = new Date(fechaObjetivo2[i]);
-    if (fechaObjetivo3.getFullYear() == 
-        ahora.getFullYear() && fechaObjetivo3.getMonth() == 
-        ahora.getMonth() 
+    if (fechaObjetivo3.getFullYear() ==
+        ahora.getFullYear() && fechaObjetivo3.getMonth() ==
+        ahora.getMonth()
         && fechaObjetivo3.getDate() >= ahora.getDate()) {
-        var diferencia2 = fechaObjetivo3 - ahora;        
+        var diferencia2 = fechaObjetivo3 - ahora;
         var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
-        if (dias2 == 0){
+        if (dias2 == 0) {
             diasRestantesLi.style.color = "red";
         }
         diasRestantesLi.innerHTML = dias2;
@@ -138,7 +138,7 @@ numemoroM.addEventListener('keyup', (e) => {
 
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
-    
+
     e.preventDefault();
     const cantidad = document.querySelector('#cantidad').value;
     const valorUnidad = document.querySelector('#valorUnidad').value;

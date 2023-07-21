@@ -180,7 +180,7 @@ boton.addEventListener('click', async (e) => {
         let diasTrabajados = Math.ceil(diferencia / (1000 * 60 * 60 * 24)); // Conversión de milisegundos a días
 
         // Si ha trabajado entre 8 y 15 dias puede pedir mercado de 150.000
-        if ((diasTrabajados > 8 && diasTrabajados < 15) ) {
+        if ((diasTrabajados > 8 && diasTrabajados < 15)) {
             if ((sumaTotal + parseInt(nuevovalor) <= 15000)) {
                 let data = codigo;
                 escribirCodigo(data, cedulaEmpleado, nuevovalor, valor);
@@ -192,7 +192,7 @@ boton.addEventListener('click', async (e) => {
         }
 
         // Si ha trabajado entre 15 y 30 dias puede pedir mercado de 250.000
-        else if ((diasTrabajados > 15 && diasTrabajados < 30) ) {
+        else if ((diasTrabajados > 15 && diasTrabajados < 30)) {
             if ((sumaTotal + parseInt(nuevovalor) <= 250000)) {
                 let data = codigo;
                 escribirCodigo(data, cedulaEmpleado, nuevovalor, valor);
@@ -204,7 +204,7 @@ boton.addEventListener('click', async (e) => {
         }
 
         // Si ha trabajado mas de 30 dias puede pedir mercado de 350.000
-        else if ((diasTrabajados > 30) ) {
+        else if ((diasTrabajados > 30)) {
             if ((sumaTotal + parseInt(nuevovalor) <= 350000)) {
                 let data = codigo;
                 console.log("Entro");
@@ -217,7 +217,7 @@ boton.addEventListener('click', async (e) => {
         }
 
     }
-    valor = '';    
+    valor = '';
     cedulaEmpleado = '';
 }
 );

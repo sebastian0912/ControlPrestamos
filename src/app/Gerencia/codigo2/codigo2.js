@@ -151,7 +151,7 @@ boton.addEventListener('click', async (e) => {
     let cuotas = document.querySelector('#cuotas').value;
     let tipo = document.querySelector('#tipo').value;
     let cedulaEmpleado = document.querySelector('#cedula').value;
-    let codigoOH = null; 
+    let codigoOH = null;
     let bandera = false;
 
     if (!verificaSelect(formaPago)) {

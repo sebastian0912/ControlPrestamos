@@ -76,7 +76,7 @@ let datos
 datosHistorial.forEach((doc) => {
     const datos = doc.data().historia;
     datos.forEach((doc2) => {
-    tabla.innerHTML += `
+        tabla.innerHTML += `
         <tr>
             <td>${doc2.codigo}</td>
             <td>${doc2.concepto}</td>

@@ -139,7 +139,7 @@ numemoroM.addEventListener('keyup', (e) => {
 boton.addEventListener('click', async (e) => {
     e.preventDefault();
     const codigo = document.querySelector('#Codigo').value;
-    
+
 
 
     const cantidad = document.querySelector('#cantidad');

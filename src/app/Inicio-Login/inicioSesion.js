@@ -84,8 +84,9 @@ async function fetchData() {
 
         const responseBody = await response.text();
 
-        window.sessionStorage.setItem('key', responseBody);
-        var body = window.sessionStorage.getItem('key');
+        localStorage.setItem('key', responseBody);
+        
+        var body = localStorage.getItem('key');
 
         const obj = JSON.parse(body);
 
@@ -149,7 +150,7 @@ function numTiendas(datos) {
 async function getUserbyUsername(jwt) {
 
     var user = usuarioR;
-    var body = window.sessionStorage.getItem("key");
+    var body = localStorage.getItem("key");
     const obj = JSON.parse(body);
     const jwtKey = obj.jwt;
     const headers = {
