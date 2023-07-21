@@ -7,7 +7,9 @@ const signInform = document.querySelector('#signIn-form');
 signInform.addEventListener('submit', async (e) => {
     e.preventDefault();
 
+
     const values = await fetchData();
+
 
     localStorage.setItem('idUsuario', values.numero_de_documento);
     localStorage.setItem('perfil', values.rol);
@@ -82,7 +84,7 @@ async function fetchData() {
 
         const responseBody = await response.text();
 
-        localStorage.setItem('jwt', responseBody);
+        window.sessionStorage.setItem('key', responseBody);
         var body = window.sessionStorage.getItem('key');
 
         const obj = JSON.parse(body);
