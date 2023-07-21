@@ -1,6 +1,6 @@
 export let datosbase = {
     codigo: '',
-    cedula: '',
+    numero_de_documento: '',
     nombre: '',
     ingreso: '',
     temporal: '',
@@ -10,7 +10,7 @@ export let datosbase = {
     fondos: '',
     mercados: '',
     cuotasMercados: '',
-    prestamoPaDescontar : '',
+    prestamoParaDescontar : '',
     cuotasPrestamos: '',    
     casino: '',
     anchetas: '',
@@ -35,10 +35,10 @@ export let usuarioR = {
     segundo_nombre: '', // Nuevo
     primer_apellido: '', // Nuevo
     segundo_apellido: '',    // Nuevo
-    Celular: '', // Nuevo
-    Localizacion: '', // Nuevo
-    Edad: '', // Nuevo
-    Tipodedocumento: '' , // Nuevo
+    celular: '', // Nuevo
+    localizacion: '', // Nuevo
+    edad: '', // Nuevo
+    tipodedocumento: '' , // Nuevo
     correo_electronico: '', // Se mantiene
     avatar: '',  // nuevo
     empladode: '', // se mantiene es sede

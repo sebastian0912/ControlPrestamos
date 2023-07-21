@@ -6,123 +6,99 @@ const signInform = document.querySelector('#signIn-form');
 
 signInform.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    const values = await fetchData();
+
+    localStorage.setItem('idUsuario', values.numero_de_documento);
+    localStorage.setItem('perfil', values.rol);
+    localStorage.setItem('username', values.primer_nombre + ' ' + values.primer_apellido);
+    localStorage.setItem('sede', values.empladode);
+
+    if (values.EstadoQuincena == false) {
+        aviso('No puedes ingresar, ya se ha cerrado la quincena', 'error');
+    }
+    else {
+        if (values.rol == 'TESORERIA') {          
+            console.log(values);
+            window.location.href = "../Tesorero/tesorero.html";
+        } else if (values.rol == 'Gerencia') {
+            const datos = await getDocs(collection(db, "Usuarios"));
+            localStorage.setItem('empleados', Base.length);
+            localStorage.setItem('coordinadores', numCoordinador(datos));
+            localStorage.setItem('tiendas', numTiendas(datos));
+            window.location.href = "../Gerencia/gerencia.html";
+
+        } else if (values.rol == 'JefeArea') {
+            window.location.href = "../JefeArea/jefeArea.html";
+        } else if (values.rol == 'Tienda') {
+            window.location.href = "../Tienda/tienda.html";
+        }
+        else if (values.rol == 'Coordinador') {
+            const docRef = doc(db, "Codigos", credenciales.user.uid);
+            const docSnap2 = await getDoc(docRef);
+            let codigos;
+            if (docSnap2.data() != undefined) {
+                codigos = docSnap2.data().prestamos;
+            }
+            else {
+                codigos = [];
+            }
+            const arrayString = JSON.stringify(codigos);
+            localStorage.setItem('estado', docSnap.data().estadoSolicitudes);
+            localStorage.setItem('codigos', arrayString);
+            window.location.href = "../Coordinador/coordinador.html";
+        }
+        else if (values.rol == 'Comercializadora') {
+            const querySnapshot = await getDocs(collection(db, "Comercio"));
+            let datosComercializadoraGeneral = querySnapshot.docs.map(doc => doc.data());
+            const arrayString = JSON.stringify(datosComercializadoraGeneral);
+            localStorage.setItem('datosComercializadoraGeneral', arrayString);
+            window.location.href = "../Comercializadora/comercializadora.html";
+        }
+        else if (values.rol == 'Admin') {
+            window.location.href = "../Administrador/editar.html";
+        }
+        else {
+            aviso('No tienes acceso todavia, comunicate con el administrador', 'error');
+        }
+    }
+
+});
+
+async function fetchData() {
     const email = signInform['signIn-email'].value;
     const password = signInform['signIn-password'].value;
     const urlcompleta = urlBack.url + '/usuarios/ingresar';
-    let currentUser = null;
-    fetch(urlcompleta, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ email: email, password: password }),
-    })
-        .then(response => response.text())
-        .then(responseBody => {
-            console.log(responseBody);
-            window.sessionStorage.setItem('key', responseBody);
-            var body = window.sessionStorage.getItem('key');
-            console.log(body);
-            const obj = JSON.parse(body);
-            if (responseBody != null) {
-                if (obj.jwt != null) {
-                    getUserbyUsername(responseBody).then(values => {
-                        if (values != null) {
-                            currentUser = values;
-                            console.log(currentUser);
-                            return true;
-                        }
-                        return true;
-                    });
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-        })
-        .catch(error => {
-            console.error(error);
-            return false;
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ email: email, password: password }),
         });
 
+        const responseBody = await response.text();
 
+        localStorage.setItem('jwt', responseBody);
+        var body = window.sessionStorage.getItem('key');
 
-    /*try {
-       
-        localStorage.setItem('idUsuario', credenciales.user.uid);
-        localStorage.setItem('perfil', perfil);
-        localStorage.setItem('username', docSnap.data().username);
-        localStorage.setItem('sede', docSnap.data().sede);
+        const obj = JSON.parse(body);
 
-        localStorage.setItem('sede', docSnap.data().sede);
-
-        if (estadoQuincena == false) {
-            aviso('No puedes ingresar, ya se ha cerrado la quincena', 'error');
-        }
-        else {
-            if (perfil == 'Tesorero') {
-                localStorage.setItem('empleados', Base.length);
-                const datos = await getDocs(collection(db, "Codigos"));
-                localStorage.setItem('codigos', verificarCodigoEstado(datos));
-                const datosU = await getDocs(collection(db, "Usuarios"));
-                localStorage.setItem('coordinadores', numCoordinadoresConestadoSolicitudesTrue(datosU));
-
-                window.location.href = "../Tesorero/tesorero.html";
-            } else if (perfil == 'Gerencia') {
-                const datos = await getDocs(collection(db, "Usuarios"));
-                localStorage.setItem('empleados', Base.length);
-                localStorage.setItem('coordinadores', numCoordinador(datos));
-                localStorage.setItem('tiendas', numTiendas(datos));
-                window.location.href = "../Gerencia/gerencia.html";
-
-            } else if (perfil == 'JefeArea') {
-                window.location.href = "../JefeArea/jefeArea.html";
-            } else if (perfil == 'Tienda') {
-                window.location.href = "../Tienda/tienda.html";
-            }
-            else if (perfil == 'Coordinador') {
-                const docRef = doc(db, "Codigos", credenciales.user.uid);
-                const docSnap2 = await getDoc(docRef);
-                let codigos;
-                if (docSnap2.data() != undefined) {
-                    codigos = docSnap2.data().prestamos;
-                }
-                else {
-                    codigos = [];
-                }
-                const arrayString = JSON.stringify(codigos);
-                localStorage.setItem('estado', docSnap.data().estadoSolicitudes);                
-                localStorage.setItem('codigos', arrayString);
-                window.location.href = "../Coordinador/coordinador.html";
-            }
-            else if (perfil == 'Comercializadora') {
-                const querySnapshot = await getDocs(collection(db, "Comercio"));
-                let datosComercializadoraGeneral = querySnapshot.docs.map(doc => doc.data());
-                const arrayString = JSON.stringify(datosComercializadoraGeneral);
-                localStorage.setItem('datosComercializadoraGeneral', arrayString);
-                window.location.href = "../Comercializadora/comercializadora.html";
-            }
-            else if (perfil == 'Admin') {
-                window.location.href = "../Administrador/editar.html";
-            }
-            else {
-                aviso('No tienes acceso todavia, comunicate con el administrador', 'error');
+        if (responseBody != null && obj.jwt != null) {
+            const values = await getUserbyUsername(responseBody);
+            if (values != null) {
+                return values; // Devuelve el valor de 'values'
             }
         }
+        return null; // Si no hay valores o hay errores, devuelve null
     } catch (error) {
-        console.log(error.message);
-        if (error.code === 'auth/wrong-password') {
-            aviso('La contraseña que ingresaste es erronea', 'error');
-        } else if (error.code === 'auth/user-not-found') {
-            aviso('El correo no se encuentra', 'error');
-        } else {
-            aviso('El correo  no es valido', 'error');
-        }
-    }*/
-});
+        console.error(error);
+        return null; // En caso de error, devuelve null
+    }
+}
 
 function verificarCodigoEstado(datos) {
     let encontrado = 0;
@@ -186,17 +162,17 @@ async function getUserbyUsername(jwt) {
         const json = await response.json();
         if (json.message !== "sessionOut") {
             if (json !== null) {
-                usuarioR.Numero_de_documento = json.numero_de_documento;
-                usuarioR.Primernombre = json.primer_nombre;
-                usuarioR.Celular = json.celular;
-                usuarioR.Primerapellido = json.primer_apellido;
-                usuarioR.Localizacion = json.localizacion;
-                usuarioR.Edad = json.edad;
-                usuarioR.Tipodedocumento = json.tipodedocumento;
-                usuarioR.Correo_electronico = json.correo_electronico;
-                usuarioR.Avatar = json.avatar;
-                usuarioR.Empladode = json.empleadode;
-                usuarioR.Rol = json.rol;
+                usuarioR.numero_de_documento = json.numero_de_documento;
+                usuarioR.primer_nombre = json.primer_nombre;
+                usuarioR.celular = json.celular;
+                usuarioR.primer_apellido = json.primer_apellido;
+                usuarioR.localizacion = json.localizacion;
+                usuarioR.edad = json.edad;
+                usuarioR.tipodedocumento = json.tipodedocumento;
+                usuarioR.correo_electronico = json.correo_electronico;
+                usuarioR.avatar = json.avatar;
+                usuarioR.empladode = json.empleadode;
+                usuarioR.rol = json.rol;
             }
         } else {
             this.currentUser = null;
