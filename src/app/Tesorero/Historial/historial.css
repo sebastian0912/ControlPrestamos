@@ -17,15 +17,15 @@ h1 {
 
 .diasT {
     width: 100%;
-    margin: 50px 0 20px 30px;
+    margin: 10px 0 20px 30px;
     font-family: 'Nunito Sans', sans-serif;
-    font-size: 20pt;
+    font-size: 16pt;
     font-weight: 400;
 }
 
 .dias {
     text-align: justify;
-    margin: 10px 0 20px 120px;
+    margin: 5px 0 20px 120px;
 
     font-family: 'Nunito Sans', sans-serif;
     font-size: 20pt;
@@ -88,8 +88,8 @@ li:hover {
 
 
 .logo {
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     padding: 0 10px 0 0;
     margin-top: -10px;
 }

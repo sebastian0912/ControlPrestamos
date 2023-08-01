@@ -32,16 +32,120 @@ const loader = document.querySelector('#loader');
 var h1Elemento = document.querySelector('#cont');
 
 
+// Obtén la fecha actual
+var ahora = new Date();
+var anio = ahora.getFullYear();
+var mes = ahora.getMonth();
+var dia = 0;
+
+if (ahora.getDate() == 13 || ahora.getDate() == 27) {
+    dia = 0;
+    numeroDias.style.color = "red";
+}
+else if (ahora.getDate() < 13) {
+    dia = 13;
+}
+else if (ahora.getDate() < 27) {
+    dia = 27;
+}
+else {
+    dia = 13;
+    mes++; // Cambia al próximo mes
+}
+
+// Crea la fecha objetivo
+var fechaObjetivo = new Date(anio, mes, dia);
+// Calcula la diferencia en milisegundos
+var diferencia = fechaObjetivo - ahora;
+// Convierte la diferencia en días
+var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
+diasRestantes.innerHTML = dias;
+
+
+var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05'];
+
+function obtenerFecha() {
+    // Convertimos la fecha actual a un formato que coincida con las fechas del arreglo
+    var fechaActualFormato = ahora.toISOString().slice(0, 10);
+
+    var fechaSeleccionada = null;
+
+    for (var i = 0; i < fechaObjetivo2.length; i++) {
+        // Comparamos las fechas ignorando la información de la hora y el huso horario
+        if (fechaActualFormato <= fechaObjetivo2[i]) {
+            fechaSeleccionada = fechaObjetivo2[i];
+            return fechaSeleccionada;
+        }
+    }
+}
+
+var diferencia2 = new Date(obtenerFecha()) - ahora;
+var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
+
+if (dias2 == 0) {
+    diasLiqui.style.color = "red";
+} else {
+    diasLiqui.style.color = "black";
+}
+diasLiqui.innerHTML = dias2;
+
+
+
+// Base total de empleados
+//numeroTotal.innerHTML = empleados;
+
+
+/* Obtener codigos de la base de datos */
+// Numero de codigos activos de la base de datos del coodinador
+
+//numeroSolicitudesPendientes.innerHTML = codigos;
+
+
+//numeroCoordinadores.innerHTML = numCoordinadoresConestadoSolicitudesTrue;
+
+
+async function datos() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Datosbase/tesoreria';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
 extrae.addEventListener('click', async () => {
-    const querySnapshot = await getDocs(collection(db, "Base"));
+
+    const datosExtraidos = await datos();
 
     let dataString = '\t\t\t\t\t\t\tANTERIOR\t\tPARA DESCONTAR\t\t\t\t\t\t\t\t\t\tPARA HACER\t\t\t\nCÓDIGO\tCÉDULA\tNOMBRE\tINGRESO\tTEMPORAL\tFINCA\tSALARIO\tSALDOS\tFONDOS\tMERCADOS\tCUOTAS\tPRESTAMO\tCUOTAS\tCASINO\tANCHETAS\tCUOTAS\tFONDO\tCARNET\tSEGURO FUNERARIO\tPRESTAMO\tCUOTAS\tANTICIPO LIQ\tCUENTAS\n';
+    console.log(datosExtraidos.datosbase);
 
-    querySnapshot.forEach((doc) => {
-        const docData = doc.data();
+    datosExtraidos.datosbase.forEach((doc) => {
+        const docData = doc;
         dataString +=
             docData.codigo + '\t' +
-            docData.cedula + '\t' +
+            docData.numero_de_documento + '\t' +
             docData.nombre + '\t' +
             docData.ingreso + '\t' +
             docData.temporal + '\t' +
@@ -51,16 +155,16 @@ extrae.addEventListener('click', async () => {
             docData.fondos + '\t' +
             docData.mercados + '\t' +
             docData.cuotasMercados + '\t' +
-            docData.prestamoPaDescontar + '\t' +
-            docData.cuotasPrestamos + '\t' +
+            docData.prestamoParaDescontar + '\t' +
+            docData.cuotasPrestamosParaDescontar + '\t' +
             docData.casino + '\t' +
             docData.anchetas + '\t' +
             docData.cuotasAnchetas + '\t' +
             docData.fondo + '\t' +
             docData.carnet + '\t' +
             docData.seguroFunerario + '\t' +
-            docData.prestamoPaHacer + '\t' +
-            docData.cuotasPrestamoPahacer + '\t' +
+            docData.prestamoParaHacer + '\t' +
+            docData.cuotasPrestamoParahacer + '\t' +
             docData.anticipoLiquidacion + '\t' +
             docData.cuentas + '\n';
     });
@@ -76,6 +180,7 @@ extrae.addEventListener('click', async () => {
     element.click();
 
     document.body.removeChild(element);
+
 });
 
 extraeC.addEventListener('click', async () => {
@@ -119,11 +224,41 @@ extraeC.addEventListener('click', async () => {
 
 });
 
+async function datosT() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Tienda/traerTienda';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
 
 extraeT.addEventListener('click', async () => {
-    const querySnapshot = await getDocs(collection(db, "Tienda"));
+    const datosExtraidos = await datosT();
 
-    let dataString = 'nombre\tMonto Total\t Numero de compras en la tienda\n';
+    /*let dataString = 'nombre\tMonto Total\t Numero de compras en la tienda\n';
 
     querySnapshot.forEach((doc) => {
         const docData = doc.data();
@@ -143,7 +278,7 @@ extraeT.addEventListener('click', async () => {
 
     element.click();
 
-    document.body.removeChild(element);
+    document.body.removeChild(element);*/
 });
 
 
@@ -293,71 +428,6 @@ document.getElementById("myonoffswitch").addEventListener("click", async functio
     }
 });
 
-/*Calculo cuantos dias faltan*/
-// Obtén la fecha actual
-var ahora = new Date();
-var anio = ahora.getFullYear();
-var mes = ahora.getMonth();
-var dia = 0;
 
-if (ahora.getDate() == 13 || ahora.getDate() == 27) {
-    dia = 0;
-    numeroDias.style.color = "red";
-}
-else if (ahora.getDate() < 13) {
-    dia = 13;
-}
-else if (ahora.getDate() < 27) {
-    dia = 27;
-}
-
-// Comprueba si el día ya ha pasado este mes
-if (ahora.getDate() > dia) {
-    // Si es así, cambia al próximo mes
-    mes++;
-}
-// Crea la fecha objetivo
-var fechaObjetivo = new Date(anio, mes, dia);
-// Calcula la diferencia en milisegundos
-var diferencia = fechaObjetivo - ahora;
-// Convierte la diferencia en días
-var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
-diasRestantes.innerHTML = dias;
-
-
-// Mostrar en el html el numero de dias Restantes de liquidacion
-var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05']
-// Recorre el arreglo y muestra los dias restantes deacuerdo a la fecha
-for (let i = 0; i < fechaObjetivo2.length; i++) {
-    // separar por año, mes y dia
-    var fechaObjetivo3 = new Date(fechaObjetivo2[i]);
-    if (fechaObjetivo3.getFullYear() == ahora.getFullYear() &&
-        fechaObjetivo3.getMonth() == ahora.getMonth() &&
-        fechaObjetivo3.getDate() >= ahora.getDate()) {
-
-        var diferencia2 = fechaObjetivo3 - ahora;
-        var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
-        if (dias2 == 0) {
-            diasLi.style.color = "red";
-        }
-        diasLi.innerHTML = dias2;
-        break;
-    }
-}
-
-
-
-
-// Base total de empleados
-numeroTotal.innerHTML = empleados;
-
-
-/* Obtener codigos de la base de datos */
-// Numero de codigos activos de la base de datos del coodinador
-
-numeroSolicitudesPendientes.innerHTML = codigos;
-
-
-numeroCoordinadores.innerHTML = numCoordinadoresConestadoSolicitudesTrue;
 
 

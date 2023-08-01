@@ -23,14 +23,13 @@ h1 {
     padding: 0;    
 }
 
-.diasT{
+.diasT {
     width: 100%;
-    margin: 10px 0 20px 50px;
+    margin: 10px 0 20px 30px;
     font-family: 'Nunito Sans', sans-serif;
-    font-size: 20pt;
+    font-size: 16pt;
     font-weight: 400;
 }
-
 .dias{    
     text-align: justify;    
     margin: 10px 0 20px 120px;
@@ -68,12 +67,16 @@ li {
     cursor: pointer;
 }
 
+
+
 li:hover {
     background: #bbd0ff;
     color: #000000;
     transform: scale(1.1);
     border-left: #1157fb 8px solid;
 }
+
+
 
 .logo {
     width: 30px;
@@ -227,7 +230,7 @@ span {
 .onoffswitch {
     position: relative;
     width: 90px;
-    margin: 50px 0 0 95px;
+    margin: 5px 0 0 95px;
 }
 
 .onoffswitch-checkbox {

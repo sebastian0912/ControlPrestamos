@@ -1,6 +1,5 @@
-import { doc, getDoc, getDocs, collection} from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
-import { db } from "../../firebase.js";
-
+import { doc, getDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
+import { urlBack } from "../../models/base.js";
 const boton = document.querySelector('#boton');
 
 // capturar el id del usuario logeado del input
@@ -17,7 +16,6 @@ const usernameLocal = localStorage.getItem("username");
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
 
-/*Calculo cuantos dias faltan*/
 // Obtén la fecha actual
 var ahora = new Date();
 var anio = ahora.getFullYear();
@@ -34,12 +32,11 @@ else if (ahora.getDate() < 13) {
 else if (ahora.getDate() < 27) {
     dia = 27;
 }
-
-// Comprueba si el día ya ha pasado este mes
-if (ahora.getDate() > dia) {
-    // Si es así, cambia al próximo mes
-    mes++;
+else {
+    dia = 13;
+    mes++; // Cambia al próximo mes
 }
+
 // Crea la fecha objetivo
 var fechaObjetivo = new Date(anio, mes, dia);
 // Calcula la diferencia en milisegundos
@@ -49,27 +46,42 @@ var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
 diasRestantes.innerHTML = dias;
 
 
+var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05'];
 
-// Mostrar en el html el numero de dias Restantes de liquidacion
-var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05']
-// Recorre el arreglo y muestra los dias restantes deacuerdo a la fecha
-for (let i = 0; i < fechaObjetivo2.length; i++) {
-    // separar por año, mes y dia
-    var fechaObjetivo3 = new Date(fechaObjetivo2[i]);
-    if (fechaObjetivo3.getFullYear() == ahora.getFullYear() &&
-        fechaObjetivo3.getMonth() == ahora.getMonth() &&
-        fechaObjetivo3.getDate() >= ahora.getDate()) {
+var diasLiqui = document.getElementById('diasLiqui'); // Asegúrate de que este elemento exista en tu HTML
 
-        var diferencia2 = fechaObjetivo3 - ahora;
-        var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
-        if (dias2 == 0) {
-            diasLi.style.color = "red";
+
+// Convertimos la fecha actual a un formato que coincida con las fechas del arreglo
+var fechaActualFormato = ahora.toISOString().slice(0, 10);
+
+var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05'];
+
+var diasLiqui = document.getElementById('diasLiqui'); // Asegúrate de que este elemento exista en tu HTML
+
+function obtenerFecha() {
+    // Convertimos la fecha actual a un formato que coincida con las fechas del arreglo
+    var fechaActualFormato = ahora.toISOString().slice(0, 10);
+
+    var fechaSeleccionada = null;
+
+    for (var i = 0; i < fechaObjetivo2.length; i++) {
+        // Comparamos las fechas ignorando la información de la hora y el huso horario
+        if (fechaActualFormato <= fechaObjetivo2[i]) {
+            fechaSeleccionada = fechaObjetivo2[i];
+            return fechaSeleccionada;
         }
-        diasLi.innerHTML = dias2;
-        break;
     }
 }
 
+var diferencia2 = new Date(obtenerFecha()) - ahora;
+var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
+
+if (dias2 == 0) {
+    diasLiqui.style.color = "red";
+} else {
+    diasLiqui.style.color = "black";
+}
+diasLiqui.innerHTML = dias2;
 
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
@@ -78,9 +90,45 @@ boton.addEventListener('click', async (e) => {
     oculto.style.display = "block";
     // capturar los datos del formulario
     const cedulaEmpleado = document.querySelector('#cedula').value;
-    const docRef = doc(db, "Historial", cedulaEmpleado);
+
+    var body = localStorage.getItem('key');
+    
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;    
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Historial/tesoreria/'+ cedulaEmpleado;
+
+    try {
+        fetch(urlcompleta, {
+            method: 'GET', // para el resto de peticiónes HTTP le cambias a GET, POST, PUT, DELETE, etc.           
+            headers: headers 
+        })
+            .then(response => {
+                if (response.ok) {                   
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                    return response.json();
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    } catch (error) {
+        console.error('Error en la petición HTTP PUT');
+        console.error(error);
+    }
+
+    /*const docRef = doc(db, "Historial", cedulaEmpleado);
     const docSnap = await getDoc(docRef);
-    let data = docSnap.data().historia;  
+    let data = docSnap.data().historia;
     data.forEach(async (p) => {
         tabla.innerHTML += `
             <tr>
@@ -92,7 +140,7 @@ boton.addEventListener('click', async (e) => {
                 <td>${p.nombreQuienEntrego}</td>
             </tr>
             `
-    }); 
+    });*/
 });
 
 
