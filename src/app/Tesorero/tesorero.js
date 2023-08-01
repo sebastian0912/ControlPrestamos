@@ -90,7 +90,6 @@ if (dias2 == 0) {
 diasLiqui.innerHTML = dias2;
 
 
-
 // Base total de empleados
 //numeroTotal.innerHTML = empleados;
 
@@ -257,11 +256,11 @@ async function datosT() {
 
 extraeT.addEventListener('click', async () => {
     const datosExtraidos = await datosT();
+    console.log(datosExtraidos);
+    let dataString = 'nombre\tMonto Total\t Numero de compras en la tienda\n';
 
-    /*let dataString = 'nombre\tMonto Total\t Numero de compras en la tienda\n';
-
-    querySnapshot.forEach((doc) => {
-        const docData = doc.data();
+    datosExtraidos.tienda.forEach((doc) => {
+        const docData = doc;
         dataString +=
             docData.nombre + '\t' +
             docData.valorTotal + '\t' +
@@ -278,7 +277,7 @@ extraeT.addEventListener('click', async () => {
 
     element.click();
 
-    document.body.removeChild(element);*/
+    document.body.removeChild(element);
 });
 
 
@@ -317,8 +316,6 @@ input.addEventListener('change', () => {
         guardarDatos(datosFinales);
     };
 });
-
-
 
 async function guardarDatos(datosFinales) {
 
@@ -373,16 +370,29 @@ async function guardarDatos(datosFinales) {
 
 /*Inabilitar permisos*/
 document.getElementById("myonoffswitch").addEventListener("click", async function (event) {
-    const querySnapshot2 = await getDocs(collection(db, "Usuarios"));
 
     const jwtToken = localStorage.getItem('jwt');
-    const urlcompleta = urlBack.url + '/usuarios/usuario';
+    const urlcompleta = urlBack.url + '/usuarios/tesoreria/cambioEstado';
+    var checked;
+    console.log(this.checked);
+
+    if (this.checked) {
+        checked = "true";
+    } else {
+        checked = "false";
+    }
+
     try {
         fetch(urlcompleta, {
-            method: 'GET',
+            method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                Authorization: jwtToken
+                //'Content-Type': 'application/json',
+                //Authorization: jwtToken,
+                body:
+                    JSON.stringify({
+                        estado: checked,
+                        jwt: jwtToken
+                    })
             }
         })
             .then(response => {
@@ -399,33 +409,12 @@ document.getElementById("myonoffswitch").addEventListener("click", async functio
             .catch(error => {
                 console.error('Error:', error);
             });
+
     } catch (error) {
-        console.error('Error en la petición HTTP GET');
+        console.error('Error en la petición HTTP POST');
         console.error(error);
     }
-    if (this.checked) {
-        querySnapshot2.forEach(async (cod) => {
-            const docRef = doc(db, "Usuarios", cod.id);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.data().perfil == 'JefeArea' || docSnap.data().perfil == 'Coordinador' || docSnap.data().perfil == 'Tienda') {
-                await updateDoc(doc(db, "Usuarios", cod.id), {
-                    estadoQuincena: true
-                });
-                aviso('Se ha habilitado el acceso a la modificaciones de jefes de area, tiendas y coordinadores', 'success');
-            }
-        });
-    } else {
-        querySnapshot2.forEach(async (cod) => {
-            const docRef = doc(db, "Usuarios", cod.id);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.data().perfil == 'JefeArea' || docSnap.data().perfil == 'Coordinador' || docSnap.data().perfil == 'Tienda') {
-                await updateDoc(doc(db, "Usuarios", cod.id), {
-                    estadoQuincena: false
-                });
-                aviso('Se ha deshabilitado el acceso a la modificaciones de jefes de area, tiendas y coordinadores', 'success');
-            }
-        });
-    }
+    
 });
 
 

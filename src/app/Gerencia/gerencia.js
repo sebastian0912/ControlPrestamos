@@ -1,31 +1,34 @@
+import { urlBack } from "../models/base.js";
 
-
-import { doc, getDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
-import { db } from "../firebase.js";
-
-
-// capturar el id del usuario logeado del input
-const idUsuario = localStorage.getItem("idUsuario");
-
-// MOSTRAR EN EL HTML EL NOMBRE DEL USUARIO LOGEADO
 // Capturar el h1 del titulo y perfil
 const titulo = document.querySelector('#username');
 const perfil = document.querySelector('#perfil');
 // Capturar el PERFIL y el USERNAME del local storage
 const perfilLocal = localStorage.getItem("perfil");
 const usernameLocal = localStorage.getItem("username");
-const numeroTotal = document.querySelector('#numeroEmpleados');
-const numeroCoordinadores = document.querySelector('#numeroCoordinadores');
-const numeroTiendas = document.querySelector('#numeroTiendas');
-const numeroDias = document.querySelector('#diasRestantes');
-const extraeT = document.getElementById("extraeT");
-const extrae = document.getElementById("extrae");
-
+const empleados = localStorage.getItem("empleados");
+const codigos = localStorage.getItem("codigos");
+const numCoordinadoresConestadoSolicitudesTrue = localStorage.getItem("coordinadores");
 //Muestra en la parte superior el nombre y el perfil
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
 
-/*Calculo cuantos dias faltan*/
+const numeroTotal = document.querySelector('#numeroEmpleados');
+const numeroSolicitudesPendientes = document.querySelector('#numeroSolicitudesPendientes');
+
+let extrae = document.getElementById("extrae");
+let extraeT = document.getElementById("extraeT");
+
+let input = document.getElementById('archivoInput');
+
+let datosFinales = [];
+
+const over = document.querySelector('#overlay');
+const loader = document.querySelector('#loader');
+
+var h1Elemento = document.querySelector('#cont');
+
+
 // Obtén la fecha actual
 var ahora = new Date();
 var anio = ahora.getFullYear();
@@ -42,12 +45,11 @@ else if (ahora.getDate() < 13) {
 else if (ahora.getDate() < 27) {
     dia = 27;
 }
-
-// Comprueba si el día ya ha pasado este mes
-if (ahora.getDate() > dia) {
-    // Si es así, cambia al próximo mes
-    mes++;
+else {
+    dia = 13;
+    mes++; // Cambia al próximo mes
 }
+
 // Crea la fecha objetivo
 var fechaObjetivo = new Date(anio, mes, dia);
 // Calcula la diferencia en milisegundos
@@ -57,27 +59,33 @@ var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
 diasRestantes.innerHTML = dias;
 
 
-// Mostrar en el html el numero de dias Restantes de liquidacion
-var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05']
-// Recorre el arreglo y muestra los dias restantes deacuerdo a la fecha
-for (let i = 0; i < fechaObjetivo2.length; i++) {
-    // separar por año, mes y dia
-    var fechaObjetivo3 = new Date(fechaObjetivo2[i]);
-    if (fechaObjetivo3.getFullYear() == ahora.getFullYear() &&
-        fechaObjetivo3.getMonth() == ahora.getMonth() &&
-        fechaObjetivo3.getDate() >= ahora.getDate()) {
+var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05'];
 
-        var diferencia2 = fechaObjetivo3 - ahora;
-        var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
-        if (dias2 == 0) {
-            diasLi.style.color = "red";
+function obtenerFecha() {
+    // Convertimos la fecha actual a un formato que coincida con las fechas del arreglo
+    var fechaActualFormato = ahora.toISOString().slice(0, 10);
+
+    var fechaSeleccionada = null;
+
+    for (var i = 0; i < fechaObjetivo2.length; i++) {
+        // Comparamos las fechas ignorando la información de la hora y el huso horario
+        if (fechaActualFormato <= fechaObjetivo2[i]) {
+            fechaSeleccionada = fechaObjetivo2[i];
+            return fechaSeleccionada;
         }
-        diasLi.innerHTML = dias2;
-        break;
     }
 }
 
-const empleados = localStorage.getItem("empleados");
+var diferencia2 = new Date(obtenerFecha()) - ahora;
+var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
+
+if (dias2 == 0) {
+    diasLi.style.color = "red";
+} else {
+    diasLi.style.color = "black";
+}
+diasLi.innerHTML = dias2;
+
 const coordinadores = localStorage.getItem("coordinadores");
 const tiendas = localStorage.getItem("tiendas");
 
@@ -89,13 +97,44 @@ numeroTiendas.innerHTML = tiendas;
 
 
 
-extraeT.addEventListener('click', async () => {
-    const querySnapshot = await getDocs(collection(db, "Tienda"));
+async function datosT() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
 
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Tienda/traerTienda';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
+extraeT.addEventListener('click', async () => {
+    const datosExtraidos = await datosT();
+    console.log(datosExtraidos);
     let dataString = 'nombre\tMonto Total\t Numero de compras en la tienda\n';
 
-    querySnapshot.forEach((doc) => {
-        const docData = doc.data();
+    datosExtraidos.tienda.forEach((doc) => {
+        const docData = doc;
         dataString +=
             docData.nombre + '\t' +
             docData.valorTotal + '\t' +

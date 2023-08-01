@@ -83,18 +83,10 @@ if (dias2 == 0) {
 }
 diasLiqui.innerHTML = dias2;
 
-// darle click al boton para que se ejecute la funcion
-boton.addEventListener('click', async (e) => {
-    e.preventDefault();
-    const oculto = document.querySelector('#oculto');
-    oculto.style.display = "block";
-    // capturar los datos del formulario
-    const cedulaEmpleado = document.querySelector('#cedula').value;
-
+async function datosH(cedulaEmpleado) {
     var body = localStorage.getItem('key');
-    
     const obj = JSON.parse(body);
-    const jwtKey = obj.jwt;    
+    const jwtKey = obj.jwt;
 
     const headers = {
         'Authorization': jwtKey
@@ -103,33 +95,36 @@ boton.addEventListener('click', async (e) => {
     const urlcompleta = urlBack.url + '/Historial/tesoreria/'+ cedulaEmpleado;
 
     try {
-        fetch(urlcompleta, {
-            method: 'GET', // para el resto de peticiónes HTTP le cambias a GET, POST, PUT, DELETE, etc.           
-            headers: headers 
-        })
-            .then(response => {
-                if (response.ok) {                   
-                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
-                    return response.json();
-                } else {
-                    throw new Error('Error en la petición POST');
-                }
-            })
-            .then(responseData => {
-                console.log('Respuesta:', responseData);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    } catch (error) {
-        console.error('Error en la petición HTTP PUT');
-        console.error(error);
-    }
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
 
-    /*const docRef = doc(db, "Historial", cedulaEmpleado);
-    const docSnap = await getDoc(docRef);
-    let data = docSnap.data().historia;
-    data.forEach(async (p) => {
+        if (response.ok) {
+            const responseData = await response.json();
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
+// darle click al boton para que se ejecute la funcion
+boton.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const oculto = document.querySelector('#oculto');
+    oculto.style.display = "block";
+    // capturar los datos del formulario
+    const cedulaEmpleado = document.querySelector('#cedula').value;
+
+    const datosExtraidos = await datosH(cedulaEmpleado);
+    
+    
+    datosExtraidos.historial.forEach(async (p) => {
         tabla.innerHTML += `
             <tr>
                 <td>${p.cedula}</td>
@@ -140,9 +135,8 @@ boton.addEventListener('click', async (e) => {
                 <td>${p.nombreQuienEntrego}</td>
             </tr>
             `
-    });*/
+    });
 });
-
 
 extraeC.addEventListener('click', async () => {
     datosFinales = [];

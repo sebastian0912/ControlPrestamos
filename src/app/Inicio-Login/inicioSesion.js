@@ -23,14 +23,14 @@ signInform.addEventListener('submit', async (e) => {
         if (values.rol == 'TESORERIA') {          
             console.log(values);
             window.location.href = "../Tesorero/tesorero.html";
-        } else if (values.rol == 'Gerencia') {
-            const datos = await getDocs(collection(db, "Usuarios"));
+        } else if (values.rol == 'GERENCIA') {
+            /*const datos = await getDocs(collection(db, "Usuarios"));
             localStorage.setItem('empleados', Base.length);
             localStorage.setItem('coordinadores', numCoordinador(datos));
-            localStorage.setItem('tiendas', numTiendas(datos));
+            localStorage.setItem('tiendas', numTiendas(datos));*/
             window.location.href = "../Gerencia/gerencia.html";
 
-        } else if (values.rol == 'JefeArea') {
+        } else if (values.rol == 'JEFE-DE-AREA') {
             window.location.href = "../JefeArea/jefeArea.html";
         } else if (values.rol == 'Tienda') {
             window.location.href = "../Tienda/tienda.html";
