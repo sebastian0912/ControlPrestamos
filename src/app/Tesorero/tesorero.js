@@ -371,15 +371,19 @@ async function guardarDatos(datosFinales) {
 /*Inabilitar permisos*/
 document.getElementById("myonoffswitch").addEventListener("click", async function (event) {
 
-    const jwtToken = localStorage.getItem('jwt');
+    var body = localStorage.getItem('key');
+    console.log(body);
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
     const urlcompleta = urlBack.url + '/usuarios/tesoreria/cambioEstado';
     var checked;
     console.log(this.checked);
 
     if (this.checked) {
-        checked = "true";
+        checked = "True";
     } else {
-        checked = "false";
+        checked = "False";
     }
 
     try {
@@ -388,12 +392,13 @@ document.getElementById("myonoffswitch").addEventListener("click", async functio
             headers: {
                 //'Content-Type': 'application/json',
                 //Authorization: jwtToken,
-                body:
-                    JSON.stringify({
-                        estado: checked,
-                        jwt: jwtToken
-                    })
-            }
+                
+            },
+            body:
+                JSON.stringify({
+                    estado: checked,
+                    jwt: jwtToken
+                })
         })
             .then(response => {
                 if (response.ok) {
