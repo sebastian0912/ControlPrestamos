@@ -103,20 +103,18 @@ try {
     throw error; // Propaga el error para que se pueda manejar fuera de la función
 }
 
-console.log(datos);/*
-datosHistorial.forEach((doc) => {
-    const datos = doc.data().historia;
-    datos.forEach((doc2) => {
-        tabla.innerHTML += `
+console.log(datos);
+datos.historialModificaciones.forEach((doc) => {
+    const datos = doc;
+    tabla.innerHTML += `
         <tr>
-            <td>${doc2.codigo}</td>
-            <td>${doc2.concepto}</td>
-            <td>${doc2.fechaEfectuado}</td>
-            <td>${doc2.username}</td>
+            <td>${doc.codigo}</td>
+            <td>${doc.concepto}</td>
+            <td>${doc.fechaEfectuado}</td>
+            <td>${doc.username}</td>
         </tr>
-    `
-    })
-})*/
+    `;
+})
 
 
 async function datosT() {

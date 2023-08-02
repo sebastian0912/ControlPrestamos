@@ -9,6 +9,7 @@ const perfil = document.querySelector('#perfil');
 // Capturar el PERFIL y el USERNAME del local storage
 const perfilLocal = localStorage.getItem("perfil");
 const usernameLocal = localStorage.getItem("username");
+const iddatos = localStorage.getItem("iddatos");
 const empleados = localStorage.getItem("empleados");
 const codigos = localStorage.getItem("codigos");
 const numCoordinadoresConestadoSolicitudesTrue = localStorage.getItem("coordinadores");
@@ -103,33 +104,55 @@ numemoroM.addEventListener('keyup', (e) => {
     }
 });
 
-async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas, tipo) {
-
-    const docCoordinador = doc(db, "Codigos", idUsuario);
-    const coordninador = await getDoc(docCoordinador);
-    data.codigo = tipo;
+async function escribirCodigo(data, cedulaEmpleado, nuevovalor, cod, cuotas, tipo) {
+    var body = localStorage.getItem('key');
+    console.log(body);
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+    //const docCoordinador = doc(db, "Codigos", iddatos);
+    //const coordninador = await getDoc(docCoordinador);
+    data.codigo = cod;
     data.monto = nuevovalor;
-    data.uid = idUsuario;
     data.cuotas = cuotas;
+    data.estado = true;
+    data.concepto = tipo;
     data.cedulaQuienPide = cedulaEmpleado;
-    data.fechaGenerado = new Date().toLocaleDateString()
     data.generadoPor = usernameLocal;
+    data.ceduladelGenerador = iddatos;
+    //data.fechaGenerado = new Date().toLocaleDateString();
+    
+    const urlcompleta = urlBack.url + '/Codigo/jefedearea/crearcodigo';
 
-    if (coordninador.exists()) {
-        // generar un codigo aleatorio para el prestamo        
-        // Actualizar en la base de datos
-        await updateDoc(doc(db, "Codigos", idUsuario), {
-            prestamos: arrayUnion(data)
-        });
-        aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + data.codigo, 'success');
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    datoscodigo: data,
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
     }
-    else {
-        await setDoc(docCoordinador, {
-            prestamos: [data]
-        });
-        //await setDoc(doc(db, "Codigos", idUsuario), data);
-        aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + data.codigo, 'success');
-    }
+
 }
 
 let tipo = document.querySelector('#tipo');
@@ -207,10 +230,13 @@ boton.addEventListener('click', async (e) => {
         return;
     }
 
-    //console.log(datosEmpleado(cedulaEmpleado));
-    //let datos = await datosEmpleado(cedulaEmpleado);   
+    let aux = await datosEmpleado(cedulaEmpleado);
+    console.log(aux.datosbase[0]);  
+    let datos = aux.datosbase[0];
+       
 
     // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
+    
     const fechaIngreso = datos.ingreso;
     
     let mes = fechaIngreso.split('-')[1];
@@ -225,18 +251,19 @@ boton.addEventListener('click', async (e) => {
         parseInt(datos.saldos) +
         parseInt(datos.fondos) +
         parseInt(datos.mercados) +
-        parseInt(datos.prestamoPaDescontar) +
+        parseInt(datos.prestamoParaDescontar) +
         parseInt(datos.casino) +
         parseInt(datos.anchetas) +
         parseInt(datos.fondo) +
         parseInt(datos.carnet) +
         parseInt(datos.seguroFunerario) +
-        parseInt(datos.prestamoPaHacer) +
+        parseInt(datos.prestamoParaHacer) +
         parseInt(datos.anticipoLiquidacion) +
         parseInt(datos.cuentas);
+    console.log(sumaTotal);
     const fechaActual = new Date();
     let codigoOH = null;
-
+    
     if (parseInt(datos.saldos) >= 175000) {
         aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
     }
@@ -274,7 +301,7 @@ boton.addEventListener('click', async (e) => {
             else {
                 let data = codigo;
                 bandera = true;
-                escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas, codigoOH)
+                escribirCodigo(data, cedulaEmpleado, nuevovalor, codigoOH, cuotas, tipo)
             }
         }
         else if ((anioActual > anio)) {
@@ -291,26 +318,25 @@ boton.addEventListener('click', async (e) => {
             else {
                 bandera = true;
                 let data = codigo;
-                escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas, codigoOH)
+                escribirCodigo(data, cedulaEmpleado, nuevovalor, codigoOH, cuotas, codigoOH)
             }
         }
         if (bandera == true) {
-            const datosUsuario = await getDoc(doc(db, "Base", cedulaEmpleado));
-            const usuario = datosUsuario.data();
+            
             let empresa = null;
             let NIT = null;
             let direcccion = null;
-            if (usuario.temporal.startsWith("Apoyo") || usuario.temporal.startsWith("APOYO")) {
+            if (datos.temporal.startsWith("Apoyo") || datos.temporal.startsWith("APOYO")) {
                 empresa = "APOYO LABORAL TS SAS";
                 NIT = "NIT 900814587"
                 direcccion = "CALLE 112 A No. 18 A -05"
             }
-            else if (usuario.temporal.startsWith("Tu") || usuario.temporal.startsWith("TU")) {
+            else if (datos.temporal.startsWith("Tu") || datos.temporal.startsWith("TU")) {
                 empresa = "TU ALIANZA SAS";
                 NIT = "NIT 900864596 - 1"
                 direcccion = "CRA 2 N 8- 156 FACATATIVA'"
             }
-            else if (usuario.temporal.startsWith("Comercializadora") || usuario.temporal.startsWith("COMERCIALIZADORA")) {
+            else if (datos.temporal.startsWith("Comercializadora") || datos.temporal.startsWith("COMERCIALIZADORA")) {
                 empresa = "COMERCIALIZADORA TS";
             }
             var docPdf = new jsPDF();
@@ -340,22 +366,22 @@ boton.addEventListener('click', async (e) => {
             docPdf.setFont('Helvetica', 'normal');
 
 
-            docPdf.text('Yo, ' + usuario.nombre + ' mayor de edad,  identificado con la cedula de ciudadania No. '
-                + usuario.cedula + ' autorizo', 10, 55);
+            docPdf.text('Yo, ' + datos.nombre + ' mayor de edad,  identificado con la cedula de ciudadania No. '
+                + datos.cedula + ' autorizo', 10, 55);
             docPdf.text('expresa e irrevocablemente para que del sueldo, salario, prestaciones sociales o de cualquier suma de la sea acreedor; me sean', 10, 60);
             docPdf.text('descontados la cantidad de ' + valor + ' (Letras)  ' + NumeroALetras(nuevovalor) + 'por concepto de' + ' PRESTAMO, en ' + cuotas + ' cuota(s), ', 10, 65);
             docPdf.text('quincenal del credito del que soy deudor ante Tu alianza S.A.S. , aun en el evento de encontrarme disfrutando de mis licencias ', 10, 70);
             docPdf.text('o incapacidades. ', 10, 75);
 
-            docPdf.text('Fecha de ingreso: ' + usuario.ingreso, 10, 90);
-            docPdf.text('Centro de Costo: ' + usuario.finca, 130, 90);
+            docPdf.text('Fecha de ingreso: ' + datos.ingreso, 10, 90);
+            docPdf.text('Centro de Costo: ' + datos.finca, 130, 90);
             docPdf.text('Forma de pago: ' + formaPago.value, 10, 95);
             docPdf.text('Telefono: ' + celular.value, 130, 95);
             docPdf.setFont('Helvetica', 'bold');
             docPdf.text('Cordialmente ', 10, 110);
             docPdf.setFont('Helvetica', 'normal');
             docPdf.text('Firma de Autorización ', 10, 115);
-            docPdf.text('C.C. ' + usuario.cedula, 10, 120);
+            docPdf.text('C.C. ' + datos.cedula, 10, 120);
 
             // realizar un cuadro para colocar la huella dactilar
             docPdf.rect(130, 110, 35, 45);
@@ -364,7 +390,7 @@ boton.addEventListener('click', async (e) => {
             docPdf.setFontSize(6);
             docPdf.text('Huella Indice Derecho', 130, 105);
 
-            docPdf.save('PrestamoDescontar' + '_' + usuario.nombre + "_" + codigoOH + '.pdf');
+            docPdf.save('PrestamoDescontar' + '_' + datos.nombre + "_" + codigoOH + '.pdf');
         }
     }
     valor = ""

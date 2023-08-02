@@ -28,6 +28,7 @@ signInform.addEventListener('submit', async (e) => {
             localStorage.setItem('empleados', Base.length);
             localStorage.setItem('coordinadores', numCoordinador(datos));
             localStorage.setItem('tiendas', numTiendas(datos));*/
+           
             window.location.href = "../Gerencia/gerencia.html";
 
         } else if (values.rol == 'JEFE-DE-AREA') {
