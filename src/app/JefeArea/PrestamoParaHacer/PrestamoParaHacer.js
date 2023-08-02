@@ -121,15 +121,22 @@ async function escribirCodigo(data, cedulaEmpleado, nuevovalor, cod, cuotas, tip
     data.generadoPor = usernameLocal;
     data.ceduladelGenerador = iddatos;
     //data.fechaGenerado = new Date().toLocaleDateString();
-    
     const urlcompleta = urlBack.url + '/Codigo/jefedearea/crearcodigo';
-
     try {
         fetch(urlcompleta, {
             method: 'POST',
             body:
                 JSON.stringify({
-                    datoscodigo: data,
+                    codigo: cod,
+                    monto: nuevovalor,
+                    cuotas: cuotas,
+                    estado: true,
+                    Concepto: tipo,
+                    cedulaQuienPide: cedulaEmpleado,
+                    generadoPor: usernameLocal,
+                    ceduladelGenerador: iddatos,
+                    formasdepago: 'none',
+                    numerodepago: 'none',
                     jwt: jwtToken
                 })
         })
@@ -271,6 +278,10 @@ boton.addEventListener('click', async (e) => {
         aviso('Ups no se pueden generar prestamos perteneces al fondo', 'error');
     }
     else {
+
+
+
+
         // VERIFICAR EL TIPO QUE SE ESTA SELECCIONANDO        
         if (tipo == "Seguro Funerario") {
             codigoOH = 'SF' + Math.floor(Math.random() * 1000000);
