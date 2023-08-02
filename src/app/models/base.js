@@ -25,7 +25,7 @@ export let datosbase = {
 }
 
 export let urlBack = {
-    url: 'http://10.195.41.242:8000'
+    url: 'http://192.168.1.14:8000'
     //url: 'http://192.168.1.10:8080'// no borres esta que es cuando quiero hacer pruebas locales despues en prod se borra
 }
 
@@ -42,7 +42,7 @@ export let usuarioR = {
     correo_electronico: '', // Se mantiene
     avatar: '',  // nuevo
     empladode: '', // se mantiene es sede
-    rol: 'GERENCIA', // se mantiene
+    rol: 'TESORERIA', // se mantiene
     password: '', // se mantiene
     username: '', // se mantiene
     EstadoQuincena: true,

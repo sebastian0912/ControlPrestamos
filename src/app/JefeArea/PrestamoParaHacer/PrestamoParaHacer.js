@@ -207,15 +207,8 @@ boton.addEventListener('click', async (e) => {
         return;
     }
 
-    console.log(datosEmpleado(cedulaEmpleado));
-
-    // capturar los datos del formulario
-
-    /*
-    const docRef = doc(db, "Base", cedulaEmpleado);
-    const docSnap = await getDoc(docRef);
-
-    const datos = docSnap.data();
+    //console.log(datosEmpleado(cedulaEmpleado));
+    //let datos = await datosEmpleado(cedulaEmpleado);   
 
     // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
     const fechaIngreso = datos.ingreso;
@@ -227,7 +220,7 @@ boton.addEventListener('click', async (e) => {
     // el año esta en formato xxaa y se debe convertir a 20aa
     let anioConvertido = '20' + anio;
     anio = anioConvertido;
-
+    
     const sumaTotal =
         parseInt(datos.saldos) +
         parseInt(datos.fondos) +
@@ -376,7 +369,7 @@ boton.addEventListener('click', async (e) => {
     }
     valor = ""
     cuotas = ""
-    cedulaEmpleado = ""*/
+    cedulaEmpleado = ""
 
 });
 
