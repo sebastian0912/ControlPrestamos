@@ -1,33 +1,12 @@
-import { codigo } from "../models/base.js";
-import { aviso } from "../Avisos/avisos.js";
-
 // Capturar el h1 del titulo y perfil
 const titulo = document.querySelector('#username');
 const perfil = document.querySelector('#perfil');
 // Capturar el PERFIL y el USERNAME del local storage
 const perfilLocal = localStorage.getItem("perfil");
 const usernameLocal = localStorage.getItem("username");
-const empleados = localStorage.getItem("empleados");
-const codigos = localStorage.getItem("codigos");
-const numCoordinadoresConestadoSolicitudesTrue = localStorage.getItem("coordinadores");
 //Muestra en la parte superior el nombre y el perfil
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
-
-const numeroTotal = document.querySelector('#numeroEmpleados');
-const numeroSolicitudesPendientes = document.querySelector('#numeroSolicitudesPendientes');
-
-let extrae = document.getElementById("extrae");
-let extraeT = document.getElementById("extraeT");
-
-let input = document.getElementById('archivoInput');
-
-let datosFinales = [];
-
-const over = document.querySelector('#overlay');
-const loader = document.querySelector('#loader');
-
-var h1Elemento = document.querySelector('#cont');
 
 
 // Obtén la fecha actual

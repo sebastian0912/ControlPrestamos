@@ -7,14 +7,13 @@ const signInform = document.querySelector('#signIn-form');
 signInform.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-
     const values = await fetchData();
-
-
+    
     localStorage.setItem('idUsuario', values.numero_de_documento);
     localStorage.setItem('perfil', values.rol);
     localStorage.setItem('username', values.primer_nombre + ' ' + values.primer_apellido);
     localStorage.setItem('sede', values.empladode);
+    localStorage.setItem('estadoSolicitudes', values.EstadoSolicitudes);
 
     if (values.EstadoQuincena == false) {
         aviso('No puedes ingresar, ya se ha cerrado la quincena', 'error');
@@ -36,8 +35,8 @@ signInform.addEventListener('submit', async (e) => {
         } else if (values.rol == 'Tienda') {
             window.location.href = "../Tienda/tienda.html";
         }
-        else if (values.rol == 'Coordinador') {
-            const docRef = doc(db, "Codigos", credenciales.user.uid);
+        else if (values.rol == 'COORDINADOR') {
+            /*const docRef = doc(db, "Codigos", credenciales.user.uid);
             const docSnap2 = await getDoc(docRef);
             let codigos;
             if (docSnap2.data() != undefined) {
@@ -48,17 +47,17 @@ signInform.addEventListener('submit', async (e) => {
             }
             const arrayString = JSON.stringify(codigos);
             localStorage.setItem('estado', docSnap.data().estadoSolicitudes);
-            localStorage.setItem('codigos', arrayString);
+            localStorage.setItem('codigos', arrayString);*/
             window.location.href = "../Coordinador/coordinador.html";
         }
-        else if (values.rol == 'Comercializadora') {
-            const querySnapshot = await getDocs(collection(db, "Comercio"));
+        else if (values.rol == 'COMERCIALIZADORA') {
+            /*const querySnapshot = await getDocs(collection(db, "Comercio"));
             let datosComercializadoraGeneral = querySnapshot.docs.map(doc => doc.data());
             const arrayString = JSON.stringify(datosComercializadoraGeneral);
-            localStorage.setItem('datosComercializadoraGeneral', arrayString);
+            localStorage.setItem('datosComercializadoraGeneral', arrayString);*/
             window.location.href = "../Comercializadora/comercializadora.html";
         }
-        else if (values.rol == 'Admin') {
+        else if (values.rol == 'ADMIN') {
             window.location.href = "../Administrador/editar.html";
         }
         else {

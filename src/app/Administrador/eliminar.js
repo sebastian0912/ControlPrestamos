@@ -116,16 +116,12 @@ let datos = [
     }
 ];
 
-let roles = [ "SELECCIONE EL ROL", "ADMIN", "COORDINADOR", "TIENDA", "GERENCIA", "JEFE-DE-AREA", "TESORERO", "COMERCIALIZADORA"];
-
-// llenar roles con el arreglo roles
-roles.forEach((opcion) => {
-    const option = document.createElement('option');
-    option.text = opcion;
-    option.value = opcion;
-    rol.appendChild(option);
-});
-
+let datos2 = [
+    {
+        codigo: '0',
+        nombre: 'Seleccione un usuario',
+    }
+];
 
 listaU.forEach((doc) => {
     let aux = {
@@ -134,9 +130,7 @@ listaU.forEach((doc) => {
     };
     //console.log(doc.id);
     aux.codigo = doc.numero_de_documento;
-    //    aux.nombre = doc.primer_nombre + ' ' + doc.primer_apellido;
     aux.nombre = doc.username;
-
     console.log(aux);
     datos.push(aux);
 });
@@ -145,28 +139,22 @@ datos.forEach((opcion) => {
     const option = document.createElement('option');
     option.text = opcion.nombre;
     option.value = opcion.codigo;
-    editar.appendChild(option);
+    miSelect.appendChild(option);
 });
 
-
-
-
-async function cambioR(cedulaEmpleado, nuevoRol) {
+async function EliminarU(cedulaEmpleado) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
     console.log(jwtToken);
 
-    const urlcompleta = urlBack.url + '/usuarios/administrador/cambioRol';
+    const urlcompleta = urlBack.url + '/usuarios/administrador/eliminarUsuario/' + cedulaEmpleado;
     try {
         fetch(urlcompleta, {
-            method: 'POST',
-            body:
-                JSON.stringify({
-                    ceduladelapersona: cedulaEmpleado,
-                    rolacambiar: nuevoRol,
-                    jwt: jwtToken
-                })
+            method: 'DELETE',
+            headers: {
+                'Authorization': jwtToken
+            },
         })
             .then(response => {
                 if (response.ok) {
@@ -191,21 +179,12 @@ async function cambioR(cedulaEmpleado, nuevoRol) {
 
 }
 
-// al darle click a cualquier opcion del select imprima el valor
-editar.addEventListener('change', async (e) => {
-    var boton = document.getElementById('boton');
-    boton.style.display = 'block';
-    console.log(editar.value);
-    console.log(rol.value);
-    boton.addEventListener('click', async (e) => {
-        cambioR(editar.value, rol.value);
-        aviso('Se cambio el rol correctamente', 'success');
-        document.querySelector('#editar').value = 0;
-        document.querySelector('#rol').value = 0;
+miSelect.addEventListener('change', async (e) => {
 
-        boton.style.display = 'none';
-        
-    });
-}
-);
+    const boton = document.querySelector('#boton');
 
+    EliminarU(e.target.value);
+    document.querySelector('#miSelect').value = 0;
+    aviso('Usuario eliminado con exito', 'success');
+
+});

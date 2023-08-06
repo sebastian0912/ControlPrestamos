@@ -9,28 +9,10 @@ const perfil = document.querySelector('#perfil');
 // Capturar el PERFIL y el USERNAME del local storage
 const perfilLocal = localStorage.getItem("perfil");
 const usernameLocal = localStorage.getItem("username");
-const iddatos = localStorage.getItem("iddatos");
-const empleados = localStorage.getItem("empleados");
-const codigos = localStorage.getItem("codigos");
-const numCoordinadoresConestadoSolicitudesTrue = localStorage.getItem("coordinadores");
+const iddatos = localStorage.getItem("idUsuario");
 //Muestra en la parte superior el nombre y el perfil
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
-
-const numeroTotal = document.querySelector('#numeroEmpleados');
-const numeroSolicitudesPendientes = document.querySelector('#numeroSolicitudesPendientes');
-
-let extrae = document.getElementById("extrae");
-let extraeT = document.getElementById("extraeT");
-
-let input = document.getElementById('archivoInput');
-
-let datosFinales = [];
-
-const over = document.querySelector('#overlay');
-const loader = document.querySelector('#loader');
-
-var h1Elemento = document.querySelector('#cont');
 
 
 // Obtén la fecha actual
@@ -104,23 +86,12 @@ numemoroM.addEventListener('keyup', (e) => {
     }
 });
 
-async function escribirCodigo(data, cedulaEmpleado, nuevovalor, cod, cuotas, tipo) {
+async function escribirCodigo(cedulaEmpleado, nuevovalor, cod, cuotas, tipo, valor) {
     var body = localStorage.getItem('key');
-    console.log(body);
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
     console.log(jwtToken);
-    //const docCoordinador = doc(db, "Codigos", iddatos);
-    //const coordninador = await getDoc(docCoordinador);
-    data.codigo = cod;
-    data.monto = nuevovalor;
-    data.cuotas = cuotas;
-    data.estado = true;
-    data.concepto = tipo;
-    data.cedulaQuienPide = cedulaEmpleado;
-    data.generadoPor = usernameLocal;
-    data.ceduladelGenerador = iddatos;
-    //data.fechaGenerado = new Date().toLocaleDateString();
+
     const urlcompleta = urlBack.url + '/Codigo/jefedearea/crearcodigo';
     try {
         fetch(urlcompleta, {
@@ -131,7 +102,7 @@ async function escribirCodigo(data, cedulaEmpleado, nuevovalor, cod, cuotas, tip
                     monto: nuevovalor,
                     cuotas: cuotas,
                     estado: true,
-                    Concepto: tipo,
+                    Concepto: tipo + ' Autorizacion',
                     cedulaQuienPide: cedulaEmpleado,
                     generadoPor: usernameLocal,
                     ceduladelGenerador: iddatos,
@@ -149,6 +120,7 @@ async function escribirCodigo(data, cedulaEmpleado, nuevovalor, cod, cuotas, tip
                 }
             })
             .then(responseData => {
+                aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + cod, 'success');
                 console.log('Respuesta:', responseData);
             })
             .catch(error => {
@@ -232,7 +204,7 @@ boton.addEventListener('click', async (e) => {
     let cuotas = document.querySelector('#cuotas').value;
     let cedulaEmpleado = document.querySelector('#cedula').value;
     let tipo = document.querySelector('#tipo').value;
-
+    let cuotasAux = cuotas;
     if (!verificaSelect(formaPago)) {
         return;
     }
@@ -267,7 +239,7 @@ boton.addEventListener('click', async (e) => {
         parseInt(datos.prestamoParaHacer) +
         parseInt(datos.anticipoLiquidacion) +
         parseInt(datos.cuentas);
-    console.log(sumaTotal);
+    
     const fechaActual = new Date();
     let codigoOH = null;
     
@@ -278,14 +250,10 @@ boton.addEventListener('click', async (e) => {
         aviso('Ups no se pueden generar prestamos perteneces al fondo', 'error');
     }
     else {
-
-
-
-
         // VERIFICAR EL TIPO QUE SE ESTA SELECCIONANDO        
         if (tipo == "Seguro Funerario") {
             codigoOH = 'SF' + Math.floor(Math.random() * 1000000);
-            cuotas = 1;
+            cuotasAux = 1;
         }
         else if (tipo == "Dinero") {
             codigoOH = 'PH' + Math.floor(Math.random() * 1000000);            
@@ -310,9 +278,8 @@ boton.addEventListener('click', async (e) => {
                 return;
             }
             else {
-                let data = codigo;
                 bandera = true;
-                escribirCodigo(data, cedulaEmpleado, nuevovalor, codigoOH, cuotas, tipo)
+                escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, cuotasAux, tipo, valor)
             }
         }
         else if ((anioActual > anio)) {
@@ -328,8 +295,7 @@ boton.addEventListener('click', async (e) => {
             }
             else {
                 bandera = true;
-                let data = codigo;
-                escribirCodigo(data, cedulaEmpleado, nuevovalor, codigoOH, cuotas, codigoOH)
+                escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, cuotasAux, tipo, valor)
             }
         }
         if (bandera == true) {
@@ -392,7 +358,7 @@ boton.addEventListener('click', async (e) => {
             docPdf.text('Cordialmente ', 10, 110);
             docPdf.setFont('Helvetica', 'normal');
             docPdf.text('Firma de Autorización ', 10, 115);
-            docPdf.text('C.C. ' + datos.cedula, 10, 120);
+            docPdf.text('C.C. ' + datos.numero_de_documento, 10, 120);
 
             // realizar un cuadro para colocar la huella dactilar
             docPdf.rect(130, 110, 35, 45);
@@ -404,9 +370,12 @@ boton.addEventListener('click', async (e) => {
             docPdf.save('PrestamoDescontar' + '_' + datos.nombre + "_" + codigoOH + '.pdf');
         }
     }
-    valor = ""
-    cuotas = ""
-    cedulaEmpleado = ""
+    document.querySelector('#valor').value = "";
+    document.querySelector('#cuotas').value = "";
+    document.querySelector('#cedula').value = "";
+    document.querySelector('#celular').value = "";
+    document.querySelector('#tipo').value = "0";
+    document.querySelector('#formaPago').value = "0";
 
 });
 
