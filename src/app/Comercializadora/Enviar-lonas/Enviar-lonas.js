@@ -3,10 +3,6 @@
 import { comercio, urlBack } from "../../models/base.js";
 import { aviso } from "../../Avisos/avisos.js";
 
-import { doc, getDoc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
-import { db } from "../../firebase.js";
-
-
 
 const boton = document.querySelector('#boton');
 // Capturar el h1 del titulo y perfil
@@ -136,13 +132,55 @@ numemoroM.addEventListener('keyup', (e) => {
 });
 
 
+async function escribirHistorial(cod, destino, concepto, cantidad, valorUnidad, PersonaEnvia) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+
+    // yyyy-mm-dd
+    const fecha = anio + '-' + mes + '-' + dia;
+    const urlcompleta = urlBack.url + '/Comercio/Comercializadora/realizarenvio';
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    codigo: cod,
+                    concepto: concepto,
+                    destino: destino,
+                    cantidadEnvio: cantidad,
+                    valorUnidad: valorUnidad,
+                    PersonaEnvia: PersonaEnvia,                    
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+
+}
 
 
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
     e.preventDefault();
-
-    console.log("jhhjkjhkjkhkjh");
 
     const cantidad = document.querySelector('#cantidad').value;
     const valorUnidad = document.querySelector('#valorUnidad').value;
@@ -162,45 +200,19 @@ boton.addEventListener('click', async (e) => {
     }
 
     let aux = comercio;
-    let uid = Math.floor(Math.random() * (9999999999 - 1000000000)) + 1000000000;
-    aux.codigo = uid;
-    aux.destino = miSelect;
-    aux.concepto = miSelect2;
-    aux.cantidadEnvio = cantidad;
-    aux.PersonaEnvia = usernameLocal;
-    aux.valorUnidad = nuevovalor;
-    aux.fechaEnviada = new Date().toLocaleDateString();
-    //await setDoc(doc(db, "Comercio", uid.toString()), aux);
-    const urlcompleta = urlBack.url + '/Comercio/comercio'; // Reemplaza 'URL_DEL_ENDPOINT' con la URL del endpoint donde quieres hacer la petición PUT
-    const jwt = localStorage.getItem('jwt');
-    aux.jwt = jwt;
-    try {
-        fetch(urlcompleta, {
-            method: 'POST',// para el resto de peticiónes HTTP le cambias a GET, POST, PUT, DELETE, etc.
-            body: JSON.stringify(aux)// Aquí va el body de tu petición tiene que ser asi en json para que el back lo pueda leer y procesar y hay algun problema me dices
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
-                } else {
-                    throw new Error('Error en la petición POST');
-                }
-            })
-            .then(responseData => {
-                console.log('Respuesta:', responseData);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    } catch (error) {
-        console.error('Error en la petición HTTP PUT');
-        console.error(error);
-    }
+    let uid = Math.floor(Math.random() * (999999 - 100000)) ;
 
+    await escribirHistorial(uid, miSelect, miSelect2, cantidad, nuevovalor, usernameLocal);
 
 
     aviso("Se ha cargado la informacion exitosamente, el codigo es: " + uid, "success");
+    // Limpiar los campos
+    document.querySelector('#cantidad').value = "";
+    document.querySelector('#valorUnidad').value = "";
+    document.querySelector('#otro2').value = "";
+    miSelect = "";
+    miSelect2 = "";
+    
 });
 
 

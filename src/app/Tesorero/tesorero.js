@@ -258,14 +258,19 @@ extraeT.addEventListener('click', async () => {
     const datosExtraidos = await datosT();
     console.log(datosExtraidos);
     let dataString = 'nombre\tMonto Total\t Numero de compras en la tienda\n';
+    if (datosExtraidos.empresa.length == 0) {
+        aviso("No hay datos en la tienda", "warning");
+    }
+    else {
+        datosExtraidos.tienda.forEach((doc) => {
+            const docData = doc;
+            dataString +=
+                docData.nombre + '\t' +
+                docData.valorTotal + '\t' +
+                docData.numPersonasAtendidas + '\n';
+        });
+    }
 
-    datosExtraidos.tienda.forEach((doc) => {
-        const docData = doc;
-        dataString +=
-            docData.nombre + '\t' +
-            docData.valorTotal + '\t' +
-            docData.numPersonasAtendidas + '\n';
-    });
 
     // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
     const element = document.createElement('a');

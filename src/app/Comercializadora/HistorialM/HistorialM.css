@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,300;0,1000;1,1000&display=swap');
 
 body {
-  background-size: 100%; 
+  background-size: 100%;
   min-height: 100vh;
   background: linear-gradient(120deg, #eeeeee 50%, #FEBB2E 40%);
   background-repeat: no-repeat;
@@ -19,13 +19,14 @@ h1 {
   width: 100%;
   margin: 50px 0 20px 30px;
   font-family: 'Nunito Sans', sans-serif;
-  font-size: 20pt;
+  font-size: 16pt;
   font-weight: 400;
+  text-align: center;
 }
 
 .dias {
   text-align: justify;
-  margin: 10px 0 20px 120px;
+  margin: 10px 0 20px 150px;
 
   font-family: 'Nunito Sans', sans-serif;
   font-size: 20pt;
@@ -219,7 +220,7 @@ select {
   font-family: 'Poppins', sans-serif;
   margin: 20px 0 0 30px;
   width: 71%;
-  
+
 }
 
 
@@ -235,24 +236,27 @@ select {
 }
 
 .tabla-contenido {
-  width: 100%;  
+  width: 100%;
   margin: 0;
   border-collapse: collapse;
-  border-spacing: 0; 
+  border-spacing: 0;
   font-family: 'Nunito Sans', sans-serif;
-  font-size: 12pt;  
+  font-size: 12pt;
   text-align: center;
 }
 
 .tabla-contenido tr:nth-child(even) {
-  background-color: #f2f2f2; /* color para filas pares */
+  background-color: #f2f2f2;
+  /* color para filas pares */
 }
 
 .tabla-contenido tr:nth-child(odd) {
-  background-color: #cccccc; /* color para filas impares */
+  background-color: #cccccc;
+  /* color para filas impares */
 }
 
-th, td {
+th,
+td {
   vertical-align: middle;
 }
 
@@ -267,5 +271,5 @@ th {
 
 tr {
   height: 40px;
-  
+
 }

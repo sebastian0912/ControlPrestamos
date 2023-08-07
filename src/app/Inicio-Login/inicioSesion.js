@@ -8,53 +8,35 @@ signInform.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const values = await fetchData();
-    
+
     localStorage.setItem('idUsuario', values.numero_de_documento);
     localStorage.setItem('perfil', values.rol);
     localStorage.setItem('username', values.primer_nombre + ' ' + values.primer_apellido);
-    localStorage.setItem('sede', values.empladode);
+    localStorage.setItem('sede', values.sucursalde);
     localStorage.setItem('estadoSolicitudes', values.EstadoSolicitudes);
+    localStorage.setItem('a', JSON.stringify(values));
 
     if (values.EstadoQuincena == false) {
         aviso('No puedes ingresar, ya se ha cerrado la quincena', 'error');
     }
     else {
-        if (values.rol == 'TESORERIA') {          
+        if (values.rol == 'TESORERIA') {
             console.log(values);
             window.location.href = "../Tesorero/tesorero.html";
         } else if (values.rol == 'GERENCIA') {
-            /*const datos = await getDocs(collection(db, "Usuarios"));
-            localStorage.setItem('empleados', Base.length);
-            localStorage.setItem('coordinadores', numCoordinador(datos));
-            localStorage.setItem('tiendas', numTiendas(datos));*/
-           
-            window.location.href = "../Gerencia/gerencia.html";
 
+            window.location.href = "../Gerencia/gerencia.html";
         } else if (values.rol == 'JEFE-DE-AREA') {
             window.location.href = "../JefeArea/jefeArea.html";
         } else if (values.rol == 'Tienda') {
             window.location.href = "../Tienda/tienda.html";
         }
         else if (values.rol == 'COORDINADOR') {
-            /*const docRef = doc(db, "Codigos", credenciales.user.uid);
-            const docSnap2 = await getDoc(docRef);
-            let codigos;
-            if (docSnap2.data() != undefined) {
-                codigos = docSnap2.data().prestamos;
-            }
-            else {
-                codigos = [];
-            }
-            const arrayString = JSON.stringify(codigos);
-            localStorage.setItem('estado', docSnap.data().estadoSolicitudes);
-            localStorage.setItem('codigos', arrayString);*/
+
             window.location.href = "../Coordinador/coordinador.html";
         }
         else if (values.rol == 'COMERCIALIZADORA') {
-            /*const querySnapshot = await getDocs(collection(db, "Comercio"));
-            let datosComercializadoraGeneral = querySnapshot.docs.map(doc => doc.data());
-            const arrayString = JSON.stringify(datosComercializadoraGeneral);
-            localStorage.setItem('datosComercializadoraGeneral', arrayString);*/
+
             window.location.href = "../Comercializadora/comercializadora.html";
         }
         else if (values.rol == 'ADMIN') {
@@ -85,7 +67,7 @@ async function fetchData() {
         const responseBody = await response.text();
 
         localStorage.setItem('key', responseBody);
-        
+
         var body = localStorage.getItem('key');
 
         const obj = JSON.parse(body);
@@ -175,6 +157,7 @@ async function getUserbyUsername(jwt) {
                 usuarioR.correo_electronico = json.correo_electronico;
                 usuarioR.avatar = json.avatar;
                 usuarioR.empladode = json.empleadode;
+                usuarioR.sucursalde = json.sucursalde;
                 usuarioR.rol = json.rol;
             }
         } else {
@@ -184,6 +167,8 @@ async function getUserbyUsername(jwt) {
         }
         return user;
     } catch (error) {
+        aviso('Error al iniciar sesión, constraseña o correo equivocados', 'error');
+
         return null;
     }
 }

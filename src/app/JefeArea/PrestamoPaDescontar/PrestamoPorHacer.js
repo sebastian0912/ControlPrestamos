@@ -183,13 +183,13 @@ function verificaCondiciones(datos, nuevovalor) {
         parseInt(datos.saldos) +
         parseInt(datos.fondos) +
         parseInt(datos.mercados) +
-        parseInt(datos.prestamoPaDescontar) +
+        parseInt(datos.prestamoParaDescontar) +
         parseInt(datos.casino) +
-        parseInt(datos.anchetas) +
+        parseInt(datos.valoranchetas) +
         parseInt(datos.fondo) +
         parseInt(datos.carnet) +
         parseInt(datos.seguroFunerario) +
-        parseInt(datos.prestamoPaHacer) +
+        parseInt(datos.prestamoParaHacer) +
         parseInt(datos.anticipoLiquidacion) +
         parseInt(datos.cuentas);
 
@@ -310,53 +310,152 @@ async function datosEmpleado(cedulaEmpleado) {
     }
 }
 
-async function escribirCodigo(cedulaEmpleado, nuevovalor, cod, cuotas, tipo, valor) {
+async function actualizar(codigo, cod, username, monto2, cuotas) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
     console.log(jwtToken);
 
-    const urlcompleta = urlBack.url + '/Codigo/jefedearea/crearcodigo';
-    try {
-        fetch(urlcompleta, {
-            method: 'POST',
-            body:
-                JSON.stringify({
-                    codigo: cod,
-                    monto: nuevovalor,
-                    cuotas: cuotas,
-                    estado: true,
-                    Concepto: tipo + ' Libranza',
-                    cedulaQuienPide: cedulaEmpleado,
-                    generadoPor: usernameLocal,
-                    ceduladelGenerador: iddatos,
-                    formasdepago: 'none',
-                    numerodepago: 'none',
-                    jwt: jwtToken
+    const urlcompleta = urlBack.url + '/Codigo/jefedearea/actualizarCodigo/' + cod;
+    
+        try {
+            fetch(urlcompleta, {
+                method: 'POST',
+                body:
+                    JSON.stringify({
+                        codigoDescontado: codigo,
+                        ejecutadoPor: username,
+                        nuevomonto: monto2,
+                        cuotas: cuotas,
+                        jwt: jwtToken
+                    })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                        //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                    } else {
+                        throw new Error('Error en la petición POST');
+                    }
                 })
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
-                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
-                } else {
-                    throw new Error('Error en la petición POST');
-                }
-            })
-            .then(responseData => {
-                aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + cod, 'success');
-                console.log('Respuesta:', responseData);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-
-    } catch (error) {
-        console.error('Error en la petición HTTP POST');
-        console.error(error);
-    }
-
+                .then(responseData => {
+                    console.log('Respuesta:', responseData);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        } catch (error) {
+            console.error('Error en la petición HTTP POST');
+            console.error(error);
+        }
 }
+
+async function actualizarDatosBase(concepto, valor, cuotas, cedulaEmpleado) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+
+    const urlcompleta = urlBack.url + '/Datosbase/jefedearea/actualizarprestamodescontar/' + cedulaEmpleado;
+    if (concepto == 'Dinero_Autorizacion') {
+        try {
+            fetch(urlcompleta, {
+                method: 'POST',
+                body:
+                    JSON.stringify({
+                        concepto: concepto,
+                        prestamoParaDescontar: valor,
+                        cuotasPrestamosParaDescontar: cuotas,
+                        ejecutadoPor: username,
+                        jwt: jwtToken
+                    })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                        //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                    } else {
+                        throw new Error('Error en la petición POST');
+                    }
+                })
+                .then(responseData => {
+                    console.log('Respuesta:', responseData);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        } catch (error) {
+            console.error('Error en la petición HTTP POST');
+            console.error(error);
+        }
+    }
+    else if (concepto == 'Seguro_Funerario_Autorizacion') {
+
+        try {
+            fetch(urlcompleta, {
+                method: 'POST',
+                body:
+                    JSON.stringify({
+                        concepto: concepto,
+                        seguroFunerario: valor,
+                        ejecutadoPor: username,
+                        jwt: jwtToken
+                    })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                        //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                    } else {
+                        throw new Error('Error en la petición POST');
+                    }
+                })
+                .then(responseData => {
+                    console.log('Respuesta:', responseData);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        } catch (error) {
+            console.error('Error en la petición HTTP POST');
+            console.error(error);
+        }
+    }
+    else if (concepto == 'Otros_Autorizacion') {
+        
+        try {
+            fetch(urlcompleta, {
+                method: 'POST',
+                body:
+                    JSON.stringify({
+                        concepto: concepto,
+                        anticipoLiquidacion: valor,
+                        cuentas: cuotas,
+                        ejecutadoPor: username,
+                        jwt: jwtToken
+                    })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                        //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                    } else {
+                        throw new Error('Error en la petición POST');
+                    }
+                })
+                .then(responseData => {
+                    console.log('Respuesta:', responseData);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        } catch (error) {
+            console.error('Error en la petición HTTP POST');
+            console.error(error);
+        }
+    }
+}
+
 
 async function escribirHistorial(cedulaEmpleado, nuevovalor, username, cuotas, tipo) {
     var body = localStorage.getItem('key');
@@ -378,7 +477,6 @@ async function escribirHistorial(cedulaEmpleado, nuevovalor, username, cuotas, t
                     valor: nuevovalor,
                     cuotas: cuotas,
                     fechaEfectuado: fecha,
-                    timesStamp: 'none',
                     concepto: tipo,
                     jwt: jwtToken
                 })
@@ -405,7 +503,7 @@ async function escribirHistorial(cedulaEmpleado, nuevovalor, username, cuotas, t
 
 }
 
-async function CambiarEstado(cod, valor) {
+async function CambiarEstado(cod, valor, codigo) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
@@ -430,7 +528,7 @@ async function CambiarEstado(cod, valor) {
                 }
             })
             .then(responseData => {
-                aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + cod, 'success');
+                aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + codigo, 'success');
                 console.log('Respuesta:', responseData);
             })
             .catch(error => {
@@ -445,7 +543,7 @@ async function CambiarEstado(cod, valor) {
 }
 
 boton.addEventListener('click', async (e) => {
-    
+
     e.preventDefault();
     // capturar los datos del formulario
     let cedulaEmpleado = document.querySelector('#cedula').value;
@@ -503,31 +601,21 @@ boton.addEventListener('click', async (e) => {
             const cod = obtenerCodigo(codigoP, aux.codigo);
             concepto2 = 'Dinero_Autorizacion';
             encontrado = true;
-
+            let codigo = 'OH' + Math.floor(Math.random() * 1000000);;
 
             if (cod.codigo.startsWith("SF")) {
                 concepto2 = 'Seguro_Funerario_Autorizacion';
-                // ------- ADVERTENCIA OJOOOO -----------
-                // funcion juan pablo paraa actualizar en datos base solo seguros funerarios
-
             }
             else if (cod.codigo.startsWith("OT")) {
                 concepto2 = 'Otros_Autorizacion';
-                // ------- ADVERTENCIA OJOOOO -----------
-                // funcion juan pablo paraa actualizar en datos base solo anticipo de liquidacion y cuentas
-            }
-            else if (cod.codigo.startsWith("PH")) {
-                // ------- ADVERTENCIA OJOOOO -----------
-                // funcion juan pablo paraa actualizar en datos base solo prestamos para descontar y cuotasprestamo para descontar
             }
 
+            await actualizar(codigo, cod.codigo, usernameLocal, nuevovalor, cuotas);
+
+            await actualizarDatosBase(concepto2, nuevovalor, cuotas, cedulaEmpleado);
             // modificar en la tabla codigos el estado del codigo a false para que no pueda ser usado nuevamente
-            CambiarEstado(codigoP, valor);
+            await CambiarEstado(cod.codigo, nuevovalor, codigo);
 
-            // generar codigo solo numeros aleatorios
-            cod.codigoDescontado = 'OH' + Math.floor(Math.random() * (999999 - 100000)) + 100000;
-
-            // Acttualizar el codigo ya se lo pedi a juan pablo ---------------------------------------
 
             escribirHistorial(cedulaEmpleado, nuevovalor, username, cuotas, concepto2)
 

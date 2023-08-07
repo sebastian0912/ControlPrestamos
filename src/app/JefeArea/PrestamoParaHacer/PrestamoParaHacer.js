@@ -232,7 +232,7 @@ boton.addEventListener('click', async (e) => {
         parseInt(datos.mercados) +
         parseInt(datos.prestamoParaDescontar) +
         parseInt(datos.casino) +
-        parseInt(datos.anchetas) +
+        parseInt(datos.valoranchetas) +
         parseInt(datos.fondo) +
         parseInt(datos.carnet) +
         parseInt(datos.seguroFunerario) +

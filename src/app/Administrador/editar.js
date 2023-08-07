@@ -116,7 +116,7 @@ let datos = [
     }
 ];
 
-let roles = [ "SELECCIONE EL ROL", "ADMIN", "COORDINADOR", "TIENDA", "GERENCIA", "JEFE-DE-AREA", "TESORERO", "COMERCIALIZADORA"];
+let roles = [ "SELECCIONE EL ROL", "ADMIN", "COORDINADOR", "TIENDA", "GERENCIA", "JEFE-DE-AREA", "TESORERIA", "COMERCIALIZADORA"];
 
 // llenar roles con el arreglo roles
 roles.forEach((opcion) => {
@@ -134,8 +134,8 @@ listaU.forEach((doc) => {
     };
     //console.log(doc.id);
     aux.codigo = doc.numero_de_documento;
-    //    aux.nombre = doc.primer_nombre + ' ' + doc.primer_apellido;
-    aux.nombre = doc.username;
+    aux.nombre = doc.primer_nombre + ' ' + doc.primer_apellido;
+    
 
     console.log(aux);
     datos.push(aux);
@@ -202,7 +202,6 @@ editar.addEventListener('change', async (e) => {
         aviso('Se cambio el rol correctamente', 'success');
         document.querySelector('#editar').value = 0;
         document.querySelector('#rol').value = 0;
-
         boton.style.display = 'none';
         
     });

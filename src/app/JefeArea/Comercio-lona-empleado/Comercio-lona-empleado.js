@@ -1,27 +1,22 @@
 
-import { codigo, historial } from "../../models/base.js";
+import { codigo, historial, urlBack } from "../../models/base.js";
 import { aviso } from "../../Avisos/avisos.js";
-import { doc, getDoc, setDoc, updateDoc, collection, getDocs, arrayUnion } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
-import { db } from "../../firebase.js";
 
 const boton = document.querySelector("#boton");
 
-// capturar el id del usuario logeado del input
-const idUsuario = localStorage.getItem("idUsuario");
-const sede = localStorage.getItem("sede");
-
-// MOSTRAR EN EL HTML EL NOMBRE DEL USUARIO LOGEADO
 // Capturar el h1 del titulo y perfil
-const titulo = document.querySelector("#username");
-const perfil = document.querySelector("#perfil");
+const titulo = document.querySelector('#username');
+const perfil = document.querySelector('#perfil');
 // Capturar el PERFIL y el USERNAME del local storage
 const perfilLocal = localStorage.getItem("perfil");
 const usernameLocal = localStorage.getItem("username");
+const iddatos = localStorage.getItem("idUsuario");
+const sede = localStorage.getItem("sede");
 //Muestra en la parte superior el nombre y el perfil
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
 
-/*Calculo cuantos dias faltan*/
+
 // Obtén la fecha actual
 var ahora = new Date();
 var anio = ahora.getFullYear();
@@ -38,12 +33,11 @@ else if (ahora.getDate() < 13) {
 else if (ahora.getDate() < 27) {
     dia = 27;
 }
-
-// Comprueba si el día ya ha pasado este mes
-if (ahora.getDate() > dia) {
-    // Si es así, cambia al próximo mes
-    mes++;
+else {
+    dia = 13;
+    mes++; // Cambia al próximo mes
 }
+
 // Crea la fecha objetivo
 var fechaObjetivo = new Date(anio, mes, dia);
 // Calcula la diferencia en milisegundos
@@ -53,23 +47,62 @@ var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
 diasRestantes.innerHTML = dias;
 
 
-// Mostrar en el html el numero de dias Restantes de liquidacion
-var fechaObjetivo2 = ["2023-04-10", "2023-04-24", "2023-05-08", "2023-05-23", "2023-06-07", "2023-06-23", "2023-07-05", "2023-07-26", "2023-08-09", "2023-08-23", "2023-09-06", "2023-09-25", "2023-10-06", "2023-10-23", "2023-11-08", "2023-11-22", "2023-11-05", "2023-12-21", "2024-01-05"]
-// Recorre el arreglo y muestra los dias restantes deacuerdo a la fecha
-for (let i = 0; i < fechaObjetivo2.length; i++) {
-    // separar por año, mes y dia
-    var fechaObjetivo3 = new Date(fechaObjetivo2[i]);
-    if (fechaObjetivo3.getFullYear() == ahora.getFullYear() &&
-        fechaObjetivo3.getMonth() == ahora.getMonth() &&
-        fechaObjetivo3.getDate() >= ahora.getDate()) {
+var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05'];
 
-        var diferencia2 = fechaObjetivo3 - ahora;
-        var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
-        if (dias2 == 0) {
-            diasLi.style.color = "red";
+function obtenerFecha() {
+    // Convertimos la fecha actual a un formato que coincida con las fechas del arreglo
+    var fechaActualFormato = ahora.toISOString().slice(0, 10);
+
+    var fechaSeleccionada = null;
+
+    for (var i = 0; i < fechaObjetivo2.length; i++) {
+        // Comparamos las fechas ignorando la información de la hora y el huso horario
+        if (fechaActualFormato <= fechaObjetivo2[i]) {
+            fechaSeleccionada = fechaObjetivo2[i];
+            return fechaSeleccionada;
         }
-        diasLi.innerHTML = dias2;
-        break;
+    }
+}
+
+var diferencia2 = new Date(obtenerFecha()) - ahora;
+var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
+
+if (dias2 == 0) {
+    diasLi.style.color = "red";
+} else {
+    diasLi.style.color = "black";
+}
+diasLi.innerHTML = dias2;
+
+
+async function datosTComercio() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Comercio/comercio';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
     }
 }
 
@@ -77,11 +110,11 @@ for (let i = 0; i < fechaObjetivo2.length; i++) {
 // Mostar contenido en una tabla
 const tabla = document.querySelector("#tabla");
 
-const querySnapshot = await getDocs(collection(db, "Comercio"));
-
-let datosComercializadoraGeneral = querySnapshot.docs.map(doc => doc.data());
-
-datosComercializadoraGeneral.forEach((p) => {
+let datosComercializadoraGeneral = [];
+datosComercializadoraGeneral = await datosTComercio();
+let datosArreglo = datosComercializadoraGeneral.comercio;
+console.log(datosArreglo);
+datosArreglo.forEach((p) => {
     if (p.destino == sede) {
         tabla.innerHTML += `
         <tr>
@@ -102,16 +135,10 @@ datosComercializadoraGeneral.forEach((p) => {
 
 function verificarCodigo(codigo, datos) {
     let encontrado = false;
-
     datos.forEach(doc => {
-        const cod = doc.data();
-        const prestamos = cod.prestamos;
-
-        prestamos.forEach(p => {
-            if (p.codigo == codigo) {
-                encontrado = true;
-            }
-        });
+        if (doc.codigo == codigo) {
+            encontrado = true;
+        }
     });
     return encontrado;
 }
@@ -119,12 +146,9 @@ function verificarCodigo(codigo, datos) {
 function obtenerCodigo(codigo, datos) {
     let cod = null;
     datos.forEach(doc => {
-        const codigos = doc.data().prestamos;
-        codigos.forEach(c => {
-            if (c.codigo == codigo) {
-                cod = c;
-            }
-        });
+        if (doc.codigo == codigo) {
+            cod = doc;
+        }
     });
     return cod;
 }
@@ -132,7 +156,7 @@ function obtenerCodigo(codigo, datos) {
 function verificarCodigoComercio(codigo, datos) {
     let encontrado = false;
     datos.forEach(doc => {
-        if (doc.id == codigo) {
+        if (doc.codigo == codigo) {
             encontrado = true;
         }
     });
@@ -155,13 +179,13 @@ function verificaCondiciones(datos, nuevovalor) {
         parseInt(datos.saldos) +
         parseInt(datos.fondos) +
         parseInt(datos.mercados) +
-        parseInt(datos.prestamoPaDescontar) +
+        parseInt(datos.prestamoParaDescontar) +
         parseInt(datos.casino) +
-        parseInt(datos.anchetas) +
+        parseInt(datos.valoranchetas) +
         parseInt(datos.fondo) +
         parseInt(datos.carnet) +
         parseInt(datos.seguroFunerario) +
-        parseInt(datos.prestamoPaHacer) +
+        parseInt(datos.prestamoParaHacer) +
         parseInt(datos.anticipoLiquidacion) +
         parseInt(datos.cuentas);
 
@@ -233,13 +257,9 @@ function verificaSelect(select) {
 function verificarCodigoEstado(codigo, datos) {
     let encontrado = false;
     datos.forEach(doc => {
-        const cod = doc.data();
-        const prestamos = cod.prestamos;
-        prestamos.forEach(p => {
-            if (p.codigo == codigo && p.estado == true) {
-                encontrado = true;
-            }
-        });
+        if (doc.codigo == codigo && doc.estado == true) {
+            encontrado = true;
+        }
     });
     return encontrado;
 }
@@ -247,15 +267,11 @@ function verificarCodigoEstado(codigo, datos) {
 function verificarCedula(codigoP, cedula, datos) {
     let encontrado = false;
     datos.forEach(doc => {
-        const cod = doc.data();
-        const prestamos = cod.prestamos;
-        prestamos.forEach(p => {
-            if (p.codigo == codigoP) {
-                if (p.cedulaQuienPide == cedula) {
-                    encontrado = true;
-                }
+        if (doc.codigo == codigoP) {
+            if (doc.cedulaQuienPide == cedula) {
+                encontrado = true;
             }
-        });
+        }
     });
     return encontrado;
 }
@@ -263,15 +279,279 @@ function verificarCedula(codigoP, cedula, datos) {
 function verificaMonto(monto, datos) {
     let encontrado = false;
     datos.forEach(doc => {
-        const cod = doc.data();
-        const prestamos = cod.prestamos;
-        prestamos.forEach(p => {
-            if (parseInt(p.monto) >= monto) {
-                encontrado = true;
-            }
-        });
+        if (parseInt(doc.monto) >= monto) {
+            encontrado = true;
+        }
     });
     return encontrado;
+}
+
+async function datosTCodigos() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Codigo/codigos';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
+async function escribirHistorial(cedulaEmpleado, nuevovalor, username, cuotas, tipo) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+    var dia = new Date().getDate();
+    var mes = new Date().getMonth() + 1;
+    var anio = new Date().getFullYear();
+    // yyyy-mm-dd
+    const fecha = anio + '-' + mes + '-' + dia;
+    const urlcompleta = urlBack.url + '/Historial/jefedearea/crearHistorialPrestamo/' + cedulaEmpleado;
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    nombreQuienEntrego: username,
+                    valor: nuevovalor,
+                    cuotas: cuotas,
+                    fechaEfectuado: fecha,
+                    concepto: tipo,
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+
+}
+
+async function datosEmpleado(cedulaEmpleado) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Datosbase/tesoreria/' + cedulaEmpleado;
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
+// ENCONTRAR EL CODIGO DE LA COMERCIALIZADORA
+async function datosComercializadora(codigo, listaC) {
+    for (let i = 0; i < listaC.length; i++) {
+        if (listaC[i].codigo == codigo) {
+            return listaC[i];
+        }
+    }
+}
+
+async function actualizar(codigo, cod, username, monto2, cuotas2) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+
+    const urlcompleta = urlBack.url + '/Codigo/jefedearea/actualizarCodigo/' + cod;
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    codigoDescontado: codigo,
+                    ejecutadoPor: username,
+                    nuevomonto: monto2,
+                    cuotas: cuotas2,
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+}
+
+async function actualizarVentas(cantidad, cod) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+
+    const urlcompleta = urlBack.url + '/Comercio/jefedearea/ActualizarCantidadVendida/' + cod;
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    cantidadTotalVendida: cantidad,
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+}
+
+async function actualizarDatos(cedulaEmpleado, valor, cuotas) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+
+    const urlcompleta = urlBack.url + '/Datosbase/jefedearea/actualizarAnchetas/' + cedulaEmpleado;
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    valoranchetas: valor,
+                    cuotasAnchetas: cuotas,
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+}
+
+async function CambiarEstado(cod, valor, codigo) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+
+    const urlcompleta = urlBack.url + '/Codigo/jefedearea/cambiarEstadoCodigo/' + cod;
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    estado: false,
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + codigo, 'success');
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+
 }
 
 // darle click al boton para que se ejecute la funcion
@@ -282,23 +562,25 @@ boton.addEventListener("click", async (e) => {
     let codigoA = document.querySelector("#codigoA").value;
     let celular = document.querySelector("#celular").value;
 
+    const aux = await datosTCodigos();
+    console.log(aux.codigo);
+    let CodigosMercado = aux.codigo;
+    let aux2 = await datosEmpleado(cedula);
+    console.log(aux2.datosbase[0]);
+    let usuario = aux2.datosbase[0];
+    console.log(usuario);
+
+    datosComercializadoraGeneral = await datosTComercio();
+    let datosArreglo = datosComercializadoraGeneral.comercio;
+    console.log(datosArreglo);
 
 
-    const CodigosMercado = await getDocs(collection(db, "Codigos"));
-    const CodigosComercio = await getDocs(collection(db, "Comercio"));
+    const datos = await datosComercializadora(codigo, datosArreglo);
 
-    const docRef = doc(db, "Comercio", codigo);
-    const docSnap = await getDoc(docRef);
-    const datos = docSnap.data();
-
-    const doocRef = doc(db, "Base", cedula);
-    const doocSnap = await getDoc(doocRef);
-    const datos2 = doocSnap.data();
     let cod = null;
+
     let sumaVentas = parseInt(cantidad) * parseInt(datos.valorUnidad);
     let sumaCantidad = parseInt(cantidad) + parseInt(datos.cantidadTotalVendida);
-
-
 
     if (sumaCantidad > datos.cantidadRecibida) {
         aviso("No se puede cargar el mercado porque no hay inventario lo maximo a sacar es " + (datos.cantidadRecibida - datos.cantidadTotalVendida), "error");
@@ -325,7 +607,7 @@ boton.addEventListener("click", async (e) => {
         return;
     }
 
-    if (!verificarCodigoComercio(codigo, CodigosComercio) == true) {
+    if (!verificarCodigoComercio(codigo, datosArreglo) == true) {
         aviso("El codigo de la comercializadora no existe", "error");
         return;
     }
@@ -341,10 +623,7 @@ boton.addEventListener("click", async (e) => {
 
     if (verificarCodigo(codigoA, CodigosMercado) == true) {
 
-
-
-
-        if (!verificaCondiciones(datos2, sumaVentas) == true) {
+        if (!verificaCondiciones(usuario, sumaVentas) == true) {
             return;
         }
 
@@ -356,59 +635,29 @@ boton.addEventListener("click", async (e) => {
             cod = obtenerCodigo(codigoA, CodigosMercado);
         }
 
-        cod.estado = false;
-        cod.fechaEjecutado = new Date().toLocaleDateString()
-        cod.ejecutadoPor = usernameLocal;
-        // generar codigo solo numeros aleatorios
         cod.codigoDescontado = "MOH" + Math.floor(Math.random() * (999999 - 100000)) + 100000;
 
-        await setDoc(doc(db, "Codigos", cod.uid), {
-            prestamos: arrayUnion(cod)
-        });
+        // modificar en la tabla codigos el estado del codigo a false para que no pueda ser usado nuevamente
+        await CambiarEstado(cod.codigo, sumaVentas, cod.codigoDescontado);
+
+        await actualizar(cod.codigoDescontado, cod.codigo, usernameLocal, sumaVentas, 2);
+
+        await actualizarVentas(sumaCantidad, codigo);
 
 
-        await updateDoc(doc(db, "Comercio", codigo), {
+        /*await updateDoc(doc(db, "Comercio", codigo), {
             cantidadTotalVendida: parseInt(datos.cantidadTotalVendida) + parseInt(cantidad),
-        });
+        });*/
 
 
+        await actualizarDatos(cedula, sumaVentas, 2);
 
-        await updateDoc(doc(db, "Base", cedula), {
-            anchetas: parseInt(datos2.anchetas) + sumaVentas,
-            cuotasAnchetas: 2
-        });
-
-
-        // crear un nuevo registro en la coleccion historial
-        const docEmpleado = doc(db, "Historial", cedula);
-        const empleadoRef = await getDoc(docEmpleado);
-        let data = historial;
-        if (empleadoRef.exists()) {
-            data.cedula = cedula;
-            data.concepto = "Compra producto comercializadora";
-            data.fechaEfectuado = new Date().toLocaleDateString()
-            data.valor = sumaVentas;
-            data.cuotas = cod.cuotas;
-            data.nombreQuienEntrego = usernameLocal;
-            data.timesStamp = new Date().getTime();
-            await updateDoc(doc(db, "Historial", cedula), {
-                historia: arrayUnion(data)
-            });
-        }
-        else {
-            data.cedula = cedula;
-            data.concepto = "Compra producto comercializadora";
-            data.fechaEfectuado = new Date().toLocaleDateString()
-            data.valor = sumaVentas;
-            data.cuotas = cod.cuotas;
-            data.nombreQuienEntrego = usernameLocal;
-            data.timesStamp = new Date().getTime();
-            await setDoc(docEmpleado, {
-                historia: [data]
-            });
-        }
+        await escribirHistorial(cedula, sumaVentas, usernameLocal, 2, "Compra producto comercializadora");
 
         aviso("Se ha cargado la informacion exitosamente", "success");
+
+
+        /*
         let empresa = null;
         let NIT = null;
         let direcccion = null;
@@ -453,23 +702,23 @@ boton.addEventListener("click", async (e) => {
         docPdf.setFont("Helvetica", "normal");
 
 
-        docPdf.text("Yo, " + datos2.nombre + " mayor de edad,  identificado con la cedula de ciudadania No. "
-            + datos2.cedula + " autorizo", 10, 55);
+        docPdf.text("Yo, " + usuario.nombre + " mayor de edad,  identificado con la cedula de ciudadania No. "
+            + usuario.cedula + " autorizo", 10, 55);
         docPdf.text("expresa e irrevocablemente para que del sueldo, salario, prestaciones sociales o de cualquier suma de la sea acreedor; me sean", 10, 60);
         docPdf.text("descontados la cantidad de " + sumaVentas + " (Letras)  " + NumeroALetras(sumaVentas) + "por concepto de" + " PRESTAMO, en 2 cuota(s), ", 10, 65);
         docPdf.text("quincenal del credito del que soy deudor ante Tu alianza S.A.S. , aun en el evento de encontrarme disfrutando de mis licencias ", 10, 70);
         docPdf.text("o incapacidades. ", 10, 75);
 
-        docPdf.text("Fecha de ingreso: " + datos2.ingreso, 10, 90);
+        docPdf.text("Fecha de ingreso: " + usuario.ingreso, 10, 90);
         docPdf.text("Forma de pago: " + tipo.value, 10, 95);
-        docPdf.text('Centro de Costo: ' + datos2.finca, 130, 90);
+        docPdf.text('Centro de Costo: ' + usuario.finca, 130, 90);
 
         docPdf.text("Telefono: " + celular, 130, 95);
         docPdf.setFont("Helvetica", "bold");
         docPdf.text("Cordialmente ", 10, 110);
         docPdf.setFont("Helvetica", "normal");
         docPdf.text("Firma de Autorización ", 10, 115);
-        docPdf.text("C.C. " + datos2.cedula, 10, 120);
+        docPdf.text("C.C. " + usuario.cedula, 10, 120);
 
         // realizar un cuadro para colocar la huella dactilar
         docPdf.rect(130, 110, 35, 45);
@@ -478,19 +727,21 @@ boton.addEventListener("click", async (e) => {
         docPdf.setFontSize(6);
         docPdf.text("Huella Indice Derecho", 130, 105);
 
-        docPdf.save("PrestamoDescontar" + "_" + datos2.nombre + "_" + cod.codigoDescontado + ".pdf");
+        docPdf.save("PrestamoDescontar" + "_" + usuario.nombre + "_" + cod.codigoDescontado + ".pdf");
     }
     else {
         aviso("El codigo de autorizacion no existe", "error");
     }
-
-    cantidad = ""
-    cedula = ""
-    codigo = ""
-    codigoA = ""
-    celular = ""
+    */
 
 
+        document.querySelector("#Cantidad").value = "";
+        document.querySelector("#cedula").value = "";
+        document.querySelector("#codigo").value = "";
+        document.querySelector("#codigoA").value = "";
+        document.querySelector("#celular").value = "";
+
+    }
 
 });
 

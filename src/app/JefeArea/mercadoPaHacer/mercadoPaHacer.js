@@ -215,13 +215,15 @@ boton.addEventListener('click', async (e) => {
         parseInt(datos.mercados) +
         parseInt(datos.prestamoParaDescontar) +
         parseInt(datos.casino) +
-        parseInt(datos.anchetas) +
+        parseInt(datos.valoranchetas) +
         parseInt(datos.fondo) +
         parseInt(datos.carnet) +
         parseInt(datos.seguroFunerario) +
         parseInt(datos.prestamoParaHacer) +
         parseInt(datos.anticipoLiquidacion) +
         parseInt(datos.cuentas);
+
+    console.log(sumaTotal);
 
     const fechaActual = new Date();
 
@@ -245,6 +247,7 @@ boton.addEventListener('click', async (e) => {
                 escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, cuotas, tipo, valor)
             }
             else {
+                console.log("Entro4");
                 aviso('Ups no se pueden generar mercado, puede sacar maximo ' + (150000 - (sumaTotal)), 'error');
                 return;
             }
@@ -256,6 +259,7 @@ boton.addEventListener('click', async (e) => {
                 escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, valor)
             }
             else {
+                console.log("Entro3");
                 aviso('Ups no se pueden generar mercado, puede sacar maximo ' + (250000 - (sumaTotal)), 'error');
                 return;
             }
@@ -268,6 +272,7 @@ boton.addEventListener('click', async (e) => {
                 escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, valor)
             }
             else {
+                console.log("Entro2");
                 aviso('Ups no se pueden generar mercado, puede sacar maximo ' + (350000 - (sumaTotal)), 'error');
                 return;
             }
