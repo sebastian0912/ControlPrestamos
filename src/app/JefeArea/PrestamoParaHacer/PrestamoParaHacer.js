@@ -215,6 +215,10 @@ boton.addEventListener('click', async (e) => {
        
 
     // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
+    if (datos == undefined) {
+        aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
+        return;
+    }
     
     const fechaIngreso = datos.ingreso;
     

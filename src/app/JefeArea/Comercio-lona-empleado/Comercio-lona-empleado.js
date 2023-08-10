@@ -442,12 +442,12 @@ async function actualizar(codigo, cod, username, monto2, cuotas2) {
     }
 }
 
-async function actualizarVentas(cantidad, cod) {
+async function actualizarVentas(cantidad, cod, username) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
     console.log(jwtToken);
-
+    console.log(cantidad);
     const urlcompleta = urlBack.url + '/Comercio/jefedearea/ActualizarCantidadVendida/' + cod;
     try {
         fetch(urlcompleta, {
@@ -455,6 +455,7 @@ async function actualizarVentas(cantidad, cod) {
             body:
                 JSON.stringify({
                     cantidadTotalVendida: cantidad,
+                    PersonaRecibe: username,
                     jwt: jwtToken
                 })
         })
@@ -642,8 +643,7 @@ boton.addEventListener("click", async (e) => {
 
         await actualizar(cod.codigoDescontado, cod.codigo, usernameLocal, sumaVentas, 2);
 
-        await actualizarVentas(sumaCantidad, codigo);
-
+        await actualizarVentas(cantidad, codigo, usernameLocal);
 
         /*await updateDoc(doc(db, "Comercio", codigo), {
             cantidadTotalVendida: parseInt(datos.cantidadTotalVendida) + parseInt(cantidad),
@@ -657,7 +657,7 @@ boton.addEventListener("click", async (e) => {
         aviso("Se ha cargado la informacion exitosamente", "success");
 
 
-        /*
+        
         let empresa = null;
         let NIT = null;
         let direcccion = null;
@@ -718,7 +718,7 @@ boton.addEventListener("click", async (e) => {
         docPdf.text("Cordialmente ", 10, 110);
         docPdf.setFont("Helvetica", "normal");
         docPdf.text("Firma de Autorización ", 10, 115);
-        docPdf.text("C.C. " + usuario.cedula, 10, 120);
+        docPdf.text("C.C. " + usuario.numero_de_documento, 10, 120);
 
         // realizar un cuadro para colocar la huella dactilar
         docPdf.rect(130, 110, 35, 45);
@@ -732,7 +732,7 @@ boton.addEventListener("click", async (e) => {
     else {
         aviso("El codigo de autorizacion no existe", "error");
     }
-    */
+
 
 
         document.querySelector("#Cantidad").value = "";
@@ -741,7 +741,7 @@ boton.addEventListener("click", async (e) => {
         document.querySelector("#codigoA").value = "";
         document.querySelector("#celular").value = "";
 
-    }
+    
 
 });
 

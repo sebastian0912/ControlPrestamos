@@ -199,6 +199,10 @@ boton.addEventListener('click', async (e) => {
     console.log(aux.datosbase[0]);
     let datos = aux.datosbase[0];
 
+    if (datos == undefined) {
+        aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
+        return;
+    }
     // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
     const fechaIngreso = datos.ingreso;
     let dia = fechaIngreso.split('-')[0];
@@ -208,14 +212,14 @@ boton.addEventListener('click', async (e) => {
     // el año esta en formato xxaa y se debe convertir a 20aa
     let anioConvertido = '20' + anio;
     anio = anioConvertido;
-
+    console.log(datos)
     const sumaTotal =
         parseInt(datos.saldos) +
         parseInt(datos.fondos) +
         parseInt(datos.mercados) +
         parseInt(datos.prestamoParaDescontar) +
         parseInt(datos.casino) +
-        parseInt(datos.anchetas) +
+        parseInt(datos.valoranchetas) +
         parseInt(datos.fondo) +
         parseInt(datos.carnet) +
         parseInt(datos.seguroFunerario) +
@@ -225,6 +229,7 @@ boton.addEventListener('click', async (e) => {
 
     const fechaActual = new Date();
 
+    console.log(sumaTotal);
 
     if (parseInt(datos.saldos) >= 175000) {
         aviso('Ups no se pueden generar mercado porque superas los 175000 de saldo permitido', 'error');

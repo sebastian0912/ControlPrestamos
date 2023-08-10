@@ -14,29 +14,49 @@ signInform.addEventListener('submit', async (e) => {
     localStorage.setItem('username', values.primer_nombre + ' ' + values.primer_apellido);
     localStorage.setItem('sede', values.sucursalde);
     localStorage.setItem('estadoSolicitudes', values.EstadoSolicitudes);
-    localStorage.setItem('a', JSON.stringify(values));
+    localStorage.setItem('estadoQuincena', values.EstadoQuincena);
 
+    const aux = await datosTCodigos();
+    console.log(aux.codigo);
+    let datos = aux.codigo;
+    let aux2 = await datosEmpleado();
+
+    let datosU = await datosUsuarios();
+    console.log(datosU);
+
+    let datosEmpleados = aux2.datosbase;
+    
+    console.log(datosEmpleados);
+
+    if (values.rol == 'TESORERIA') {
+        values.EstadoQuincena = true;
+        localStorage.setItem('CantidadEmpleados', datosEmpleados.length);
+        localStorage.setItem('CantidadSolicitudes', verificarCodigoEstado(datos));
+        localStorage.setItem('CantidadCoordinadoresConEstadoSolicitudesTrue', numCoordinadoresConestadoSolicitudesTrue(datosU));
+        window.location.href = "../Tesorero/tesorero.html";
+    }
     if (values.EstadoQuincena == false) {
         aviso('No puedes ingresar, ya se ha cerrado la quincena', 'error');
     }
     else {
-        if (values.rol == 'TESORERIA') {
-            console.log(values);
-            window.location.href = "../Tesorero/tesorero.html";
-        } else if (values.rol == 'GERENCIA') {
-
+        if (values.rol == 'GERENCIA') {
+            localStorage.setItem('CantidadCoordinadores', numCoordinador(datosU));
+            localStorage.setItem('CantidadTiendas', numTiendas(datosU));            
+            if (datosEmpleados == "error") {
+                localStorage.setItem('CantidadEmpleados', 0);
+            } else {
+                localStorage.setItem('CantidadEmpleados', datosEmpleados.length);                
+            }
             window.location.href = "../Gerencia/gerencia.html";
         } else if (values.rol == 'JEFE-DE-AREA') {
             window.location.href = "../JefeArea/jefeArea.html";
-        } else if (values.rol == 'Tienda') {
+        } else if (values.rol == 'TIENDA') {
             window.location.href = "../Tienda/tienda.html";
         }
         else if (values.rol == 'COORDINADOR') {
-
             window.location.href = "../Coordinador/coordinador.html";
         }
         else if (values.rol == 'COMERCIALIZADORA') {
-
             window.location.href = "../Comercializadora/comercializadora.html";
         }
         else if (values.rol == 'ADMIN') {
@@ -85,24 +105,115 @@ async function fetchData() {
     }
 }
 
+async function datosTCodigos() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Codigo/codigos';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
+async function datosEmpleado() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Datosbase/datosbase';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
+async function datosUsuarios() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/usuarios/usuarios';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
 function verificarCodigoEstado(datos) {
     let encontrado = 0;
     datos.forEach(doc => {
-        const cod = doc.data();
-        const prestamos = cod.prestamos;
-        prestamos.forEach(p => {
-            if (p.estado == true) {
-                encontrado++;
-            }
-        });
+        if (doc.estado == true) {
+            encontrado++;
+        }
     });
     return encontrado;
 }
 
 function numCoordinadoresConestadoSolicitudesTrue(datos) {
+    
     let auxCoordinadores = 0;
     datos.forEach((doc) => {
-        if (doc.data().perfil == "Coordinador" && doc.data().estadoSolicitudes == true) {
+        console.log(doc);
+        if (doc.rol == "COORDINADOR" && doc.estadoSolicitudes == true) {
             auxCoordinadores++;
         }
     });
@@ -110,9 +221,10 @@ function numCoordinadoresConestadoSolicitudesTrue(datos) {
 }
 
 function numCoordinador(datos) {
+    console.log(datos);
     let auxCoordinadores = 0;
     datos.forEach((doc) => {
-        if (doc.data().perfil == "Coordinador") {
+        if (doc.rol == "COORDINADOR") {
             auxCoordinadores++;
         }
     });
@@ -120,9 +232,10 @@ function numCoordinador(datos) {
 }
 
 function numTiendas(datos) {
+    console.log(datos);
     let auxTiendas = 0;
     datos.forEach((doc) => {
-        if (doc.data().perfil == "Tienda") {
+        if (doc.rol == "TIENDA") {
             auxTiendas++;
         }
     });

@@ -163,16 +163,16 @@ function verificaSelect(select) {
     }
 }
 
-async function datosEmpleado(cedulaEmpleado){
+async function datosEmpleado(cedulaEmpleado) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtKey = obj.jwt;
-    
+
     const headers = {
         'Authorization': jwtKey
     };
 
-    const urlcompleta = urlBack.url + '/Datosbase/tesoreria/'+ cedulaEmpleado;
+    const urlcompleta = urlBack.url + '/Datosbase/tesoreria/' + cedulaEmpleado;
 
     try {
         const response = await fetch(urlcompleta, {
@@ -208,14 +208,18 @@ boton.addEventListener('click', async (e) => {
     }
 
     let aux = await datosEmpleado(cedulaEmpleado);
-    console.log(aux.datosbase[0]);  
+    console.log(aux.datosbase[0]);
     let datos = aux.datosbase[0];
-       
+
 
     // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
-    
+
     const fechaIngreso = datos.ingreso;
-    
+    if (datos == undefined) {
+        aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
+        return;
+    }
+
     let mes = fechaIngreso.split('-')[1];
     let anio = fechaIngreso.split('-')[2];
     let dia = fechaIngreso.split('-')[0];
@@ -223,24 +227,24 @@ boton.addEventListener('click', async (e) => {
     // el año esta en formato xxaa y se debe convertir a 20aa
     let anioConvertido = '20' + anio;
     anio = anioConvertido;
-    
+
     const sumaTotal =
         parseInt(datos.saldos) +
         parseInt(datos.fondos) +
         parseInt(datos.mercados) +
         parseInt(datos.prestamoParaDescontar) +
         parseInt(datos.casino) +
-        parseInt(datos.anchetas) +
+        parseInt(datos.valoranchetas) +
         parseInt(datos.fondo) +
         parseInt(datos.carnet) +
         parseInt(datos.seguroFunerario) +
         parseInt(datos.prestamoParaHacer) +
         parseInt(datos.anticipoLiquidacion) +
         parseInt(datos.cuentas);
-    
+
     const fechaActual = new Date();
     let codigoOH = null;
-    
+
     if (parseInt(datos.saldos) >= 175000) {
         aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
     }
@@ -254,7 +258,7 @@ boton.addEventListener('click', async (e) => {
             cuotasAux = 1;
         }
         else if (tipo == "Dinero") {
-            codigoOH = 'PH' + Math.floor(Math.random() * 1000000);            
+            codigoOH = 'PH' + Math.floor(Math.random() * 1000000);
         }
         else if (tipo == "Otro") {
             codigoOH = 'OT' + Math.floor(Math.random() * 1000000);
@@ -297,7 +301,7 @@ boton.addEventListener('click', async (e) => {
             }
         }
         if (bandera == true) {
-            
+
             let empresa = null;
             let NIT = null;
             let direcccion = null;

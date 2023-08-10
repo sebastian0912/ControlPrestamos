@@ -317,37 +317,37 @@ async function actualizar(codigo, cod, username, monto2, cuotas) {
     console.log(jwtToken);
 
     const urlcompleta = urlBack.url + '/Codigo/jefedearea/actualizarCodigo/' + cod;
-    
-        try {
-            fetch(urlcompleta, {
-                method: 'POST',
-                body:
-                    JSON.stringify({
-                        codigoDescontado: codigo,
-                        ejecutadoPor: username,
-                        nuevomonto: monto2,
-                        cuotas: cuotas,
-                        jwt: jwtToken
-                    })
+
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    codigoDescontado: codigo,
+                    ejecutadoPor: username,
+                    nuevomonto: monto2,
+                    cuotas: cuotas,
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
             })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
-                        //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
-                    } else {
-                        throw new Error('Error en la petición POST');
-                    }
-                })
-                .then(responseData => {
-                    console.log('Respuesta:', responseData);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-        } catch (error) {
-            console.error('Error en la petición HTTP POST');
-            console.error(error);
-        }
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
 }
 
 async function actualizarDatosBase(concepto, valor, cuotas, cedulaEmpleado) {
@@ -421,8 +421,10 @@ async function actualizarDatosBase(concepto, valor, cuotas, cedulaEmpleado) {
             console.error(error);
         }
     }
-    else if (concepto == 'Otros_Autorizacion') {
-        
+    else if (concepto == 'Otro_Autorizacion') {
+        console.log('con2' + concepto);
+        // quitar espacios en blanco a concepto
+        concepto = concepto.replace(/\s/g, '');
         try {
             fetch(urlcompleta, {
                 method: 'POST',
@@ -456,7 +458,6 @@ async function actualizarDatosBase(concepto, valor, cuotas, cedulaEmpleado) {
     }
 }
 
-
 async function escribirHistorial(cedulaEmpleado, nuevovalor, username, cuotas, tipo) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
@@ -473,7 +474,8 @@ async function escribirHistorial(cedulaEmpleado, nuevovalor, username, cuotas, t
             method: 'POST',
             body:
                 JSON.stringify({
-                    nombreQuienEntrego: username,
+                    cedula: cedulaEmpleado,
+                    nombreQuienEntrego: usernameLocal,
                     valor: nuevovalor,
                     cuotas: cuotas,
                     fechaEfectuado: fecha,
@@ -563,11 +565,11 @@ boton.addEventListener('click', async (e) => {
         const aux = await datosTCodigos();
         console.log(aux.codigo);
         let aux2 = await datosEmpleado(cedulaEmpleado);
+        console.log(aux2);
+        
         console.log(aux2.datosbase[0]);
         let usuario = aux2.datosbase[0];
         console.log(usuario);
-
-        let todas = false;
 
         if (!verificarCodigo(codigoP, aux.codigo)) {
             aviso('El codigo no existe', 'error');
@@ -607,17 +609,17 @@ boton.addEventListener('click', async (e) => {
                 concepto2 = 'Seguro_Funerario_Autorizacion';
             }
             else if (cod.codigo.startsWith("OT")) {
-                concepto2 = 'Otros_Autorizacion';
+                concepto2 = 'Otro_Autorizacion';
             }
 
             await actualizar(codigo, cod.codigo, usernameLocal, nuevovalor, cuotas);
 
+            console.log("primero" + concepto2);
             await actualizarDatosBase(concepto2, nuevovalor, cuotas, cedulaEmpleado);
             // modificar en la tabla codigos el estado del codigo a false para que no pueda ser usado nuevamente
             await CambiarEstado(cod.codigo, nuevovalor, codigo);
 
-
-            escribirHistorial(cedulaEmpleado, nuevovalor, username, cuotas, concepto2)
+            await escribirHistorial(cedulaEmpleado, nuevovalor, username, cuotas, concepto2)
 
             aviso('Acaba de pedir un prestamo de ' + valor, 'success');
 
@@ -682,16 +684,16 @@ boton.addEventListener('click', async (e) => {
             docPdf.text('Cordialmente ', 10, 110);
             docPdf.setFont('Helvetica', 'normal');
             docPdf.text('Firma de Autorización ', 10, 115);
-            docPdf.text('C.C. ' + usuario.cedula, 10, 120);
+            docPdf.text('C.C. ' + usuario.numero_de_documento, 10, 120);
 
             // realizar un cuadro para colocar la huella dactilar
             docPdf.rect(130, 110, 35, 45);
-            docPdf.text('Codigo de descuento nomina: ' + cod.codigoDescontado, 10, 130);
+            docPdf.text('Codigo de descuento nomina: ' + codigo, 10, 130);
             docPdf.setFont('Helvetica', 'bold');
             docPdf.setFontSize(6);
             docPdf.text('Huella Indice Derecho', 130, 105);
 
-            docPdf.save('AutorizacionPrestamo' + '_' + usuario.nombre + "_" + cod.codigoDescontado + '.pdf');
+            docPdf.save('AutorizacionPrestamo' + '_' + usuario.nombre + "_" + codigo + '.pdf');
 
         }
     }

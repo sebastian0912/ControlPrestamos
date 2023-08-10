@@ -1,9 +1,8 @@
 
 
-import { comercio } from "../../models/base.js";
+import { comercio, urlBack } from "../../models/base.js";
 import { aviso } from "../../Avisos/avisos.js";
-import { doc, getDoc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
-import { db } from "../../firebase.js";
+
 
 const boton = document.querySelector('#boton');
 
@@ -46,61 +45,66 @@ for (let i = 0; i < datos2.length; i++) {
 
 
 
-/*Calculo cuantos dias faltan*/
 // Obtén la fecha actual
 var ahora = new Date();
 var anio = ahora.getFullYear();
 var mes = ahora.getMonth();
 var dia = 0;
 
-if (ahora.getDate() == 15 || ahora.getDate() == 30) {
+if (ahora.getDate() == 13 || ahora.getDate() == 27) {
     dia = 0;
     numeroDias.style.color = "red";
 }
-else if (ahora.getDate() < 15) {
-    dia = 15;
+else if (ahora.getDate() < 13) {
+    dia = 13;
 }
-else if (ahora.getDate() < 30) {
-    dia = 30;
+else if (ahora.getDate() < 27) {
+    dia = 27;
+}
+else {
+    dia = 13;
+    mes++; // Cambia al próximo mes
 }
 
-// Comprueba si el día ya ha pasado este mes
-if (ahora.getDate() > dia) {
-    // Si es así, cambia al próximo mes
-    mes++;
-}
 // Crea la fecha objetivo
 var fechaObjetivo = new Date(anio, mes, dia);
 // Calcula la diferencia en milisegundos
 var diferencia = fechaObjetivo - ahora;
 // Convierte la diferencia en días
 var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
-numeroDias.innerHTML = dias;
+diasRestantes.innerHTML = dias;
 
-// Mostrar en el html el numero de dias Restantes de liquidacion
-var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05']
-// Recorre el arreglo y muestra los dias restantes deacuerdo a la fecha
-for (let i = 0; i < fechaObjetivo2.length; i++) {
-    // separar por año, mes y dia
-    var fechaObjetivo3 = new Date(fechaObjetivo2[i]);
-    if (fechaObjetivo3.getFullYear() ==
-        ahora.getFullYear() && fechaObjetivo3.getMonth() ==
-        ahora.getMonth()
-        && fechaObjetivo3.getDate() >= ahora.getDate()) {
-        var diferencia2 = fechaObjetivo3 - ahora;
-        var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
-        if (dias2 == 0) {
-            diasRestantesLi.style.color = "red";
+
+var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05'];
+
+function obtenerFecha() {
+    // Convertimos la fecha actual a un formato que coincida con las fechas del arreglo
+    var fechaActualFormato = ahora.toISOString().slice(0, 10);
+
+    var fechaSeleccionada = null;
+
+    for (var i = 0; i < fechaObjetivo2.length; i++) {
+        // Comparamos las fechas ignorando la información de la hora y el huso horario
+        if (fechaActualFormato <= fechaObjetivo2[i]) {
+            fechaSeleccionada = fechaObjetivo2[i];
+            return fechaSeleccionada;
         }
-        diasRestantesLi.innerHTML = dias2;
-        break;
     }
 }
+
+var diferencia2 = new Date(obtenerFecha()) - ahora;
+var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
+
+if (dias2 == 0) {
+    diasLi.style.color = "red";
+} else {
+    diasLi.style.color = "black";
+}
+diasLi.innerHTML = dias2;
 
 
 let mostrarAviso = false;
 miSelect2.addEventListener('change', async (e) => {
-    const querySnapshot = await getDocs(collection(db, "Conceptos"));
     const otro = document.querySelector('#otro2');
 
     if (e.target.value == "11") {
@@ -135,6 +139,50 @@ numemoroM.addEventListener('keyup', (e) => {
     }
 });
 
+async function enviarLona(cod, destino, concepto, cantidad, valorUnidad, PersonaEnvia) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+
+    // yyyy-mm-dd
+    const fecha = anio + '-' + mes + '-' + dia;
+    const urlcompleta = urlBack.url + '/Comercio/Comercializadora/realizarenvio';
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    codigo: cod,
+                    concepto: concepto,
+                    destino: destino,
+                    cantidadEnvio: cantidad,
+                    valorUnidad: valorUnidad,
+                    PersonaEnvia: PersonaEnvia,                    
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+}
+
 
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
@@ -157,19 +205,18 @@ boton.addEventListener('click', async (e) => {
         return;
     }
 
-    let aux = comercio;
-    let uid;
-    uid = Math.floor(Math.random() * 10000000);
+    
+    let uid = Math.floor(Math.random() * 10000000);
 
-    aux.codigo = uid;
-    aux.destino = miSelect;
-    aux.concepto = miSelect2;
-    aux.cantidadEnvio = cantidad;
-    aux.PersonaEnvia = usernameLocal;
-    aux.valorUnidad = nuevovalor;
-    aux.fechaEnviada = new Date().toLocaleDateString();
-    await setDoc(doc(db, "Comercio", uid.toString()), aux);
+    await enviarLona(uid, miSelect, miSelect2, cantidad, nuevovalor, usernameLocal);
+   
     aviso("Se ha cargado la informacion exitosamente, el codigo es: " + uid, "success");
+
+    document.querySelector('#cantidad').value = "";
+    document.querySelector('#valorUnidad').value = "";
+    document.querySelector('#otro2').value = "";
+    document.querySelector('#miSelect').value = "";
+    document.querySelector('#miSelect2').value = "";
 });
 
 

@@ -1,6 +1,6 @@
 
 
-import { comercio, urlBack } from "../../models/base.js";
+import { urlBack } from "../../models/base.js";
 import { aviso } from "../../Avisos/avisos.js";
 
 
@@ -23,7 +23,7 @@ perfil.innerHTML = perfilLocal;
 
 
 // Arreglo con las sedes y conceptos
-let datos = ["Faca Principal", "Faca Centro", "Rosal", "Cartagenita", "Madrid", "Funza", "Soacha", "Fontibón", "Suba", "Tocancipá", "Bosa"];
+let datos = ["Faca Principal", "Faca Centro", "Rosal", "Cartagenita", "Madrid", "Funza", "Soacha", "Fontibón", "Suba", "Tocancipá", "Bosa", "Bogota"];
 let datos2 = ["Mercado", "Kit escolar", "Kit aseo", "Anchetas", "Matrimonios", "Kit velitas", "Kit amor y amistad", "Kit Día de las Madres", "Juguetes", "Kit dulces", "Otro"];
 
 // recorrer el arreglo y mostrarlo en el select
@@ -44,7 +44,6 @@ for (let i = 0; i < datos2.length; i++) {
 
 
 
-/*Calculo cuantos dias faltan*/
 // Obtén la fecha actual
 var ahora = new Date();
 var anio = ahora.getFullYear();
@@ -61,39 +60,46 @@ else if (ahora.getDate() < 13) {
 else if (ahora.getDate() < 27) {
     dia = 27;
 }
-
-// Comprueba si el día ya ha pasado este mes
-if (ahora.getDate() > dia) {
-    // Si es así, cambia al próximo mes
-    mes++;
+else {
+    dia = 13;
+    mes++; // Cambia al próximo mes
 }
+
 // Crea la fecha objetivo
 var fechaObjetivo = new Date(anio, mes, dia);
 // Calcula la diferencia en milisegundos
 var diferencia = fechaObjetivo - ahora;
 // Convierte la diferencia en días
 var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
-numeroDias.innerHTML = dias;
+diasRestantes.innerHTML = dias;
 
-// Mostrar en el html el numero de dias Restantes de liquidacion
-var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05']
-// Recorre el arreglo y muestra los dias restantes deacuerdo a la fecha
-for (let i = 0; i < fechaObjetivo2.length; i++) {
-    // separar por año, mes y dia
-    var fechaObjetivo3 = new Date(fechaObjetivo2[i]);
-    if (fechaObjetivo3.getFullYear() ==
-        ahora.getFullYear() && fechaObjetivo3.getMonth() ==
-        ahora.getMonth()
-        && fechaObjetivo3.getDate() >= ahora.getDate()) {
-        var diferencia2 = fechaObjetivo3 - ahora;
-        var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
-        if (dias2 == 0) {
-            diasRestantesLi.style.color = "red";
+
+var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05'];
+
+function obtenerFecha() {
+    // Convertimos la fecha actual a un formato que coincida con las fechas del arreglo
+    var fechaActualFormato = ahora.toISOString().slice(0, 10);
+
+    var fechaSeleccionada = null;
+
+    for (var i = 0; i < fechaObjetivo2.length; i++) {
+        // Comparamos las fechas ignorando la información de la hora y el huso horario
+        if (fechaActualFormato <= fechaObjetivo2[i]) {
+            fechaSeleccionada = fechaObjetivo2[i];
+            return fechaSeleccionada;
         }
-        diasRestantesLi.innerHTML = dias2;
-        break;
     }
 }
+
+var diferencia2 = new Date(obtenerFecha()) - ahora;
+var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
+
+if (dias2 == 0) {
+    diasLi.style.color = "red";
+} else {
+    diasLi.style.color = "black";
+}
+diasLi.innerHTML = dias2;
 
 
 let mostrarAviso = false;
@@ -132,7 +138,7 @@ numemoroM.addEventListener('keyup', (e) => {
 });
 
 
-async function escribirHistorial(cod, destino, concepto, cantidad, valorUnidad, PersonaEnvia) {
+async function enviarLona(cod, destino, concepto, cantidad, valorUnidad, PersonaEnvia) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
@@ -199,10 +205,9 @@ boton.addEventListener('click', async (e) => {
         return;
     }
 
-    let aux = comercio;
-    let uid = Math.floor(Math.random() * (999999 - 100000)) ;
+    let uid = Math.floor(Math.random() * 10000000);;
 
-    await escribirHistorial(uid, miSelect, miSelect2, cantidad, nuevovalor, usernameLocal);
+    await enviarLona(uid, miSelect, miSelect2, cantidad, nuevovalor, usernameLocal);
 
 
     aviso("Se ha cargado la informacion exitosamente, el codigo es: " + uid, "success");
@@ -210,8 +215,8 @@ boton.addEventListener('click', async (e) => {
     document.querySelector('#cantidad').value = "";
     document.querySelector('#valorUnidad').value = "";
     document.querySelector('#otro2').value = "";
-    miSelect = "";
-    miSelect2 = "";
+    document.querySelector('#miSelect').value = "";
+    document.querySelector('#miSelect2').value = "";
     
 });
 

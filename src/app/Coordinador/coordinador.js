@@ -109,7 +109,7 @@ const aux = await datosTCodigos();
 let arrayCodigos = [];
 
 aux.codigo.forEach((c) => {
-    if( c.ceduladelGenerador_id == uid){
+    if (c.ceduladelGenerador_id == uid) {
         arrayCodigos.push(c);
     }
 });
@@ -163,6 +163,7 @@ async function estadoSoli(checked) {
     console.log(jwtToken);
 
     const urlcompleta = urlBack.url + '/usuarios/coordinador/cambioSolicitudes';
+
     try {
         fetch(urlcompleta, {
             method: 'POST',
@@ -198,13 +199,15 @@ async function estadoSoli(checked) {
 document.getElementById("myonoffswitch").addEventListener("click", async function (event) {
 
     if (this.checked) {
-        estadoSoli("True");
-        aviso('Se ha notificado que va a publicar mas codigos para hacer', 'success');
-
-
-    } else {
         estadoSoli("False");
+        localStorage.setItem("estadoSolicitudes", "false");
         aviso('Se ha notificado que no va a publicar mas codigos para hacer', 'success');
+       
+        
+    } else {
+        estadoSoli("True");
+        localStorage.setItem("estadoSolicitudes", "true");
+        aviso('Se ha notificado que va a publicar mas codigos para hacer', 'success');
     }
 });
 

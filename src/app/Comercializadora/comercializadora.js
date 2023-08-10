@@ -114,6 +114,9 @@ console.log(miArray);
 
 
 miArray.forEach((p) => {
+    if (p.fechaRecibida == null) {
+        p.fechaRecibida = "";
+    }
         tabla.innerHTML += `
         <tr>
             <td>${p.codigo}</td>

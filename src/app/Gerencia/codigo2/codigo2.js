@@ -1,21 +1,18 @@
-import { codigo } from "../../models/base.js";
+import { codigo, urlBack } from "../../models/base.js";
 import { aviso } from "../../Avisos/avisos.js";
-import { doc, getDoc, getDocs, collection, setDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
-import { db } from "../../firebase.js";
 
-
-
-const boton = document.querySelector('#boton');
-const idUsuario = localStorage.getItem("idUsuario");
-
+// Capturar el h1 del titulo y perfil
+const titulo = document.querySelector('#username');
+const perfil = document.querySelector('#perfil');
 // Capturar el PERFIL y el USERNAME del local storage
 const perfilLocal = localStorage.getItem("perfil");
 const usernameLocal = localStorage.getItem("username");
+const iddatos = localStorage.getItem("idUsuario");
 //Muestra en la parte superior el nombre y el perfil
-username.innerHTML = usernameLocal;
+titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
 
-/*Calculo cuantos dias faltan*/
+
 // Obtén la fecha actual
 var ahora = new Date();
 var anio = ahora.getFullYear();
@@ -32,12 +29,11 @@ else if (ahora.getDate() < 13) {
 else if (ahora.getDate() < 27) {
     dia = 27;
 }
-
-// Comprueba si el día ya ha pasado este mes
-if (ahora.getDate() > dia) {
-    // Si es así, cambia al próximo mes
-    mes++;
+else {
+    dia = 13;
+    mes++; // Cambia al próximo mes
 }
+
 // Crea la fecha objetivo
 var fechaObjetivo = new Date(anio, mes, dia);
 // Calcula la diferencia en milisegundos
@@ -47,28 +43,33 @@ var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
 diasRestantes.innerHTML = dias;
 
 
-// Mostrar en el html el numero de dias Restantes de liquidacion
-var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05']
-// Recorre el arreglo y muestra los dias restantes deacuerdo a la fecha
-for (let i = 0; i < fechaObjetivo2.length; i++) {
-    // separar por año, mes y dia
-    var fechaObjetivo3 = new Date(fechaObjetivo2[i]);
-    if (fechaObjetivo3.getFullYear() == ahora.getFullYear() &&
-        fechaObjetivo3.getMonth() == ahora.getMonth() &&
-        fechaObjetivo3.getDate() >= ahora.getDate()) {
+var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05'];
 
-        var diferencia2 = fechaObjetivo3 - ahora;
-        var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
-        if (dias2 == 0) {
-            diasLi.style.color = "red";
+function obtenerFecha() {
+    // Convertimos la fecha actual a un formato que coincida con las fechas del arreglo
+    var fechaActualFormato = ahora.toISOString().slice(0, 10);
+
+    var fechaSeleccionada = null;
+
+    for (var i = 0; i < fechaObjetivo2.length; i++) {
+        // Comparamos las fechas ignorando la información de la hora y el huso horario
+        if (fechaActualFormato <= fechaObjetivo2[i]) {
+            fechaSeleccionada = fechaObjetivo2[i];
+            return fechaSeleccionada;
         }
-        diasLi.innerHTML = dias2;
-        break;
     }
 }
 
+var diferencia2 = new Date(obtenerFecha()) - ahora;
+var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
 
-let extraeT = document.getElementById("extraeT");
+if (dias2 == 0) {
+    diasLi.style.color = "red";
+} else {
+    diasLi.style.color = "black";
+}
+diasLi.innerHTML = dias2;
+
 /*Convertir valor a separado por miles*/
 const numemoroM = document.querySelector('#valor');
 numemoroM.addEventListener('keyup', (e) => {
@@ -82,6 +83,54 @@ numemoroM.addEventListener('keyup', (e) => {
         numemoroM.value = numemoroM.value.replace(/[^\d\,]*/g, '');
     }
 });
+
+async function escribirCodigo(cedulaEmpleado, nuevovalor, cod, cuotas, tipo, valor) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+
+    const urlcompleta = urlBack.url + '/Codigo/jefedearea/crearcodigo';
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    codigo: cod,
+                    monto: nuevovalor,
+                    cuotas: cuotas,
+                    estado: true,
+                    Concepto: tipo + ' Autorizacion',
+                    cedulaQuienPide: cedulaEmpleado,
+                    generadoPor: usernameLocal,
+                    ceduladelGenerador: iddatos,
+                    formasdepago: 'none',
+                    numerodepago: 'none',
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + cod, 'success');
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+
+}
 
 let tipo = document.querySelector('#tipo');
 tipo.addEventListener('change', (e) => {
@@ -114,32 +163,34 @@ function verificaSelect(select) {
     }
 }
 
-async function escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas, tipo) {
+async function datosEmpleado(cedulaEmpleado){
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+    
+    const headers = {
+        'Authorization': jwtKey
+    };
 
-    const docCoordinador = doc(db, "Codigos", idUsuario);
-    const coordninador = await getDoc(docCoordinador);
-    data.codigo = tipo;
-    data.monto = nuevovalor;
-    data.uid = idUsuario;
-    data.cuotas = cuotas;
-    data.cedulaQuienPide = cedulaEmpleado;
-    data.fechaGenerado = new Date().toLocaleDateString()
-    data.generadoPor = usernameLocal;
+    const urlcompleta = urlBack.url + '/Datosbase/tesoreria/'+ cedulaEmpleado;
 
-    if (coordninador.exists()) {
-        // generar un codigo aleatorio para el prestamo        
-        // Actualizar en la base de datos
-        await updateDoc(doc(db, "Codigos", idUsuario), {
-            prestamos: arrayUnion(data)
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
         });
-        aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + data.codigo, 'success');
-    }
-    else {
-        await setDoc(docCoordinador, {
-            prestamos: [data]
-        });
-        //await setDoc(doc(db, "Codigos", idUsuario), data);
-        aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + data.codigo, 'success');
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
     }
 }
 
@@ -149,48 +200,118 @@ boton.addEventListener('click', async (e) => {
     let valor = document.querySelector('#valor').value;
     let nuevovalor = valor.replace(/\,/g, '');
     let cuotas = document.querySelector('#cuotas').value;
-    let tipo = document.querySelector('#tipo').value;
     let cedulaEmpleado = document.querySelector('#cedula').value;
-    let codigoOH = null;
-    let bandera = false;
-
+    let tipo = document.querySelector('#tipo').value;
+    let cuotasAux = cuotas;
     if (!verificaSelect(formaPago)) {
         return;
     }
-    if (valor != '' && tipo != '0') {
-        bandera = true;
+
+    let aux = await datosEmpleado(cedulaEmpleado);
+    console.log(aux.datosbase[0]);  
+    let datos = aux.datosbase[0];
+       
+
+    // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
+    
+    const fechaIngreso = datos.ingreso;
+    
+    let mes = fechaIngreso.split('-')[1];
+    let anio = fechaIngreso.split('-')[2];
+    let dia = fechaIngreso.split('-')[0];
+
+    // el año esta en formato xxaa y se debe convertir a 20aa
+    let anioConvertido = '20' + anio;
+    anio = anioConvertido;
+    
+    const sumaTotal =
+        parseInt(datos.saldos) +
+        parseInt(datos.fondos) +
+        parseInt(datos.mercados) +
+        parseInt(datos.prestamoParaDescontar) +
+        parseInt(datos.casino) +
+        parseInt(datos.anchetas) +
+        parseInt(datos.fondo) +
+        parseInt(datos.carnet) +
+        parseInt(datos.seguroFunerario) +
+        parseInt(datos.prestamoParaHacer) +
+        parseInt(datos.anticipoLiquidacion) +
+        parseInt(datos.cuentas);
+    
+    const fechaActual = new Date();
+    let codigoOH = null;
+    
+    if (parseInt(datos.saldos) >= 175000) {
+        aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
+    }
+    else if (parseInt(datos.fondos) > 0) {
+        aviso('Ups no se pueden generar prestamos perteneces al fondo', 'error');
+    }
+    else {
+        // VERIFICAR EL TIPO QUE SE ESTA SELECCIONANDO        
         if (tipo == "Seguro Funerario") {
             codigoOH = 'SF' + Math.floor(Math.random() * 1000000);
-            cuotas = 1;
+            cuotasAux = 1;
         }
         else if (tipo == "Dinero") {
-            codigoOH = 'PH' + Math.floor(Math.random() * 1000000);
+            codigoOH = 'PH' + Math.floor(Math.random() * 1000000);            
         }
         else if (tipo == "Otro") {
             codigoOH = 'OT' + Math.floor(Math.random() * 1000000);
         }
 
-        // capturar los datos del formulario
-        let data = codigo;
-        escribirCodigo(data, cedulaEmpleado, nuevovalor, valor, cuotas, codigoOH)
-
+        // conseguir la fecha actual y separarla en dia, mes y año para poder compararla con la fecha de ingreso del empleado            
+        let mesActual = fechaActual.getMonth() + 1;
+        let anioActual = fechaActual.getFullYear();
+        let bandera = false;
+        if ((anioActual == anio) && ((mesActual - mes) >= 2)) {
+            if (parseInt(nuevovalor) >= 200001) {
+                aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
+                bandera = false;
+                return;
+            }
+            else if (sumaTotal >= 350001 || (sumaTotal + parseInt(nuevovalor)) >= 350001) {
+                bandera = false;
+                aviso('Ups no se pueden generar prestamos, puede sacar maximo ' + (350000 - (sumaTotal)), 'error');
+                return;
+            }
+            else {
+                bandera = true;
+                escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, cuotasAux, tipo, valor)
+            }
+        }
+        else if ((anioActual > anio)) {
+            if (parseInt(nuevovalor) >= 200001) {
+                bandera = false;
+                aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
+                return;
+            }
+            else if (sumaTotal >= 350001 || (sumaTotal + parseInt(nuevovalor)) >= 350001) {
+                bandera = false;
+                aviso('Ups no se pueden generar prestamos, puede sacar maximo ' + (350000 - (sumaTotal)), 'error');
+                return;
+            }
+            else {
+                bandera = true;
+                escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, cuotasAux, tipo, valor)
+            }
+        }
         if (bandera == true) {
-            const datosUsuario = await getDoc(doc(db, "Base", cedulaEmpleado));
-            const usuario = datosUsuario.data();
+            
             let empresa = null;
             let NIT = null;
             let direcccion = null;
-            if (usuario.temporal.startsWith("Apoyo") || usuario.temporal.startsWith("APOYO")) {
+            if (datos.temporal.startsWith("Apoyo") || datos.temporal.startsWith("APOYO")) {
                 empresa = "APOYO LABORAL TS SAS";
                 NIT = "NIT 900814587"
                 direcccion = "CALLE 112 A No. 18 A -05"
             }
-            else if (usuario.temporal.startsWith("Tu") || usuario.temporal.startsWith("TU")) {
+            else if (datos.temporal.startsWith("Tu") || datos.temporal.startsWith("TU")) {
                 empresa = "TU ALIANZA SAS";
                 NIT = "NIT 900864596 - 1"
                 direcccion = "CRA 2 N 8- 156 FACATATIVA'"
             }
-            else if (usuario.temporal.startsWith("Comercializadora") || usuario.temporal.startsWith("COMERCIALIZADORA")) {
+            else if (datos.temporal.startsWith("Comercializadora") || datos.temporal.startsWith("COMERCIALIZADORA")) {
                 empresa = "COMERCIALIZADORA TS";
             }
             var docPdf = new jsPDF();
@@ -220,22 +341,22 @@ boton.addEventListener('click', async (e) => {
             docPdf.setFont('Helvetica', 'normal');
 
 
-            docPdf.text('Yo, ' + usuario.nombre + ' mayor de edad,  identificado con la cedula de ciudadania No. '
-                + usuario.cedula + ' autorizo', 10, 55);
+            docPdf.text('Yo, ' + datos.nombre + ' mayor de edad,  identificado con la cedula de ciudadania No. '
+                + datos.cedula + ' autorizo', 10, 55);
             docPdf.text('expresa e irrevocablemente para que del sueldo, salario, prestaciones sociales o de cualquier suma de la sea acreedor; me sean', 10, 60);
             docPdf.text('descontados la cantidad de ' + valor + ' (Letras)  ' + NumeroALetras(nuevovalor) + 'por concepto de' + ' PRESTAMO, en ' + cuotas + ' cuota(s), ', 10, 65);
             docPdf.text('quincenal del credito del que soy deudor ante Tu alianza S.A.S. , aun en el evento de encontrarme disfrutando de mis licencias ', 10, 70);
             docPdf.text('o incapacidades. ', 10, 75);
 
-            docPdf.text('Fecha de ingreso: ' + usuario.ingreso, 10, 90);
-            docPdf.text('Centro de Costo: ' + usuario.finca, 130, 90);
+            docPdf.text('Fecha de ingreso: ' + datos.ingreso, 10, 90);
+            docPdf.text('Centro de Costo: ' + datos.finca, 130, 90);
             docPdf.text('Forma de pago: ' + formaPago.value, 10, 95);
             docPdf.text('Telefono: ' + celular.value, 130, 95);
             docPdf.setFont('Helvetica', 'bold');
             docPdf.text('Cordialmente ', 10, 110);
             docPdf.setFont('Helvetica', 'normal');
             docPdf.text('Firma de Autorización ', 10, 115);
-            docPdf.text('C.C. ' + usuario.cedula, 10, 120);
+            docPdf.text('C.C. ' + datos.numero_de_documento, 10, 120);
 
             // realizar un cuadro para colocar la huella dactilar
             docPdf.rect(130, 110, 35, 45);
@@ -244,75 +365,20 @@ boton.addEventListener('click', async (e) => {
             docPdf.setFontSize(6);
             docPdf.text('Huella Indice Derecho', 130, 105);
 
-            docPdf.save('PrestamoDescontar' + '_' + usuario.nombre + "_" + codigoOH + '.pdf');
+            docPdf.save('PrestamoDescontar' + '_' + datos.nombre + "_" + codigoOH + '.pdf');
         }
     }
-    valor = '';
-    cuotas = '';
-    cedulaEmpleado = '';
+    document.querySelector('#valor').value = "";
+    document.querySelector('#cuotas').value = "";
+    document.querySelector('#cedula').value = "";
+    document.querySelector('#celular').value = "";
+    document.querySelector('#tipo').value = "0";
+    document.querySelector('#formaPago').value = "0";
+
 });
 
-extraeT.addEventListener('click', async () => {
-    const querySnapshot = await getDocs(collection(db, "Tienda"));
 
-    let dataString = 'nombre\tMonto Total\t Numero de compras en la tienda\n';
 
-    querySnapshot.forEach((doc) => {
-        const docData = doc.data();
-        dataString +=
-            docData.nombre + '\t' +
-            docData.valorTotal + '\t' +
-            docData.numPersonasAtendidas + '\n';
-    });
-
-    // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
-    const element = document.createElement('a');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
-    element.setAttribute('download', 'datosTienda.txt');
-
-    element.style.display = 'none';
-    document.body.appendChild(element);
-
-    element.click();
-
-    document.body.removeChild(element);
-});
-
-extrae.addEventListener('click', async () => {
-    const querySnapshot = await getDocs(collection(db, "Historial"));
-    let historial = [];
-    querySnapshot.forEach(doc => {
-        const cod = doc.data();
-        const historia = cod.historia;
-
-        historia.forEach(p => {
-            if (p.concepto.startsWith("Compra")) {
-                historial.push(p);
-            }
-        });
-    });
-
-    let dataString = 'Cedula\tconcepto\tcuotas\fechaEfectuado\tnombreQuienEntrego\tvalor\n';
-    historial.forEach((doc) => {
-        dataString +=
-            doc.cedula + '\t' +
-            doc.concepto + '\t' +
-            doc.cuotas + '\t' +
-            doc.fechaEfectuado + '\t' +
-            doc.nombreQuienEntrego + '\t' +
-            doc.valor + '\n';
-    }
-    );
-    // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
-    const element = document.createElement('a');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
-    element.setAttribute('download', 'datosHistorialDetallado.txt');
-
-    element.style.display = 'none';
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
-});
 
 /*************************************************************/
 // NumeroALetras
@@ -495,3 +561,161 @@ function NumeroALetras(num) {
         return Millones(data.enteros) + " " + data.letrasMonedaPlural + " " + data.letrasCentavos;
 }
 
+async function datosT() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Tienda/traerTienda';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
+extraeT.addEventListener('click', async () => {
+    const datosExtraidos = await datosT();
+
+    console.log(datosExtraidos);
+
+    let dataString = 'nombre\tMonto Total\t Numero de compras en la tienda\n';
+    if (datosExtraidos.empresa.length == 0) {
+        aviso("No se han comprado productos en las tiendas", "warning");
+    }
+    else {
+        datosExtraidos.tienda.forEach((doc) => {
+            const docData = doc;
+            dataString +=
+                docData.nombre + '\t' +
+                docData.valorTotal + '\t' +
+                docData.numPersonasAtendidas + '\n';
+        });
+        // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
+        const element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
+        element.setAttribute('download', 'datosTienda.txt');
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+
+        element.click();
+
+        document.body.removeChild(element);
+    }
+});
+
+async function THistorial() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Historial/historial';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
+extraeT.addEventListener('click', async () => {
+    const datosExtraidos = await datosT();
+
+    console.log(datosExtraidos);
+
+    let dataString = 'nombre\tMonto Total\t Numero de compras en la tienda\n';
+    if (datosExtraidos.empresa.length == 0) {
+        aviso("No se han comprado productos en las tiendas", "warning");
+        return;
+    }
+    else {
+        datosExtraidos.tienda.forEach((doc) => {
+            const docData = doc;
+            dataString +=
+                docData.nombre + '\t' +
+                docData.valorTotal + '\t' +
+                docData.numPersonasAtendidas + '\n';
+        });
+        // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
+        const element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
+        element.setAttribute('download', 'datosTienda.txt');
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+
+        element.click();
+
+        document.body.removeChild(element);
+    }
+});
+
+
+extraeHistorialT.addEventListener('click', async () => {
+    console.log("entro");
+    const datosExtraidos = await THistorial();
+    
+    let historial = [];
+    datosExtraidos.historial.forEach(doc => {
+        if (doc.concepto.startsWith("Compra tienda")) {
+            historial.push(doc);
+        }
+    });
+
+    let dataString = 'Cedula\tconcepto\tcuotas\fechaEfectuado\tnombreQuienEntrego\tvalor\n';
+    historial.forEach((doc) => {
+        dataString +=
+            doc.cedula + '\t' +
+            doc.concepto + '\t' +
+            doc.cuotas + '\t' +
+            doc.fechaEfectuado + '\t' +
+            doc.nombreQuienEntrego + '\t' +
+            doc.valor + '\n';
+    }
+    );
+    // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
+    const element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
+    element.setAttribute('download', 'datosHistorialDetallado.txt');
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+});

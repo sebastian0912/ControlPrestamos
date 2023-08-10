@@ -19,4 +19,17 @@ module.exports = {
       config: {},
     },
   ],
+  publishers: [
+    {
+      name: '@electron-forge/publisher-github',
+      config: {
+        repository: {
+          owner: 'sebastian0912',
+          name: 'ControlPrestamos'
+        },
+        prerelease: false,
+        draft: true
+      }
+    }
+  ]
 };

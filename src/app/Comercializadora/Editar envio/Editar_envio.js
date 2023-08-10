@@ -1,10 +1,9 @@
 
 
-import { comercio, historialModificaciones } from "../../models/base.js";
+import { urlBack } from "../../models/base.js";
 import { aviso } from "../../Avisos/avisos.js";
-import { doc, getDoc, setDoc, collection, getDocs, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
-import { db } from "../../firebase.js";
-import axios from 'axios';
+
+
 const boton = document.querySelector('#boton');
 
 // Capturar el h1 del titulo y perfil
@@ -45,8 +44,6 @@ for (let i = 0; i < datos2.length; i++) {
 }
 
 
-
-/*Calculo cuantos dias faltan*/
 // Obtén la fecha actual
 var ahora = new Date();
 var anio = ahora.getFullYear();
@@ -63,38 +60,191 @@ else if (ahora.getDate() < 13) {
 else if (ahora.getDate() < 27) {
     dia = 27;
 }
-
-// Comprueba si el día ya ha pasado este mes
-if (ahora.getDate() > dia) {
-    // Si es así, cambia al próximo mes
-    mes++;
+else {
+    dia = 13;
+    mes++; // Cambia al próximo mes
 }
+
 // Crea la fecha objetivo
 var fechaObjetivo = new Date(anio, mes, dia);
 // Calcula la diferencia en milisegundos
 var diferencia = fechaObjetivo - ahora;
 // Convierte la diferencia en días
 var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
-numeroDias.innerHTML = dias;
+diasRestantes.innerHTML = dias;
 
-// Mostrar en el html el numero de dias Restantes de liquidacion
-var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05']
-// Recorre el arreglo y muestra los dias restantes deacuerdo a la fecha
-for (let i = 0; i < fechaObjetivo2.length; i++) {
-    // separar por año, mes y dia
-    var fechaObjetivo3 = new Date(fechaObjetivo2[i]);
-    if (fechaObjetivo3.getFullYear() ==
-        ahora.getFullYear() && fechaObjetivo3.getMonth() ==
-        ahora.getMonth()
-        && fechaObjetivo3.getDate() >= ahora.getDate()) {
-        var diferencia2 = fechaObjetivo3 - ahora;
-        var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
-        if (dias2 == 0) {
-            diasRestantesLi.style.color = "red";
+
+var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05'];
+
+function obtenerFecha() {
+    // Convertimos la fecha actual a un formato que coincida con las fechas del arreglo
+    var fechaActualFormato = ahora.toISOString().slice(0, 10);
+
+    var fechaSeleccionada = null;
+
+    for (var i = 0; i < fechaObjetivo2.length; i++) {
+        // Comparamos las fechas ignorando la información de la hora y el huso horario
+        if (fechaActualFormato <= fechaObjetivo2[i]) {
+            fechaSeleccionada = fechaObjetivo2[i];
+            return fechaSeleccionada;
         }
-        diasRestantesLi.innerHTML = dias2;
-        break;
     }
+}
+
+var diferencia2 = new Date(obtenerFecha()) - ahora;
+var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
+
+if (dias2 == 0) {
+    diasLi.style.color = "red";
+} else {
+    diasLi.style.color = "black";
+}
+diasLi.innerHTML = dias2;
+
+/*Convertir valor a separado por miles*/
+const numemoroM = document.querySelector('#valorUnidad');
+numemoroM.addEventListener('keyup', (e) => {
+    var num = numemoroM.value.replace(/\,/g, '');
+    if (!isNaN(num)) {
+        num = num.toString().split('').reverse().join('').replace(/(?=\d*\.?)(\d{3})/g, '$1,');
+        num = num.split('').reverse().join('').replace(/^[\,]/, '');
+        numemoroM.value = num;
+    } else {
+        alert('Solo se permiten números');
+    }
+});
+
+
+async function datosTComercio() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Comercio/comercio';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
+
+async function obtenerDatosComercio(codigo) {
+    let datosComercializadoraGeneral = [];
+    datosComercializadoraGeneral = await datosTComercio();
+    let miArray = datosComercializadoraGeneral.comercio;
+    console.log(miArray);
+    let objeto = null;
+
+    miArray.forEach((p) => {
+        if (p.codigo == codigo) {
+            console.log(p);
+            return objeto = p;
+        }
+    });
+    return objeto;
+}
+
+async function editarEnvio(destino, concepto, cantidad, valorUnidad, cod) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+
+    // yyyy-mm-dd
+    const fecha = anio + '-' + mes + '-' + dia;
+    const urlcompleta = urlBack.url + '/Comercio/Comercializadora/editarEnvio/' + cod;
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    codigo: cod,
+                    concepto: concepto,
+                    destino: destino,
+                    cantidadEnvio: cantidad,
+                    valorUnidad: valorUnidad,
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+}
+
+
+async function historialModificaciones(concepto, cod) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+
+    // yyyy-mm-dd
+    const fecha = anio + '-' + mes + '-' + dia;
+    const urlcompleta = urlBack.url + '/HistorialModificaciones/Comercializadora/crearRegistro';
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    codigo: cod,
+                    concepto: concepto,
+                    username: usernameLocal,
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+
 }
 
 
@@ -120,46 +270,23 @@ boton2.addEventListener('click', async (e) => {
     }
 });
 
-/*Convertir valor a separado por miles*/
-const numemoroM = document.querySelector('#valorUnidad');
-numemoroM.addEventListener('keyup', (e) => {
-    var num = numemoroM.value.replace(/\,/g, '');
-    if (!isNaN(num)) {
-        num = num.toString().split('').reverse().join('').replace(/(?=\d*\.?)(\d{3})/g, '$1,');
-        num = num.split('').reverse().join('').replace(/^[\,]/, '');
-        numemoroM.value = num;
-    } else {
-        alert('Solo se permiten números');
-    }
-});
-
 
 
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
     e.preventDefault();
     const codigo = document.querySelector('#Codigo').value;
-
-
-
     const cantidad = document.querySelector('#cantidad');
     const valorUnidad = document.querySelector('#valorUnidad');
-    //
     const otro2 = document.querySelector('#otro2').value;
     let miSelect = document.querySelector('#miSelect');
     let miSelect2 = document.querySelector('#miSelect2');
 
-
-
-
-
-
-
-
-
-    const datosCodigo = await getDoc(doc(db, "Comercio", codigo));
-    if (datosCodigo.exists()) {
-        if (datosCodigo.data().cantidadRecibida == "") {
+    const datosCodigo = await obtenerDatosComercio(codigo);
+    console.log(datosCodigo);
+    if (datosCodigo != null) {
+        console.log(datosCodigo);
+        if (datosCodigo.cantidadRecibida == "") {
             const codigo2 = document.querySelector('#Codigo');
 
             boton.style.display = "none";
@@ -172,28 +299,31 @@ boton.addEventListener('click', async (e) => {
             if (otro2 != "") {
                 miSelect2 = otro2;
             }
-            cantidad.placeholder = datosCodigo.data().cantidadEnvio;
-            valorUnidad.placeholder = datosCodigo.data().valorUnidad;
-            miSelect.value = datosCodigo.data().destino;
-            miSelect2.value = datosCodigo.data().concepto;
+            cantidad.placeholder = datosCodigo.cantidadEnvio;
+            valorUnidad.placeholder = datosCodigo.valorUnidad;
+            miSelect.value = datosCodigo.destino;
+            miSelect2.value = datosCodigo.concepto;
 
             boton2.addEventListener('click', async (e) => {
-                const nuevovalor = valorUnidad.value.replace(/\,/g, '');
-                await updateDoc(doc(db, "Comercio", codigo), {
-                    cantidadEnvio: cantidad.value,
-                    valorUnidad: nuevovalor,
-                    destino: miSelect.value,
-                    concepto: miSelect2.value,
-                });// se hace peticion post con el id del comercioComercio.objects.filter(codigo=id)
+                e.preventDefault();
+                const cantidadValor = cantidad.value || cantidad.placeholder;
+                const valorUnidadValor = valorUnidad.value || valorUnidad.placeholder;
 
+                console.log(cantidadValor);
+                console.log(valorUnidadValor);
+                console.log(miSelect.value);
+                console.log(miSelect2.value);
+
+                const nuevovalor = valorUnidadValor.replace(/\,/g, '');
+                await editarEnvio(miSelect.value, miSelect2.value, cantidadValor, nuevovalor, codigo);
                 aviso("Se ha actualizado correctamente", "success");
             });
 
 
 
-
-
-            /*// crear un nuevo registro en la coleccion historial
+            await historialModificaciones("Editar envio", codigo);
+/*
+            // crear un nuevo registro en la coleccion historial
             const docHistorial = doc(db, "HistorialModificaciones", codigo);
             const HistorialRef = await getDoc(docHistorial);
             let aux = historialModificaciones;
@@ -201,7 +331,7 @@ boton.addEventListener('click', async (e) => {
                 aux.codigo = datosCodigo.data().codigo;
                 aux.concepto = "Editar envio";
                 let fecha = new Date();
-                var fechaHoraString = fecha.getFullYear() + '-' + fecha.getMonth()+1 + '-' + fecha.getDay() + ' ' + fecha.getHours() + ':' + fecha.getMinutes() + ':' + fecha.getMinutes();
+                var fechaHoraString = fecha.getFullYear() + '-' + fecha.getMonth() + 1 + '-' + fecha.getDay() + ' ' + fecha.getHours() + ':' + fecha.getMinutes() + ':' + fecha.getMinutes();
                 aux.fechaEfectuado = fechaHoraString;
                 aux.username = usernameLocal;
                 await updateDoc(doc(db, "HistorialModificaciones", codigo), {
@@ -212,7 +342,7 @@ boton.addEventListener('click', async (e) => {
                 aux.codigo = datosCodigo.data().codigo;
                 aux.concepto = "Editar envio";
                 let fecha = new Date();
-                var fechaHoraString = fecha.getFullYear() + '-' + fecha.getMonth()+1 + '-' + fecha.getDay() + ' ' + fecha.getHours() + ':' + fecha.getMinutes() + ':' + fecha.getMinutes();
+                var fechaHoraString = fecha.getFullYear() + '-' + fecha.getMonth() + 1 + '-' + fecha.getDay() + ' ' + fecha.getHours() + ':' + fecha.getMinutes() + ':' + fecha.getMinutes();
                 aux.fechaEfectuado = fechaHoraString;
                 aux.username = usernameLocal;
                 await setDoc(docHistorial, {

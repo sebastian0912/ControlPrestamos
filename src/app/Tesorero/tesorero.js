@@ -9,9 +9,9 @@ const perfil = document.querySelector('#perfil');
 // Capturar el PERFIL y el USERNAME del local storage
 const perfilLocal = localStorage.getItem("perfil");
 const usernameLocal = localStorage.getItem("username");
-const empleados = localStorage.getItem("empleados");
-const codigos = localStorage.getItem("codigos");
-const numCoordinadoresConestadoSolicitudesTrue = localStorage.getItem("coordinadores");
+const empleados = localStorage.getItem("CantidadEmpleados");
+const codigos = localStorage.getItem("CantidadSolicitudes");
+const numCoordinadoresConestadoSolicitudesTrue = localStorage.getItem("CantidadCoordinadoresConEstadoSolicitudesTrue");
 //Muestra en la parte superior el nombre y el perfil
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
@@ -91,16 +91,16 @@ diasLiqui.innerHTML = dias2;
 
 
 // Base total de empleados
-//numeroTotal.innerHTML = empleados;
+numeroTotal.innerHTML = empleados;
 
 
 /* Obtener codigos de la base de datos */
 // Numero de codigos activos de la base de datos del coodinador
 
-//numeroSolicitudesPendientes.innerHTML = codigos;
+numeroSolicitudesPendientes.innerHTML = codigos;
 
 
-//numeroCoordinadores.innerHTML = numCoordinadoresConestadoSolicitudesTrue;
+numeroCoordinadores.innerHTML = numCoordinadoresConestadoSolicitudesTrue;
 
 
 async function datos() {
@@ -157,7 +157,7 @@ extrae.addEventListener('click', async () => {
             docData.prestamoParaDescontar + '\t' +
             docData.cuotasPrestamosParaDescontar + '\t' +
             docData.casino + '\t' +
-            docData.anchetas + '\t' +
+            docData.valoranchetas + '\t' +
             docData.cuotasAnchetas + '\t' +
             docData.fondo + '\t' +
             docData.carnet + '\t' +
@@ -182,17 +182,47 @@ extrae.addEventListener('click', async () => {
 
 });
 
+async function datosTCodigos() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Codigo/codigos';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
 extraeC.addEventListener('click', async () => {
     datosFinales = [];
-    const querySnapshot = await getDocs(collection(db, "Codigos"));
-    querySnapshot.forEach((doc) => {
-        const cod = doc.data();
-        const prestamos = cod.prestamos;
-        prestamos.forEach(p => {
-            if (p.estado == true) {
-                datosFinales.push(p);
-            }
-        });
+
+    const aux = await datosTCodigos();
+    console.log(aux.codigo);
+
+    aux.codigo.forEach((doc) => {
+        if (doc.estado == true) {
+            datosFinales.push(doc);
+        }
     });
     let dataString = 'Código\tCédula quien pidio\tNombre persona quien dio el codigo\tValor\tCuotas\tFecha\n';
 
@@ -259,7 +289,8 @@ extraeT.addEventListener('click', async () => {
     console.log(datosExtraidos);
     let dataString = 'nombre\tMonto Total\t Numero de compras en la tienda\n';
     if (datosExtraidos.empresa.length == 0) {
-        aviso("No hay datos en la tienda", "warning");
+        aviso("No se han comprado productos en las tiendas", "warning");
+        return;
     }
     else {
         datosExtraidos.tienda.forEach((doc) => {
@@ -373,8 +404,27 @@ async function guardarDatos(datosFinales) {
 
 }
 
+/* Obtener estado de las solicitudes */
+var estado = localStorage.getItem("estadoQuincena");
+if (estado == 'true') {
+    document.getElementById("myonoffswitch").checked = false;
+}
+else {
+    document.getElementById("myonoffswitch").checked = true;
+}
+
 /*Inabilitar permisos*/
 document.getElementById("myonoffswitch").addEventListener("click", async function (event) {
+
+    // editar en el local storage
+    if (this.checked) {
+        localStorage.setItem("estadoQuincena", "false");
+        aviso('Has desbloqueado el acceso', 'success');
+    }
+    else {
+        localStorage.setItem("estadoQuincena", "true");
+        aviso('Has bloqueado el acceso', 'success');
+    }
 
     var body = localStorage.getItem('key');
     console.log(body);
@@ -397,7 +447,7 @@ document.getElementById("myonoffswitch").addEventListener("click", async functio
             headers: {
                 //'Content-Type': 'application/json',
                 //Authorization: jwtToken,
-                
+
             },
             body:
                 JSON.stringify({
@@ -424,7 +474,7 @@ document.getElementById("myonoffswitch").addEventListener("click", async functio
         console.error('Error en la petición HTTP POST');
         console.error(error);
     }
-    
+
 });
 
 

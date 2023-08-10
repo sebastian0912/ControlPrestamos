@@ -1,6 +1,5 @@
-import { doc, getDoc, getDocs, setDoc, updateDoc, collection, arrayUnion } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
-import { db } from "../../firebase.js";
-import { codigo, historial } from "../../models/base.js";
+
+import { urlBack } from "../../models/base.js";
 import { aviso } from "../../Avisos/avisos.js";
 
 
@@ -21,7 +20,6 @@ const usernameLocal = localStorage.getItem("username");
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
 
-/*Calculo cuantos dias faltan*/
 // Obtén la fecha actual
 var ahora = new Date();
 var anio = ahora.getFullYear();
@@ -38,12 +36,11 @@ else if (ahora.getDate() < 13) {
 else if (ahora.getDate() < 27) {
     dia = 27;
 }
-
-// Comprueba si el día ya ha pasado este mes
-if (ahora.getDate() > dia) {
-    // Si es así, cambia al próximo mes
-    mes++;
+else {
+    dia = 13;
+    mes++; // Cambia al próximo mes
 }
+
 // Crea la fecha objetivo
 var fechaObjetivo = new Date(anio, mes, dia);
 // Calcula la diferencia en milisegundos
@@ -53,25 +50,32 @@ var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
 diasRestantes.innerHTML = dias;
 
 
-// Mostrar en el html el numero de dias Restantes de liquidacion
-var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05']
-// Recorre el arreglo y muestra los dias restantes deacuerdo a la fecha
-for (let i = 0; i < fechaObjetivo2.length; i++) {
-    // separar por año, mes y dia
-    var fechaObjetivo3 = new Date(fechaObjetivo2[i]);
-    if (fechaObjetivo3.getFullYear() == ahora.getFullYear() &&
-        fechaObjetivo3.getMonth() == ahora.getMonth() &&
-        fechaObjetivo3.getDate() >= ahora.getDate()) {
+var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05'];
 
-        var diferencia2 = fechaObjetivo3 - ahora;
-        var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
-        if (dias2 == 0) {
-            diasLi.style.color = "red";
+function obtenerFecha() {
+    // Convertimos la fecha actual a un formato que coincida con las fechas del arreglo
+    var fechaActualFormato = ahora.toISOString().slice(0, 10);
+
+    var fechaSeleccionada = null;
+
+    for (var i = 0; i < fechaObjetivo2.length; i++) {
+        // Comparamos las fechas ignorando la información de la hora y el huso horario
+        if (fechaActualFormato <= fechaObjetivo2[i]) {
+            fechaSeleccionada = fechaObjetivo2[i];
+            return fechaSeleccionada;
         }
-        diasLi.innerHTML = dias2;
-        break;
     }
 }
+
+var diferencia2 = new Date(obtenerFecha()) - ahora;
+var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
+
+if (dias2 == 0) {
+    diasLiqui.style.color = "red";
+} else {
+    diasLiqui.style.color = "black";
+}
+diasLiqui.innerHTML = dias2;
 
 /*Convertir valor a separado por miles*/
 const numemoroM = document.querySelector('#valor');
@@ -89,31 +93,21 @@ numemoroM.addEventListener('keyup', (e) => {
 function verificarCedula(codigoP, cedulaEmpleado, datos) {
     let encontrado = false;
     datos.forEach(doc => {
-        const cod = doc.data();
-        const prestamos = cod.prestamos;
-        prestamos.forEach(p => {
-            if (p.codigo == codigoP) {
-                if (p.cedulaQuienPide == cedulaEmpleado) {
-                    encontrado = true;
-                }
+        if (doc.codigo == codigoP) {
+            if (doc.cedulaQuienPide == cedulaEmpleado) {
+                encontrado = true;
             }
-        });
+        }
     });
     return encontrado;
 }
 
 function verificarCodigo(codigo, datos) {
     let encontrado = false;
-
     datos.forEach(doc => {
-        const cod = doc.data();
-        const prestamos = cod.prestamos;
-
-        prestamos.forEach(p => {
-            if (p.codigo == codigo) {
-                encontrado = true;
-            }
-        });
+        if (doc.codigo == codigo) {
+            encontrado = true;
+        }
     });
     return encontrado;
 }
@@ -121,13 +115,9 @@ function verificarCodigo(codigo, datos) {
 function verificarCodigoEstado(codigo, datos) {
     let encontrado = false;
     datos.forEach(doc => {
-        const cod = doc.data();
-        const prestamos = cod.prestamos;
-        prestamos.forEach(p => {
-            if (p.codigo == codigo && p.estado == true) {
-                encontrado = true;
-            }
-        });
+        if (doc.codigo == codigo && doc.estado == true) {
+            encontrado = true;
+        }
     });
     return encontrado;
 }
@@ -135,13 +125,9 @@ function verificarCodigoEstado(codigo, datos) {
 function verificaMonto(monto, datos) {
     let encontrado = false;
     datos.forEach(doc => {
-        const cod = doc.data();
-        const prestamos = cod.prestamos;
-        prestamos.forEach(p => {
-            if (parseInt(p.monto) >= monto) {
-                encontrado = true;
-            }
-        });
+        if (parseInt(doc.monto) >= monto) {
+            encontrado = true;
+        }
     });
     return encontrado;
 }
@@ -149,12 +135,9 @@ function verificaMonto(monto, datos) {
 function obtenerCodigo(codigo, datos) {
     let cod;
     datos.forEach(doc => {
-        const codigos = doc.data().prestamos;
-        codigos.forEach(c => {
-            if (c.codigo == codigo) {
-                cod = c;
-            }
-        });
+        if (doc.codigo == codigo) {
+            cod = doc;
+        }
     });
     return cod;
 }
@@ -165,6 +148,74 @@ function verificaSiesUnPrestamo(codigo) {
     }
     else {
         return false;
+    }
+}
+
+function verificaCondiciones(datos, nuevovalor) {
+    // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
+    const fechaIngreso = datos.ingreso;
+    let dia = fechaIngreso.split('-')[0];
+    let mes = fechaIngreso.split('-')[1];
+    let anio = fechaIngreso.split('-')[2];
+
+    // el año esta en formato xxaa y se debe convertir a 20aa
+    let anioConvertido = '20' + anio;
+    anio = anioConvertido;
+
+    const sumaTotal =
+        parseInt(datos.saldos) +
+        parseInt(datos.fondos) +
+        parseInt(datos.mercados) +
+        parseInt(datos.prestamoParaDescontar) +
+        parseInt(datos.casino) +
+        parseInt(datos.valoranchetas) +
+        parseInt(datos.fondo) +
+        parseInt(datos.carnet) +
+        parseInt(datos.seguroFunerario) +
+        parseInt(datos.prestamoParaHacer) +
+        parseInt(datos.anticipoLiquidacion) +
+        parseInt(datos.cuentas);
+
+    const fechaActual = new Date();
+
+    if (parseInt(datos.saldos) >= 175001) {
+        aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
+        return false;
+    }
+    else if (parseInt(datos.fondos) > 0) {
+        aviso('Ups no se pueden generar prestamos perteneces al fondo', 'error');
+        return false;
+    }
+    else {
+        // conseguir la fecha actual y separarla en dia, mes y año para poder compararla con la fecha de ingreso del empleado            
+        let mesActual = fechaActual.getMonth() + 1;
+        let anioActual = fechaActual.getFullYear();
+        if ((anioActual == anio) && ((mesActual - mes) >= 2)) {
+            if (parseInt(nuevovalor) >= 200000) {
+                aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
+                return false;
+            }
+            else if ((sumaTotal + parseInt(nuevovalor)) >= 350000) {
+                aviso('Ups no se pueden generar prestamos, puede sacar maximo ' + (350000 - (sumaTotal)), 'error');
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+        else if ((anioActual > anio)) {
+            if (parseInt(nuevovalor) >= 200000) {
+                aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
+                return false;
+            }
+            else if ((sumaTotal + parseInt(nuevovalor)) >= 350000) {
+                aviso('Ups no se pueden generar prestamos, puede sacar maximo ' + (350000 - (sumaTotal)), 'error');
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
     }
 }
 
@@ -180,43 +231,343 @@ function verificaSelect(select) {
     }
 }
 
-boton.addEventListener('click', async (e) => {
-    e.preventDefault();
+async function datosTCodigos() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
 
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Codigo/codigos';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
+async function datosEmpleado(cedulaEmpleado) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Datosbase/tesoreria/' + cedulaEmpleado;
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
+async function actualizar(codigo, cod, username, monto2, cuotas) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+
+    const urlcompleta = urlBack.url + '/Codigo/jefedearea/actualizarCodigo/' + cod;
+
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    codigoDescontado: codigo,
+                    ejecutadoPor: username,
+                    nuevomonto: monto2,
+                    cuotas: cuotas,
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+}
+
+async function actualizarDatosBase(concepto, valor, cuotas, cedulaEmpleado) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+
+    const urlcompleta = urlBack.url + '/Datosbase/jefedearea/actualizarprestamodescontar/' + cedulaEmpleado;
+    if (concepto == 'Dinero_Autorizacion') {
+        try {
+            fetch(urlcompleta, {
+                method: 'POST',
+                body:
+                    JSON.stringify({
+                        concepto: concepto,
+                        prestamoParaDescontar: valor,
+                        cuotasPrestamosParaDescontar: cuotas,
+                        ejecutadoPor: username,
+                        jwt: jwtToken
+                    })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                        //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                    } else {
+                        throw new Error('Error en la petición POST');
+                    }
+                })
+                .then(responseData => {
+                    console.log('Respuesta:', responseData);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        } catch (error) {
+            console.error('Error en la petición HTTP POST');
+            console.error(error);
+        }
+    }
+    else if (concepto == 'Seguro_Funerario_Autorizacion') {
+
+        try {
+            fetch(urlcompleta, {
+                method: 'POST',
+                body:
+                    JSON.stringify({
+                        concepto: concepto,
+                        seguroFunerario: valor,
+                        ejecutadoPor: username,
+                        jwt: jwtToken
+                    })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                        //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                    } else {
+                        throw new Error('Error en la petición POST');
+                    }
+                })
+                .then(responseData => {
+                    console.log('Respuesta:', responseData);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        } catch (error) {
+            console.error('Error en la petición HTTP POST');
+            console.error(error);
+        }
+    }
+    else if (concepto == 'Otro_Autorizacion') {
+        console.log('con2' + concepto);
+        // quitar espacios en blanco a concepto
+        concepto = concepto.replace(/\s/g, '');
+        try {
+            fetch(urlcompleta, {
+                method: 'POST',
+                body:
+                    JSON.stringify({
+                        concepto: concepto,
+                        anticipoLiquidacion: valor,
+                        cuentas: cuotas,
+                        ejecutadoPor: username,
+                        jwt: jwtToken
+                    })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                        //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                    } else {
+                        throw new Error('Error en la petición POST');
+                    }
+                })
+                .then(responseData => {
+                    console.log('Respuesta:', responseData);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        } catch (error) {
+            console.error('Error en la petición HTTP POST');
+            console.error(error);
+        }
+    }
+}
+
+
+async function escribirHistorial(cedulaEmpleado, nuevovalor, username, cuotas, tipo) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+    var dia = new Date().getDate();
+    var mes = new Date().getMonth() + 1;
+    var anio = new Date().getFullYear();
+    // yyyy-mm-dd
+    const fecha = anio + '-' + mes + '-' + dia;
+    const urlcompleta = urlBack.url + '/Historial/jefedearea/crearHistorialPrestamo/' + cedulaEmpleado;
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    cedula: cedulaEmpleado,
+                    nombreQuienEntrego: username,
+                    valor: nuevovalor,
+                    cuotas: cuotas,
+                    fechaEfectuado: fecha,
+                    concepto: tipo,
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+
+}
+
+async function CambiarEstado(cod, valor, codigo) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+
+    const urlcompleta = urlBack.url + '/Codigo/jefedearea/cambiarEstadoCodigo/' + cod;
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    estado: false,
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + codigo, 'success');
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+
+}
+
+boton.addEventListener('click', async (e) => {
+
+    e.preventDefault();
     // capturar los datos del formulario
     let cedulaEmpleado = document.querySelector('#cedula').value;
     let codigoP = document.querySelector('#codigo').value;
     let valor = document.querySelector('#valor').value;
-    let nuevovalor = valor.replace(/\,/g, '');
+    const nuevovalor = valor.replace(/\,/g, '');
     let cuotas = document.querySelector('#cuotas').value;
     let celular = document.querySelector('#celular').value;
 
     let encontrado = false;
-    let concepto;
-
+    let concepto2;
 
     if (codigoP == '') {
         aviso('El campo codigo no puede estar vacio', 'error');
     }
     else {
-        const datos = await getDocs(collection(db, "Codigos"));
-        const datosUsuario = await getDoc(doc(db, "Base", cedulaEmpleado));
-        const usuario = datosUsuario.data();
+        const aux = await datosTCodigos();
+        console.log(aux.codigo);
+        let aux2 = await datosEmpleado(cedulaEmpleado);
+        console.log(aux2.datosbase[0]);
+        let usuario = aux2.datosbase[0];
+        console.log(usuario);
+
         let todas = false;
-        console.log(datosUsuario)
-        if (!verificarCodigo(codigoP, datos)) {
+
+        if (!verificarCodigo(codigoP, aux.codigo)) {
             aviso('El codigo no existe', 'error');
             return;
         }
-        if (!verificarCodigoEstado(codigoP, datos)) {
+        if (!verificarCodigoEstado(codigoP, aux.codigo)) {
             aviso('El codigo ya fue usado', 'error');
-            return
+            return;
         }
-        if (!verificarCedula(codigoP, cedulaEmpleado, datos)) {
+        if (!verificarCedula(codigoP, cedulaEmpleado, aux.codigo)) {
             aviso('El codigo no pertenece a este empleado', 'error');
             return;
         }
-        if (!verificaMonto(parseInt(nuevovalor), datos)) {
+        if (!verificaMonto(parseInt(nuevovalor), aux.codigo)) {
             aviso('El monto del prestamo es mayor al permitido generado por el coodinador', 'error');
             return;
         }
@@ -224,70 +575,38 @@ boton.addEventListener('click', async (e) => {
             aviso('El codigo no es valido solo se admiten prestamos', 'error');
             return;
         }
+        if (!verificaCondiciones(usuario, parseInt(nuevovalor))) {
+            return;
+        }
         if (!verificaSelect(tipo)) {
             return;
         }
+
+
         else {
-
-
-            const cod = obtenerCodigo(codigoP, datos);
-            concepto = 'Prestamo para hacer';
+            const cod = obtenerCodigo(codigoP, aux.codigo);
+            concepto2 = 'Dinero_Autorizacion';
             encontrado = true;
+            let codigo = 'OH' + Math.floor(Math.random() * 1000000);;
 
-            if (usuario.cuotasPrestamos != "0" && usuario.cuotasPrestamos != "" || parseInt(usuario.cuotasPrestamos) > 0) {
-                await updateDoc(doc(db, "Base", cedulaEmpleado), {
-                    prestamoPaDescontar: parseInt(usuario.prestamoPaDescontar) + parseInt(nuevovalor),
-                });
+            if (cod.codigo.startsWith("SF")) {
+                concepto2 = 'Seguro_Funerario_Autorizacion';
             }
-            else {
-                await updateDoc(doc(db, "Base", cedulaEmpleado), {
-                    prestamoPaDescontar: parseInt(usuario.prestamoPaDescontar) + parseInt(nuevovalor),
-                    cuotasPrestamos: parseInt(cuotas)
-                });
+            else if (cod.codigo.startsWith("OT")) {
+                concepto2 = 'Otro_Autorizacion';
             }
 
-            // modificar la variable estado dentro del arreglo y subir cambios a firebase
-            cod.estado = false;
-            cod.fechaEjecutado = new Date().toLocaleDateString()
-            cod.ejecutadoPor = usernameLocal;
-            // generar codigo solo numeros aleatorios
-            cod.codigoDescontado = 'OH' + Math.floor(Math.random() * (999999 - 100000)) + 100000;
+            await actualizar(codigo, cod.codigo, usernameLocal, nuevovalor, cuotas);
 
+            console.log("primero" + concepto2);
+            await actualizarDatosBase(concepto2, nuevovalor, cuotas, cedulaEmpleado);
+            // modificar en la tabla codigos el estado del codigo a false para que no pueda ser usado nuevamente
+            await CambiarEstado(cod.codigo, nuevovalor, codigo);
 
-            await setDoc(doc(db, "Codigos", cod.uid), {
-                prestamos: arrayUnion(cod)
-            });
-
-            // crear un nuevo registro en la coleccion historial
-            const docEmpleado = doc(db, "Historial", cedulaEmpleado);
-            const empleadoRef = await getDoc(docEmpleado);
-            let data = historial;
-            if (empleadoRef.exists()) {
-                data.cedula = cedulaEmpleado;
-                data.concepto = concepto;
-                data.fechaEfectuado = new Date().toLocaleDateString()
-                data.valor = nuevovalor;
-                data.cuotas = cod.cuotas;
-                data.nombreQuienEntrego = usernameLocal;
-                data.timesStamp = new Date().getTime();
-                await updateDoc(doc(db, "Historial", cedulaEmpleado), {
-                    historia: arrayUnion(data)
-                });
-            }
-            else {
-                data.cedula = cedulaEmpleado;
-                data.concepto = concepto;
-                data.fechaEfectuado = new Date().toLocaleDateString()
-                data.valor = nuevovalor;
-                data.cuotas = cod.cuotas;
-                data.nombreQuienEntrego = usernameLocal;
-                data.timesStamp = new Date().getTime();
-                await setDoc(docEmpleado, {
-                    historia: [data]
-                });
-            }
+            await escribirHistorial(cedulaEmpleado, nuevovalor, username, cuotas, concepto2)
 
             aviso('Acaba de pedir un prestamo de ' + valor, 'success');
+
             let empresa = null;
             let NIT = null;
             let direcccion = null;
@@ -296,11 +615,13 @@ boton.addEventListener('click', async (e) => {
                 NIT = "NIT 900814587"
                 direcccion = "CALLE 112 A No. 18 A -05"
             }
+
             else if (usuario.temporal.startsWith("Tu") || usuario.temporal.startsWith("TU")) {
                 empresa = "TU ALIANZA SAS";
                 NIT = "NIT 900864596 - 1"
                 direcccion = "CRA 2 N 8- 156 FACATATIVA'"
             }
+
             else if (usuario.temporal.startsWith("Comercializadora") || usuario.temporal.startsWith("COMERCIALIZADORA")) {
                 empresa = "COMERCIALIZADORA TS";
             }
@@ -342,30 +663,32 @@ boton.addEventListener('click', async (e) => {
             docPdf.text('Fecha de ingreso: ' + usuario.ingreso, 10, 90);
             docPdf.text('Centro de Costo: ' + usuario.finca, 130, 90);
             docPdf.text('Forma de pago: ' + tipo.value, 10, 95);
+            docPdf.text('Telefono: ' + celular, 130, 95);
             docPdf.setFont('Helvetica', 'bold');
             docPdf.text('Cordialmente ', 10, 110);
             docPdf.setFont('Helvetica', 'normal');
             docPdf.text('Firma de Autorización ', 10, 115);
-            docPdf.text('C.C. ' + usuario.cedula, 10, 120);
-            docPdf.text('Telefono: ' + celular, 10, 125);
+            docPdf.text('C.C. ' + usuario.numero_de_documento , 10, 120);
+
             // realizar un cuadro para colocar la huella dactilar
             docPdf.rect(130, 110, 35, 45);
-            docPdf.text('Codigo de descuento nomina: ' + cod.codigoDescontado, 10, 130);
+            docPdf.text('Codigo de descuento nomina: ' + codigo, 10, 130);
             docPdf.setFont('Helvetica', 'bold');
-            docPdf.setFontSize(5);
+            docPdf.setFontSize(6);
             docPdf.text('Huella Indice Derecho', 130, 105);
 
-            docPdf.save('PrestamoDescontar' + '_' + usuario.nombre + "_" + cod.codigoDescontado + '.pdf');
+            docPdf.save('AutorizacionPrestamo' + '_' + usuario.nombre + "_" + codigo + '.pdf');
+
         }
     }
 
-    codigoP = ""
-    cedulaEmpleado = ""
-    valor = ""
-    cuotas = ""
-    celular = ""
-
+    document.querySelector('#codigo').value = "";
+    document.querySelector('#cedula').value = "";
+    document.querySelector('#valor').value = "";
+    document.querySelector('#cuotas').value = "";
+    document.querySelector('#celular').value = "";
 });
+
 
 
 /*************************************************************/
@@ -551,45 +874,142 @@ function NumeroALetras(num) {
 
 // fin
 
+async function datosT() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Tienda/traerTienda';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
 extraeT.addEventListener('click', async () => {
-    const querySnapshot = await getDocs(collection(db, "Tienda"));
+    const datosExtraidos = await datosT();
+
+    console.log(datosExtraidos);
 
     let dataString = 'nombre\tMonto Total\t Numero de compras en la tienda\n';
+    if (datosExtraidos.empresa.length == 0) {
+        aviso("No se han comprado productos en las tiendas", "warning");
+    }
+    else {
+        datosExtraidos.tienda.forEach((doc) => {
+            const docData = doc;
+            dataString +=
+                docData.nombre + '\t' +
+                docData.valorTotal + '\t' +
+                docData.numPersonasAtendidas + '\n';
+        });
+        // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
+        const element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
+        element.setAttribute('download', 'datosTienda.txt');
 
-    querySnapshot.forEach((doc) => {
-        const docData = doc.data();
-        dataString +=
-            docData.nombre + '\t' +
-            docData.valorTotal + '\t' +
-            docData.numPersonasAtendidas + '\n';
-    });
+        element.style.display = 'none';
+        document.body.appendChild(element);
 
-    // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
-    const element = document.createElement('a');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
-    element.setAttribute('download', 'datosTienda.txt');
+        element.click();
 
-    element.style.display = 'none';
-    document.body.appendChild(element);
-
-    element.click();
-
-    document.body.removeChild(element);
+        document.body.removeChild(element);
+    }
 });
 
 
-extrae.addEventListener('click', async () => {
-    const querySnapshot = await getDocs(collection(db, "Historial"));
-    let historial = [];
-    querySnapshot.forEach(doc => {
-        const cod = doc.data();
-        const historia = cod.historia;
+async function THistorial() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
 
-        historia.forEach(p => {
-            if (p.concepto.startsWith("Compra")) {
-                historial.push(p);
-            }
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Historial/historial';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
         });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
+extraeT.addEventListener('click', async () => {
+    const datosExtraidos = await datosT();
+
+    console.log(datosExtraidos);
+
+    let dataString = 'nombre\tMonto Total\t Numero de compras en la tienda\n';
+    if (datosExtraidos.empresa.length == 0) {
+        aviso("No se han comprado productos en las tiendas", "warning");
+        return;
+    }
+    else {
+        datosExtraidos.tienda.forEach((doc) => {
+            const docData = doc;
+            dataString +=
+                docData.nombre + '\t' +
+                docData.valorTotal + '\t' +
+                docData.numPersonasAtendidas + '\n';
+        });
+        // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
+        const element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
+        element.setAttribute('download', 'datosTienda.txt');
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+
+        element.click();
+
+        document.body.removeChild(element);
+    }
+});
+
+
+extraeHistorialT.addEventListener('click', async () => {
+    console.log("entro");
+    const datosExtraidos = await THistorial();
+    
+    let historial = [];
+    datosExtraidos.historial.forEach(doc => {
+        if (doc.concepto.startsWith("Compra tienda")) {
+            historial.push(doc);
+        }
     });
 
     let dataString = 'Cedula\tconcepto\tcuotas\fechaEfectuado\tnombreQuienEntrego\tvalor\n';

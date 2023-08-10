@@ -1,5 +1,6 @@
 import { doc, getDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
 import { urlBack } from "../../models/base.js";
+import { aviso } from "../../Avisos/avisos.js";
 const boton = document.querySelector('#boton');
 
 // capturar el id del usuario logeado del input
@@ -12,9 +13,21 @@ const perfil = document.querySelector('#perfil');
 // Capturar el PERFIL y el USERNAME del local storage
 const perfilLocal = localStorage.getItem("perfil");
 const usernameLocal = localStorage.getItem("username");
+let extrae = document.getElementById("extrae");
+let extraeT = document.getElementById("extraeT");
 //Muestra en la parte superior el nombre y el perfil
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
+
+
+let input = document.getElementById('archivoInput');
+
+let datosFinales = [];
+
+const over = document.querySelector('#overlay');
+const loader = document.querySelector('#loader');
+
+var h1Elemento = document.querySelector('#cont');
 
 // Obtén la fecha actual
 var ahora = new Date();
@@ -83,6 +96,219 @@ if (dias2 == 0) {
 }
 diasLiqui.innerHTML = dias2;
 
+
+async function datos() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Datosbase/tesoreria';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
+extrae.addEventListener('click', async () => {
+
+    const datosExtraidos = await datos();
+
+    let dataString = '\t\t\t\t\t\t\tANTERIOR\t\tPARA DESCONTAR\t\t\t\t\t\t\t\t\t\tPARA HACER\t\t\t\nCÓDIGO\tCÉDULA\tNOMBRE\tINGRESO\tTEMPORAL\tFINCA\tSALARIO\tSALDOS\tFONDOS\tMERCADOS\tCUOTAS\tPRESTAMO\tCUOTAS\tCASINO\tANCHETAS\tCUOTAS\tFONDO\tCARNET\tSEGURO FUNERARIO\tPRESTAMO\tCUOTAS\tANTICIPO LIQ\tCUENTAS\n';
+    console.log(datosExtraidos.datosbase);
+
+    datosExtraidos.datosbase.forEach((doc) => {
+        const docData = doc;
+        dataString +=
+            docData.codigo + '\t' +
+            docData.numero_de_documento + '\t' +
+            docData.nombre + '\t' +
+            docData.ingreso + '\t' +
+            docData.temporal + '\t' +
+            docData.finca + '\t' +
+            docData.salario + '\t' +
+            docData.saldos + '\t' +
+            docData.fondos + '\t' +
+            docData.mercados + '\t' +
+            docData.cuotasMercados + '\t' +
+            docData.prestamoParaDescontar + '\t' +
+            docData.cuotasPrestamosParaDescontar + '\t' +
+            docData.casino + '\t' +
+            docData.valoranchetas + '\t' +
+            docData.cuotasAnchetas + '\t' +
+            docData.fondo + '\t' +
+            docData.carnet + '\t' +
+            docData.seguroFunerario + '\t' +
+            docData.prestamoParaHacer + '\t' +
+            docData.cuotasPrestamoParahacer + '\t' +
+            docData.anticipoLiquidacion + '\t' +
+            docData.cuentas + '\n';
+    });
+
+    // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
+    const element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
+    element.setAttribute('download', 'datos.txt');
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+
+});
+
+async function datosTCodigos() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Codigo/codigos';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
+extraeC.addEventListener('click', async () => {
+    datosFinales = [];
+
+    const aux = await datosTCodigos();
+    console.log(aux.codigo);
+
+    aux.codigo.forEach((doc) => {
+        if (doc.estado == true) {
+            datosFinales.push(doc);
+        }
+    });
+    let dataString = 'Código\tCédula quien pidio\tNombre persona quien dio el codigo\tValor\tCuotas\tFecha\n';
+
+    datosFinales.forEach((doc) => {
+        dataString +=
+            doc.codigo + '\t' +
+            doc.cedulaQuienPide + '\t' +
+            doc.generadoPor + '\t' +
+            doc.monto + '\t' +
+            doc.cuotas + '\t' +
+            doc.fechaGenerado + '\n';
+    });
+
+    // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
+    const element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
+    element.setAttribute('download', 'datosCodigos.txt');
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+
+
+    // borrar la coleccion de codigos
+
+});
+
+async function datosT() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Tienda/traerTienda';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
+extraeT.addEventListener('click', async () => {
+    const datosExtraidos = await datosT();
+    console.log(datosExtraidos);
+    let dataString = 'nombre\tMonto Total\t Numero de compras en la tienda\n';
+    if (datosExtraidos.empresa.length == 0) {
+        aviso("No se han comprado productos en las tiendas", "warning");
+    }
+    else {
+        datosExtraidos.tienda.forEach((doc) => {
+            const docData = doc;
+            dataString +=
+                docData.nombre + '\t' +
+                docData.valorTotal + '\t' +
+                docData.numPersonasAtendidas + '\n';
+        });
+    }
+
+
+    // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
+    const element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
+    element.setAttribute('download', 'datosTienda.txt');
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+});
+
 async function datosH(cedulaEmpleado) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
@@ -112,31 +338,6 @@ async function datosH(cedulaEmpleado) {
         throw error; // Propaga el error para que se pueda manejar fuera de la función
     }
 }
-
-// darle click al boton para que se ejecute la funcion
-boton.addEventListener('click', async (e) => {
-    e.preventDefault();
-    const oculto = document.querySelector('#oculto');
-    oculto.style.display = "block";
-    // capturar los datos del formulario
-    const cedulaEmpleado = document.querySelector('#cedula').value;
-
-    const datosExtraidos = await datosH(cedulaEmpleado);
-    
-    
-    datosExtraidos.historial.forEach(async (p) => {
-        tabla.innerHTML += `
-            <tr>
-                <td>${p.cedula}</td>
-                <td>${p.concepto}</td>            
-                <td>${p.fechaEfectuado}</td>
-                <td>${p.valor}</td>
-                <td>${p.cuotas}</td>
-                <td>${p.nombreQuienEntrego}</td>
-            </tr>
-            `
-    });
-});
 
 extraeC.addEventListener('click', async () => {
     datosFinales = [];
@@ -175,3 +376,118 @@ extraeC.addEventListener('click', async () => {
     document.body.removeChild(element);
 
 });
+
+input.addEventListener('change', () => {
+    let archivo = input.files[0];
+    let reader = new FileReader();
+    var h1Elemento = document.getElementById("cont");
+
+    /* leer archivo .csv */
+    reader.readAsText(archivo);
+
+    reader.onload = () => {
+        let info = reader.result;
+        /* Separar por saltos de línea */
+        let datos = info.split('\n');
+
+        // Array para almacenar los datos finales
+        let datosFinales = [];
+
+        datos.forEach(dato => {
+            // Separar por tabulaciones y remplazar espacios vacíos por "0"
+            let fila = dato.split('\t').map(item => item.trim() === '' ? "0" : item.trim());
+            datosFinales.push(fila);
+        });
+
+        // Mostrar elementos ocultos
+        over.style.display = "block";
+        loader.style.display = "block";
+        h1Elemento.style.display = "block";
+
+        // Eliminar las primeras 4 filas (si es necesario)
+        console.log(datosFinales);
+        datosFinales.splice(0, 4);
+
+        // Guardar los datos finales
+        guardarDatos(datosFinales);
+    };
+});
+
+async function guardarDatos(datosFinales) {
+
+    var body = localStorage.getItem('key');
+    console.log(body);
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+
+    const bodyData = {
+        jwt: jwtKey,
+        mensaje: "muchos",
+        datos: datosFinales
+    };
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Datosbase/datosbase';
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',// para el resto de peticiónes HTTP le cambias a GET, POST, PUT, DELETE, etc.
+            body: JSON.stringify(bodyData),// Aquí va el body de tu petición tiene que ser asi en json para que el back lo pueda leer y procesar y hay algun problema me dices
+
+        })
+            .then(response => {
+                if (response.ok) {
+                    aviso("Datos guardados correctamente", "success");
+                    over.style.display = "none";
+                    loader.style.display = "none";
+                    h1Elemento.style.display = "none";
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                    return response.json();
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    } catch (error) {
+        console.error('Error en la petición HTTP PUT');
+        console.error(error);
+    }
+
+
+}
+
+
+
+// darle click al boton para que se ejecute la funcion
+boton.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const oculto = document.querySelector('#oculto');
+    oculto.style.display = "block";
+    // capturar los datos del formulario
+    const cedulaEmpleado = document.querySelector('#cedula').value;
+
+    const datosExtraidos = await datosH(cedulaEmpleado);
+    
+    
+    datosExtraidos.historial.forEach(async (p) => {
+        tabla.innerHTML += `
+            <tr>
+                <td>${p.cedula}</td>
+                <td>${p.concepto}</td>            
+                <td>${p.fechaEfectuado}</td>
+                <td>${p.valor}</td>
+                <td>${p.cuotas}</td>
+                <td>${p.nombreQuienEntrego}</td>
+            </tr>
+            `
+    });
+});
+
