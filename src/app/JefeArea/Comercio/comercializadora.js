@@ -143,7 +143,7 @@ boton.addEventListener('click', async (e) => {
     ///const otro = document.querySelector('#otro').value;
     
     if (codigo == "") {
-        aviso("Por favor ingrese el codigo generado por la comercializadora", "error");
+        aviso("Por favor ingrese el código generado por la comercializadora", "error");
         return;
     }
     if (cantidad == "") {

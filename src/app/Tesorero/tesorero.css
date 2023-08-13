@@ -25,17 +25,17 @@ h1 {
 
 .diasT {
     width: 100%;
-    margin: 10px 0 20px 30px;
+    margin: 20px 0 10px 30px;
     font-family: 'Nunito Sans', sans-serif;
-    font-size: 16pt;
+    font-size: 14pt;
     font-weight: 400;
 }
-.dias{    
-    text-align: justify;    
-    margin: 10px 0 20px 120px;
 
+.dias {
+    text-align: justify;
+    margin: 0px 0 10px 120px;
     font-family: 'Nunito Sans', sans-serif;
-    font-size: 20pt;
+    font-size: 16pt;
     font-weight: 600;
 }
 
@@ -55,7 +55,7 @@ a {
 }
 
 .lista-Opciones {
-    margin: 100px 0 0 50px;
+    margin: 65px 0 0 50px;
 }
 
 li {

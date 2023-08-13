@@ -660,7 +660,7 @@ boton.addEventListener('click', async (e) => {
             docPdf.text(empresa, 15, 22);
             docPdf.setFont('Helvetica', 'normal');
             docPdf.setFontSize(9);
-            docPdf.text('AUTORIZACION DE LIBRANZA', 132, 15);
+            docPdf.text('AUTORIZACIÓN DE LIBRANZA', 132, 15);
             docPdf.text(NIT, 145, 20);
             docPdf.text(direcccion, 135, 25);
             docPdf.text('______________________________________________________________________________________________________________', 10, 27);
@@ -694,7 +694,7 @@ boton.addEventListener('click', async (e) => {
 
             // realizar un cuadro para colocar la huella dactilar
             docPdf.rect(130, 110, 35, 45);
-            docPdf.text('Codigo de descuento nomina: ' + codigo, 10, 130);
+            docPdf.text('Código de descuento nómina: ' + codigo, 10, 130);
             docPdf.setFont('Helvetica', 'bold');
             docPdf.setFontSize(6);
             docPdf.text('Huella Indice Derecho', 130, 105);

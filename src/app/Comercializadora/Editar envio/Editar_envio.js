@@ -114,7 +114,8 @@ numemoroM.addEventListener('keyup', (e) => {
         num = num.split('').reverse().join('').replace(/^[\,]/, '');
         numemoroM.value = num;
     } else {
-        alert('Solo se permiten números');
+        aviso('Solo se permiten numeros');
+        
     }
 });
 

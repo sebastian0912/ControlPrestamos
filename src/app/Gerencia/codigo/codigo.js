@@ -719,23 +719,23 @@ boton.addEventListener('click', async (e) => {
         let todas = false;
 
         if (!verificarCodigo(codigoP, aux.codigo)) {
-            aviso('El codigo no existe', 'error');
+            aviso('El código no existe', 'error');
             return;
         }
         if (!verificarCodigoEstado(codigoP, aux.codigo)) {
-            aviso('El codigo ya fue usado', 'error');
+            aviso('El código ya fue usado', 'error');
             return;
         }
         if (!verificarCedula(codigoP, cedulaEmpleado, aux.codigo)) {
-            aviso('El codigo no pertenece a este empleado', 'error');
+            aviso('El código no pertenece a este empleado', 'error');
             return;
         }
         if (!verificaMonto(parseInt(nuevovalor), aux.codigo)) {
-            aviso('El monto del prestamo es mayor al permitido generado con el codigo ', 'error');
+            aviso('El monto del prestamo es mayor al permitido generado con el código ', 'error');
             return;
         }
         if (!verificaSiesUnPrestamo(codigoP)) {
-            aviso('El codigo no es valido solo se admiten prestamos', 'error');
+            aviso('El código no es valido solo se admiten prestamos', 'error');
             return;
         }
         if (!verificaCondiciones(usuario, parseInt(nuevovalor))) {
@@ -804,7 +804,7 @@ boton.addEventListener('click', async (e) => {
             docPdf.text(empresa, 15, 22);
             docPdf.setFont('Helvetica', 'normal');
             docPdf.setFontSize(9);
-            docPdf.text('AUTORIZACION DE LIBRANZA', 132, 15);
+            docPdf.text('AUTORIZACIóN DE LIBRANZA', 132, 15);
             docPdf.text(NIT, 145, 20);
             docPdf.text(direcccion, 135, 25);
             docPdf.text('______________________________________________________________________________________________________________', 10, 27);
@@ -838,7 +838,7 @@ boton.addEventListener('click', async (e) => {
 
             // realizar un cuadro para colocar la huella dactilar
             docPdf.rect(130, 110, 35, 45);
-            docPdf.text('Codigo de descuento nomina: ' + codigo, 10, 130);
+            docPdf.text('Código de descuento nómina: ' + codigo, 10, 130);
             docPdf.setFont('Helvetica', 'bold');
             docPdf.setFontSize(6);
             docPdf.text('Huella Indice Derecho', 130, 105);
