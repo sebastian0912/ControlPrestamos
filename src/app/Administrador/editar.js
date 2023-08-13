@@ -18,16 +18,18 @@ const usernameLocal = localStorage.getItem("username");
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
 
-/*Calculo cuantos dias faltan*/
 // Obtén la fecha actual
 var ahora = new Date();
 var anio = ahora.getFullYear();
 var mes = ahora.getMonth();
-var dia = 0;
+var dia = 1;
+var bandera = true;
 
 if (ahora.getDate() == 13 || ahora.getDate() == 27) {
     dia = 0;
-    numeroDias.style.color = "red";
+    diasRestantes.innerHTML = "0";
+    diasRestantes.style.color = "red";
+    bandera = false;
 }
 else if (ahora.getDate() < 13) {
     dia = 13;
@@ -35,19 +37,20 @@ else if (ahora.getDate() < 13) {
 else if (ahora.getDate() < 27) {
     dia = 27;
 }
-
-// Comprueba si el día ya ha pasado este mes
-if (ahora.getDate() > dia) {
-    // Si es así, cambia al próximo mes
-    mes++;
+else {
+    dia = 13;
+    mes++; // Cambia al próximo mes
 }
-// Crea la fecha objetivo
-var fechaObjetivo = new Date(anio, mes, dia);
-// Calcula la diferencia en milisegundos
-var diferencia = fechaObjetivo - ahora;
-// Convierte la diferencia en días
-var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
-diasRestantes.innerHTML = dias;
+if (bandera) {
+    // Crea la fecha objetivo
+    var fechaObjetivo = new Date(anio, mes, dia);
+    // Calcula la diferencia en milisegundos
+    var diferencia = fechaObjetivo - ahora;
+    // Convierte la diferencia en días
+    var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
+    diasRestantes.innerHTML = dias;
+}
+
 
 
 // Mostrar en el html el numero de dias Restantes de liquidacion

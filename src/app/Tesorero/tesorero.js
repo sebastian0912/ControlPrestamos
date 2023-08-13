@@ -36,11 +36,14 @@ var h1Elemento = document.querySelector('#cont');
 var ahora = new Date();
 var anio = ahora.getFullYear();
 var mes = ahora.getMonth();
-var dia = 0;
+var dia = 1;
+var bandera = true;
 
 if (ahora.getDate() == 13 || ahora.getDate() == 27) {
     dia = 0;
-    numeroDias.style.color = "red";
+    diasRestantes.innerHTML = "0";
+    diasRestantes.style.color = "red";
+    bandera = false;
 }
 else if (ahora.getDate() < 13) {
     dia = 13;
@@ -52,14 +55,15 @@ else {
     dia = 13;
     mes++; // Cambia al próximo mes
 }
-
-// Crea la fecha objetivo
-var fechaObjetivo = new Date(anio, mes, dia);
-// Calcula la diferencia en milisegundos
-var diferencia = fechaObjetivo - ahora;
-// Convierte la diferencia en días
-var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
-diasRestantes.innerHTML = dias;
+if (bandera) {
+    // Crea la fecha objetivo
+    var fechaObjetivo = new Date(anio, mes, dia);
+    // Calcula la diferencia en milisegundos
+    var diferencia = fechaObjetivo - ahora;
+    // Convierte la diferencia en días
+    var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
+    diasRestantes.innerHTML = dias;
+}
 
 
 var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05'];
@@ -137,49 +141,61 @@ extrae.addEventListener('click', async () => {
 
     const datosExtraidos = await datos();
 
-    let dataString = '\t\t\t\t\t\t\tANTERIOR\t\tPARA DESCONTAR\t\t\t\t\t\t\t\t\t\tPARA HACER\t\t\t\nCÓDIGO\tCÉDULA\tNOMBRE\tINGRESO\tTEMPORAL\tFINCA\tSALARIO\tSALDOS\tFONDOS\tMERCADOS\tCUOTAS\tPRESTAMO\tCUOTAS\tCASINO\tANCHETAS\tCUOTAS\tFONDO\tCARNET\tSEGURO FUNERARIO\tPRESTAMO\tCUOTAS\tANTICIPO LIQ\tCUENTAS\n';
+    let excelData = [
+        ['','','','','','','','ANTERIOR', '', 'PARA DESCONTAR', '', '', '','','','','','','', 'PARA HACER', '', '', '', '', '', '', '', ''],
+        ['CÓDIGO', 'CÉDULA', 'NOMBRE', 'INGRESO', 'TEMPORAL', 'FINCA', 'SALARIO', 'SALDOS', 'FONDOS', 'MERCADOS', 'CUOTAS MERCADOS', 'PRESTAMO PARA DESCONTAR', 'CUOTAS PRESTAMOS PARA DESCONTAR', 'CASINO', 'ANCHETAS', 'CUOTAS ANCHETAS', 'FONDO', 'CARNET', 'SEGURO FUNERARIO', 'PRESTAMO PARA HACER', 'CUOTAS PRESTAMO PARA HACER', 'ANTICIPO LIQUIDACIÓN', 'CUENTAS'],
+    ];
+    
     console.log(datosExtraidos.datosbase);
 
     datosExtraidos.datosbase.forEach((doc) => {
         const docData = doc;
-        dataString +=
-            docData.codigo + '\t' +
-            docData.numero_de_documento + '\t' +
-            docData.nombre + '\t' +
-            docData.ingreso + '\t' +
-            docData.temporal + '\t' +
-            docData.finca + '\t' +
-            docData.salario + '\t' +
-            docData.saldos + '\t' +
-            docData.fondos + '\t' +
-            docData.mercados + '\t' +
-            docData.cuotasMercados + '\t' +
-            docData.prestamoParaDescontar + '\t' +
-            docData.cuotasPrestamosParaDescontar + '\t' +
-            docData.casino + '\t' +
-            docData.valoranchetas + '\t' +
-            docData.cuotasAnchetas + '\t' +
-            docData.fondo + '\t' +
-            docData.carnet + '\t' +
-            docData.seguroFunerario + '\t' +
-            docData.prestamoParaHacer + '\t' +
-            docData.cuotasPrestamoParahacer + '\t' +
-            docData.anticipoLiquidacion + '\t' +
-            docData.cuentas + '\n';
+        excelData.push([
+            docData.codigo,
+            docData.numero_de_documento,
+            docData.nombre,
+            docData.ingreso,
+            docData.temporal,
+            docData.finca,
+            docData.salario,
+            docData.saldos,
+            docData.fondos,
+            docData.mercados,
+            docData.cuotasMercados,
+            docData.prestamoParaDescontar,
+            docData.cuotasPrestamosParaDescontar,
+            docData.casino,
+            docData.valoranchetas,
+            docData.cuotasAnchetas,
+            docData.fondo,
+            docData.carnet,
+            docData.seguroFunerario,
+            docData.prestamoParaHacer,
+            docData.cuotasPrestamoParahacer,
+            docData.anticipoLiquidacion,
+            docData.cuentas
+        ]);
     });
 
-    // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
+    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Datos');
+
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+
+    const blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+
     const element = document.createElement('a');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
-    element.setAttribute('download', 'datos.txt');
-
+    element.href = url;
+    element.download = 'datos.xlsx';
     element.style.display = 'none';
-    document.body.appendChild(element);
 
+    document.body.appendChild(element);
     element.click();
 
     document.body.removeChild(element);
-
+    URL.revokeObjectURL(url);
 });
 
 async function datosTCodigos() {
@@ -224,33 +240,41 @@ extraeC.addEventListener('click', async () => {
             datosFinales.push(doc);
         }
     });
-    let dataString = 'Código\tCédula quien pidio\tNombre persona quien dio el codigo\tValor\tCuotas\tFecha\n';
 
+    let excelData = [['Código', 'Cédula quien pidió', 'Nombre persona quien dio el código', 'Valor', 'Cuotas', 'Fecha']];
+    
     datosFinales.forEach((doc) => {
-        dataString +=
-            doc.codigo + '\t' +
-            doc.cedulaQuienPide + '\t' +
-            doc.generadoPor + '\t' +
-            doc.monto + '\t' +
-            doc.cuotas + '\t' +
-            doc.fechaGenerado + '\n';
+        excelData.push([
+            doc.codigo,
+            doc.cedulaQuienPide,
+            doc.generadoPor,
+            doc.monto,
+            doc.cuotas,
+            doc.fechaGenerado
+        ]);
     });
 
-    // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
+    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Datos Codigos');
+
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+
+    const blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+
     const element = document.createElement('a');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
-    element.setAttribute('download', 'datosCodigos.txt');
-
+    element.href = url;
+    element.download = 'datosCodigos.xlsx';
     element.style.display = 'none';
-    document.body.appendChild(element);
 
+    document.body.appendChild(element);
     element.click();
 
     document.body.removeChild(element);
+    URL.revokeObjectURL(url);
 
-
-    // borrar la coleccion de codigos
-
+    // borrar la colección de códigos
 });
 
 async function datosT() {
@@ -286,36 +310,50 @@ async function datosT() {
 
 extraeT.addEventListener('click', async () => {
     const datosExtraidos = await datosT();
+
     console.log(datosExtraidos);
-    let dataString = 'nombre\tMonto Total\t Numero de compras en la tienda\n';
-    if (datosExtraidos.empresa.length == 0) {
+
+    let excelData = [['Nombre De la Tienda', 'Monto Total', 'Numero de compras en la tienda']];
+    
+    if (datosExtraidos.message == "error" ) {
         aviso("No se han comprado productos en las tiendas", "warning");
         return;
-    }
-    else {
+    } else {
         datosExtraidos.tienda.forEach((doc) => {
             const docData = doc;
-            dataString +=
-                docData.nombre + '\t' +
-                docData.valorTotal + '\t' +
-                docData.numPersonasAtendidas + '\n';
+            excelData.push([docData.nombre, docData.valorTotal, docData.numPersonasAtendidas]);
         });
+
+        const ws = XLSX.utils.aoa_to_sheet(excelData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Datos Tienda');
+
+        const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+        
+        const blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
+        const url = URL.createObjectURL(blob);
+
+        const element = document.createElement('a');
+        element.href = url;
+        element.download = 'datosTienda.xlsx';
+        element.style.display = 'none';
+
+        document.body.appendChild(element);
+        element.click();
+
+        document.body.removeChild(element);
+        URL.revokeObjectURL(url);
     }
-
-
-    // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
-    const element = document.createElement('a');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
-    element.setAttribute('download', 'datosTienda.txt');
-
-    element.style.display = 'none';
-    document.body.appendChild(element);
-
-    element.click();
-
-    document.body.removeChild(element);
 });
 
+function s2ab(s) {
+    const buf = new ArrayBuffer(s.length);
+    const view = new Uint8Array(buf);
+    for (let i = 0; i < s.length; i++) {
+        view[i] = s.charCodeAt(i) & 0xFF;
+    }
+    return buf;
+}
 
 input.addEventListener('change', () => {
     let archivo = input.files[0];

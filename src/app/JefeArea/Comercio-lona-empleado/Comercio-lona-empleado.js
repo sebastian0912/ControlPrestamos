@@ -21,11 +21,14 @@ perfil.innerHTML = perfilLocal;
 var ahora = new Date();
 var anio = ahora.getFullYear();
 var mes = ahora.getMonth();
-var dia = 0;
+var dia = 1;
+var bandera = true;
 
 if (ahora.getDate() == 13 || ahora.getDate() == 27) {
     dia = 0;
-    numeroDias.style.color = "red";
+    diasRestantes.innerHTML = "0";
+    diasRestantes.style.color = "red";
+    bandera = false;
 }
 else if (ahora.getDate() < 13) {
     dia = 13;
@@ -37,14 +40,15 @@ else {
     dia = 13;
     mes++; // Cambia al próximo mes
 }
-
-// Crea la fecha objetivo
-var fechaObjetivo = new Date(anio, mes, dia);
-// Calcula la diferencia en milisegundos
-var diferencia = fechaObjetivo - ahora;
-// Convierte la diferencia en días
-var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
-diasRestantes.innerHTML = dias;
+if (bandera) {
+    // Crea la fecha objetivo
+    var fechaObjetivo = new Date(anio, mes, dia);
+    // Calcula la diferencia en milisegundos
+    var diferencia = fechaObjetivo - ahora;
+    // Convierte la diferencia en días
+    var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
+    diasRestantes.innerHTML = dias;
+}
 
 
 var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05'];
@@ -333,7 +337,7 @@ async function escribirHistorial(cedulaEmpleado, nuevovalor, username, cuotas, t
             method: 'POST',
             body:
                 JSON.stringify({
-                    nombreQuienEntrego: username,
+                    nombreQuienEntrego: usernameLocal,
                     valor: nuevovalor,
                     cuotas: cuotas,
                     fechaEfectuado: fecha,
@@ -645,18 +649,11 @@ boton.addEventListener("click", async (e) => {
 
         await actualizarVentas(cantidad, codigo, usernameLocal);
 
-        /*await updateDoc(doc(db, "Comercio", codigo), {
-            cantidadTotalVendida: parseInt(datos.cantidadTotalVendida) + parseInt(cantidad),
-        });*/
-
-
         await actualizarDatos(cedula, sumaVentas, 2);
 
         await escribirHistorial(cedula, sumaVentas, usernameLocal, 2, "Compra producto comercializadora");
 
         aviso("Se ha cargado la informacion exitosamente", "success");
-
-
         
         let empresa = null;
         let NIT = null;
@@ -664,15 +661,19 @@ boton.addEventListener("click", async (e) => {
         if (usuario.temporal.startsWith("Apoyo") || usuario.temporal.startsWith("APOYO")) {
             empresa = "APOYO LABORAL TS SAS";
             NIT = "NIT 900814587"
-            direcccion = "CALLE 112 A No. 18 A -05"
+            direcccion = "CRA 2 N 8-156 FACATATIVA"
         }
+
         else if (usuario.temporal.startsWith("Tu") || usuario.temporal.startsWith("TU")) {
             empresa = "TU ALIANZA SAS";
-            NIT = "NIT 900864596 - 1"
-            direcccion = "CRA 2 N 8- 156 FACATATIVA'"
+            NIT = "NIT 900864596"
+            direcccion = "Calle 7 N 4-49 MADRID"
         }
+
         else if (usuario.temporal.startsWith("Comercializadora") || usuario.temporal.startsWith("COMERCIALIZADORA")) {
             empresa = "COMERCIALIZADORA TS";
+            NIT = "NIT 901602948"
+            direcccion = "CRA 1 N 17-37 BRAZILIA"
         }
 
         var docPdf = new jsPDF();
@@ -684,7 +685,7 @@ boton.addEventListener("click", async (e) => {
         docPdf.text("______________________________________________________________________________________________________________", 10, 10);
         docPdf.setFontSize(24);
         docPdf.setFont("Helvetica", "bold");
-        docPdf.text(empresa, 35, 19);
+        docPdf.text(empresa, 15, 22);
         docPdf.setFont('Helvetica', 'normal');
         docPdf.setFontSize(9);
         docPdf.text('AUTORIZACION DE LIBRANZA', 132, 15);
@@ -703,7 +704,7 @@ boton.addEventListener("click", async (e) => {
 
 
         docPdf.text("Yo, " + usuario.nombre + " mayor de edad,  identificado con la cedula de ciudadania No. "
-            + usuario.cedula + " autorizo", 10, 55);
+            + usuario.numero_de_documento + " autorizo", 10, 55);
         docPdf.text("expresa e irrevocablemente para que del sueldo, salario, prestaciones sociales o de cualquier suma de la sea acreedor; me sean", 10, 60);
         docPdf.text("descontados la cantidad de " + sumaVentas + " (Letras)  " + NumeroALetras(sumaVentas) + "por concepto de" + " PRESTAMO, en 2 cuota(s), ", 10, 65);
         docPdf.text("quincenal del credito del que soy deudor ante Tu alianza S.A.S. , aun en el evento de encontrarme disfrutando de mis licencias ", 10, 70);

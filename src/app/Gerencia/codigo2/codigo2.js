@@ -17,11 +17,14 @@ perfil.innerHTML = perfilLocal;
 var ahora = new Date();
 var anio = ahora.getFullYear();
 var mes = ahora.getMonth();
-var dia = 0;
+var dia = 1;
+var bandera = true;
 
 if (ahora.getDate() == 13 || ahora.getDate() == 27) {
     dia = 0;
-    numeroDias.style.color = "red";
+    diasRestantes.innerHTML = "0";
+    diasRestantes.style.color = "red";
+    bandera = false;
 }
 else if (ahora.getDate() < 13) {
     dia = 13;
@@ -33,15 +36,18 @@ else {
     dia = 13;
     mes++; // Cambia al próximo mes
 }
-
-// Crea la fecha objetivo
-var fechaObjetivo = new Date(anio, mes, dia);
-// Calcula la diferencia en milisegundos
-var diferencia = fechaObjetivo - ahora;
-// Convierte la diferencia en días
-var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
-diasRestantes.innerHTML = dias;
-
+if (bandera) {
+    // Crea la fecha objetivo
+    console.log(dia);
+    console.log(ahora);
+    var fechaObjetivo = new Date(anio, mes, dia);
+    console.log(fechaObjetivo);
+    // Calcula la diferencia en milisegundos
+    var diferencia = fechaObjetivo - ahora;
+    // Convierte la diferencia en días
+    var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
+    diasRestantes.innerHTML = dias;
+}
 
 var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05'];
 
@@ -163,16 +169,16 @@ function verificaSelect(select) {
     }
 }
 
-async function datosEmpleado(cedulaEmpleado){
+async function datosEmpleado(cedulaEmpleado) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtKey = obj.jwt;
-    
+
     const headers = {
         'Authorization': jwtKey
     };
 
-    const urlcompleta = urlBack.url + '/Datosbase/tesoreria/'+ cedulaEmpleado;
+    const urlcompleta = urlBack.url + '/Datosbase/tesoreria/' + cedulaEmpleado;
 
     try {
         const response = await fetch(urlcompleta, {
@@ -208,14 +214,14 @@ boton.addEventListener('click', async (e) => {
     }
 
     let aux = await datosEmpleado(cedulaEmpleado);
-    console.log(aux.datosbase[0]);  
+    console.log(aux.datosbase[0]);
     let datos = aux.datosbase[0];
-       
+
 
     // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
-    
+
     const fechaIngreso = datos.ingreso;
-    
+
     let mes = fechaIngreso.split('-')[1];
     let anio = fechaIngreso.split('-')[2];
     let dia = fechaIngreso.split('-')[0];
@@ -223,7 +229,7 @@ boton.addEventListener('click', async (e) => {
     // el año esta en formato xxaa y se debe convertir a 20aa
     let anioConvertido = '20' + anio;
     anio = anioConvertido;
-    
+
     const sumaTotal =
         parseInt(datos.saldos) +
         parseInt(datos.fondos) +
@@ -237,10 +243,10 @@ boton.addEventListener('click', async (e) => {
         parseInt(datos.prestamoParaHacer) +
         parseInt(datos.anticipoLiquidacion) +
         parseInt(datos.cuentas);
-    
+
     const fechaActual = new Date();
     let codigoOH = null;
-    
+
     if (parseInt(datos.saldos) >= 175000) {
         aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
     }
@@ -254,7 +260,7 @@ boton.addEventListener('click', async (e) => {
             cuotasAux = 1;
         }
         else if (tipo == "Dinero") {
-            codigoOH = 'PH' + Math.floor(Math.random() * 1000000);            
+            codigoOH = 'PH' + Math.floor(Math.random() * 1000000);
         }
         else if (tipo == "Otro") {
             codigoOH = 'OT' + Math.floor(Math.random() * 1000000);
@@ -297,7 +303,7 @@ boton.addEventListener('click', async (e) => {
             }
         }
         if (bandera == true) {
-            
+
             let empresa = null;
             let NIT = null;
             let direcccion = null;
@@ -592,36 +598,6 @@ async function datosT() {
     }
 }
 
-extraeT.addEventListener('click', async () => {
-    const datosExtraidos = await datosT();
-
-    console.log(datosExtraidos);
-
-    let dataString = 'nombre\tMonto Total\t Numero de compras en la tienda\n';
-    if (datosExtraidos.empresa.length == 0) {
-        aviso("No se han comprado productos en las tiendas", "warning");
-    }
-    else {
-        datosExtraidos.tienda.forEach((doc) => {
-            const docData = doc;
-            dataString +=
-                docData.nombre + '\t' +
-                docData.valorTotal + '\t' +
-                docData.numPersonasAtendidas + '\n';
-        });
-        // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
-        const element = document.createElement('a');
-        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
-        element.setAttribute('download', 'datosTienda.txt');
-
-        element.style.display = 'none';
-        document.body.appendChild(element);
-
-        element.click();
-
-        document.body.removeChild(element);
-    }
-});
 
 async function THistorial() {
     var body = localStorage.getItem('key');
@@ -659,38 +635,55 @@ extraeT.addEventListener('click', async () => {
 
     console.log(datosExtraidos);
 
-    let dataString = 'nombre\tMonto Total\t Numero de compras en la tienda\n';
-    if (datosExtraidos.empresa.length == 0) {
+    let excelData = [['Nombre De la Tienda', 'Monto Total', 'Numero de compras en la tienda']];
+
+    if (datosExtraidos.message == "error") {
         aviso("No se han comprado productos en las tiendas", "warning");
         return;
-    }
-    else {
+    } else {
         datosExtraidos.tienda.forEach((doc) => {
             const docData = doc;
-            dataString +=
-                docData.nombre + '\t' +
-                docData.valorTotal + '\t' +
-                docData.numPersonasAtendidas + '\n';
+            excelData.push([docData.nombre, docData.valorTotal, docData.numPersonasAtendidas]);
         });
-        // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
+
+        const ws = XLSX.utils.aoa_to_sheet(excelData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Datos Tienda');
+
+        const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+
+        const blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
+        const url = URL.createObjectURL(blob);
+
         const element = document.createElement('a');
-        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
-        element.setAttribute('download', 'datosTienda.txt');
-
+        element.href = url;
+        element.download = 'datosTienda.xlsx';
         element.style.display = 'none';
-        document.body.appendChild(element);
 
+        document.body.appendChild(element);
         element.click();
 
         document.body.removeChild(element);
+        URL.revokeObjectURL(url);
     }
 });
 
+function s2ab(s) {
+    const buf = new ArrayBuffer(s.length);
+    const view = new Uint8Array(buf);
+    for (let i = 0; i < s.length; i++) {
+        view[i] = s.charCodeAt(i) & 0xFF;
+    }
+    return buf;
+}
 
 extraeHistorialT.addEventListener('click', async () => {
     console.log("entro");
     const datosExtraidos = await THistorial();
-    
+    if (datosExtraidos.historial.length == 0) {
+        aviso("No hay registros de compras realizadas en las tiendas", "warning");
+        return;
+    }
     let historial = [];
     datosExtraidos.historial.forEach(doc => {
         if (doc.concepto.startsWith("Compra tienda")) {
@@ -698,24 +691,42 @@ extraeHistorialT.addEventListener('click', async () => {
         }
     });
 
-    let dataString = 'Cedula\tconcepto\tcuotas\fechaEfectuado\tnombreQuienEntrego\tvalor\n';
-    historial.forEach((doc) => {
-        dataString +=
-            doc.cedula + '\t' +
-            doc.concepto + '\t' +
-            doc.cuotas + '\t' +
-            doc.fechaEfectuado + '\t' +
-            doc.nombreQuienEntrego + '\t' +
-            doc.valor + '\n';
-    }
-    );
-    // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
-    const element = document.createElement('a');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
-    element.setAttribute('download', 'datosHistorialDetallado.txt');
 
+
+    let excelData = [['Cedula', 'Concepto', 'Cuotas', 'Fecha Efectuado', 'Nombre Quien Entregó', 'Valor']];
+
+    historial.forEach((doc) => {
+        excelData.push([
+            doc.cedula,
+            doc.concepto,
+            doc.cuotas,
+            doc.fechaEfectuado,
+            doc.nombreQuienEntrego,
+            doc.valor
+        ]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Historial Detallado');
+
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+
+    const blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+
+    const element = document.createElement('a');
+    element.href = url;
+    element.download = 'datosHistorialDetallado.xlsx';
     element.style.display = 'none';
+
     document.body.appendChild(element);
     element.click();
+
     document.body.removeChild(element);
+    URL.revokeObjectURL(url);
 });
+
+
+
+

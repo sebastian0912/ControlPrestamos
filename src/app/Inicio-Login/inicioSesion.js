@@ -30,7 +30,11 @@ signInform.addEventListener('submit', async (e) => {
 
     if (values.rol == 'TESORERIA') {
         values.EstadoQuincena = true;
-        localStorage.setItem('CantidadEmpleados', datosEmpleados.length);
+        if (datosEmpleados == "error") {
+            localStorage.setItem('CantidadEmpleados', 0);
+        } else {
+            localStorage.setItem('CantidadEmpleados', datosEmpleados.length);                
+        }
         localStorage.setItem('CantidadSolicitudes', verificarCodigoEstado(datos));
         localStorage.setItem('CantidadCoordinadoresConEstadoSolicitudesTrue', numCoordinadoresConestadoSolicitudesTrue(datosU));
         window.location.href = "../Tesorero/tesorero.html";

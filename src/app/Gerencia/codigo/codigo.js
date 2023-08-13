@@ -24,11 +24,14 @@ perfil.innerHTML = perfilLocal;
 var ahora = new Date();
 var anio = ahora.getFullYear();
 var mes = ahora.getMonth();
-var dia = 0;
+var dia = 1;
+var bandera = true;
 
 if (ahora.getDate() == 13 || ahora.getDate() == 27) {
     dia = 0;
-    numeroDias.style.color = "red";
+    diasRestantes.innerHTML = "0";
+    diasRestantes.style.color = "red";
+    bandera = false;
 }
 else if (ahora.getDate() < 13) {
     dia = 13;
@@ -40,14 +43,15 @@ else {
     dia = 13;
     mes++; // Cambia al próximo mes
 }
-
-// Crea la fecha objetivo
-var fechaObjetivo = new Date(anio, mes, dia);
-// Calcula la diferencia en milisegundos
-var diferencia = fechaObjetivo - ahora;
-// Convierte la diferencia en días
-var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
-diasRestantes.innerHTML = dias;
+if (bandera) {
+    // Crea la fecha objetivo
+    var fechaObjetivo = new Date(anio, mes, dia);
+    // Calcula la diferencia en milisegundos
+    var diferencia = fechaObjetivo - ahora;
+    // Convierte la diferencia en días
+    var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
+    diasRestantes.innerHTML = dias;
+}
 
 
 var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05'];
@@ -441,8 +445,167 @@ async function actualizarDatosBase(concepto, valor, cuotas, cedulaEmpleado) {
     }
 }
 
+async function datosT() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
 
-async function escribirHistorial(cedulaEmpleado, nuevovalor, username, cuotas, tipo) {
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Tienda/traerTienda';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
+async function THistorial() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Historial/historial';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
+extraeT.addEventListener('click', async () => {
+    const datosExtraidos = await datosT();
+
+    console.log(datosExtraidos);
+
+    let excelData = [['Nombre De la Tienda', 'Monto Total', 'Numero de compras en la tienda']];
+    
+    if (datosExtraidos.message == "error" ) {
+        aviso("No se han comprado productos en las tiendas", "warning");
+        return;
+    } else {
+        datosExtraidos.tienda.forEach((doc) => {
+            const docData = doc;
+            excelData.push([docData.nombre, docData.valorTotal, docData.numPersonasAtendidas]);
+        });
+
+        const ws = XLSX.utils.aoa_to_sheet(excelData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Datos Tienda');
+
+        const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+        
+        const blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
+        const url = URL.createObjectURL(blob);
+
+        const element = document.createElement('a');
+        element.href = url;
+        element.download = 'datosTienda.xlsx';
+        element.style.display = 'none';
+
+        document.body.appendChild(element);
+        element.click();
+
+        document.body.removeChild(element);
+        URL.revokeObjectURL(url);
+    }
+});
+
+function s2ab(s) {
+    const buf = new ArrayBuffer(s.length);
+    const view = new Uint8Array(buf);
+    for (let i = 0; i < s.length; i++) {
+        view[i] = s.charCodeAt(i) & 0xFF;
+    }
+    return buf;
+}
+
+extraeHistorialT.addEventListener('click', async () => {
+    console.log("entro");
+    const datosExtraidos = await THistorial();
+    if (datosExtraidos.historial.length == 0 ) {
+        aviso("No hay registros de compras realizadas en las tiendas", "warning");
+        return;
+    }
+    let historial = [];
+    datosExtraidos.historial.forEach(doc => {
+        if (doc.concepto.startsWith("Compra tienda")) {
+            historial.push(doc);
+        }
+    });
+
+
+
+    let excelData = [['Cedula', 'Concepto', 'Cuotas', 'Fecha Efectuado', 'Nombre Quien Entregó', 'Valor']];
+    
+    historial.forEach((doc) => {
+        excelData.push([
+            doc.cedula,
+            doc.concepto,
+            doc.cuotas,
+            doc.fechaEfectuado,
+            doc.nombreQuienEntrego,
+            doc.valor
+        ]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Historial Detallado');
+
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+
+    const blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+
+    const element = document.createElement('a');
+    element.href = url;
+    element.download = 'datosHistorialDetallado.xlsx';
+    element.style.display = 'none';
+
+    document.body.appendChild(element);
+    element.click();
+
+    document.body.removeChild(element);
+    URL.revokeObjectURL(url);
+});
+
+
+async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
@@ -459,7 +622,7 @@ async function escribirHistorial(cedulaEmpleado, nuevovalor, username, cuotas, t
             body:
                 JSON.stringify({
                     cedula: cedulaEmpleado,
-                    nombreQuienEntrego: username,
+                    nombreQuienEntrego: usernameLocal,
                     valor: nuevovalor,
                     cuotas: cuotas,
                     fechaEfectuado: fecha,
@@ -568,7 +731,7 @@ boton.addEventListener('click', async (e) => {
             return;
         }
         if (!verificaMonto(parseInt(nuevovalor), aux.codigo)) {
-            aviso('El monto del prestamo es mayor al permitido generado por el coodinador', 'error');
+            aviso('El monto del prestamo es mayor al permitido generado con el codigo ', 'error');
             return;
         }
         if (!verificaSiesUnPrestamo(codigoP)) {
@@ -610,20 +773,23 @@ boton.addEventListener('click', async (e) => {
             let empresa = null;
             let NIT = null;
             let direcccion = null;
+
             if (usuario.temporal.startsWith("Apoyo") || usuario.temporal.startsWith("APOYO")) {
                 empresa = "APOYO LABORAL TS SAS";
                 NIT = "NIT 900814587"
-                direcccion = "CALLE 112 A No. 18 A -05"
+                direcccion = "CRA 2 N 8-156 FACATATIVA"
             }
 
             else if (usuario.temporal.startsWith("Tu") || usuario.temporal.startsWith("TU")) {
                 empresa = "TU ALIANZA SAS";
-                NIT = "NIT 900864596 - 1"
-                direcccion = "CRA 2 N 8- 156 FACATATIVA'"
+                NIT = "NIT 900864596"
+                direcccion = "Calle 7 N 4-49 MADRID"
             }
 
             else if (usuario.temporal.startsWith("Comercializadora") || usuario.temporal.startsWith("COMERCIALIZADORA")) {
                 empresa = "COMERCIALIZADORA TS";
+                NIT = "NIT 901602948"
+                direcccion = "CRA 1 N 17-37 BRAZILIA"
             }
 
             var docPdf = new jsPDF();
@@ -654,7 +820,7 @@ boton.addEventListener('click', async (e) => {
 
 
             docPdf.text('Yo, ' + usuario.nombre + ' mayor de edad,  identificado con la cedula de ciudadania No. '
-                + usuario.cedula + ' autorizo', 10, 55);
+                + usuario.numero_de_documento + ' autorizo', 10, 55);
             docPdf.text('expresa e irrevocablemente para que del sueldo, salario, prestaciones sociales o de cualquier suma de la sea acreedor; me sean', 10, 60);
             docPdf.text('descontados la cantidad de ' + valor + ' (Letras)  ' + NumeroALetras(nuevovalor) + 'por concepto de' + ' PRESTAMO, en ' + cuotas + ' cuota(s), ', 10, 65);
             docPdf.text('quincenal del credito del que soy deudor ante Tu alianza S.A.S. , aun en el evento de encontrarme disfrutando de mis licencias ', 10, 70);
@@ -874,165 +1040,8 @@ function NumeroALetras(num) {
 
 // fin
 
-async function datosT() {
-    var body = localStorage.getItem('key');
-    const obj = JSON.parse(body);
-    const jwtKey = obj.jwt;
-
-    const headers = {
-        'Authorization': jwtKey
-    };
-
-    const urlcompleta = urlBack.url + '/Tienda/traerTienda';
-
-    try {
-        const response = await fetch(urlcompleta, {
-            method: 'GET',
-            headers: headers,
-        });
-
-        if (response.ok) {
-            const responseData = await response.json();
-            console.log(responseData);
-            return responseData;
-        } else {
-            throw new Error('Error en la petición GET');
-        }
-    } catch (error) {
-        console.error('Error en la petición HTTP GET');
-        console.error(error);
-        throw error; // Propaga el error para que se pueda manejar fuera de la función
-    }
-}
-
-extraeT.addEventListener('click', async () => {
-    const datosExtraidos = await datosT();
-
-    console.log(datosExtraidos);
-
-    let dataString = 'nombre\tMonto Total\t Numero de compras en la tienda\n';
-    if (datosExtraidos.empresa.length == 0) {
-        aviso("No se han comprado productos en las tiendas", "warning");
-    }
-    else {
-        datosExtraidos.tienda.forEach((doc) => {
-            const docData = doc;
-            dataString +=
-                docData.nombre + '\t' +
-                docData.valorTotal + '\t' +
-                docData.numPersonasAtendidas + '\n';
-        });
-        // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
-        const element = document.createElement('a');
-        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
-        element.setAttribute('download', 'datosTienda.txt');
-
-        element.style.display = 'none';
-        document.body.appendChild(element);
-
-        element.click();
-
-        document.body.removeChild(element);
-    }
-});
 
 
-async function THistorial() {
-    var body = localStorage.getItem('key');
-    const obj = JSON.parse(body);
-    const jwtKey = obj.jwt;
-
-    const headers = {
-        'Authorization': jwtKey
-    };
-
-    const urlcompleta = urlBack.url + '/Historial/historial';
-
-    try {
-        const response = await fetch(urlcompleta, {
-            method: 'GET',
-            headers: headers,
-        });
-
-        if (response.ok) {
-            const responseData = await response.json();
-            console.log(responseData);
-            return responseData;
-        } else {
-            throw new Error('Error en la petición GET');
-        }
-    } catch (error) {
-        console.error('Error en la petición HTTP GET');
-        console.error(error);
-        throw error; // Propaga el error para que se pueda manejar fuera de la función
-    }
-}
-
-extraeT.addEventListener('click', async () => {
-    const datosExtraidos = await datosT();
-
-    console.log(datosExtraidos);
-
-    let dataString = 'nombre\tMonto Total\t Numero de compras en la tienda\n';
-    if (datosExtraidos.empresa.length == 0) {
-        aviso("No se han comprado productos en las tiendas", "warning");
-        return;
-    }
-    else {
-        datosExtraidos.tienda.forEach((doc) => {
-            const docData = doc;
-            dataString +=
-                docData.nombre + '\t' +
-                docData.valorTotal + '\t' +
-                docData.numPersonasAtendidas + '\n';
-        });
-        // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
-        const element = document.createElement('a');
-        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
-        element.setAttribute('download', 'datosTienda.txt');
-
-        element.style.display = 'none';
-        document.body.appendChild(element);
-
-        element.click();
-
-        document.body.removeChild(element);
-    }
-});
-
-
-extraeHistorialT.addEventListener('click', async () => {
-    console.log("entro");
-    const datosExtraidos = await THistorial();
-    
-    let historial = [];
-    datosExtraidos.historial.forEach(doc => {
-        if (doc.concepto.startsWith("Compra tienda")) {
-            historial.push(doc);
-        }
-    });
-
-    let dataString = 'Cedula\tconcepto\tcuotas\fechaEfectuado\tnombreQuienEntrego\tvalor\n';
-    historial.forEach((doc) => {
-        dataString +=
-            doc.cedula + '\t' +
-            doc.concepto + '\t' +
-            doc.cuotas + '\t' +
-            doc.fechaEfectuado + '\t' +
-            doc.nombreQuienEntrego + '\t' +
-            doc.valor + '\n';
-    }
-    );
-    // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
-    const element = document.createElement('a');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
-    element.setAttribute('download', 'datosHistorialDetallado.txt');
-
-    element.style.display = 'none';
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
-});
 
 
 

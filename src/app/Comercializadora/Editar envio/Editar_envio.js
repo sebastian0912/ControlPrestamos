@@ -24,7 +24,7 @@ perfil.innerHTML = perfilLocal;
 
 
 // Arreglo con las sedes y conceptos
-let datos = ["Faca Principal", "Faca Centro", "Rosal", "Cartagenita", "Madrid", "Funza", "Soacha", "Fontibón", "Suba", "Tocancipá", "Bosa"];
+let datos = ["FACA_PRINCIPAL", "FACA_CENTRO", "ROSAL", "CARTAGENITA", "MADRID", "FUNZA", "SOACHA", "FONTIBÓN", "SUBA", "TOCANCIPÁ", "BOSA", "BOGOTÁ"];
 let datos2 = ["Mercado", "Kit escolar", "Kit aseo", "Anchetas", "Matrimonios", "Kit velitas", "Kit amor y amistad", "Kit Día de las Madres", "Juguetes", "Kit dulces", "Otro"];
 
 // recorrer el arreglo y mostrarlo en el select
@@ -48,11 +48,14 @@ for (let i = 0; i < datos2.length; i++) {
 var ahora = new Date();
 var anio = ahora.getFullYear();
 var mes = ahora.getMonth();
-var dia = 0;
+var dia = 1;
+var bandera = true;
 
 if (ahora.getDate() == 13 || ahora.getDate() == 27) {
     dia = 0;
-    numeroDias.style.color = "red";
+    diasRestantes.innerHTML = "0";
+    diasRestantes.style.color = "red";
+    bandera = false;
 }
 else if (ahora.getDate() < 13) {
     dia = 13;
@@ -64,14 +67,15 @@ else {
     dia = 13;
     mes++; // Cambia al próximo mes
 }
-
-// Crea la fecha objetivo
-var fechaObjetivo = new Date(anio, mes, dia);
-// Calcula la diferencia en milisegundos
-var diferencia = fechaObjetivo - ahora;
-// Convierte la diferencia en días
-var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
-diasRestantes.innerHTML = dias;
+if (bandera) {
+    // Crea la fecha objetivo
+    var fechaObjetivo = new Date(anio, mes, dia);
+    // Calcula la diferencia en milisegundos
+    var diferencia = fechaObjetivo - ahora;
+    // Convierte la diferencia en días
+    var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
+    diasRestantes.innerHTML = dias;
+}
 
 
 var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05'];
@@ -282,11 +286,18 @@ boton.addEventListener('click', async (e) => {
     let miSelect = document.querySelector('#miSelect');
     let miSelect2 = document.querySelector('#miSelect2');
 
+    if (codigo == "") {
+        aviso("No se ha ingresado ningun codigo", "error");
+        return;
+    }
+
+
     const datosCodigo = await obtenerDatosComercio(codigo);
-    console.log(datosCodigo);
+    // Guardar los valores actuales antes de aplicar los cambios
+
     if (datosCodigo != null) {
         console.log(datosCodigo);
-        if (datosCodigo.cantidadRecibida == "") {
+        if (datosCodigo.cantidadRecibida == "0") {
             const codigo2 = document.querySelector('#Codigo');
 
             boton.style.display = "none";
@@ -303,68 +314,43 @@ boton.addEventListener('click', async (e) => {
             valorUnidad.placeholder = datosCodigo.valorUnidad;
             miSelect.value = datosCodigo.destino;
             miSelect2.value = datosCodigo.concepto;
-
+            
+            const cantidadValorAntes = cantidad.value || cantidad.placeholder;
+            const valorUnidadValorAntes = valorUnidad.value || valorUnidad.placeholder;
+            const miSelectValorAntes = miSelect.value;
+            const miSelect2ValorAntes = miSelect2.value;
+            
             boton2.addEventListener('click', async (e) => {
                 e.preventDefault();
-                const cantidadValor = cantidad.value || cantidad.placeholder;
-                const valorUnidadValor = valorUnidad.value || valorUnidad.placeholder;
 
-                console.log(cantidadValor);
-                console.log(valorUnidadValor);
-                console.log(miSelect.value);
-                console.log(miSelect2.value);
+                // Obtener los valores actuales después de los cambios
+                const cantidadValorDespues = cantidad.value || cantidad.placeholder;
+                const valorUnidadValorDespues = valorUnidad.value || valorUnidad.placeholder;
+                const miSelectValorDespues = miSelect.value;
+                const miSelect2ValorDespues = miSelect2.value;
 
-                const nuevovalor = valorUnidadValor.replace(/\,/g, '');
-                await editarEnvio(miSelect.value, miSelect2.value, cantidadValor, nuevovalor, codigo);
-                aviso("Se ha actualizado correctamente", "success");
+                // Comparar los valores antes y después para detectar cambios
+                const cantidadCambio = cantidadValorAntes !== cantidadValorDespues;
+                const valorUnidadCambio = valorUnidadValorAntes !== valorUnidadValorDespues;
+                const miSelectCambio = miSelectValorAntes !== miSelectValorDespues;
+                const miSelect2Cambio = miSelect2ValorAntes !== miSelect2ValorDespues;
+
+                if (cantidadCambio || valorUnidadCambio || miSelectCambio || miSelect2Cambio) {
+                    // Algo ha cambiado
+                    console.log("Se han realizado cambios en los valores.");
+                    const nuevovalor = valorUnidadValorDespues.replace(/\,/g, '');
+                    await editarEnvio(miSelectValorDespues, miSelect2ValorDespues, cantidadValorDespues, nuevovalor, codigo);
+                    aviso("Se ha actualizado correctamente", "success");
+                } else {
+                    console.log("No se ha realizado ningún cambio.");
+                }
             });
-
-
-
             await historialModificaciones("Editar envio", codigo);
-/*
-            // crear un nuevo registro en la coleccion historial
-            const docHistorial = doc(db, "HistorialModificaciones", codigo);
-            const HistorialRef = await getDoc(docHistorial);
-            let aux = historialModificaciones;
-            if (HistorialRef.exists()) {
-                aux.codigo = datosCodigo.data().codigo;
-                aux.concepto = "Editar envio";
-                let fecha = new Date();
-                var fechaHoraString = fecha.getFullYear() + '-' + fecha.getMonth() + 1 + '-' + fecha.getDay() + ' ' + fecha.getHours() + ':' + fecha.getMinutes() + ':' + fecha.getMinutes();
-                aux.fechaEfectuado = fechaHoraString;
-                aux.username = usernameLocal;
-                await updateDoc(doc(db, "HistorialModificaciones", codigo), {
-                    historia: arrayUnion(aux)
-                });
-            }
-            else {
-                aux.codigo = datosCodigo.data().codigo;
-                aux.concepto = "Editar envio";
-                let fecha = new Date();
-                var fechaHoraString = fecha.getFullYear() + '-' + fecha.getMonth() + 1 + '-' + fecha.getDay() + ' ' + fecha.getHours() + ':' + fecha.getMinutes() + ':' + fecha.getMinutes();
-                aux.fechaEfectuado = fechaHoraString;
-                aux.username = usernameLocal;
-                await setDoc(docHistorial, {
-                    historia: [aux]
-                });
-            }*/
-
         }
         else {
             aviso("El envio ya fue recibido", "error");
         }
     }
-
-
-
-
-
-
-
-
-
-
 });
 
 

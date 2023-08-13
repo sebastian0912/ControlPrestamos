@@ -21,11 +21,14 @@ perfil.innerHTML = perfilLocal;
 var ahora = new Date();
 var anio = ahora.getFullYear();
 var mes = ahora.getMonth();
-var dia = 0;
+var dia = 1;
+var bandera = true;
 
 if (ahora.getDate() == 13 || ahora.getDate() == 27) {
     dia = 0;
-    numeroDias.style.color = "red";
+    diasRestantes.innerHTML = "0";
+    diasRestantes.style.color = "red";
+    bandera = false;
 }
 else if (ahora.getDate() < 13) {
     dia = 13;
@@ -37,15 +40,15 @@ else {
     dia = 13;
     mes++; // Cambia al próximo mes
 }
-
-// Crea la fecha objetivo
-var fechaObjetivo = new Date(anio, mes, dia);
-// Calcula la diferencia en milisegundos
-var diferencia = fechaObjetivo - ahora;
-// Convierte la diferencia en días
-var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
-diasRestantes.innerHTML = dias;
-
+if (bandera) {
+    // Crea la fecha objetivo
+    var fechaObjetivo = new Date(anio, mes, dia);
+    // Calcula la diferencia en milisegundos
+    var diferencia = fechaObjetivo - ahora;
+    // Convierte la diferencia en días
+    var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
+    diasRestantes.innerHTML = dias;
+}
 
 var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05'];
 
@@ -76,7 +79,7 @@ diasLi.innerHTML = dias2;
 
 
 
-if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen" || usernameLocal == "Señora Lola" ) {
+if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen" ) {
     lola.style.display = "inline-block";
 }
 else {
@@ -115,19 +118,26 @@ async function datosH(cedulaEmpleado) {
 }
 
 // darle click al boton para que se ejecute la funcion
+// darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
     e.preventDefault();
-    const oculto = document.querySelector('#oculto');
-    oculto.style.display = "block";
     // capturar los datos del formulario
     const cedulaEmpleado = document.querySelector('#cedula').value;
-
+    
     const datosExtraidos = await datosH(cedulaEmpleado);
-
+    console.log(datosExtraidos);
+    if (datosExtraidos.historial.length == 0) {
+        aviso('No hay datos para mostrar', 'warning');
+        return
+    }
+    
+    const oculto = document.querySelector('#oculto');
+    oculto.style.display = "block";
+    
+    tabla.innerHTML = '';
     datosExtraidos.historial.forEach(async (p) => {
         // limpiar la tabla
         const tabla = document.querySelector('#tabla');
-        tabla.innerHTML = '';
         tabla.innerHTML += `
             <tr>
                 <td>${p.cedula}</td>

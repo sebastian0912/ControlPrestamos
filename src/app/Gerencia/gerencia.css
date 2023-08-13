@@ -3,19 +3,11 @@
 
 body {
   background-size: 100%;
-  height: auto;
-  min-height: 840px;
+  min-height: 100vh;
   background: linear-gradient(120deg, #eeeeee 50%, #FEBB2E 40%);
   background-repeat: no-repeat;
   font-family: 'Poppins', sans-serif;
 }
-
-@media (min-height: 850px) {
-  body {
-    height: 947px
-  }
-}
-
 
 h1 {
   margin: 0;
@@ -23,19 +15,19 @@ h1 {
 }
 
 .diasT {
-  width: 100%;
-  margin: 50px 0 20px 30px;
-  font-family: 'Nunito Sans', sans-serif;
-  font-size: 20pt;
-  font-weight: 400;
+    width: 100%;
+    margin: 20px 0 10px 30px;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 14pt;
+    font-weight: 400;
 }
 
 .dias {
-  text-align: justify;
-  margin: 10px 0 20px 120px;
-  font-family: 'Nunito Sans', sans-serif;
-  font-size: 20pt;
-  font-weight: 600;
+    text-align: justify;
+    margin: 0px 0 10px 120px;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 16pt;
+    font-weight: 600;
 }
 
 a {

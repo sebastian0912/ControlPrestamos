@@ -24,11 +24,14 @@ let extraeT = document.getElementById("extraeT");
 var ahora = new Date();
 var anio = ahora.getFullYear();
 var mes = ahora.getMonth();
-var dia = 0;
+var dia = 1;
+var bandera = true;
 
 if (ahora.getDate() == 13 || ahora.getDate() == 27) {
     dia = 0;
-    numeroDias.style.color = "red";
+    diasRestantes.innerHTML = "0";
+    diasRestantes.style.color = "red";
+    bandera = false;
 }
 else if (ahora.getDate() < 13) {
     dia = 13;
@@ -40,14 +43,15 @@ else {
     dia = 13;
     mes++; // Cambia al próximo mes
 }
-
-// Crea la fecha objetivo
-var fechaObjetivo = new Date(anio, mes, dia);
-// Calcula la diferencia en milisegundos
-var diferencia = fechaObjetivo - ahora;
-// Convierte la diferencia en días
-var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
-diasRestantes.innerHTML = dias;
+if (bandera) {
+    // Crea la fecha objetivo
+    var fechaObjetivo = new Date(anio, mes, dia);
+    // Calcula la diferencia en milisegundos
+    var diferencia = fechaObjetivo - ahora;
+    // Convierte la diferencia en días
+    var dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
+    diasRestantes.innerHTML = dias;
+}
 
 
 var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05'];
@@ -110,17 +114,23 @@ async function datosH(cedulaEmpleado) {
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
     e.preventDefault();
-    const oculto = document.querySelector('#oculto');
-    oculto.style.display = "block";
     // capturar los datos del formulario
     const cedulaEmpleado = document.querySelector('#cedula').value;
-
+    
     const datosExtraidos = await datosH(cedulaEmpleado);
-
+    console.log(datosExtraidos);
+    if (datosExtraidos.historial.length == 0) {
+        aviso('No hay datos para mostrar', 'warning');
+        return
+    }
+    
+    const oculto = document.querySelector('#oculto');
+    oculto.style.display = "block";
+    
+    tabla.innerHTML = '';
     datosExtraidos.historial.forEach(async (p) => {
         // limpiar la tabla
         const tabla = document.querySelector('#tabla');
-        tabla.innerHTML = '';
         tabla.innerHTML += `
             <tr>
                 <td>${p.cedula}</td>
@@ -165,37 +175,6 @@ async function datosT() {
     }
 }
 
-extraeT.addEventListener('click', async () => {
-    const datosExtraidos = await datosT();
-
-    console.log(datosExtraidos);
-
-    let dataString = 'nombre\tMonto Total\t Numero de compras en la tienda\n';
-    if (datosExtraidos.empresa.length == 0) {
-        aviso("No se han comprado productos en las tiendas", "warning");
-    }
-    else {
-        datosExtraidos.tienda.forEach((doc) => {
-            const docData = doc;
-            dataString +=
-                docData.nombre + '\t' +
-                docData.valorTotal + '\t' +
-                docData.numPersonasAtendidas + '\n';
-        });
-        // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
-        const element = document.createElement('a');
-        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
-        element.setAttribute('download', 'datosTienda.txt');
-
-        element.style.display = 'none';
-        document.body.appendChild(element);
-
-        element.click();
-
-        document.body.removeChild(element);
-    }
-});
-
 async function THistorial() {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
@@ -232,38 +211,55 @@ extraeT.addEventListener('click', async () => {
 
     console.log(datosExtraidos);
 
-    let dataString = 'nombre\tMonto Total\t Numero de compras en la tienda\n';
-    if (datosExtraidos.empresa.length == 0) {
+    let excelData = [['Nombre De la Tienda', 'Monto Total', 'Numero de compras en la tienda']];
+    
+    if (datosExtraidos.message == "error" ) {
         aviso("No se han comprado productos en las tiendas", "warning");
         return;
-    }
-    else {
+    } else {
         datosExtraidos.tienda.forEach((doc) => {
             const docData = doc;
-            dataString +=
-                docData.nombre + '\t' +
-                docData.valorTotal + '\t' +
-                docData.numPersonasAtendidas + '\n';
+            excelData.push([docData.nombre, docData.valorTotal, docData.numPersonasAtendidas]);
         });
-        // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
+
+        const ws = XLSX.utils.aoa_to_sheet(excelData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Datos Tienda');
+
+        const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+        
+        const blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
+        const url = URL.createObjectURL(blob);
+
         const element = document.createElement('a');
-        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
-        element.setAttribute('download', 'datosTienda.txt');
-
+        element.href = url;
+        element.download = 'datosTienda.xlsx';
         element.style.display = 'none';
-        document.body.appendChild(element);
 
+        document.body.appendChild(element);
         element.click();
 
         document.body.removeChild(element);
+        URL.revokeObjectURL(url);
     }
 });
 
+function s2ab(s) {
+    const buf = new ArrayBuffer(s.length);
+    const view = new Uint8Array(buf);
+    for (let i = 0; i < s.length; i++) {
+        view[i] = s.charCodeAt(i) & 0xFF;
+    }
+    return buf;
+}
 
 extraeHistorialT.addEventListener('click', async () => {
     console.log("entro");
     const datosExtraidos = await THistorial();
-    
+    if (datosExtraidos.historial.length == 0 ) {
+        aviso("No hay registros de compras realizadas en las tiendas", "warning");
+        return;
+    }
     let historial = [];
     datosExtraidos.historial.forEach(doc => {
         if (doc.concepto.startsWith("Compra tienda")) {
@@ -271,24 +267,38 @@ extraeHistorialT.addEventListener('click', async () => {
         }
     });
 
-    let dataString = 'Cedula\tconcepto\tcuotas\fechaEfectuado\tnombreQuienEntrego\tvalor\n';
-    historial.forEach((doc) => {
-        dataString +=
-            doc.cedula + '\t' +
-            doc.concepto + '\t' +
-            doc.cuotas + '\t' +
-            doc.fechaEfectuado + '\t' +
-            doc.nombreQuienEntrego + '\t' +
-            doc.valor + '\n';
-    }
-    );
-    // Creamos un elemento "a" invisible, establecemos su URL para que apunte a nuestros datos y forzamos un click para iniciar la descarga
-    const element = document.createElement('a');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(dataString));
-    element.setAttribute('download', 'datosHistorialDetallado.txt');
 
+
+    let excelData = [['Cedula', 'Concepto', 'Cuotas', 'Fecha Efectuado', 'Nombre Quien Entregó', 'Valor']];
+    
+    historial.forEach((doc) => {
+        excelData.push([
+            doc.cedula,
+            doc.concepto,
+            doc.cuotas,
+            doc.fechaEfectuado,
+            doc.nombreQuienEntrego,
+            doc.valor
+        ]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Historial Detallado');
+
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+
+    const blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+
+    const element = document.createElement('a');
+    element.href = url;
+    element.download = 'datosHistorialDetallado.xlsx';
     element.style.display = 'none';
+
     document.body.appendChild(element);
     element.click();
+
     document.body.removeChild(element);
+    URL.revokeObjectURL(url);
 });
