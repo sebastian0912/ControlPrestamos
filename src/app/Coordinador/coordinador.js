@@ -115,10 +115,20 @@ aux.codigo.forEach((c) => {
         arrayCodigos.push(c);
     }
 });
-
-
-
 console.log(arrayCodigos);
+// Mostar contenido en una tabla
+arrayCodigos.forEach((c) => {
+    tabla.innerHTML += `
+    <tr>
+        <td>${c.codigo}</td>
+        <td>${c.monto}</td>
+        <td>${c.cuotas}</td>
+        <td>${c.estado}</td>
+        <td>${c.Concepto}</td>
+        <td>${c.cedulaQuienPide}</td>
+    </tr>
+    `
+});
 
 // Numero de codigos activos de la base de datos del coodinador
 let auxSolicitudes = 0;
@@ -137,19 +147,7 @@ else {
 
 numeroSolicitudesPendientes.innerHTML = auxSolicitudes;
 
-// Mostar contenido en una tabla
-arrayCodigos.forEach((c) => {
-    tabla.innerHTML += `
-    <tr>
-        <td>${c.codigo}</td>
-        <td>${c.monto}</td>
-        <td>${c.cuotas}</td>
-        <td>${c.estado}</td>
-        <td>${c.Concepto}</td>
-        <td>${c.cedulaQuienPide}</td>
-    </tr>
-    `
-});
+
 
 if (estado == 'true') {
     document.getElementById("myonoffswitch").checked = false;

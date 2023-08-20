@@ -98,7 +98,7 @@ for (let i = 0; i < fechaObjetivo2.length; i++) {
 }
 
 /*Convertir valor a separado por miles*/
-const numemoroM = document.querySelector('#valor');
+const numemoroM = document.querySelector('#monto');
 numemoroM.addEventListener('keyup', (e) => {
     var num = numemoroM.value.replace(/\,/g, '');
     if (!isNaN(num)) {
@@ -190,33 +190,17 @@ async function datosEmpleado(cedulaEmpleado) {
     }
 }
 
-// darle click al boton para que se ejecute la funcion
-boton.addEventListener('click', async (e) => {
-    e.preventDefault();
-    // capturar los datos del formulario
-    let valor = document.querySelector('#valor').value;
-    let nuevovalor = valor.replace(/\,/g, '');
-    let cedulaEmpleado = document.querySelector('#cedula').value;
-
-
-    let aux = await datosEmpleado(cedulaEmpleado);
-    console.log(aux.datosbase[0]);
-    let datos = aux.datosbase[0];
-
-    if (datos == undefined) {
-        aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
-        return;
-    }
+function verificaCondiciones(datos, nuevovalor) {
     // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
     const fechaIngreso = datos.ingreso;
-    let dia = fechaIngreso.split('-')[0];
-    let mes = fechaIngreso.split('-')[1];
-    let anio = fechaIngreso.split('-')[2];
+    let dia = fechaIngreso.split("-")[0];
+    let mes = fechaIngreso.split("-")[1];
+    let anio = fechaIngreso.split("-")[2];
 
     // el año esta en formato xxaa y se debe convertir a 20aa
-    let anioConvertido = '20' + anio;
+    let anioConvertido = "20" + anio;
     anio = anioConvertido;
-    console.log(datos)
+
     const sumaTotal =
         parseInt(datos.saldos) +
         parseInt(datos.fondos) +
@@ -233,59 +217,151 @@ boton.addEventListener('click', async (e) => {
 
     const fechaActual = new Date();
 
-    console.log(sumaTotal);
-
     if (parseInt(datos.saldos) >= 175000) {
-        aviso('Ups no se pueden generar mercado porque superas los 175000 de saldo permitido', 'error');
+        aviso("Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido", "error");
+        return false;
     }
     else {
         // conseguir la fecha actual y separarla en dia, mes y año para poder compararla con la fecha de ingreso del empleado   
         let diaActual = fechaActual.getDate();
         let mesActual = fechaActual.getMonth() + 1;
         let anioActual = fechaActual.getFullYear();
-        let fechaInicio = new Date(anio, mes, dia); // Asume que 'anio', 'mes', 'dia' representan la fecha de inicio del trabajador
-        let fechaActualCompara = new Date(anioActual, mesActual, diaActual); // Asume que 'anioActual', 'mesActual', 'diaActual' representan la fecha actual
+        let fechaInicio = new Date(anio, mes, dia); // Asume que "anio", "mes", "dia" representan la fecha de inicio del trabajador
+        let fechaActualCompara = new Date(anioActual, mesActual, diaActual); // Asume que "anioActual", "mesActual", "diaActual" representan la fecha actual
         let diferencia = Math.abs(fechaActualCompara - fechaInicio); // Diferencia en milisegundos
         let diasTrabajados = Math.ceil(diferencia / (1000 * 60 * 60 * 24)); // Conversión de milisegundos a días
-        let codigoOH = 'M' + Math.floor(Math.random() * 1000000);
-        // Si ha trabajado entre 8 y 15 dias puede pedir mercado de 150.000
+
+        // Si ha trabajado entre 8 y 15 dias puede pedir prestamo de 150.000
         if ((diasTrabajados > 8 && diasTrabajados < 15)) {
-            if ((sumaTotal + parseInt(nuevovalor) <= 15000)) {
-                escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, cuotas, tipo, valor)
+            if ((sumaTotal + parseInt(nuevovalor) >= 150001)) {
+                aviso("Ups no se pueden generar mercado, puede sacar maximo " + (150000 - (sumaTotal)), "error");
+                return false;
             }
             else {
-                aviso('Ups no se pueden generar mercado, puede sacar maximo ' + (150000 - (sumaTotal)), 'error');
-                return;
+                return true;
             }
+
         }
 
-        // Si ha trabajado entre 15 y 30 dias puede pedir mercado de 250.000
+        // Si ha trabajado entre 15 y 30 dias puede pedir prestamo de 250.000
         else if ((diasTrabajados > 15 && diasTrabajados < 30)) {
-            if ((sumaTotal + parseInt(nuevovalor) <= 250000)) {
-                escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, valor)
+            if ((sumaTotal + parseInt(nuevovalor) >= 250001)) {
+                aviso("Ups no se pueden generar mercado, puede sacar maximo " + (250000 - (sumaTotal)), "error");
+                return false;
             }
             else {
-                aviso('Ups no se pueden generar mercado, puede sacar maximo ' + (250000 - (sumaTotal)), 'error');
-                return;
+                return true;
             }
         }
 
-        // Si ha trabajado mas de 30 dias puede pedir mercado de 350.000
+        // Si ha trabajado mas de 30 dias puede pedir prestamo de 350.000
         else if ((diasTrabajados > 30)) {
-            if ((sumaTotal + parseInt(nuevovalor) <= 350000)) {
-                console.log("Entro");
-                escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, valor)
+            if ((sumaTotal + parseInt(nuevovalor) >= 350001)) {
+                aviso("Ups no se pueden generar mercado, puede sacar maximo " + (350000 - (sumaTotal)), "error");
+                return false;
             }
             else {
-                aviso('Ups no se pueden generar mercado, puede sacar maximo ' + (350000 - (sumaTotal)), 'error');
-                return;
+                return true;
             }
         }
     }
+}
 
-    document.querySelector('#valor').value = "";
-    document.querySelector('#cedula').value = "";
+async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+    var dia = new Date().getDate();
+    var mes = new Date().getMonth() + 1;
+    var anio = new Date().getFullYear();
+    // yyyy-mm-dd
+    const fecha = anio + '-' + mes + '-' + dia;
+    const urlcompleta = urlBack.url + '/Historial/jefedearea/crearHistorialPrestamo/' + cedulaEmpleado;
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    cedula: cedulaEmpleado,
+                    nombreQuienEntrego: usernameLocal,
+                    valor: nuevovalor,
+                    cuotas: cuotas,
+                    fechaEfectuado: fecha,
+                    concepto: tipo,
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
 
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+
+}
+
+// darle click al boton para que se ejecute la funcion
+boton.addEventListener('click', async (e) => {
+    e.preventDefault();
+    // capturar los datos del formulario
+   
+    let cedulaEmpleado = document.querySelector('#cedula').value;
+
+    let aux = await datosEmpleado(cedulaEmpleado);
+    console.log(aux.datosbase[0]);
+    let datos = aux.datosbase[0];
+
+    if (datos == undefined) {
+        aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
+        return;
+    }
+    boton.style.display = "none";
+
+    boton2.style.display = "inline-block";
+    monto.style.display = "inline-block";
+    
+    
+    console.log(datos.nombre);
+    datosPersona.innerHTML = datos.nombre;
+
+    boton2.addEventListener('click', async (e) => {   
+        let valor = document.querySelector('#monto').value;
+        let nuevovalor = valor.replace(/\,/g, '');     
+        e.preventDefault(); 
+
+        let codigoOH = 'M' + Math.floor(Math.random() * 1000000);
+
+        if (datos == undefined) {
+            aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
+            return;
+        }
+
+        if (!verificaCondiciones(datos, nuevovalor) == true) {
+            return;
+        }
+
+        await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, valor)
+        await escribirHistorial(cedulaEmpleado, nuevovalor, 2, 'Autorizacion de Mercado');
+
+        document.querySelector('#monto').value = "";
+        document.querySelector('#cedula').value = "";
+
+    }
+    );
 }
 );
 

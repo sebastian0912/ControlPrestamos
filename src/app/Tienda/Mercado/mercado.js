@@ -97,6 +97,23 @@ for (let i = 0; i < fechaObjetivo2.length; i++) {
     }
 }
 
+// mostrar modulo de envio comida
+if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen") {
+    lola.style.display = "inline-block";
+}
+else {
+    lola.style.display = "none";
+}
+
+//mostrar modulo de autorizacion
+if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen"
+    || usernameLocal == "Señora Lola" || usernameLocal == "SEÑORA LOLA" || usernameLocal == "señora lola") {
+    lola2.style.display = "inline-block";
+}
+else {
+    lola2.style.display = "none";
+}
+
 /*Convertir valor a separado por miles*/
 const numemoroM = document.querySelector('#monto');
 numemoroM.addEventListener('keyup', (e) => {
@@ -190,7 +207,6 @@ async function datosEmpleado(cedulaEmpleado) {
     }
 }
 
-
 function verificaCondiciones(datos, nuevovalor) {
     // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
     const fechaIngreso = datos.ingreso;
@@ -268,7 +284,6 @@ function verificaCondiciones(datos, nuevovalor) {
     }
 }
 
-
 async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
@@ -316,11 +331,12 @@ async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo) {
 
 }
 
+
+
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
     e.preventDefault();
     // capturar los datos del formulario
-
     let cedulaEmpleado = document.querySelector('#cedula').value;
 
     let aux = await datosEmpleado(cedulaEmpleado);
@@ -341,9 +357,9 @@ boton.addEventListener('click', async (e) => {
     datosPersona.innerHTML = datos.nombre;
 
     boton2.addEventListener('click', async (e) => {
+        e.preventDefault();
         let valor = document.querySelector('#monto').value;
         let nuevovalor = valor.replace(/\,/g, '');
-        e.preventDefault();
 
         let codigoOH = 'M' + Math.floor(Math.random() * 1000000);
 

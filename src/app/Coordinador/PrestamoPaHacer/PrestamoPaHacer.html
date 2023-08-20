@@ -11,7 +11,7 @@
 
   <script defer src="../../logOut2.js" type="module"></script>
   <script defer src="PrestamoPaHacer.js" type="module"></script>
-  <script defer type="text/javascript" src="./jspdf.es.min.js.js" type="module"></script>
+  <script defer type="text/javascript" src="../../jspdf.es.min.js.js" type="module"></script>
 
 </head>
 
@@ -29,7 +29,7 @@
 
       <li>
         <a href="PrestamoPaHacer.html">
-          <img src="../../assets/prestamo.png" alt="logo" class="logo" />
+          <img src="../../assets/sello.png" alt="logo" class="logo" />
           <p> Autorizacion prestamo </p>
         </a>
       </li>
@@ -38,6 +38,13 @@
         <a href="../Mercado/mercado.html">
           <img src="../../assets/mercado.png" alt="logo" class="logo" />
           <p> Autorizacion mercado</p>
+        </a>
+      </li>
+
+      <li>
+        <a href="../Historial/historial.html">
+          <img src="../../assets/historial-medico.png" alt="logo" class="logo" />
+          <p> Historial </p>
         </a>
       </li>
 
@@ -72,29 +79,35 @@
     <div class="cuadroTexto">
       <div class="valor">
         <div class="valoresEscribir">
-          <h1 class="titulo" style="margin-right: 10px;"> Digite la cedula del empleado a validar </h1>
-          <input type="text" id="cedula" placeholder="Ingrese el número de cédula a buscar" class="input2" />
-          <select name="tipo" id="tipo" class="input2">
+          <h1 class="titulo" style="margin-right: 10px;"> Digite el número de identificación del empleado a validar:
+          </h1>
+          <input type="text" id="cedula" placeholder="Número de identificación" class="input" />
+          <button class="btn2" id="boton">Buscar</button>
+
+          <select name="tipo" id="tipo" class="input2" style="display:none">
             <option value="0">Concepto</option>
-            <option value="Dinero">Dinero</option>
+            <option value="Dinero">Prestamo</option>
             <option value="Seguro Funerario">Seguro Funerario</option>
             <option value="Otro">Otro</option>
           </select>
           <input type="text" id="valor" placeholder="Valor" class="input2" style="display: none;" />
           <input type="text" id="cuotas" placeholder="Número de cuotas" class="input2" style="display: none;" />
-          <select name="tipo" id="formaPago" class="input2">
+          <select name="" id="formaPago" class="input2" style="display:none; margin-left: 20px">
             <option value="0">Forma Pago</option>
             <option value="Daviplata">Daviplata</option>
-            <option value="Davivienda">Efectivo</option>
+            <option value="Efectivo">Efectivo</option>
             <option value="Master">Mastercard</option>
+            <option value="Otro">Otro</option>
           </select>
-          <input type="text" id="celular" placeholder="Número para pago" class="input2" style="margin-left: 40px;" />
-          <button class="btn" id="boton">Buscar</button>
+          <input type="text" id="celular" placeholder="" class="input2" style="margin-left: 30px; display:none" />
+          <button class="btn2" id="boton2" style="display: none; margin-left: 20px">Cargar</button>
+
         </div>
       </div>
-
+      <h1 id="datosPersona" class="titulo" style="float: left; margin-left: 30px"></h1>
 
     </div>
+  </div>
 
 
 

@@ -86,6 +86,14 @@ else {
     lola.style.display = "none";
 }
 
+//mostrar modulo de autorizacion
+if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen"
+    || usernameLocal == "Señora Lola" || usernameLocal == "SEÑORA LOLA" || usernameLocal == "señora lola") {
+    lola2.style.display = "inline-block";
+}
+else {
+    lola2.style.display = "none";
+}
 
 async function datosH(cedulaEmpleado) {
     var body = localStorage.getItem('key');

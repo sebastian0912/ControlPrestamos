@@ -97,6 +97,23 @@ for (let i = 0; i < fechaObjetivo2.length; i++) {
     }
 }
 
+formaPago.addEventListener('change', (e) => {
+    const numerodepago = document.querySelector('#celular');
+
+    if (e.target.value == "Daviplata") {
+        numerodepago.placeholder = "Número de Daviplata";
+    }
+    else if (e.target.value == "Master") {
+        numerodepago.placeholder = "Número de tarjeta Master";
+    }
+    else if (e.target.value == "Efectivo") {
+        numerodepago.placeholder = "";
+    }
+    else {
+        numerodepago.placeholder = "Número de cuenta";
+    }
+});
+
 /*Convertir valor a separado por miles*/
 const numemoroM = document.querySelector('#valor');
 numemoroM.addEventListener('keyup', (e) => {
@@ -369,8 +386,7 @@ async function actualizarDatosBase(concepto, valor, cuotas, cedulaEmpleado) {
                     JSON.stringify({
                         concepto: concepto,
                         prestamoParaDescontar: valor,
-                        cuotasPrestamosParaDescontar: cuotas,
-                        ejecutadoPor: username,
+                        cuotasPrestamosParaDescontar: cuotas,                        
                         jwt: jwtToken
                     })
             })
@@ -401,8 +417,7 @@ async function actualizarDatosBase(concepto, valor, cuotas, cedulaEmpleado) {
                 body:
                     JSON.stringify({
                         concepto: concepto,
-                        seguroFunerario: valor,
-                        ejecutadoPor: username,
+                        seguroFunerario: valor,                        
                         jwt: jwtToken
                     })
             })
@@ -436,8 +451,7 @@ async function actualizarDatosBase(concepto, valor, cuotas, cedulaEmpleado) {
                     JSON.stringify({
                         concepto: concepto,
                         anticipoLiquidacion: valor,
-                        cuentas: cuotas,
-                        ejecutadoPor: username,
+                        cuentas: cuotas,                        
                         jwt: jwtToken
                     })
             })
@@ -462,7 +476,7 @@ async function actualizarDatosBase(concepto, valor, cuotas, cedulaEmpleado) {
     }
 }
 
-async function escribirHistorial(cedulaEmpleado, nuevovalor, username, cuotas, tipo) {
+async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
@@ -598,22 +612,28 @@ boton.addEventListener('click', async (e) => {
         if (!verificaCondiciones(usuario, parseInt(nuevovalor))) {
             return;
         }
-        if (!verificaSelect(tipo)) {
+        if (!verificaSelect(formaPago)) {
             return;
         }
 
 
         else {
             const cod = obtenerCodigo(codigoP, aux.codigo);
+            let concepto = null;
+            concepto = 'Libranza_Prestamo_Dinero';
             concepto2 = 'Dinero_Autorizacion';
             encontrado = true;
             let codigo = 'OH' + Math.floor(Math.random() * 1000000);;
 
             if (cod.codigo.startsWith("SF")) {
                 concepto2 = 'Seguro_Funerario_Autorizacion';
+                concepto = 'Libranza_Seguro_Funerario';
+
             }
             else if (cod.codigo.startsWith("OT")) {
                 concepto2 = 'Otro_Autorizacion';
+                concepto = 'Libranza_Otro_concepto';
+
             }
 
             await actualizar(codigo, cod.codigo, usernameLocal, nuevovalor, cuotas);
@@ -623,7 +643,7 @@ boton.addEventListener('click', async (e) => {
             // modificar en la tabla codigos el estado del codigo a false para que no pueda ser usado nuevamente
             await CambiarEstado(cod.codigo, nuevovalor, codigo);
 
-            await escribirHistorial(cedulaEmpleado, nuevovalor, username, cuotas, concepto2)
+            await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, concepto)
 
             aviso('Acaba de pedir un prestamo de ' + valor, 'success');
 
@@ -637,9 +657,9 @@ boton.addEventListener('click', async (e) => {
             }
 
             else if (usuario.temporal.startsWith("Tu") || usuario.temporal.startsWith("TU")) {
-                empresa = "TU ALIANZA SAS";
-                NIT = "NIT 900864596"
-                direcccion = "Calle 7 N 4-49 MADRID"
+                empresa = "APOYO LABORAL TS SAS";
+                NIT = "NIT 900814587"
+                direcccion = "CRA 2 N 8-156 FACATATIVA"
             }
 
             else if (usuario.temporal.startsWith("Comercializadora") || usuario.temporal.startsWith("COMERCIALIZADORA")) {
@@ -678,26 +698,26 @@ boton.addEventListener('click', async (e) => {
             docPdf.text('Yo, ' + usuario.nombre + ' mayor de edad,  identificado con la cedula de ciudadania No. '
                 + usuario.numero_de_documento + ' autorizo', 10, 55);
             docPdf.text('expresa e irrevocablemente para que del sueldo, salario, prestaciones sociales o de cualquier suma de la sea acreedor; me sean', 10, 60);
-            docPdf.text('descontados la cantidad de ' + valor + ' (Letras)  ' + NumeroALetras(nuevovalor) + 'por concepto de' + ' PRESTAMO, en ' + cuotas + ' cuota(s), ', 10, 65);
+            docPdf.text('descontados la cantidad de ' + valor + ' " ' + NumeroALetras(nuevovalor) +' " '+ 'por concepto de' + ' PRESTAMO, en ' + cuotas + ' cuota(s), ', 10, 65);
             docPdf.text('quincenal del credito del que soy deudor ante Tu alianza S.A.S. , aun en el evento de encontrarme disfrutando de mis licencias ', 10, 70);
             docPdf.text('o incapacidades. ', 10, 75);
 
-            docPdf.text('Fecha de ingreso: ' + usuario.ingreso, 10, 90);
-            docPdf.text('Centro de Costo: ' + usuario.finca, 130, 90);
-            docPdf.text('Forma de pago: ' + tipo.value, 10, 95);
-            docPdf.text('Telefono: ' + celular, 130, 95);
+            docPdf.text('Fecha de ingreso: ' + usuario.ingreso, 10, 85);
+            docPdf.text('Centro de Costo: ' + usuario.finca, 130, 85);
+            docPdf.text('Forma de pago: ' + formaPago.value, 10, 90);
+            docPdf.text('Telefono: ' + celular, 130, 90);
             docPdf.setFont('Helvetica', 'bold');
-            docPdf.text('Cordialmente ', 10, 110);
+            docPdf.text('Cordialmente ', 10, 100);
             docPdf.setFont('Helvetica', 'normal');
-            docPdf.text('Firma de Autorización ', 10, 115);
-            docPdf.text('C.C. ' + usuario.numero_de_documento, 10, 120);
+            docPdf.text('Firma de Autorización ', 10, 110);
+            docPdf.text('C.C. ' + usuario.numero_de_documento, 10, 115);
 
             // realizar un cuadro para colocar la huella dactilar
-            docPdf.rect(130, 110, 35, 45);
-            docPdf.text('Código de descuento nómina: ' + codigo, 10, 130);
+            docPdf.rect(130, 97, 25, 30);
+            docPdf.text('Código de descuento nómina: ' + codigo, 10, 120);
             docPdf.setFont('Helvetica', 'bold');
             docPdf.setFontSize(6);
-            docPdf.text('Huella Indice Derecho', 130, 105);
+            docPdf.text('Huella Indice Derecho', 130, 95);
 
             docPdf.save('AutorizacionPrestamo' + '_' + usuario.nombre + "_" + codigo + '.pdf');
 

@@ -105,6 +105,16 @@ else {
     lola.style.display = "none";
 }
 
+if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen"
+    || usernameLocal == "Señora Lola" || usernameLocal == "SEÑORA LOLA" || usernameLocal == "señora lola") {
+    lola2.style.display = "inline-block";
+}
+else {
+    lola2.style.display = "none";
+}
+
+
+
 
 function verificarCedula(codigoP, cedulaEmpleado, datos) {
     let encontrado = false;
@@ -387,6 +397,45 @@ async function actualizarDatosBase(concepto, valor, cuotas, cedulaEmpleado) {
     }
 }
 
+async function CambiarEstado(cod, valor, codigo) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+
+    const urlcompleta = urlBack.url + '/Codigo/jefedearea/cambiarEstadoCodigo/' + cod;
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    estado: false,
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + codigo, 'success');
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+
+}
+
 async function escribirHistorial(cedulaEmpleado, nuevovalor, username, cuotas, tipo) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
@@ -434,47 +483,7 @@ async function escribirHistorial(cedulaEmpleado, nuevovalor, username, cuotas, t
 
 }
 
-async function CambiarEstado(cod, valor, codigo) {
-    var body = localStorage.getItem('key');
-    const obj = JSON.parse(body);
-    const jwtToken = obj.jwt;
-    console.log(jwtToken);
-
-    const urlcompleta = urlBack.url + '/Codigo/jefedearea/cambiarEstadoCodigo/' + cod;
-    try {
-        fetch(urlcompleta, {
-            method: 'POST',
-            body:
-                JSON.stringify({
-                    estado: false,
-                    jwt: jwtToken
-                })
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
-                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
-                } else {
-                    throw new Error('Error en la petición POST');
-                }
-            })
-            .then(responseData => {
-                aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + codigo, 'success');
-                console.log('Respuesta:', responseData);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-
-    } catch (error) {
-        console.error('Error en la petición HTTP POST');
-        console.error(error);
-    }
-
-}
-
-
-async function crearTienda(cedula){
+async function crearTienda(cedula) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
@@ -617,10 +626,7 @@ boton.addEventListener('click', async (e) => {
 
             await actualizarDatosBase(concepto, nuevovalor, 2, cedulaEmpleado);
 
-
             await historialT(nuevovalor);
-
-
 
             aviso('Acaba de pedir un prestamo de ' + valor, 'success');
         }

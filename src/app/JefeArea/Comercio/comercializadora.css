@@ -152,9 +152,9 @@ span {
 
 .cuadroTexto {
   width: 800px;
-  height: 400px;
+  height: 280px;
   background: #ffffff;
-  margin: 50px 0 0 80px;
+  margin: 50px 0 0 130px;
   border-radius: 15px;
   box-shadow: 0px 0px 12px 8px rgba(0, 0, 0, 0.1);
   font-size: 16pt;
@@ -222,4 +222,54 @@ select {
   margin: 20px 0 0 30px;
   width: 71%;
   
+}
+
+.tabla {
+  width: 900px;
+  height: 240px;
+  overflow: auto;
+  max-height: 40%;
+  background: #ffffff;
+  margin: 15px 0 0 80px;
+  border-radius: 15px;
+  box-shadow: 0px 0px 12px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tabla-contenido {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 12pt;
+  text-align: center;
+}
+
+.tabla-contenido tr:nth-child(even) {
+  background-color: #f2f2f2;
+  /* color para filas pares */
+}
+
+.tabla-contenido tr:nth-child(odd) {
+  background-color: #cccccc;
+  /* color para filas impares */
+}
+
+th,
+td {
+  vertical-align: middle;
+}
+
+
+th {
+  border-bottom: #b9b9b9 1px solid;
+  padding: 15px;
+  background: #5e6a75;
+  color: #ffffff;
+  font-weight: 400;
+}
+
+tr {
+  height: 40px;
+
 }

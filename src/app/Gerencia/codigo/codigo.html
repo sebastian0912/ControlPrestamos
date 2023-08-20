@@ -12,7 +12,7 @@
   <script defer src="../../logOut2.js" type="module"></script>
   <script defer src="codigo.js" type="module"></script>
 
-  <script defer type="text/javascript" src="./jspdf.es.min.js.js" type="module"></script>
+  <script defer type="text/javascript" src="../../jspdf.es.min.js.js" type="module"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
 
 
@@ -33,16 +33,16 @@
 
 
       <li>
-        <a href="../codigo/codigo.html">
+        <a href="./codigo.html">
           <img src="../../assets/prestamo.png" alt="logo" class="logo" />
-          <p> Generar código prestamo para desconstar</p>
+          <p> Realizar prestamo para desconstar</p>
         </a>
       </li>
 
       <li>
         <a href="../codigo2/codigo2.html">
-          <img src="../../assets/prestamo.png" alt="logo" class="logo" />
-          <p> Generar código prestamo para hacer</p>
+          <img src="../../assets/sello.png" alt="logo" class="logo" />
+          <p> Autorización prestamo</p>
         </a>
       </li>
 
@@ -102,8 +102,8 @@
 
     <div class="cuadroTexto">
       <div class="cajaCedula">
-        <h1 class="titulo"> Digite la cedula del empleado a validar </h1>
-        <input type="text" id="cedula" placeholder="Ingrese el numero de cedula a buscar" class="input2" />
+        <h1 class="titulo"> Digite el número de identificación del empleado a validar: </h1>
+        <input type="text" id="cedula" placeholder="Número de identificación" class="input2" />
         <input type="text" id="codigo" placeholder="Ingrese el codigo" class="input2" />
         <button class="btn" id="boton">Buscar</button>
       </div>
@@ -111,11 +111,13 @@
       <div class="valor">
         <input type="text" id="valor" placeholder="Valor" class="input2" />
         <input type="text" id="cuotas" placeholder="Numero de cuotas" class="input2" /><br><br>
-        <select name="tipo" id="tipo" class="input2">
+        <select name="tipo" id="formaPago" class="input2">
           <option value="0">Forma Pago</option>
           <option value="Daviplata">Daviplata</option>
           <option value="Davivienda">Efectivo</option>
           <option value="Master">Mastercard</option>
+          <option value="Otro">Otro</option>
+
         </select>
         <input type="text" id="celular" placeholder="Numero para pago" class="input2" style="margin-left: -32px;" />
       </div>

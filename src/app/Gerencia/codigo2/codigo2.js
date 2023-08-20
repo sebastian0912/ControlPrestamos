@@ -90,6 +90,24 @@ numemoroM.addEventListener('keyup', (e) => {
     }
 });
 
+
+formaPago.addEventListener('change', (e) => {
+    const numerodepago = document.querySelector('#celular');
+
+    if (e.target.value == "Daviplata") {
+        numerodepago.placeholder = "Número de Daviplata";
+    }
+    else if (e.target.value == "Master") {
+        numerodepago.placeholder = "Número de tarjeta Master";
+    }
+    else if (e.target.value == "Efectivo") {
+        numerodepago.placeholder = "";
+    }
+    else {
+        numerodepago.placeholder = "Número de cuenta";
+    }
+});
+
 async function escribirCodigo(cedulaEmpleado, nuevovalor, cod, cuotas, tipo, valor) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
@@ -200,6 +218,53 @@ async function datosEmpleado(cedulaEmpleado) {
     }
 }
 
+async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+    var dia = new Date().getDate();
+    var mes = new Date().getMonth() + 1;
+    var anio = new Date().getFullYear();
+    // yyyy-mm-dd
+    const fecha = anio + '-' + mes + '-' + dia;
+    const urlcompleta = urlBack.url + '/Historial/jefedearea/crearHistorialPrestamo/' + cedulaEmpleado;
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    cedula: cedulaEmpleado,
+                    nombreQuienEntrego: usernameLocal,
+                    valor: nuevovalor,
+                    cuotas: cuotas,
+                    fechaEfectuado: fecha,
+                    concepto: tipo,
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+
+}
+
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
     e.preventDefault();
@@ -217,6 +282,10 @@ boton.addEventListener('click', async (e) => {
     console.log(aux.datosbase[0]);
     let datos = aux.datosbase[0];
 
+    if (datos == undefined) {
+        aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
+        return;
+    }
 
     // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
 
@@ -254,18 +323,22 @@ boton.addEventListener('click', async (e) => {
         aviso('Ups no se pueden generar prestamos perteneces al fondo', 'error');
     }
     else {
+        let concepto = null;
         // VERIFICAR EL TIPO QUE SE ESTA SELECCIONANDO        
         if (tipo == "Seguro Funerario") {
             codigoOH = 'SF' + Math.floor(Math.random() * 1000000);
+            concepto = "Autorizacion Seguro Funerario";
             cuotasAux = 1;
         }
         else if (tipo == "Dinero") {
             codigoOH = 'PH' + Math.floor(Math.random() * 1000000);
+            concepto = "Autorizacion prestamo dinero";
+
         }
         else if (tipo == "Otro") {
             codigoOH = 'OT' + Math.floor(Math.random() * 1000000);
+            concepto = "Autorizacion otro concepto";
         }
-
         // conseguir la fecha actual y separarla en dia, mes y año para poder compararla con la fecha de ingreso del empleado            
         let mesActual = fechaActual.getMonth() + 1;
         let anioActual = fechaActual.getFullYear();
@@ -283,7 +356,8 @@ boton.addEventListener('click', async (e) => {
             }
             else {
                 bandera = true;
-                escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, cuotasAux, tipo, valor)
+                await escribirHistorial(cedulaEmpleado, nuevovalor, cuotasAux, concepto);
+                await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, cuotasAux, tipo, valor);
             }
         }
         else if ((anioActual > anio)) {
@@ -299,7 +373,8 @@ boton.addEventListener('click', async (e) => {
             }
             else {
                 bandera = true;
-                escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, cuotasAux, tipo, valor)
+                await escribirHistorial(cedulaEmpleado, nuevovalor, cuotasAux, concepto);
+                await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, cuotasAux, tipo, valor);
             }
         }
         if (bandera == true) {
@@ -348,28 +423,28 @@ boton.addEventListener('click', async (e) => {
 
 
             docPdf.text('Yo, ' + datos.nombre + ' mayor de edad,  identificado con la cedula de ciudadania No. '
-                + datos.cedula + ' autorizo', 10, 55);
+                + datos.numero_de_documento + ' autorizo', 10, 55);
             docPdf.text('expresa e irrevocablemente para que del sueldo, salario, prestaciones sociales o de cualquier suma de la sea acreedor; me sean', 10, 60);
-            docPdf.text('descontados la cantidad de ' + valor + ' (Letras)  ' + NumeroALetras(nuevovalor) + 'por concepto de' + ' PRESTAMO, en ' + cuotas + ' cuota(s), ', 10, 65);
+            docPdf.text('descontados la cantidad de ' + valor + ' " ' + NumeroALetras(nuevovalor) + ' " ' + 'por concepto de' + ' PRESTAMO, en ' + cuotas + ' cuota(s), ', 10, 65);
             docPdf.text('quincenal del credito del que soy deudor ante Tu alianza S.A.S. , aun en el evento de encontrarme disfrutando de mis licencias ', 10, 70);
             docPdf.text('o incapacidades. ', 10, 75);
 
-            docPdf.text('Fecha de ingreso: ' + datos.ingreso, 10, 90);
-            docPdf.text('Centro de Costo: ' + datos.finca, 130, 90);
-            docPdf.text('Forma de pago: ' + formaPago.value, 10, 95);
-            docPdf.text('Telefono: ' + celular.value, 130, 95);
+            docPdf.text('Fecha de ingreso: ' + datos.ingreso, 10, 85);
+            docPdf.text('Centro de Costo: ' + datos.finca, 130, 85);
+            docPdf.text('Forma de pago: ' + formaPago.value, 10, 90);
+            docPdf.text('Telefono: ' + celular, 130, 90);
             docPdf.setFont('Helvetica', 'bold');
-            docPdf.text('Cordialmente ', 10, 110);
+            docPdf.text('Cordialmente ', 10, 100);
             docPdf.setFont('Helvetica', 'normal');
-            docPdf.text('Firma de Autorización ', 10, 115);
-            docPdf.text('C.C. ' + datos.numero_de_documento, 10, 120);
+            docPdf.text('Firma de Autorización ', 10, 110);
+            docPdf.text('C.C. ' + datos.numero_de_documento, 10, 115);
 
             // realizar un cuadro para colocar la huella dactilar
-            docPdf.rect(130, 110, 35, 45);
-            docPdf.text('Código de autorización nómina: ' + codigoOH, 10, 130);
+            docPdf.rect(130, 97, 25, 30);
+            docPdf.text('Código de descuento nómina: ' + codigo, 10, 120);
             docPdf.setFont('Helvetica', 'bold');
             docPdf.setFontSize(6);
-            docPdf.text('Huella Indice Derecho', 130, 105);
+            docPdf.text('Huella Indice Derecho', 130, 95);
 
             docPdf.save('PrestamoDescontar' + '_' + datos.nombre + "_" + codigoOH + '.pdf');
         }

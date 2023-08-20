@@ -17,6 +17,7 @@ titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
 
 
+
 // Obtén la fecha actual
 var ahora = new Date();
 var anio = ahora.getFullYear();
@@ -79,6 +80,105 @@ if (dias2 == 0) {
 diasLi.innerHTML = dias2;
 
 
+formaPago.addEventListener('change', (e) => {
+    const numerodepago = document.querySelector('#celular');
+    if (e.target.value == "Daviplata") {
+        numerodepago.placeholder = "Número de Daviplata";
+    }
+    else if (e.target.value == "Master") {
+        numerodepago.placeholder = "Número de tarjeta Master";
+    }
+    else if (e.target.value == "Efectivo") {
+        numerodepago.placeholder = "";
+    }
+    else {
+        numerodepago.placeholder = "Número de cuenta";
+    }
+});
+
+
+numProducto.addEventListener('change', (e) => {
+    const numProducto = document.querySelector('#numProducto');
+    if (e.target.value == "0") {
+        Cantidad.style.display = "none";
+        Cantidad2.style.display = "none";
+        Cantidad3.style.display = "none";
+        Cantidad4.style.display = "none";
+        codigo1.style.display = "none";
+        codigo2.style.display = "none";
+        codigo3.style.display = "none";
+        codigo4.style.display = "none";
+        cuerpo.style.height = "410px";
+        document.querySelector('#codigo1').value = "";
+        document.querySelector('#codigo2').value = "";
+        document.querySelector('#codigo3').value = "";
+        document.querySelector('#codigo4').value = "";
+        document.querySelector('#Cantidad').value = "";
+        document.querySelector('#Cantidad2').value = "";
+        document.querySelector('#Cantidad3').value = "";
+        document.querySelector('#Cantidad4').value = "";
+    }
+    if (e.target.value == "1") {
+        Cantidad.style.display = "inline-block";
+        Cantidad2.style.display = "none";
+        Cantidad3.style.display = "none";
+        Cantidad4.style.display = "none";
+        codigo1.style.display = "inline-block";
+        codigo2.style.display = "none";
+        codigo3.style.display = "none";
+        codigo4.style.display = "none";
+        cuerpo.style.height = "480px";
+        document.querySelector('#codigo2').value = "";
+        document.querySelector('#codigo3').value = "";
+        document.querySelector('#codigo4').value = "";
+        document.querySelector('#Cantidad2').value = "";
+        document.querySelector('#Cantidad3').value = "";
+        document.querySelector('#Cantidad4').value = "";
+
+    }
+    else if (e.target.value == "2") {
+        Cantidad.style.display = "inline-block";
+        Cantidad2.style.display = "inline-block";
+        Cantidad3.style.display = "none";
+        Cantidad4.style.display = "none";
+        codigo1.style.display = "inline-block";
+        codigo2.style.display = "inline-block";
+        codigo3.style.display = "none";
+        codigo4.style.display = "none";
+        cuerpo.style.height = "550px";
+
+        document.querySelector('#codigo3').value = "";
+        document.querySelector('#codigo4').value = "";
+        document.querySelector('#Cantidad3').value = "";
+        document.querySelector('#Cantidad4').value = "";
+    }
+    else if (e.target.value == "3") {
+        Cantidad.style.display = "inline-block";
+        Cantidad2.style.display = "inline-block";
+        Cantidad3.style.display = "inline-block";
+        Cantidad4.style.display = "none";
+        codigo1.style.display = "inline-block";
+        codigo2.style.display = "inline-block";
+        codigo3.style.display = "inline-block";
+        codigo4.style.display = "none";
+        cuerpo.style.height = "620px";
+        document.querySelector('#codigo4').value = "";
+        document.querySelector('#Cantidad4').value = "";
+
+    }
+    else if (e.target.value == "4") {
+        Cantidad.style.display = "inline-block";
+        Cantidad2.style.display = "inline-block";
+        Cantidad3.style.display = "inline-block";
+        Cantidad4.style.display = "inline-block";
+        codigo1.style.display = "inline-block";
+        codigo2.style.display = "inline-block";
+        codigo3.style.display = "inline-block";
+        codigo4.style.display = "inline-block";
+        cuerpo.style.height = "690px";
+    }
+});
+
 async function datosTComercio() {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
@@ -119,7 +219,7 @@ datosComercializadoraGeneral = await datosTComercio();
 let datosArreglo = datosComercializadoraGeneral.comercio;
 console.log(datosArreglo);
 datosArreglo.forEach((p) => {
-    if (p.destino == sede) {
+    if (p.destino == sede && p.cantidadRecibida != p.cantidadTotalVendida) {
         tabla.innerHTML += `
         <tr>
             <td>${p.codigo}</td>
@@ -135,7 +235,6 @@ datosArreglo.forEach((p) => {
     `
     }
 });
-
 
 function verificarCodigo(codigo, datos) {
     let encontrado = false;
@@ -166,7 +265,6 @@ function verificarCodigoComercio(codigo, datos) {
     });
     return encontrado;
 }
-
 
 function verificaCondiciones(datos, nuevovalor) {
     // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
@@ -256,7 +354,6 @@ function verificaSelect(select) {
         return encontrado;
     }
 }
-
 
 function verificarCodigoEstado(codigo, datos) {
     let encontrado = false;
@@ -556,16 +653,61 @@ async function CambiarEstado(cod, valor, codigo) {
         console.error('Error en la petición HTTP POST');
         console.error(error);
     }
+}
 
+async function historialT(valor) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+
+    const urlcompleta = urlBack.url + '/Tienda/actualizarTienda';
+
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    nombre: usernameLocal,
+                    valorTotal: valor,
+                    numPersonasAtendidas: 1,
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
 }
 
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener("click", async (e) => {
-    let cantidad = document.querySelector("#Cantidad").value;
     let cedula = document.querySelector("#cedula").value;
-    let codigo = document.querySelector("#codigo").value;
     let codigoA = document.querySelector("#codigoA").value;
     let celular = document.querySelector("#celular").value;
+
+    let cantidad = document.querySelector("#Cantidad").value;
+    let cantidad2 = document.querySelector("#Cantidad2").value;
+    let cantidad3 = document.querySelector("#Cantidad3").value;
+    let cantidad4 = document.querySelector("#Cantidad4").value;
+    let codigo = document.querySelector("#codigo1").value;
+    let codigo2 = document.querySelector("#codigo2").value;
+    let codigo3 = document.querySelector("#codigo3").value;
+    let codigo4 = document.querySelector("#codigo4").value;
 
     const aux = await datosTCodigos();
     console.log(aux.codigo);
@@ -577,20 +719,81 @@ boton.addEventListener("click", async (e) => {
 
     datosComercializadoraGeneral = await datosTComercio();
     let datosArreglo = datosComercializadoraGeneral.comercio;
-    console.log(datosArreglo);
 
+    let datos = await datosComercializadora(codigo, datosArreglo);
+    let datos2 = await datosComercializadora(codigo2, datosArreglo);
+    let datos3 = await datosComercializadora(codigo3, datosArreglo);
+    let datos4 = await datosComercializadora(codigo4, datosArreglo);
+    let auxValorUnidad2 = 0;
+    let auxValorUnidad3 = 0;
+    let auxValorUnidad4 = 0;
+    let auxConcepto2 = "";
+    let auxConcepto3 = "";
+    let auxConcepto4 = "";
 
-    const datos = await datosComercializadora(codigo, datosArreglo);
+    if (datos2 == undefined) {
+        datos2 = 0;
+    }
+    else {
+        auxValorUnidad2 = parseInt(datos2.valorUnidad);
+        auxConcepto2 = datos2.concepto;
+    }
+    if (datos3 == undefined) {
+        datos3 = 0;
+    }
+    else {
+        auxValorUnidad3 = parseInt(datos3.valorUnidad);
+        auxConcepto3 = datos3.concepto;
+    }
+    if (datos4 == undefined) {
+        datos4 = 0;
+    }
+    else {
+        auxValorUnidad4 = parseInt(datos4.valorUnidad);
+        auxConcepto4 = datos4.concepto;
+    }
+    if (cantidad2  == "") {
+        cantidad2 = 0;
+    }
+    if (cantidad3  == "") {
+        cantidad3 = 0;
+    }
+    if (cantidad4  == "") {
+        cantidad4 = 0;
+    }
+
 
     let cod = null;
+    console.log(parseInt(cantidad)  * parseInt(datos2.valorUnidad));
+    console.log(parseInt(cantidad2) * auxValorUnidad2);
+    console.log(parseInt(cantidad3) * auxValorUnidad3);
+    console.log(parseInt(cantidad4) * auxValorUnidad4);
+    console.log("Datos: " + datos);
+    console.log("Datos2: " + datos2);
+    console.log("Datos3: " + datos3);
+    console.log("Datos4: " + datos4);
+    console.log("Cantidad: " + cantidad);
+    console.log("Cantidad2: " + cantidad2);
+    console.log("Cantidad3: " + cantidad3);
+    console.log("Cantidad4: " + cantidad4);
+    console.log("Codigo: " + parseInt(datos.valorUnidad));
+    console.log("Codigo2: " + parseInt(datos2.valorUnidad));
+    console.log("Codigo3: " + parseInt(datos3.valorUnidad));
+    console.log("Codigo4: " + parseInt(datos4.valorUnidad));
 
-    let sumaVentas = parseInt(cantidad) * parseInt(datos.valorUnidad);
+
+    let sumaVentas = parseInt(cantidad) * parseInt(datos.valorUnidad) + parseInt(cantidad2) * auxValorUnidad2 + parseInt(cantidad3) * auxValorUnidad3 + parseInt(cantidad4) * auxValorUnidad4; 
     let sumaCantidad = parseInt(cantidad) + parseInt(datos.cantidadTotalVendida);
+    let sumaCantidad2 = parseInt(cantidad2) + parseInt(datos2.cantidadTotalVendida);
+    let sumaCantidad3 = parseInt(cantidad3) + parseInt(datos3.cantidadTotalVendida);
+    let sumaCantidad4 = parseInt(cantidad4) + parseInt(datos4.cantidadTotalVendida);
 
-    if (sumaCantidad > datos.cantidadRecibida) {
+    console.log(sumaVentas);
+    
+    if (sumaCantidad > datos.cantidadRecibida || sumaCantidad2 > datos2.cantidadRecibida || sumaCantidad3 > datos3.cantidadRecibida || sumaCantidad4 > datos4.cantidadRecibida) {
         aviso("No se puede cargar el mercado porque no hay inventario lo maximo a sacar es " + (datos.cantidadRecibida - datos.cantidadTotalVendida), "error");
         return;
-    }
+    }    
 
     if (!verificarCodigo(codigoA, CodigosMercado)) {
         aviso("El codigo no existe", "error");
@@ -617,7 +820,7 @@ boton.addEventListener("click", async (e) => {
         return;
     }
 
-    if (!verificaSelect(tipo)) {
+    if (!verificaSelect(formaPago)) {
         return;
     }
 
@@ -641,20 +844,45 @@ boton.addEventListener("click", async (e) => {
         }
 
         cod.codigoDescontado = "MOH" + Math.floor(Math.random() * (999999 - 100000)) + 100000;
+        let concepto = datos.concepto;
 
+        if (auxConcepto2) {
+          concepto += "," + auxConcepto2;
+        }
+        
+        if (auxConcepto3) {
+          concepto += "," + auxConcepto3;
+        }
+        
+        if (auxConcepto4) {
+          concepto += "," + auxConcepto4;
+        }
+        
         // modificar en la tabla codigos el estado del codigo a false para que no pueda ser usado nuevamente
         await CambiarEstado(cod.codigo, sumaVentas, cod.codigoDescontado);
 
         await actualizar(cod.codigoDescontado, cod.codigo, usernameLocal, sumaVentas, 2);
-
+        
         await actualizarVentas(cantidad, codigo, usernameLocal);
+        await escribirHistorial(cedula, sumaVentas, usernameLocal, 2, "Compra tienda respecto a:" + concepto + " en " + sede);
+
+        if (codigo2 != "") {
+            await actualizarVentas(cantidad2, codigo2, usernameLocal);
+        }
+        if (codigo3 != "") {
+            await actualizarVentas(cantidad3, codigo3, usernameLocal);
+        }
+        if (codigo4 != "") {
+            await actualizarVentas(cantidad4, codigo4, usernameLocal);
+        }
 
         await actualizarDatos(cedula, sumaVentas, 2);
 
-        await escribirHistorial(cedula, sumaVentas, usernameLocal, 2, "Compra producto comercializadora");
+
+        await historialT(sumaVentas);
 
         aviso("Se ha cargado la informacion exitosamente", "success");
-        
+
         let empresa = null;
         let NIT = null;
         let direcccion = null;
@@ -706,27 +934,27 @@ boton.addEventListener("click", async (e) => {
         docPdf.text("Yo, " + usuario.nombre + " mayor de edad,  identificado con la cedula de ciudadania No. "
             + usuario.numero_de_documento + " autorizo", 10, 55);
         docPdf.text("expresa e irrevocablemente para que del sueldo, salario, prestaciones sociales o de cualquier suma de la sea acreedor; me sean", 10, 60);
-        docPdf.text("descontados la cantidad de " + sumaVentas + " (Letras)  " + NumeroALetras(sumaVentas) + "por concepto de" + " PRESTAMO, en 2 cuota(s), ", 10, 65);
+        docPdf.text('descontados la cantidad de ' + sumaVentas + '"' + NumeroALetras(sumaVentas) + '"' + 'por concepto de' + ' PRESTAMO, en 2 cuota(s), ', 10, 65);
         docPdf.text("quincenal del credito del que soy deudor ante Tu alianza S.A.S. , aun en el evento de encontrarme disfrutando de mis licencias ", 10, 70);
         docPdf.text("o incapacidades. ", 10, 75);
 
-        docPdf.text("Fecha de ingreso: " + usuario.ingreso, 10, 90);
-        docPdf.text("Forma de pago: " + tipo.value, 10, 95);
-        docPdf.text('Centro de Costo: ' + usuario.finca, 130, 90);
+        docPdf.text("Fecha de ingreso: " + usuario.ingreso, 10, 85);
+        docPdf.text('Centro de Costo: ' + usuario.finca, 130, 85);
+        docPdf.text("Forma de pago: " + formaPago.value, 10, 90);
+        docPdf.text("Telefono: " + celular, 130, 90);
 
-        docPdf.text("Telefono: " + celular, 130, 95);
         docPdf.setFont("Helvetica", "bold");
-        docPdf.text("Cordialmente ", 10, 110);
+        docPdf.text("Cordialmente ", 10, 100);
         docPdf.setFont("Helvetica", "normal");
-        docPdf.text("Firma de Autorización ", 10, 115);
-        docPdf.text("C.C. " + usuario.numero_de_documento, 10, 120);
+        docPdf.text("Firma de Autorización ", 10, 110);
+        docPdf.text("C.C. " + usuario.numero_de_documento, 10, 115);
 
         // realizar un cuadro para colocar la huella dactilar
-        docPdf.rect(130, 110, 35, 45);
-        docPdf.text("Código de descuento nómina: " + cod.codigoDescontado, 10, 130);
+        docPdf.rect(130, 97, 25, 30);
+        docPdf.text("Código de descuento nómina: " + cod.codigoDescontado, 10, 120);
         docPdf.setFont("Helvetica", "bold");
         docPdf.setFontSize(6);
-        docPdf.text("Huella Indice Derecho", 130, 105);
+        docPdf.text("Huella Indice Derecho", 130, 95);
 
         docPdf.save("PrestamoDescontar" + "_" + usuario.nombre + "_" + cod.codigoDescontado + ".pdf");
     }
@@ -736,13 +964,23 @@ boton.addEventListener("click", async (e) => {
 
 
 
-        document.querySelector("#Cantidad").value = "";
-        document.querySelector("#cedula").value = "";
-        document.querySelector("#codigo").value = "";
-        document.querySelector("#codigoA").value = "";
-        document.querySelector("#celular").value = "";
+    document.querySelector("#Cantidad").value = "";
+    document.querySelector("#Cantidad2").value = "";
+    document.querySelector("#Cantidad3").value = "";
+    document.querySelector("#Cantidad4").value = "";
 
-    
+    document.querySelector("#codigo1").value = "";
+    document.querySelector("#codigo2").value = "";
+    document.querySelector("#codigo3").value = "";
+    document.querySelector("#codigo4").value = "";
+
+    document.querySelector("#cedula").value = "";
+    document.querySelector("#codigoA").value = "";
+    document.querySelector("#celular").value = "";
+
+
+
+
 
 });
 

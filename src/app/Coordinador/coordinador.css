@@ -170,7 +170,7 @@ span {
 
 .tabla {
   width: 800px;
-  height: 50%;
+  height: 600px;
   overflow: auto;
   max-height: 50%;
   background: #ffffff;
@@ -200,7 +200,6 @@ span {
 th, td {
   vertical-align: middle;
 }
-
 
 th {
   border-bottom: #b9b9b9 1px solid;

@@ -81,6 +81,24 @@ if (dias2 == 0) {
 }
 diasLiqui.innerHTML = dias2;
 
+
+formaPago.addEventListener('change', (e) => {
+    const numerodepago = document.querySelector('#celular');
+
+    if (e.target.value == "Daviplata") {
+        numerodepago.placeholder = "Número de Daviplata";
+    }
+    else if (e.target.value == "Master") {
+        numerodepago.placeholder = "Número de tarjeta Master";
+    }
+    else if (e.target.value == "Efectivo") {
+        numerodepago.placeholder = "";
+    }
+    else {
+        numerodepago.placeholder = "Número de cuenta";
+    }
+});
+
 /*Convertir valor a separado por miles*/
 const numemoroM = document.querySelector('#valor');
 numemoroM.addEventListener('keyup', (e) => {
@@ -353,7 +371,6 @@ async function actualizarDatosBase(concepto, valor, cuotas, cedulaEmpleado) {
                         concepto: concepto,
                         prestamoParaDescontar: valor,
                         cuotasPrestamosParaDescontar: cuotas,
-                        ejecutadoPor: username,
                         jwt: jwtToken
                     })
             })
@@ -385,7 +402,6 @@ async function actualizarDatosBase(concepto, valor, cuotas, cedulaEmpleado) {
                     JSON.stringify({
                         concepto: concepto,
                         seguroFunerario: valor,
-                        ejecutadoPor: username,
                         jwt: jwtToken
                     })
             })
@@ -420,7 +436,6 @@ async function actualizarDatosBase(concepto, valor, cuotas, cedulaEmpleado) {
                         concepto: concepto,
                         anticipoLiquidacion: valor,
                         cuentas: cuotas,
-                        ejecutadoPor: username,
                         jwt: jwtToken
                     })
             })
@@ -513,8 +528,8 @@ extraeT.addEventListener('click', async () => {
     console.log(datosExtraidos);
 
     let excelData = [['Nombre De la Tienda', 'Monto Total', 'Numero de compras en la tienda']];
-    
-    if (datosExtraidos.message == "error" ) {
+
+    if (datosExtraidos.message == "error") {
         aviso("No se han comprado productos en las tiendas", "warning");
         return;
     } else {
@@ -528,7 +543,7 @@ extraeT.addEventListener('click', async () => {
         XLSX.utils.book_append_sheet(wb, ws, 'Datos Tienda');
 
         const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-        
+
         const blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
         const url = URL.createObjectURL(blob);
 
@@ -557,7 +572,7 @@ function s2ab(s) {
 extraeHistorialT.addEventListener('click', async () => {
     console.log("entro");
     const datosExtraidos = await THistorial();
-    if (datosExtraidos.historial.length == 0 ) {
+    if (datosExtraidos.historial.length == 0) {
         aviso("No hay registros de compras realizadas en las tiendas", "warning");
         return;
     }
@@ -571,7 +586,7 @@ extraeHistorialT.addEventListener('click', async () => {
 
 
     let excelData = [['Cedula', 'Concepto', 'Cuotas', 'Fecha Efectuado', 'Nombre Quien Entregó', 'Valor']];
-    
+
     historial.forEach((doc) => {
         excelData.push([
             doc.cedula,
@@ -708,145 +723,150 @@ boton.addEventListener('click', async (e) => {
     if (codigoP == '') {
         aviso('El campo codigo no puede estar vacio', 'error');
     }
-    else {
-        const aux = await datosTCodigos();
-        console.log(aux.codigo);
-        let aux2 = await datosEmpleado(cedulaEmpleado);
-        console.log(aux2.datosbase[0]);
-        let usuario = aux2.datosbase[0];
-        console.log(usuario);
 
-        let todas = false;
-
-        if (!verificarCodigo(codigoP, aux.codigo)) {
-            aviso('El código no existe', 'error');
-            return;
-        }
-        if (!verificarCodigoEstado(codigoP, aux.codigo)) {
-            aviso('El código ya fue usado', 'error');
-            return;
-        }
-        if (!verificarCedula(codigoP, cedulaEmpleado, aux.codigo)) {
-            aviso('El código no pertenece a este empleado', 'error');
-            return;
-        }
-        if (!verificaMonto(parseInt(nuevovalor), aux.codigo)) {
-            aviso('El monto del prestamo es mayor al permitido generado con el código ', 'error');
-            return;
-        }
-        if (!verificaSiesUnPrestamo(codigoP)) {
-            aviso('El código no es valido solo se admiten prestamos', 'error');
-            return;
-        }
-        if (!verificaCondiciones(usuario, parseInt(nuevovalor))) {
-            return;
-        }
-        if (!verificaSelect(tipo)) {
-            return;
-        }
+    const aux = await datosTCodigos();
+    console.log(aux.codigo);
+    let aux2 = await datosEmpleado(cedulaEmpleado);
+    console.log(aux2.datosbase[0]);
+    let usuario = aux2.datosbase[0];
+    console.log(usuario);
 
 
-        else {
-            const cod = obtenerCodigo(codigoP, aux.codigo);
-            concepto2 = 'Dinero_Autorizacion';
-            encontrado = true;
-            let codigo = 'OH' + Math.floor(Math.random() * 1000000);;
-
-            if (cod.codigo.startsWith("SF")) {
-                concepto2 = 'Seguro_Funerario_Autorizacion';
-            }
-            else if (cod.codigo.startsWith("OT")) {
-                concepto2 = 'Otro_Autorizacion';
-            }
-
-            await actualizar(codigo, cod.codigo, usernameLocal, nuevovalor, cuotas);
-
-            console.log("primero" + concepto2);
-            await actualizarDatosBase(concepto2, nuevovalor, cuotas, cedulaEmpleado);
-            // modificar en la tabla codigos el estado del codigo a false para que no pueda ser usado nuevamente
-            await CambiarEstado(cod.codigo, nuevovalor, codigo);
-
-            await escribirHistorial(cedulaEmpleado, nuevovalor, username, cuotas, concepto2)
-
-            aviso('Acaba de pedir un prestamo de ' + valor, 'success');
-
-            let empresa = null;
-            let NIT = null;
-            let direcccion = null;
-
-            if (usuario.temporal.startsWith("Apoyo") || usuario.temporal.startsWith("APOYO")) {
-                empresa = "APOYO LABORAL TS SAS";
-                NIT = "NIT 900814587"
-                direcccion = "CRA 2 N 8-156 FACATATIVA"
-            }
-
-            else if (usuario.temporal.startsWith("Tu") || usuario.temporal.startsWith("TU")) {
-                empresa = "TU ALIANZA SAS";
-                NIT = "NIT 900864596"
-                direcccion = "Calle 7 N 4-49 MADRID"
-            }
-
-            else if (usuario.temporal.startsWith("Comercializadora") || usuario.temporal.startsWith("COMERCIALIZADORA")) {
-                empresa = "COMERCIALIZADORA TS";
-                NIT = "NIT 901602948"
-                direcccion = "CRA 1 N 17-37 BRAZILIA"
-            }
-
-            var docPdf = new jsPDF();
-
-            docPdf.addFont('Helvetica-Bold', 'Helvetica', 'bold');
-
-
-            docPdf.setFontSize(9);
-            docPdf.text('______________________________________________________________________________________________________________', 10, 10);
-            docPdf.setFontSize(24);
-            docPdf.setFont('Helvetica', 'bold');
-            docPdf.text(empresa, 15, 22);
-            docPdf.setFont('Helvetica', 'normal');
-            docPdf.setFontSize(9);
-            docPdf.text('AUTORIZACIóN DE LIBRANZA', 132, 15);
-            docPdf.text(NIT, 145, 20);
-            docPdf.text(direcccion, 135, 25);
-            docPdf.text('______________________________________________________________________________________________________________', 10, 27);
-            docPdf.text('______________________________________________________________________________________________________________', 10, 29);
-
-
-            docPdf.text('Fecha de Solicitud: ' + new Date().toLocaleDateString(), 10, 40);
-            // salto de linea
-            docPdf.setFont('Helvetica', 'bold');
-
-            docPdf.text('ASUNTO: CREDITO (PRESTAMO)', 10, 50);
-            docPdf.setFont('Helvetica', 'normal');
-
-
-            docPdf.text('Yo, ' + usuario.nombre + ' mayor de edad,  identificado con la cedula de ciudadania No. '
-                + usuario.numero_de_documento + ' autorizo', 10, 55);
-            docPdf.text('expresa e irrevocablemente para que del sueldo, salario, prestaciones sociales o de cualquier suma de la sea acreedor; me sean', 10, 60);
-            docPdf.text('descontados la cantidad de ' + valor + ' (Letras)  ' + NumeroALetras(nuevovalor) + 'por concepto de' + ' PRESTAMO, en ' + cuotas + ' cuota(s), ', 10, 65);
-            docPdf.text('quincenal del credito del que soy deudor ante Tu alianza S.A.S. , aun en el evento de encontrarme disfrutando de mis licencias ', 10, 70);
-            docPdf.text('o incapacidades. ', 10, 75);
-
-            docPdf.text('Fecha de ingreso: ' + usuario.ingreso, 10, 90);
-            docPdf.text('Centro de Costo: ' + usuario.finca, 130, 90);
-            docPdf.text('Forma de pago: ' + tipo.value, 10, 95);
-            docPdf.text('Telefono: ' + celular, 130, 95);
-            docPdf.setFont('Helvetica', 'bold');
-            docPdf.text('Cordialmente ', 10, 110);
-            docPdf.setFont('Helvetica', 'normal');
-            docPdf.text('Firma de Autorización ', 10, 115);
-            docPdf.text('C.C. ' + usuario.numero_de_documento , 10, 120);
-
-            // realizar un cuadro para colocar la huella dactilar
-            docPdf.rect(130, 110, 35, 45);
-            docPdf.text('Código de descuento nómina: ' + codigo, 10, 130);
-            docPdf.setFont('Helvetica', 'bold');
-            docPdf.setFontSize(6);
-            docPdf.text('Huella Indice Derecho', 130, 105);
-
-            docPdf.save('AutorizacionPrestamo' + '_' + usuario.nombre + "_" + codigo + '.pdf');
-
-        }
+    if (!verificarCodigo(codigoP, aux.codigo)) {
+        aviso('El código no existe', 'error');
+        return;
     }
+    if (!verificarCodigoEstado(codigoP, aux.codigo)) {
+        aviso('El código ya fue usado', 'error');
+        return;
+    }
+    if (!verificarCedula(codigoP, cedulaEmpleado, aux.codigo)) {
+        aviso('El código no pertenece a este empleado', 'error');
+        return;
+    }
+    if (!verificaMonto(parseInt(nuevovalor), aux.codigo)) {
+        aviso('El monto del prestamo es mayor al permitido generado con el código ', 'error');
+        return;
+    }
+    if (!verificaSiesUnPrestamo(codigoP)) {
+        aviso('El código no es valido solo se admiten prestamos', 'error');
+        return;
+    }
+    if (!verificaCondiciones(usuario, parseInt(nuevovalor))) {
+        return;
+    }
+    if (!verificaSelect(tipo)) {
+        return;
+    }
+
+
+    else {
+        const cod = obtenerCodigo(codigoP, aux.codigo);
+        let concepto = null;
+        concepto2 = 'Dinero_Autorizacion';
+        concepto = 'Libranza_Prestamo_Dinero';
+        encontrado = true;
+
+        let codigo = 'OH' + Math.floor(Math.random() * 1000000);;
+
+        if (cod.codigo.startsWith("SF")) {
+            concepto2 = 'Seguro_Funerario_Autorizacion';
+            concepto = 'Libranza_Seguro_Funerario';
+
+        }
+        else if (cod.codigo.startsWith("OT")) {
+            concepto2 = 'Otro_Autorizacion';
+            concepto = 'Libranza_Otro_concepto';
+        }
+
+        await actualizar(codigo, cod.codigo, usernameLocal, nuevovalor, cuotas);
+
+        console.log("primero" + concepto2);
+        await actualizarDatosBase(concepto2, nuevovalor, cuotas, cedulaEmpleado);
+        // modificar en la tabla codigos el estado del codigo a false para que no pueda ser usado nuevamente
+        await CambiarEstado(cod.codigo, nuevovalor, codigo);
+
+        await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, concepto)
+
+        aviso('Acaba de pedir un prestamo de ' + valor, 'success');
+
+        let empresa = null;
+        let NIT = null;
+        let direcccion = null;
+
+        if (usuario.temporal.startsWith("Apoyo") || usuario.temporal.startsWith("APOYO")) {
+            empresa = "APOYO LABORAL TS SAS";
+            NIT = "NIT 900814587"
+            direcccion = "CRA 2 N 8-156 FACATATIVA"
+        }
+
+        else if (usuario.temporal.startsWith("Tu") || usuario.temporal.startsWith("TU")) {
+            empresa = "TU ALIANZA SAS";
+            NIT = "NIT 900864596"
+            direcccion = "Calle 7 N 4-49 MADRID"
+        }
+
+        else if (usuario.temporal.startsWith("Comercializadora") || usuario.temporal.startsWith("COMERCIALIZADORA")) {
+            empresa = "COMERCIALIZADORA TS";
+            NIT = "NIT 901602948"
+            direcccion = "CRA 1 N 17-37 BRAZILIA"
+        }
+
+        var docPdf = new jsPDF();
+
+        docPdf.addFont('Helvetica-Bold', 'Helvetica', 'bold');
+
+
+        docPdf.setFontSize(9);
+        docPdf.text('______________________________________________________________________________________________________________', 10, 10);
+        docPdf.setFontSize(24);
+        docPdf.setFont('Helvetica', 'bold');
+        docPdf.text(empresa, 15, 22);
+        docPdf.setFont('Helvetica', 'normal');
+        docPdf.setFontSize(9);
+        docPdf.text('AUTORIZACIóN DE LIBRANZA', 132, 15);
+        docPdf.text(NIT, 145, 20);
+        docPdf.text(direcccion, 135, 25);
+        docPdf.text('______________________________________________________________________________________________________________', 10, 27);
+        docPdf.text('______________________________________________________________________________________________________________', 10, 29);
+
+
+        docPdf.text('Fecha de Solicitud: ' + new Date().toLocaleDateString(), 10, 40);
+        // salto de linea
+        docPdf.setFont('Helvetica', 'bold');
+
+        docPdf.text('ASUNTO: CREDITO (PRESTAMO)', 10, 50);
+        docPdf.setFont('Helvetica', 'normal');
+
+
+        docPdf.text('Yo, ' + usuario.nombre + ' mayor de edad,  identificado con la cedula de ciudadania No. '
+            + usuario.numero_de_documento + ' autorizo', 10, 55);
+        docPdf.text('expresa e irrevocablemente para que del sueldo, salario, prestaciones sociales o de cualquier suma de la sea acreedor; me sean', 10, 60);
+        docPdf.text('descontados la cantidad de ' + valor + ' " ' + NumeroALetras(nuevovalor) + ' " ' + 'por concepto de' + ' PRESTAMO, en ' + cuotas + ' cuota(s), ', 10, 65);
+        docPdf.text('quincenal del credito del que soy deudor ante Tu alianza S.A.S. , aun en el evento de encontrarme disfrutando de mis licencias ', 10, 70);
+        docPdf.text('o incapacidades. ', 10, 75);
+
+        docPdf.text('Fecha de ingreso: ' + usuario.ingreso, 10, 85);
+        docPdf.text('Centro de Costo: ' + usuario.finca, 130, 85);
+        docPdf.text('Forma de pago: ' + formaPago.value, 10, 90);
+        docPdf.text('Telefono: ' + celular, 130, 90);
+        docPdf.setFont('Helvetica', 'bold');
+        docPdf.text('Cordialmente ', 10, 100);
+        docPdf.setFont('Helvetica', 'normal');
+        docPdf.text('Firma de Autorización ', 10, 110);
+        docPdf.text('C.C. ' + usuario.numero_de_documento, 10, 115);
+
+        // realizar un cuadro para colocar la huella dactilar
+        docPdf.rect(130, 97, 25, 30);
+        docPdf.text('Código de descuento nómina: ' + codigo, 10, 120);
+        docPdf.setFont('Helvetica', 'bold');
+        docPdf.setFontSize(6);
+        docPdf.text('Huella Indice Derecho', 130, 95);
+
+        docPdf.save('AutorizacionPrestamo' + '_' + usuario.nombre + "_" + codigo + '.pdf');
+
+    }
+
 
     document.querySelector('#codigo').value = "";
     document.querySelector('#cedula').value = "";

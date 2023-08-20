@@ -18,17 +18,18 @@ h1 {
 
 .diasT {
     width: 100%;
-    margin: 20px 0 10px 30px;
+    margin: 50px 0 20px 30px;
     font-family: 'Nunito Sans', sans-serif;
-    font-size: 14pt;
+    font-size: 20pt;
     font-weight: 400;
 }
 
 .dias {
     text-align: justify;
-    margin: 0px 0 10px 120px;
+    margin: 10px 0 20px 120px;
+
     font-family: 'Nunito Sans', sans-serif;
-    font-size: 16pt;
+    font-size: 20pt;
     font-weight: 600;
 }
 
@@ -66,7 +67,7 @@ li {
 
 }
 
-li:nth-child(5) {
+li:nth-child(4) {
     background: #bbd0ff;
     color: #000000;
     transform: scale(1.1);

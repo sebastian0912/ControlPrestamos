@@ -154,7 +154,7 @@ span {
 
 .cuadroTexto {
     width: 800px;
-    height: 400px;
+    height: 370px;
     background: #ffffff;
     margin: 50px 0 0 80px;
     border-radius: 15px;
@@ -182,6 +182,25 @@ select {
     margin: 0 50px 20px 30px;
     width: 240px;
     height: 50px;
+}
+
+.input {
+    font-family: 'Poppins', sans-serif;
+    width: 500px;
+    height: 40px;
+    padding: 5px;
+    font-size: 16px;
+    border-width: 0px;
+    border-color: #cccccc;
+    background-color: #ffffff;
+    border-style: solid;
+    border-radius: 11px;
+    box-shadow: 0px 0px 5px rgba(66, 66, 66, 0.75);
+    margin: 0px 20px 20px 30px;
+}
+
+.input:focus {
+    outline: none;
 }
 
 .input2 {
@@ -219,5 +238,19 @@ select {
     font-family: 'Poppins', sans-serif;
     margin: 20px 0 0 30px;
     width: 71%;
+}
 
+.btn2 {
+    height: 50px;
+    font-weight: 600;
+    font-size: 16px;
+    color: #fff;
+    background-color: #0066cc;
+    padding: 10px 30px;
+    border: 2px solid #0066cc;
+    box-shadow: rgb(0, 0, 0) 0px 0px 0px 0px;
+    border-radius: 50px;
+    transition: 1000ms;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
 }

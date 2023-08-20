@@ -7,7 +7,7 @@ const createWindow = () => {
     width: 1300,
     height: 900,
   });
-  win.setMenu(null)
+  //win.setMenu(null)
   win.loadFile("./src/app/Inicio-Login/index.html");
 };
 

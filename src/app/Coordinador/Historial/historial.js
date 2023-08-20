@@ -1,4 +1,6 @@
-import { urlBack } from "../models/base.js";
+import { urlBack } from "../../models/base.js";
+import { aviso } from "../../Avisos/avisos.js";
+const boton = document.querySelector('#boton');
 
 // Capturar el h1 del titulo y perfil
 const titulo = document.querySelector('#username');
@@ -6,13 +8,17 @@ const perfil = document.querySelector('#perfil');
 // Capturar el PERFIL y el USERNAME del local storage
 const perfilLocal = localStorage.getItem("perfil");
 const usernameLocal = localStorage.getItem("username");
-const uid = localStorage.getItem("idUsuario");
-
+const empleados = localStorage.getItem("empleados");
+const codigos = localStorage.getItem("codigos");
+const numCoordinadoresConestadoSolicitudesTrue = localStorage.getItem("coordinadores");
 //Muestra en la parte superior el nombre y el perfil
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
 
-await crearTienda(uid);
+let extrae = document.getElementById("extrae");
+let extraeT = document.getElementById("extraeT");
+
+
 
 // Obtén la fecha actual
 var ahora = new Date();
@@ -75,8 +81,7 @@ if (dias2 == 0) {
 }
 diasLi.innerHTML = dias2;
 
-
-async function datosTCodigos() {
+async function datosH(cedulaEmpleado) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtKey = obj.jwt;
@@ -85,7 +90,7 @@ async function datosTCodigos() {
         'Authorization': jwtKey
     };
 
-    const urlcompleta = urlBack.url + '/Codigo/codigos';
+    const urlcompleta = urlBack.url + '/Historial/tesoreria/' + cedulaEmpleado;
 
     try {
         const response = await fetch(urlcompleta, {
@@ -95,7 +100,6 @@ async function datosTCodigos() {
 
         if (response.ok) {
             const responseData = await response.json();
-            console.log(responseData);
             return responseData;
         } else {
             throw new Error('Error en la petición GET');
@@ -107,65 +111,36 @@ async function datosTCodigos() {
     }
 }
 
-/* Obtener codigos de la base de datos */
-const aux = await datosTCodigos();
-let arrayCodigos = [];
-
-aux.codigo.forEach((c) => {
-    if (c.ceduladelGenerador_id == uid) {
-        arrayCodigos.push(c);
+// darle click al boton para que se ejecute la funcion
+boton.addEventListener('click', async (e) => {
+    e.preventDefault();
+    // capturar los datos del formulario
+    const cedulaEmpleado = document.querySelector('#cedula').value;
+    
+    const datosExtraidos = await datosH(cedulaEmpleado);
+    console.log(datosExtraidos);
+    if (datosExtraidos.historial.length == 0) {
+        aviso('No hay datos para mostrar', 'warning');
+        return
     }
+    
+    const oculto = document.querySelector('#oculto');
+    oculto.style.display = "block";
+    
+    tabla.innerHTML = '';
+    datosExtraidos.historial.forEach(async (p) => {
+        // limpiar la tabla
+        const tabla = document.querySelector('#tabla');
+        tabla.innerHTML += `
+            <tr>
+                <td>${p.cedula}</td>
+                <td>${p.concepto}</td>            
+                <td>${p.fechaEfectuado}</td>
+                <td>${p.valor}</td>
+                <td>${p.cuotas}</td>
+                <td>${p.nombreQuienEntrego}</td>
+            </tr>
+            `
+    });
 });
 
-console.log(arrayCodigos);
-// Mostar contenido en una tabla
-arrayCodigos.forEach((c) => {
-    tabla.innerHTML += `
-    <tr>
-        <td>${c.codigo}</td>
-        <td>${c.monto}</td>
-        <td>${c.cuotas}</td>
-        <td>${c.estado}</td>
-        <td>${c.Concepto}</td>
-        <td>${c.cedulaQuienPide}</td>
-    </tr>
-    `
-});
-
-async function crearTienda(cedula){
-    var body = localStorage.getItem('key');
-    const obj = JSON.parse(body);
-    const jwtToken = obj.jwt;
-    console.log(jwtToken);
-
-    const urlcompleta = urlBack.url + '/Tienda/guardartienda';
-
-    try {
-        fetch(urlcompleta, {
-            method: 'POST',
-            body:
-                JSON.stringify({
-                    nombre: usernameLocal,
-                    codigo: cedula,
-                    jwt: jwtToken
-                })
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
-                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
-                } else {
-                    throw new Error('Error en la petición POST');
-                }
-            })
-            .then(responseData => {
-                console.log('Respuesta:', responseData);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    } catch (error) {
-        console.error('Error en la petición HTTP POST');
-        console.error(error);
-    }
-}

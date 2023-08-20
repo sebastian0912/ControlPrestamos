@@ -11,7 +11,8 @@ const perfil = document.querySelector('#perfil');
 // Capturar el PERFIL y el USERNAME del local storage
 const perfilLocal = localStorage.getItem("perfil");
 const usernameLocal = localStorage.getItem("username");
-const iddatos = localStorage.getItem("idUsuario");
+const sede = localStorage.getItem("sede");
+
 //Muestra en la parte superior el nombre y el perfil
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
@@ -98,6 +99,87 @@ for (let i = 0; i < fechaObjetivo2.length; i++) {
     }
 }
 
+async function datosTComercio() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Comercio/comercio';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
+
+// Mostar contenido en una tabla
+const tabla = document.querySelector("#tabla");
+
+let datosComercializadoraGeneral = [];
+datosComercializadoraGeneral = await datosTComercio();
+let datosArreglo = datosComercializadoraGeneral.comercio;
+
+
+
+console.log(datosArreglo);
+let aux = [];
+console.log(sede);
+
+datosArreglo.forEach((p) => {
+    if (p.destino == sede && p.cantidadRecibida == 0) {
+        aux.push(p);
+    }
+});
+
+console.log(aux);
+
+if (aux.length == 0) {
+    aviso("No hay envios por recibir", "warning")
+    
+    tabla.innerHTML += `
+        <tr>
+            <td colspan="9">No envios por recibir</td>
+        </tr>
+    `
+}
+
+aux.forEach((p) => {
+    tabla.innerHTML += `
+        <tr>
+            <td>${p.codigo}</td>
+            <td>${p.concepto}</td>
+            <td>${p.destino}</td>
+            <td>${p.cantidadEnvio}</td>
+            <td>${p.cantidadRecibida}</td>
+            <td>${p.valorUnidad}</td>
+            <td>${p.cantidadTotalVendida}</td>
+            <td>${p.PersonaEnvia}</td>
+            <td>${p.PersonaRecibe}</td>
+        </tr>
+    `
+});
+
+
+
 async function actualizar(cod, cantidadRecibida, PersonaRecibe) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
@@ -141,7 +223,7 @@ boton.addEventListener('click', async (e) => {
     //const valorUnidad = document.querySelector('#valorUnidad').value;
     const codigo = document.querySelector('#codigo').value;
     ///const otro = document.querySelector('#otro').value;
-    
+
     if (codigo == "") {
         aviso("Por favor ingrese el código generado por la comercializadora", "error");
         return;
@@ -150,7 +232,7 @@ boton.addEventListener('click', async (e) => {
         aviso("Por favor ingrese la cantidad recibida", "error");
         return;
     }
-    
+
     actualizar(codigo, cantidad, usernameLocal);
     aviso("Se ha cargado la informacion exitosamente", "success");
 });

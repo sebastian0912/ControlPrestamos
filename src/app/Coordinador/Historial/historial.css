@@ -17,19 +17,19 @@ h1 {
 }
 
 .diasT {
-    width: 100%;
-    margin: 20px 0 10px 30px;
-    font-family: 'Nunito Sans', sans-serif;
-    font-size: 14pt;
-    font-weight: 400;
+  width: 100%;
+  margin: 20px 0 10px 30px;
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 14pt;
+  font-weight: 400;
 }
 
 .dias {
-    text-align: justify;
-    margin: 0px 0 10px 120px;
-    font-family: 'Nunito Sans', sans-serif;
-    font-size: 16pt;
-    font-weight: 600;
+  text-align: justify;
+  margin: 0px 0 10px 120px;
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 16pt;
+  font-weight: 600;
 }
 
 a {
@@ -63,10 +63,9 @@ li {
     display: flex;
     align-items: center;
     cursor: pointer;
-
 }
 
-li:nth-child(5) {
+li:nth-child(4) {
     background: #bbd0ff;
     color: #000000;
     transform: scale(1.1);
@@ -152,27 +151,9 @@ span {
     flex-direction: column;
 }
 
-.cuadro {
-    width: 250px;
-    height: 150px;
-    background: #ffffff;
-    margin: 50px 0 0 80px;
-    border-radius: 15px;
-    box-shadow: 0px 0px 12px 8px rgba(0, 0, 0, 0.1);
-    font-size: 16pt;
-    font-weight: 700;
-}
-
-.titulo-Opciones {
-    padding-left: 20px;
-    font-size: 12pt;
-    margin-top: 10px;
-}
-
-
 .cuadroTexto {
-    width: 800px;
-    height: 300px;
+    width: 900px;
+    height: 210px;
     background: #ffffff;
     margin: 50px 0 0 80px;
     border-radius: 15px;
@@ -186,7 +167,7 @@ span {
 }
 
 .cajaCedula .titulo {
-    margin-top: 30px;
+    margin-top: 20px;
     float: left;
 }
 
@@ -230,7 +211,7 @@ span {
     border-style: solid;
     border-radius: 11px;
     box-shadow: 0px 0px 5px rgba(66, 66, 66, 0.75);
-    margin: 0 50px 0 -300px;
+    margin: 0 50px 0 -25px;
     position: relative;
 }
 
@@ -251,4 +232,56 @@ span {
     transition: 1000ms;
     cursor: pointer;
     font-family: 'Poppins', sans-serif;
+}
+
+
+.tabla {
+    width: 900px;
+    height: 40%;
+    overflow: auto;
+    max-height: 400px;
+    background: #ffffff;
+    margin: 20px 0 0 80px;
+    border-radius: 15px;
+    box-shadow: 0px 0px 12px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 50px;
+}
+
+.tabla-contenido {
+    width: 100%;
+    margin: 0;
+    border-collapse: collapse;
+    border-spacing: 0;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 12pt;
+    text-align: center;    
+}
+
+.tabla-contenido tr:nth-child(even) {
+    background-color: #f2f2f2;
+    /* color para filas pares */
+}
+
+.tabla-contenido tr:nth-child(odd) {
+    background-color: #cccccc;
+    /* color para filas impares */
+}
+
+th,
+td {
+    vertical-align: middle;
+}
+
+
+th {
+    border-bottom: #b9b9b9 1px solid;
+    padding: 15px;
+    background: #5e6a75;
+    color: #ffffff;
+    font-weight: 400;
+}
+
+tr {
+    height: 40px;
+
 }

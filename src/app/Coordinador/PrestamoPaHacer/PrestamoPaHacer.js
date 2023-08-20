@@ -198,35 +198,29 @@ async function datosEmpleado(cedulaEmpleado) {
     }
 }
 
-// darle click al boton para que se ejecute la funcion
-boton.addEventListener('click', async (e) => {
-    e.preventDefault();
-    let valor = document.querySelector('#valor').value;
-    let nuevovalor = valor.replace(/\,/g, '');
-    let cuotas = document.querySelector('#cuotas').value;
-    let cedulaEmpleado = document.querySelector('#cedula').value;
-    let tipo = document.querySelector('#tipo').value;
-    let cuotasAux = cuotas;
-    if (!verificaSelect(formaPago)) {
-        return;
+formaPago.addEventListener('change', (e) => {
+    const numerodepago = document.querySelector('#celular');
+
+    if (e.target.value == "Daviplata") {
+        numerodepago.placeholder = "Número de Daviplata";
     }
+    else if (e.target.value == "Master") {
+        numerodepago.placeholder = "Número de tarjeta Master";
+    }
+    else if (e.target.value == "Efectivo") {
+        numerodepago.placeholder = "";
+    }
+    else {
+        numerodepago.placeholder = "Número de cuenta";
+    }
+});
 
-    let aux = await datosEmpleado(cedulaEmpleado);
-    console.log(aux.datosbase[0]);
-    let datos = aux.datosbase[0];
-
-
+function verificaCondiciones(datos, nuevovalor) {
     // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
-
     const fechaIngreso = datos.ingreso;
-    if (datos == undefined) {
-        aviso('Ups no se pueden generar el prestamo, el empleado no existe', 'error');
-        return;
-    }
-
+    let dia = fechaIngreso.split('-')[0];
     let mes = fechaIngreso.split('-')[1];
     let anio = fechaIngreso.split('-')[2];
-    let dia = fechaIngreso.split('-')[0];
 
     // el año esta en formato xxaa y se debe convertir a 20aa
     let anioConvertido = '20' + anio;
@@ -247,141 +241,240 @@ boton.addEventListener('click', async (e) => {
         parseInt(datos.cuentas);
 
     const fechaActual = new Date();
-    let codigoOH = null;
 
-    if (parseInt(datos.saldos) >= 175000) {
+    if (parseInt(datos.saldos) >= 175001) {
         aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
+        return false;
     }
     else if (parseInt(datos.fondos) > 0) {
         aviso('Ups no se pueden generar prestamos perteneces al fondo', 'error');
+        return false;
     }
     else {
+        // conseguir la fecha actual y separarla en dia, mes y año para poder compararla con la fecha de ingreso del empleado            
+        let mesActual = fechaActual.getMonth() + 1;
+        let anioActual = fechaActual.getFullYear();
+        if ((anioActual == anio) && ((mesActual - mes) >= 2)) {
+            if (parseInt(nuevovalor) >= 200000) {
+                aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
+                return false;
+            }
+            else if ((sumaTotal + parseInt(nuevovalor)) >= 350000) {
+                aviso('Ups no se pueden generar prestamos, puede sacar maximo ' + (350000 - (sumaTotal)), 'error');
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+        else if ((anioActual > anio)) {
+            if (parseInt(nuevovalor) >= 200000) {
+                aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
+                return false;
+            }
+            else if ((sumaTotal + parseInt(nuevovalor)) >= 350000) {
+                aviso('Ups no se pueden generar prestamos, puede sacar maximo ' + (350000 - (sumaTotal)), 'error');
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+    }
+}
+
+async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+    var dia = new Date().getDate();
+    var mes = new Date().getMonth() + 1;
+    var anio = new Date().getFullYear();
+    // yyyy-mm-dd
+    const fecha = anio + '-' + mes + '-' + dia;
+    const urlcompleta = urlBack.url + '/Historial/jefedearea/crearHistorialPrestamo/' + cedulaEmpleado;
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    cedula: cedulaEmpleado,
+                    nombreQuienEntrego: usernameLocal,
+                    valor: nuevovalor,
+                    cuotas: cuotas,
+                    fechaEfectuado: fecha,
+                    concepto: tipo,
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+
+}
+
+// darle click al boton para que se ejecute la funcion
+boton.addEventListener('click', async (e) => {
+    e.preventDefault();
+    let cedulaEmpleado = document.querySelector('#cedula').value;
+
+    let aux = await datosEmpleado(cedulaEmpleado);
+    console.log(aux.datosbase[0]);
+    let datos = aux.datosbase[0];
+
+    // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
+
+    if (datos == undefined) {
+        aviso('Ups no se pueden generar el prestamo, el empleado no existe', 'error');
+        return;
+    }
+    boton.style.display = "none";
+    cedula.style.display = "none";
+    boton2.style.display = "inline-block";
+    tipo.style.display = "inline-block";
+    valor.style.display = "inline-block";
+    cuotas.style.display = "inline-block";
+    formaPago.style.display = "inline-block";
+    celular.style.display = "inline-block";
+
+    console.log(datos.nombre);
+    datosPersona.innerHTML = datos.nombre;
+
+    boton2.addEventListener('click', async (e) => {
+        let valor = document.querySelector('#valor').value;
+        let nuevovalor = valor.replace(/\,/g, '');
+        let cuotas = document.querySelector('#cuotas').value;
+        let tipo = document.querySelector('#tipo').value;
+        let cuotasAux = cuotas;
+
+        if (!verificaCondiciones(datos, parseInt(nuevovalor))) {
+            return;
+        }
+
+        if (!verificaSelect(formaPago)) {
+            return;
+        }
+
+        let codigoOH;
+        let empresa = null;
+        let NIT = null;
+        let direcccion = null;
+        let concepto = null;
         // VERIFICAR EL TIPO QUE SE ESTA SELECCIONANDO        
         if (tipo == "Seguro Funerario") {
             codigoOH = 'SF' + Math.floor(Math.random() * 1000000);
+            concepto = "Autorizacion Seguro Funerario";
             cuotasAux = 1;
         }
         else if (tipo == "Dinero") {
             codigoOH = 'PH' + Math.floor(Math.random() * 1000000);
+            concepto = "Autorizacion prestamo dinero";
+
         }
         else if (tipo == "Otro") {
             codigoOH = 'OT' + Math.floor(Math.random() * 1000000);
+            concepto = "Autorizacion otro concepto";
         }
 
-        // conseguir la fecha actual y separarla en dia, mes y año para poder compararla con la fecha de ingreso del empleado            
-        let mesActual = fechaActual.getMonth() + 1;
-        let anioActual = fechaActual.getFullYear();
-        let bandera = false;
-        if ((anioActual == anio) && ((mesActual - mes) >= 2)) {
-            if (parseInt(nuevovalor) >= 200001) {
-                aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
-                bandera = false;
-                return;
-            }
-            else if (sumaTotal >= 350001 || (sumaTotal + parseInt(nuevovalor)) >= 350001) {
-                bandera = false;
-                aviso('Ups no se pueden generar prestamos, puede sacar maximo ' + (350000 - (sumaTotal)), 'error');
-                return;
-            }
-            else {
-                bandera = true;
-                escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, cuotasAux, tipo, valor)
-            }
+        await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, cuotasAux, tipo, valor)
+        await escribirHistorial(cedulaEmpleado, nuevovalor, cuotasAux, tipo);
+
+        if (datos.temporal.startsWith("Apoyo") || datos.temporal.startsWith("APOYO")) {
+            empresa = "APOYO LABORAL TS SAS";
+            NIT = "NIT 900814587"
+            direcccion = "CRA 2 N 8-156 FACATATIVA"
         }
-        else if ((anioActual > anio)) {
-            if (parseInt(nuevovalor) >= 200001) {
-                bandera = false;
-                aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
-                return;
-            }
-            else if (sumaTotal >= 350001 || (sumaTotal + parseInt(nuevovalor)) >= 350001) {
-                bandera = false;
-                aviso('Ups no se pueden generar prestamos, puede sacar maximo ' + (350000 - (sumaTotal)), 'error');
-                return;
-            }
-            else {
-                bandera = true;
-                escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, cuotasAux, tipo, valor)
-            }
+        else if (datos.temporal.startsWith("Tu") || datos.temporal.startsWith("TU")) {
+            empresa = "APOYO LABORAL TS SAS";
+            NIT = "NIT 900814587"
+            direcccion = "CRA 2 N 8-156 FACATATIVA"
         }
-        if (bandera == true) {
-
-            let empresa = null;
-            let NIT = null;
-            let direcccion = null;
-            if (datos.temporal.startsWith("Apoyo") || datos.temporal.startsWith("APOYO")) {
-                empresa = "APOYO LABORAL TS SAS";
-                NIT = "NIT 900814587"
-                direcccion = "CALLE 112 A No. 18 A -05"
-            }
-            else if (datos.temporal.startsWith("Tu") || datos.temporal.startsWith("TU")) {
-                empresa = "TU ALIANZA SAS";
-                NIT = "NIT 900864596 - 1"
-                direcccion = "CRA 2 N 8- 156 FACATATIVA'"
-            }
-            else if (datos.temporal.startsWith("Comercializadora") || datos.temporal.startsWith("COMERCIALIZADORA")) {
-                empresa = "COMERCIALIZADORA TS";
-            }
-            var docPdf = new jsPDF();
-
-            docPdf.addFont('Helvetica-Bold', 'Helvetica', 'bold');
-
-
-            docPdf.setFontSize(9);
-            docPdf.text('______________________________________________________________________________________________________________', 10, 10);
-            docPdf.setFontSize(24);
-            docPdf.setFont('Helvetica', 'bold');
-            docPdf.text(empresa, 15, 22);
-            docPdf.setFont('Helvetica', 'normal');
-            docPdf.setFontSize(9);
-            docPdf.text('AUTORIZACION DE LIBRANZA', 132, 15);
-            docPdf.text(NIT, 145, 20);
-            docPdf.text(direcccion, 135, 25);
-            docPdf.text('______________________________________________________________________________________________________________', 10, 27);
-            docPdf.text('______________________________________________________________________________________________________________', 10, 29);
-
-
-            docPdf.text('Fecha de Solicitud: ' + new Date().toLocaleDateString(), 10, 40);
-            // salto de linea
-            docPdf.setFont('Helvetica', 'bold');
-
-            docPdf.text('ASUNTO: CREDITO (PRESTAMO)', 10, 50);
-            docPdf.setFont('Helvetica', 'normal');
-
-
-            docPdf.text('Yo, ' + datos.nombre + ' mayor de edad,  identificado con la cedula de ciudadania No. '
-                + datos.cedula + ' autorizo', 10, 55);
-            docPdf.text('expresa e irrevocablemente para que del sueldo, salario, prestaciones sociales o de cualquier suma de la sea acreedor; me sean', 10, 60);
-            docPdf.text('descontados la cantidad de ' + valor + ' (Letras)  ' + NumeroALetras(nuevovalor) + 'por concepto de' + ' PRESTAMO, en ' + cuotas + ' cuota(s), ', 10, 65);
-            docPdf.text('quincenal del credito del que soy deudor ante Tu alianza S.A.S. , aun en el evento de encontrarme disfrutando de mis licencias ', 10, 70);
-            docPdf.text('o incapacidades. ', 10, 75);
-
-            docPdf.text('Fecha de ingreso: ' + datos.ingreso, 10, 90);
-            docPdf.text('Centro de Costo: ' + datos.finca, 130, 90);
-            docPdf.text('Forma de pago: ' + formaPago.value, 10, 95);
-            docPdf.text('Telefono: ' + celular.value, 130, 95);
-            docPdf.setFont('Helvetica', 'bold');
-            docPdf.text('Cordialmente ', 10, 110);
-            docPdf.setFont('Helvetica', 'normal');
-            docPdf.text('Firma de Autorización ', 10, 115);
-            docPdf.text('C.C. ' + datos.numero_de_documento, 10, 120);
-
-            // realizar un cuadro para colocar la huella dactilar
-            docPdf.rect(130, 110, 35, 45);
-            docPdf.text('Codigo de autorización nomina: ' + codigoOH, 10, 130);
-            docPdf.setFont('Helvetica', 'bold');
-            docPdf.setFontSize(6);
-            docPdf.text('Huella Indice Derecho', 130, 105);
-
-            docPdf.save('PrestamoDescontar' + '_' + datos.nombre + "_" + codigoOH + '.pdf');
+        else if (datos.temporal.startsWith("Comercializadora") || datos.temporal.startsWith("COMERCIALIZADORA")) {
+            empresa = "COMERCIALIZADORA TS";
+            NIT = "NIT 901602948"
+            direcccion = "CRA 1 N 17-37 BRAZILIA"
         }
-    }
-    document.querySelector('#valor').value = "";
-    document.querySelector('#cuotas').value = "";
-    document.querySelector('#cedula').value = "";
-    document.querySelector('#celular').value = "";
-    document.querySelector('#tipo').value = "0";
-    document.querySelector('#formaPago').value = "0";
+        var docPdf = new jsPDF();
+
+        docPdf.addFont('Helvetica-Bold', 'Helvetica', 'bold');
+
+        docPdf.setFontSize(9);
+        docPdf.text('______________________________________________________________________________________________________________', 10, 10);
+        docPdf.setFontSize(24);
+        docPdf.setFont('Helvetica', 'bold');
+        docPdf.text(empresa, 15, 22);
+        docPdf.setFont('Helvetica', 'normal');
+        docPdf.setFontSize(9);
+        docPdf.text('AUTORIZACION DE LIBRANZA', 132, 15);
+        docPdf.text(NIT, 145, 20);
+        docPdf.text(direcccion, 135, 25);
+        docPdf.text('______________________________________________________________________________________________________________', 10, 27);
+        docPdf.text('______________________________________________________________________________________________________________', 10, 29);
+
+
+        docPdf.text('Fecha de Solicitud: ' + new Date().toLocaleDateString(), 10, 40);
+        // salto de linea
+        docPdf.setFont('Helvetica', 'bold');
+
+        docPdf.text('ASUNTO: CREDITO (PRESTAMO)', 10, 50);
+        docPdf.setFont('Helvetica', 'normal');
+
+
+        docPdf.text('Yo, ' + datos.nombre + ' mayor de edad,  identificado con la cedula de ciudadania No. '
+            + datos.numero_de_documento + ' autorizo', 10, 55);
+        docPdf.text('expresa e irrevocablemente para que del sueldo, salario, prestaciones sociales o de cualquier suma de la sea acreedor; me sean', 10, 60);
+        docPdf.text('descontados la cantidad de ' + valor + ' " ' + NumeroALetras(nuevovalor) + ' " ' + 'por concepto de' + ' PRESTAMO, en ' + cuotas + ' cuota(s), ', 10, 65);
+        docPdf.text('quincenal del credito del que soy deudor ante Tu alianza S.A.S. , aun en el evento de encontrarme disfrutando de mis licencias ', 10, 70);
+        docPdf.text('o incapacidades. ', 10, 75);
+
+        docPdf.text('Fecha de ingreso: ' + datos.ingreso, 10, 85);
+        docPdf.text('Centro de Costo: ' + datos.finca, 130, 85);
+        docPdf.text('Forma de pago: ' + formaPago.value, 10, 90);
+        docPdf.text('Telefono: ' + celular.value, 130, 90);
+        docPdf.setFont('Helvetica', 'bold');
+        docPdf.text('Cordialmente ', 10, 100);
+        docPdf.setFont('Helvetica', 'normal');
+        docPdf.text('Firma de Autorización ', 10, 110);
+        docPdf.text('C.C. ' + datos.numero_de_documento, 10, 115);
+
+        // realizar un cuadro para colocar la huella dactilar
+        docPdf.rect(130, 97, 25, 30);
+        docPdf.text('Codigo de autorización nomina: ' + codigoOH, 10, 120);
+        docPdf.setFont('Helvetica', 'bold');
+        docPdf.setFontSize(6);
+        docPdf.text('Huella Indice Derecho', 130, 95);
+
+        docPdf.save('PrestamoDescontar' + '_' + datos.nombre + "_" + codigoOH + '.pdf');
+
+
+
+        document.querySelector('#valor').value = "";
+        document.querySelector('#cuotas').value = "";
+        document.querySelector('#cedula').value = "";
+        document.querySelector('#celular').value = "";
+        document.querySelector('#tipo').value = "0";
+        document.querySelector('#formaPago').value = "0";
+    });
+
+
+
 
 });
 
