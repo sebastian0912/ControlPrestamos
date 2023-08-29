@@ -116,17 +116,17 @@ boton.addEventListener('click', async (e) => {
     e.preventDefault();
     // capturar los datos del formulario
     const cedulaEmpleado = document.querySelector('#cedula').value;
-    
+
     const datosExtraidos = await datosH(cedulaEmpleado);
     console.log(datosExtraidos);
     if (datosExtraidos.historial.length == 0) {
         aviso('No hay datos para mostrar', 'warning');
         return
     }
-    
+
     const oculto = document.querySelector('#oculto');
     oculto.style.display = "block";
-    
+
     tabla.innerHTML = '';
     datosExtraidos.historial.forEach(async (p) => {
         // limpiar la tabla
@@ -139,7 +139,8 @@ boton.addEventListener('click', async (e) => {
                 <td>${p.valor}</td>
                 <td>${p.cuotas}</td>
                 <td>${p.nombreQuienEntrego}</td>
-            </tr>
+                <td>${p.generadopor}</td>
+                            </tr>
             `
     });
 });
@@ -212,8 +213,8 @@ extraeT.addEventListener('click', async () => {
     console.log(datosExtraidos);
 
     let excelData = [['Nombre De la Tienda', 'Monto Total', 'Numero de compras en la tienda']];
-    
-    if (datosExtraidos.message == "error" ) {
+
+    if (datosExtraidos.message == "error") {
         aviso("No se han comprado productos en las tiendas", "warning");
         return;
     } else {
@@ -227,7 +228,7 @@ extraeT.addEventListener('click', async () => {
         XLSX.utils.book_append_sheet(wb, ws, 'Datos Tienda');
 
         const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-        
+
         const blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
         const url = URL.createObjectURL(blob);
 
@@ -256,7 +257,7 @@ function s2ab(s) {
 extraeHistorialT.addEventListener('click', async () => {
     console.log("entro");
     const datosExtraidos = await THistorial();
-    if (datosExtraidos.historial.length == 0 ) {
+    if (datosExtraidos.historial.length == 0) {
         aviso("No hay registros de compras realizadas en las tiendas", "warning");
         return;
     }
@@ -270,7 +271,7 @@ extraeHistorialT.addEventListener('click', async () => {
 
 
     let excelData = [['Cedula', 'Concepto', 'Cuotas', 'Fecha Efectuado', 'Nombre Quien Entregó', 'Valor']];
-    
+
     historial.forEach((doc) => {
         excelData.push([
             doc.cedula,

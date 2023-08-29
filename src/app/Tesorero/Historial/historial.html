@@ -16,6 +16,9 @@
 </head>
 
 <body>
+    <audio id="successSound" src="../../assets/Sounds/depositphotos_425986708-track-app-interface-button-notification.mp3"></audio>
+    <audio id="errorSound" src="../../assets/Sounds/negative_beeps-6008.mp3"></audio>
+    <div id="overlay" class="loader-overlay" style="display: none;"></div>
 
     <div class="opciones">
         <ul class="lista-Opciones">
@@ -35,6 +38,24 @@
             </li>
 
             <li>
+                <img src="../../assets/hombre.png" alt="logo" class="logo" />
+                <p>Eliminar</p>
+                <input type="file" id="archivoEliminar" class="boton" />
+            </li>
+
+            <li>
+                <img src="../../assets/actualizar.png" alt="logo" class="logo" />
+                <p>Actualizar Saldos</p>
+                <input type="file" id="archivoActualizarSaldos" class="boton" />
+            </li>
+
+            <li id="valoresEnCero">
+                <img src="../../assets/sku.png" alt="logo" class="logo" />
+                <p>Resetear valores empleados</p>
+            </li>
+
+
+            <li>
                 <a href="./historial.html">
                     <img src="../../assets/historial-medico.png" alt="logo" class="logo" />
                     <p>Historial</p>
@@ -52,10 +73,15 @@
                 <p>Extraer datos tienda</p>
             </li>
 
+            <li id="extraeHistorialT">
+                <img src="../../assets/tienda.png" alt="logo" class="logo" />
+                <p>Extraer datos tienda detallado</p>
+            </li>
+
             <li id="extraeC">
                 <img src="../../assets/servidor-de-datos.png" alt="logo" class="logo" />
-                <p>Extraer datos códigos por hacer</p>
-              </li>
+                <p>Extraer autorizaciones</p>
+            </li>
 
             <li id="logout">
                 <a href="#">
@@ -85,6 +111,10 @@
     </header>
 
     <div class="contenido">
+        <div id="loader" class="cajaloader" style="display: none;">
+            <h1 id="cont" class="contador" style="display: none;"></h1>
+            <div class="custom-loader"></div>
+        </div>
         <div class="cuadroTexto">
             <div class="cajaCedula">
                 <h1 class="titulo"> Digite el número de identificación del empleado a validar: </h1>

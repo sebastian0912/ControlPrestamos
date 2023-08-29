@@ -188,7 +188,7 @@ function verificaCondiciones(datos, nuevovalor) {
     }
 }
 
-async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo) {
+async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo, codigo) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
@@ -204,8 +204,10 @@ async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo) {
             method: 'POST',
             body:
                 JSON.stringify({
+                    codigo: codigo,
                     cedula: cedulaEmpleado,
-                    nombreQuienEntrego: usernameLocal,
+                    generadopor: usernameLocal,
+                    nombreQuienEntrego: '',
                     valor: nuevovalor,
                     cuotas: cuotas,
                     fechaEfectuado: fecha,
@@ -301,8 +303,9 @@ boton.addEventListener('click', async (e) => {
     let empresa = null;
     let NIT = null;
     let direcccion = null;
+    let codigo = 'OR' + Math.floor(Math.random() * 100000) + 1;
 
-    await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, "Prestamo para hacer");
+    await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, "Prestamo para hacer", codigo);
     await actualizarDatosBase(nuevovalor, cuotas, cedulaEmpleado);
 
     if (datos.temporal.startsWith("Apoyo") || datos.temporal.startsWith("APOYO")) {
@@ -366,11 +369,12 @@ boton.addEventListener('click', async (e) => {
 
     // realizar un cuadro para colocar la huella dactilar
     docPdf.rect(130, 97, 25, 30);
+    docPdf.text('Codigo prestamo para hacer: ' + codigo, 10, 120);
     docPdf.setFont('Helvetica', 'bold');
     docPdf.setFontSize(6);
     docPdf.text('Huella Indice Derecho', 130, 95);
 
-    docPdf.save('PrestamoDescontar' + '_' + datos.nombre + "_" + datos.numero_de_documento + "_" + new Date().toLocaleDateString() + '.pdf');
+    docPdf.save('PrestamoDescontar' + '_' + datos.nombre + "_" + codigo + '.pdf');
 
     document.querySelector('#valor').value = "";
     document.querySelector('#cuotas').value = "";

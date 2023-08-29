@@ -225,6 +225,7 @@ function verificaCondiciones(datos, nuevovalor) {
     // el año esta en formato xxaa y se debe convertir a 20aa
     let anioConvertido = '20' + anio;
     anio = anioConvertido;
+    console.log(anio);
 
     const sumaTotal =
         parseInt(datos.saldos) +
@@ -241,6 +242,7 @@ function verificaCondiciones(datos, nuevovalor) {
         parseInt(datos.cuentas);
 
     const fechaActual = new Date();
+    console.log (sumaTotal)
 
     if (parseInt(datos.saldos) >= 175001) {
         aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
@@ -251,15 +253,17 @@ function verificaCondiciones(datos, nuevovalor) {
         return false;
     }
     else {
+        console.log("entro");
         // conseguir la fecha actual y separarla en dia, mes y año para poder compararla con la fecha de ingreso del empleado            
         let mesActual = fechaActual.getMonth() + 1;
+        console.log(mesActual);
         let anioActual = fechaActual.getFullYear();
-        if ((anioActual == anio) && ((mesActual - mes) >= 2)) {
-            if (parseInt(nuevovalor) >= 200000) {
+        if ((anioActual == anio) && ((parseInt(mesActual) - parseInt(mes)) >= 2)) {
+            if (parseInt(nuevovalor) >= 200001) {
                 aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
                 return false;
             }
-            else if ((sumaTotal + parseInt(nuevovalor)) >= 350000) {
+            else if ((sumaTotal + parseInt(nuevovalor)) >= 350001) {
                 aviso('Ups no se pueden generar prestamos, puede sacar maximo ' + (350000 - (sumaTotal)), 'error');
                 return false;
             }
@@ -267,12 +271,12 @@ function verificaCondiciones(datos, nuevovalor) {
                 return true;
             }
         }
-        else if ((anioActual > anio)) {
-            if (parseInt(nuevovalor) >= 200000) {
+        else if ((parseInt(anioActual) > parseInt(anio))) {
+            if (parseInt(nuevovalor) >= 200001) {
                 aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
                 return false;
             }
-            else if ((sumaTotal + parseInt(nuevovalor)) >= 350000) {
+            else if ((sumaTotal + parseInt(nuevovalor)) >= 350001) {
                 aviso('Ups no se pueden generar prestamos, puede sacar maximo ' + (350000 - (sumaTotal)), 'error');
                 return false;
             }
@@ -283,7 +287,7 @@ function verificaCondiciones(datos, nuevovalor) {
     }
 }
 
-async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo) {
+async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo, codigo) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
@@ -299,8 +303,10 @@ async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo) {
             method: 'POST',
             body:
                 JSON.stringify({
+                    codigo: codigo,
                     cedula: cedulaEmpleado,
-                    nombreQuienEntrego: usernameLocal,
+                    nombreQuienEntrego: '',
+                    generadopor: usernameLocal,
                     valor: nuevovalor,
                     cuotas: cuotas,
                     fechaEfectuado: fecha,
@@ -330,6 +336,20 @@ async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo) {
 
 }
 
+
+function verificaSelect2(select) {
+    let encontrado = false;
+    if (select.value == '0') {
+        aviso('Debe seleccionar un concepto', 'error');
+        return false;
+    }
+    else {
+        encontrado = true;
+        return encontrado;
+    }
+}
+
+
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
     e.preventDefault();
@@ -349,8 +369,6 @@ boton.addEventListener('click', async (e) => {
     cedula.style.display = "none";
     boton2.style.display = "inline-block";
     tipo.style.display = "inline-block";
-    valor.style.display = "inline-block";
-    cuotas.style.display = "inline-block";
     formaPago.style.display = "inline-block";
     celular.style.display = "inline-block";
 
@@ -363,12 +381,31 @@ boton.addEventListener('click', async (e) => {
         let cuotas = document.querySelector('#cuotas').value;
         let tipo = document.querySelector('#tipo').value;
         let cuotasAux = cuotas;
+        console.log(datos);
+        console.log(nuevovalor);
 
-        if (!verificaCondiciones(datos, parseInt(nuevovalor))) {
+        if (valor == "") {
+            aviso('Ups no se pueden generar mercado, el monto no puede estar vacio', 'error');
             return;
         }
 
+        if (!verificaCondiciones(datos, parseInt(nuevovalor)) == true) {
+            return;
+        }
+
+
         if (!verificaSelect(formaPago)) {
+            return;
+        }
+
+        if (!verificaSelect2(tipo)) {
+            return;
+        }
+
+
+        // campo celular debe tener 10 digitos
+        if (celular.value.length != 10) {
+            aviso('Ups no se pueden generar mercado, el número proporcionado debe tener 10 digitos', 'error');
             return;
         }
 
@@ -393,8 +430,8 @@ boton.addEventListener('click', async (e) => {
             concepto = "Autorizacion otro concepto";
         }
 
-        await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, cuotasAux, tipo, valor)
-        await escribirHistorial(cedulaEmpleado, nuevovalor, cuotasAux, tipo);
+        await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, cuotasAux, concepto, valor)
+        await escribirHistorial(cedulaEmpleado, nuevovalor, cuotasAux, concepto, codigoOH);
 
         if (datos.temporal.startsWith("Apoyo") || datos.temporal.startsWith("APOYO")) {
             empresa = "APOYO LABORAL TS SAS";

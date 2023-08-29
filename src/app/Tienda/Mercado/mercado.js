@@ -284,7 +284,7 @@ function verificaCondiciones(datos, nuevovalor) {
     }
 }
 
-async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo) {
+async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo, codigo) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
@@ -300,8 +300,10 @@ async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo) {
             method: 'POST',
             body:
                 JSON.stringify({
+                    codigo: codigo,
                     cedula: cedulaEmpleado,
-                    nombreQuienEntrego: usernameLocal,
+                    nombreQuienEntrego: '',
+                    generadopor: usernameLocal,                    
                     valor: nuevovalor,
                     cuotas: cuotas,
                     fechaEfectuado: fecha,
@@ -373,7 +375,7 @@ boton.addEventListener('click', async (e) => {
         }
 
         await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, valor)
-        await escribirHistorial(cedulaEmpleado, nuevovalor, 2, 'Autorizacion de Mercado');
+        await escribirHistorial(cedulaEmpleado, nuevovalor, 2, 'Autorizacion de Mercado', codigoOH);
 
         document.querySelector('#monto').value = "";
         document.querySelector('#cedula').value = "";

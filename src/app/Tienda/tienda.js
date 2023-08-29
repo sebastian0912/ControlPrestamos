@@ -194,7 +194,7 @@ function verificaCondiciones(datos, nuevovalor) {
         parseInt(datos.mercados) +
         parseInt(datos.prestamoPaDescontar) +
         parseInt(datos.casino) +
-        parseInt(datos.anchetas) +
+        parseInt(datos.valoranchetas) +
         parseInt(datos.fondo) +
         parseInt(datos.carnet) +
         parseInt(datos.seguroFunerario) +
@@ -436,7 +436,7 @@ async function CambiarEstado(cod, valor, codigo) {
 
 }
 
-async function escribirHistorial(cedulaEmpleado, nuevovalor, username, cuotas, tipo) {
+async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo, codigo, generadoPor) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
@@ -452,8 +452,10 @@ async function escribirHistorial(cedulaEmpleado, nuevovalor, username, cuotas, t
             method: 'POST',
             body:
                 JSON.stringify({
+                    codigo: codigo,
                     cedula: cedulaEmpleado,
-                    nombreQuienEntrego: usernameLocal,
+                    nombreQuienEntrego: '',
+                    generadopor: generadoPor,                    
                     valor: nuevovalor,
                     cuotas: cuotas,
                     fechaEfectuado: fecha,
@@ -560,6 +562,43 @@ async function historialT(valor) {
     }
 }
 
+async function ActualizarHistorial(codigo) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+    const urlcompleta = urlBack.url + '/Historial/actualizarXcodigo/' + codigo;
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    codigo: codigo,                    
+                    nombreQuienEntrego: usernameLocal,                    
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+}
+
 boton.addEventListener('click', async (e) => {
     e.preventDefault();
 
@@ -575,6 +614,7 @@ boton.addEventListener('click', async (e) => {
     if (codigoP == '') {
         aviso('El campo codigo no puede estar vacio', 'error');
     }
+
     else {
         const aux = await datosTCodigos();
         console.log(aux.codigo);
@@ -596,15 +636,13 @@ boton.addEventListener('click', async (e) => {
             aviso('El codigo no pertenece a este empleado', 'error');
             return;
         }
-        if (!verificaMonto(parseInt(nuevovalor), datos)) {
-            aviso('El monto del prestamo es mayor al permitido generado con el codigo', 'error');
-            return;
-        }
+        
         if (verificaSiesUnPrestamo(codigoP)) {
             aviso('El codigo no es valido solo se admiten mercado', 'error');
             return;
         }
-        if (!verificaCondiciones(datosUsuario, parseInt(nuevovalor))) {
+
+        if (verificaCondiciones(datosUsuario, parseInt(nuevovalor))) {
             return;
         }
 
@@ -622,7 +660,8 @@ boton.addEventListener('click', async (e) => {
 
             await CambiarEstado(codigoP, nuevovalor, codigo);
 
-            await escribirHistorial(cedulaEmpleado, nuevovalor, usernameLocal, 2, concepto);
+            await escribirHistorial(cedulaEmpleado, nuevovalor, usernameLocal, 2, concepto, codigo, cod.generadoPor);
+            await ActualizarHistorial(codigo);
 
             await actualizarDatosBase(concepto, nuevovalor, 2, cedulaEmpleado);
 

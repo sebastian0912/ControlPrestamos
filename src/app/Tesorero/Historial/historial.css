@@ -64,7 +64,7 @@ li {
     cursor: pointer;
 }
 
-li:nth-child(3) {
+li:nth-child(6) {
     background: #bbd0ff;
     color: #000000;
     transform: scale(1.1);
@@ -87,11 +87,11 @@ li:hover {
 
 
 .logo {
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
     padding: 0 10px 0 0;
     margin-top: -10px;
-}
+  }
 
 .boton {
     position: absolute;
@@ -282,4 +282,61 @@ th {
 tr {
     height: 40px;
 
+}
+
+.loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    /* Ajusta el valor del último número para controlar la opacidad */
+    z-index: 9999;
+    /* Asegúrate de que la capa esté en un nivel superior para cubrir todo el contenido */
+}
+
+
+.cajaloader {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10000;
+
+}
+
+
+/*loader*/
+.custom-loader {
+    width: 100px;
+    height: 100px;
+    display: grid;
+    border-radius: 50%;
+    background: conic-gradient(#1157fb 25%, #E4E4ED 0 50%, #8CD50A 0 75%, #1157fb 0);
+    animation: s2 4s infinite linear;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+}
+
+.custom-loader::before,
+.custom-loader::after {
+    content: "";
+    grid-area: 1/1;
+    margin: 15%;
+    border-radius: 50%;
+    background: inherit;
+    animation: inherit;
+}
+
+.custom-loader::after {
+    margin: 25%;
+    animation-duration: 6s;
+}
+
+@keyframes s2 {
+    100% {
+        transform: rotate(1turn)
+    }
 }

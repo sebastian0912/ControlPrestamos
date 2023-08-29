@@ -1,6 +1,5 @@
-import { doc, getDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"
 import { urlBack } from "../../models/base.js";
-import { aviso } from "../../Avisos/avisos.js";
+import { aviso, avisoConfirmacion, avisoConfirmacionAc, isoConfirmacionAc2 } from "../../Avisos/avisos.js";
 const boton = document.querySelector('#boton');
 
 // capturar el id del usuario logeado del input
@@ -18,9 +17,11 @@ let extraeT = document.getElementById("extraeT");
 //Muestra en la parte superior el nombre y el perfil
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
+let archivoActualizarSaldos = document.getElementById('archivoActualizarSaldos');
 
 
 let input = document.getElementById('archivoInput');
+let eliminar = document.getElementById('archivoEliminar');
 
 let datosFinales = [];
 
@@ -417,6 +418,102 @@ extraeC.addEventListener('click', async () => {
 
 });
 
+
+eliminar.addEventListener('click', async () => {
+    const resultado = await avisoConfirmacion();
+    if (resultado) {
+        let archivo = eliminar.files[0];
+        console.log(archivo);
+        let reader = new FileReader();
+        var h1Elemento = document.getElementById("cont");
+
+        // leer archivo .csv 
+        reader.readAsText(archivo);
+
+        reader.onload = () => {
+            let info = reader.result;
+            // Separar por saltos de línea 
+            let lineas = info.split('\n');
+
+            // Array para almacenar los datos finales
+            let datosFinales = [];
+
+            // Iterar a través de las líneas del archivo CSV
+            lineas.forEach(linea => {
+                // Eliminar espacios en blanco y otros caracteres no deseados de la línea
+                let cedula = linea.trim();
+
+                // Verificar si la cédula es válida antes de agregarla al arreglo
+                if (cedula !== "" && cedula !== "CEDULA") {
+                    datosFinales.push(cedula);
+                }
+            });
+
+
+
+            // Mostrar elementos ocultos
+            over.style.display = "block";
+            loader.style.display = "block";
+
+            // Eliminar las primeras 4 filas (si es necesario)
+            console.log(datosFinales);
+            for (let i = 0; i < datosFinales.length; i++) {
+                EliminarEm(datosFinales[i]);
+            }
+            // Mostrar elementos ocultos
+            over.style.display = "none";
+            loader.style.display = "none";
+        };
+    } else {
+        // El usuario canceló la eliminación o cerró el diálogo
+        aviso("No se ha eliminado ningún empleado", "success");
+    }
+
+
+});
+
+
+async function EliminarEm(cedulaEmpleado) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+
+    const urlcompleta = urlBack.url + '/Datosbase/eliminardatos/' + cedulaEmpleado;
+    try {
+        fetch(urlcompleta, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': jwtToken
+            },
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+                if (responseData.message == "error") {
+                    aviso("No se ha podido eliminar el empleado con cédula: " + cedulaEmpleado, "warning");
+                } 
+                return
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+
+}
+
+
 input.addEventListener('change', () => {
     let archivo = input.files[0];
     let reader = new FileReader();
@@ -538,3 +635,249 @@ boton.addEventListener('click', async (e) => {
     });
 });
 
+
+
+archivoActualizarSaldos.addEventListener('click', async () => {
+    const resultado = await avisoConfirmacionAc();
+    if (resultado) {
+        let archivo = archivoActualizarSaldos.files[0];
+        console.log(archivo);
+        let reader = new FileReader();
+
+
+        // leer archivo .csv 
+        reader.readAsText(archivo);
+
+        reader.onload = () => {
+            let info = reader.result;
+            // Separar por saltos de línea 
+            let lineas = info.split('\n');
+
+            // Array para almacenar los datos finales
+            let datosFinales = [];
+
+            // Iterar a través de las líneas del archivo CSV
+            lineas.forEach((linea, index) => {
+                // Dividir cada línea en columnas utilizando el carácter de tabulación como separador
+                let columnas = linea.split('\t');
+
+                // Saltar la primera línea (encabezado)
+                if (index === 0) {
+                    return;
+                }
+
+                // Verificar si la línea tiene al menos dos columnas (CEDULA y SALDOS)
+                if (columnas.length >= 2) {
+                    let cedula = columnas[0].trim();
+                    let saldo = columnas[1].trim();
+
+                    // Verificar si la cédula es válida antes de agregarla al arreglo
+                    if (cedula !== "") {
+                        datosFinales.push({ cedula, saldo });
+                    }
+                }
+            });
+
+            // Mostrar elementos ocultos
+            over.style.display = "block";
+            loader.style.display = "block";
+
+            // Eliminar las primeras 4 filas (si es necesario)
+            console.log(datosFinales);
+            for (let i = 0; i < datosFinales.length; i++) {
+                ActualizarEm(datosFinales[i].cedula, datosFinales[i].saldo);
+            }
+            // Mostrar elementos ocultos
+            over.style.display = "none";
+            loader.style.display = "none";
+        };
+    } else {
+        // El usuario canceló la eliminación o cerró el diálogo
+        aviso("No se ha eliminado ningún empleado", "success");
+    }
+});
+
+async function ActualizarEm(cedulaEmpleado, valor) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+
+    const urlcompleta = urlBack.url + '/Datosbase/actualizarSaldos/' + cedulaEmpleado;
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body: JSON.stringify({
+                saldos: valor,
+                jwt: jwtToken
+
+            })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+                if (responseData.message == "error") {
+                    aviso("No se ha podido actualizar el empleado con cédula: " + cedulaEmpleado, "warning");
+                }
+                return
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+
+}
+
+
+valoresEnCero.addEventListener('click', async () => {
+    const resultado = await avisoConfirmacionAc2();
+    console.log("empezo");
+    if (resultado) {
+        var body = localStorage.getItem('key');
+        const obj = JSON.parse(body);
+        const jwtToken = obj.jwt;
+        console.log(jwtToken);
+
+        const urlcompleta = urlBack.url + '/Datosbase/reiniciarValores';
+        
+        try {
+            // Mostrar elementos ocultos
+            over.style.display = "block";
+            loader.style.display = "block";
+
+            fetch(urlcompleta, {
+                method: 'POST',
+                body: JSON.stringify({
+                    jwt: jwtToken
+                })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log("termino");
+                        document.getElementById('successSound').play();
+                        return response.json();
+                    } else {
+                        throw new Error('Error en la petición POST');
+                    }
+                })
+                .then(responseData => {
+                    
+                    console.log('Respuesta:', responseData);
+                    document.getElementById('successSound').play();
+                    // Ocultar elementos después de completar la operación
+                    over.style.display = "none";
+                    loader.style.display = "none";
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('errorSound').play();
+                    // También ocultar elementos en caso de error
+                    over.style.display = "none";
+                    loader.style.display = "none";
+                });
+
+        } catch (error) {
+            console.error('Error en la petición HTTP POST');
+            console.error(error);
+            document.getElementById('errorSound').play();
+            // Ocultar elementos en caso de error
+            over.style.display = "none";
+            loader.style.display = "none";
+        }
+    }
+    else{
+        aviso("No se han actualizado los campos", "success");
+    }
+});
+
+async function THistorial() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Historial/historial';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
+extraeHistorialT.addEventListener('click', async () => {
+    console.log("entro");
+    const datosExtraidos = await THistorial();
+    if (datosExtraidos.historial.length == 0 ) {
+        aviso("No hay registros de compras realizadas en las tiendas", "warning");
+        return;
+    }
+    let historial = [];
+    datosExtraidos.historial.forEach(doc => {
+        if (doc.concepto.startsWith("Compra tienda")) {
+            historial.push(doc);
+        }
+    });
+
+
+
+    let excelData = [['Cedula', 'Concepto', 'Cuotas', 'Fecha Efectuado', 'Nombre Quien Entregó', 'Valor']];
+    
+    historial.forEach((doc) => {
+        excelData.push([
+            doc.cedula,
+            doc.concepto,
+            doc.cuotas,
+            doc.fechaEfectuado,
+            doc.nombreQuienEntrego,
+            doc.valor
+        ]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Historial Detallado');
+
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+
+    const blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+
+    const element = document.createElement('a');
+    element.href = url;
+    element.download = 'datosHistorialDetallado.xlsx';
+    element.style.display = 'none';
+
+    document.body.appendChild(element);
+    element.click();
+
+    document.body.removeChild(element);
+    URL.revokeObjectURL(url);
+});

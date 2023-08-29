@@ -1,16 +1,18 @@
 {
   "name": "proyectocontrolprestamos",
   "productName": "Gestion Tesoreria",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Programa para control de prestamos a tesoreria",
+  "GITHUB_TOKEN": "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",
   "main": "main.js",
+  "repository": "https://github.com/sebastian0912/ControlPrestamos",
   "scripts": {
     "dev": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron-forge start",
     "package": "electron-forge package",
-    "make": "electron-forge make  --icon= ./buil/icono.ico",
-    "publish": "electron-forge publish",
+    "make": "electron-forge make .",
+    "publish": "electron-forge publish .",
     "package-win": "electron-packager . Gestion_Tesoreria --overwrite --asar=true --platform=win32 --arch=x64 --icon=./build/icono.ico --prune=true --out=release-builds --version-string.CompanyName=\"TuAlianza\" --version-string.FileDescription=\"Gestion de los prestamos de dinero, mercado, y control de los coodinadores\" --version-string.ProductName=\"Gestion_Tesoreria_DESKTOP\""
   },
   "keywords": [],
@@ -22,13 +24,18 @@
     "@electron-forge/maker-rpm": "^6.1.1",
     "@electron-forge/maker-squirrel": "^6.1.1",
     "@electron-forge/maker-zip": "^6.1.1",
+    "@electron-forge/publisher-github": "^6.4.1",
     "electron": "^24.7.1",
     "standard": "^17.0.0"
   },
   "dependencies": {
     "electron-fetch": "^1.9.1",
     "electron-squirrel-startup": "^1.0.0",
+    "electron-updater": "^6.1.1",
     "file-saver": "^2.0.5",
-    "jspdf": "^2.5.1"
+    "jspdf": "^2.5.1",
+    "update-electron-app": "^2.0.1"
   }
+  
+  
 }

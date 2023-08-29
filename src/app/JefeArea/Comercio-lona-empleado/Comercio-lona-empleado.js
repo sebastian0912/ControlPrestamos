@@ -1,5 +1,5 @@
 
-import { codigo, historial, urlBack } from "../../models/base.js";
+import { urlBack } from "../../models/base.js";
 import { aviso } from "../../Avisos/avisos.js";
 
 const boton = document.querySelector("#boton");
@@ -80,21 +80,6 @@ if (dias2 == 0) {
 diasLi.innerHTML = dias2;
 
 
-formaPago.addEventListener('change', (e) => {
-    const numerodepago = document.querySelector('#celular');
-    if (e.target.value == "Daviplata") {
-        numerodepago.placeholder = "Número de Daviplata";
-    }
-    else if (e.target.value == "Master") {
-        numerodepago.placeholder = "Número de tarjeta Master";
-    }
-    else if (e.target.value == "Efectivo") {
-        numerodepago.placeholder = "";
-    }
-    else {
-        numerodepago.placeholder = "Número de cuenta";
-    }
-});
 
 
 numProducto.addEventListener('change', (e) => {
@@ -297,6 +282,7 @@ function verificaCondiciones(datos, nuevovalor) {
         aviso("Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido", "error");
         return false;
     }
+    
     else {
         // conseguir la fecha actual y separarla en dia, mes y año para poder compararla con la fecha de ingreso del empleado   
         let diaActual = fechaActual.getDate();
@@ -418,7 +404,7 @@ async function datosTCodigos() {
     }
 }
 
-async function escribirHistorial(cedulaEmpleado, nuevovalor, username, cuotas, tipo) {
+async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo, codigo, generadopor) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
@@ -434,7 +420,9 @@ async function escribirHistorial(cedulaEmpleado, nuevovalor, username, cuotas, t
             method: 'POST',
             body:
                 JSON.stringify({
-                    nombreQuienEntrego: usernameLocal,
+                    codigo: codigo,
+                    nombreQuienEntrego: '',
+                    generadopor: generadopor,
                     valor: nuevovalor,
                     cuotas: cuotas,
                     fechaEfectuado: fecha,
@@ -694,11 +682,47 @@ async function historialT(valor) {
     }
 }
 
+async function ActualizarHistorial(codigo) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+    const urlcompleta = urlBack.url + '/Historial/actualizarXcodigo/' + codigo;
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    codigo: codigo,
+                    nombreQuienEntrego: usernameLocal,
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+}
+
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener("click", async (e) => {
     let cedula = document.querySelector("#cedula").value;
     let codigoA = document.querySelector("#codigoA").value;
-    let celular = document.querySelector("#celular").value;
 
     let cantidad = document.querySelector("#Cantidad").value;
     let cantidad2 = document.querySelector("#Cantidad2").value;
@@ -752,19 +776,19 @@ boton.addEventListener("click", async (e) => {
         auxValorUnidad4 = parseInt(datos4.valorUnidad);
         auxConcepto4 = datos4.concepto;
     }
-    if (cantidad2  == "") {
+    if (cantidad2 == "") {
         cantidad2 = 0;
     }
-    if (cantidad3  == "") {
+    if (cantidad3 == "") {
         cantidad3 = 0;
     }
-    if (cantidad4  == "") {
+    if (cantidad4 == "") {
         cantidad4 = 0;
     }
 
 
     let cod = null;
-    console.log(parseInt(cantidad)  * parseInt(datos2.valorUnidad));
+    console.log(parseInt(cantidad) * parseInt(datos2.valorUnidad));
     console.log(parseInt(cantidad2) * auxValorUnidad2);
     console.log(parseInt(cantidad3) * auxValorUnidad3);
     console.log(parseInt(cantidad4) * auxValorUnidad4);
@@ -782,18 +806,34 @@ boton.addEventListener("click", async (e) => {
     console.log("Codigo4: " + parseInt(datos4.valorUnidad));
 
 
-    let sumaVentas = parseInt(cantidad) * parseInt(datos.valorUnidad) + parseInt(cantidad2) * auxValorUnidad2 + parseInt(cantidad3) * auxValorUnidad3 + parseInt(cantidad4) * auxValorUnidad4; 
+    let sumaVentas = parseInt(cantidad) * parseInt(datos.valorUnidad) + parseInt(cantidad2) * auxValorUnidad2 + parseInt(cantidad3) * auxValorUnidad3 + parseInt(cantidad4) * auxValorUnidad4;
     let sumaCantidad = parseInt(cantidad) + parseInt(datos.cantidadTotalVendida);
     let sumaCantidad2 = parseInt(cantidad2) + parseInt(datos2.cantidadTotalVendida);
     let sumaCantidad3 = parseInt(cantidad3) + parseInt(datos3.cantidadTotalVendida);
     let sumaCantidad4 = parseInt(cantidad4) + parseInt(datos4.cantidadTotalVendida);
 
     console.log(sumaVentas);
-    
-    if (sumaCantidad > datos.cantidadRecibida || sumaCantidad2 > datos2.cantidadRecibida || sumaCantidad3 > datos3.cantidadRecibida || sumaCantidad4 > datos4.cantidadRecibida) {
-        aviso("No se puede cargar el mercado porque no hay inventario lo maximo a sacar es " + (datos.cantidadRecibida - datos.cantidadTotalVendida), "error");
+
+    if (sumaCantidad > datos.cantidadRecibida) {
+        aviso("No se puede cargar el mercado del producto #1 porque la suma de la cantidad supera el inventario disponible. Lo máximo a sacar es " + (datos.cantidadRecibida - datos.cantidadTotalVendida), "error");
         return;
-    }    
+    }
+    
+    if (sumaCantidad2 > datos2.cantidadRecibida) {
+        aviso("No se puede cargar el mercado del producto #2 porque la suma de la cantidad supera el inventario disponible. Lo máximo a sacar es " + (datos2.cantidadRecibida - datos2.cantidadTotalVendida), "error");
+        return;
+    }
+    
+    if (sumaCantidad3 > datos3.cantidadRecibida) {
+        aviso("No se puede cargar el mercado del producto #3 porque la suma de la cantidad supera el inventario disponible. Lo máximo a sacar es " + (datos3.cantidadRecibida - datos3.cantidadTotalVendida), "error");
+        return;
+    }
+    
+    if (sumaCantidad4 > datos4.cantidadRecibida) {
+        aviso("No se puede cargar el mercado del producto #4 porque la suma de la cantidad supera el inventario disponible. Lo máximo a sacar es " + (datos4.cantidadRecibida - datos4.cantidadTotalVendida), "error");
+        return;
+    }
+    
 
     if (!verificarCodigo(codigoA, CodigosMercado)) {
         aviso("El codigo no existe", "error");
@@ -810,17 +850,12 @@ boton.addEventListener("click", async (e) => {
         return;
     }
 
-    if (!verificaMonto(sumaVentas, CodigosMercado)) {
-        aviso("El monto del prestamo es mayor al permitido generado por el coodinador", "error");
-        return;
-    }
-
     if (!verificarCodigoComercio(codigo, datosArreglo) == true) {
         aviso("El codigo de la comercializadora no existe", "error");
         return;
     }
 
-    if (!verificaSelect(formaPago)) {
+    if (!verificaCondiciones(usuario, sumaVentas) == true) {
         return;
     }
 
@@ -847,24 +882,25 @@ boton.addEventListener("click", async (e) => {
         let concepto = datos.concepto;
 
         if (auxConcepto2) {
-          concepto += "," + auxConcepto2;
+            concepto += "," + auxConcepto2;
         }
-        
+
         if (auxConcepto3) {
-          concepto += "," + auxConcepto3;
+            concepto += "," + auxConcepto3;
         }
-        
+
         if (auxConcepto4) {
-          concepto += "," + auxConcepto4;
+            concepto += "," + auxConcepto4;
         }
-        
+
         // modificar en la tabla codigos el estado del codigo a false para que no pueda ser usado nuevamente
         await CambiarEstado(cod.codigo, sumaVentas, cod.codigoDescontado);
 
         await actualizar(cod.codigoDescontado, cod.codigo, usernameLocal, sumaVentas, 2);
-        
+
         await actualizarVentas(cantidad, codigo, usernameLocal);
-        await escribirHistorial(cedula, sumaVentas, usernameLocal, 2, "Compra tienda respecto a:" + concepto + " en " + sede);
+        await escribirHistorial(cedula, sumaVentas, 2, "Compra tienda respecto a:" + concepto + " en " + sede, cod.codigoDescontado, cod.generadoPor);
+        await ActualizarHistorial(cod.codigoDescontado);
 
         if (codigo2 != "") {
             await actualizarVentas(cantidad2, codigo2, usernameLocal);
@@ -882,86 +918,10 @@ boton.addEventListener("click", async (e) => {
         await historialT(sumaVentas);
 
         aviso("Se ha cargado la informacion exitosamente", "success");
-
-        let empresa = null;
-        let NIT = null;
-        let direcccion = null;
-        if (usuario.temporal.startsWith("Apoyo") || usuario.temporal.startsWith("APOYO")) {
-            empresa = "APOYO LABORAL TS SAS";
-            NIT = "NIT 900814587"
-            direcccion = "CRA 2 N 8-156 FACATATIVA"
-        }
-
-        else if (usuario.temporal.startsWith("Tu") || usuario.temporal.startsWith("TU")) {
-            empresa = "TU ALIANZA SAS";
-            NIT = "NIT 900864596"
-            direcccion = "Calle 7 N 4-49 MADRID"
-        }
-
-        else if (usuario.temporal.startsWith("Comercializadora") || usuario.temporal.startsWith("COMERCIALIZADORA")) {
-            empresa = "COMERCIALIZADORA TS";
-            NIT = "NIT 901602948"
-            direcccion = "CRA 1 N 17-37 BRAZILIA"
-        }
-
-        var docPdf = new jsPDF();
-
-        docPdf.addFont("Helvetica-Bold", "Helvetica", "bold");
-
-
-        docPdf.setFontSize(9);
-        docPdf.text("______________________________________________________________________________________________________________", 10, 10);
-        docPdf.setFontSize(24);
-        docPdf.setFont("Helvetica", "bold");
-        docPdf.text(empresa, 15, 22);
-        docPdf.setFont('Helvetica', 'normal');
-        docPdf.setFontSize(9);
-        docPdf.text('AUTORIZACIÓN DE LIBRANZA', 132, 15);
-        docPdf.text(NIT, 130, 20);
-        docPdf.text(direcccion, 135, 25);
-        docPdf.text("______________________________________________________________________________________________________________", 10, 27);
-        docPdf.text("______________________________________________________________________________________________________________", 10, 29);
-
-
-        docPdf.text("Fecha de Solicitud: " + new Date().toLocaleDateString(), 10, 40);
-        // salto de linea
-        docPdf.setFont("Helvetica", "bold");
-
-        docPdf.text("ASUNTO: CREDITO (PRESTAMO)", 10, 50);
-        docPdf.setFont("Helvetica", "normal");
-
-
-        docPdf.text("Yo, " + usuario.nombre + " mayor de edad,  identificado con la cedula de ciudadania No. "
-            + usuario.numero_de_documento + " autorizo", 10, 55);
-        docPdf.text("expresa e irrevocablemente para que del sueldo, salario, prestaciones sociales o de cualquier suma de la sea acreedor; me sean", 10, 60);
-        docPdf.text('descontados la cantidad de ' + sumaVentas + '"' + NumeroALetras(sumaVentas) + '"' + 'por concepto de' + ' PRESTAMO, en 2 cuota(s), ', 10, 65);
-        docPdf.text("quincenal del credito del que soy deudor ante Tu alianza S.A.S. , aun en el evento de encontrarme disfrutando de mis licencias ", 10, 70);
-        docPdf.text("o incapacidades. ", 10, 75);
-
-        docPdf.text("Fecha de ingreso: " + usuario.ingreso, 10, 85);
-        docPdf.text('Centro de Costo: ' + usuario.finca, 130, 85);
-        docPdf.text("Forma de pago: " + formaPago.value, 10, 90);
-        docPdf.text("Telefono: " + celular, 130, 90);
-
-        docPdf.setFont("Helvetica", "bold");
-        docPdf.text("Cordialmente ", 10, 100);
-        docPdf.setFont("Helvetica", "normal");
-        docPdf.text("Firma de Autorización ", 10, 110);
-        docPdf.text("C.C. " + usuario.numero_de_documento, 10, 115);
-
-        // realizar un cuadro para colocar la huella dactilar
-        docPdf.rect(130, 97, 25, 30);
-        docPdf.text("Código de descuento nómina: " + cod.codigoDescontado, 10, 120);
-        docPdf.setFont("Helvetica", "bold");
-        docPdf.setFontSize(6);
-        docPdf.text("Huella Indice Derecho", 130, 95);
-
-        docPdf.save("PrestamoDescontar" + "_" + usuario.nombre + "_" + cod.codigoDescontado + ".pdf");
     }
     else {
         aviso("El codigo de autorizacion no existe", "error");
     }
-
 
 
     document.querySelector("#Cantidad").value = "";
@@ -976,192 +936,5 @@ boton.addEventListener("click", async (e) => {
 
     document.querySelector("#cedula").value = "";
     document.querySelector("#codigoA").value = "";
-    document.querySelector("#celular").value = "";
-
-
-
-
-
 });
 
-
-/*************************************************************/
-// NumeroALetras
-// The MIT License (MIT)
-// 
-// Copyright (c) 2015 Luis Alfredo Chee 
-// 
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-// 
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-// 
-// @author Rodolfo Carmona
-// @contributor Jean (jpbadoino@gmail.com)
-/*************************************************************/
-function Unidades(num) {
-
-    switch (num) {
-        case 1: return "UN";
-        case 2: return "DOS";
-        case 3: return "TRES";
-        case 4: return "CUATRO";
-        case 5: return "CINCO";
-        case 6: return "SEIS";
-        case 7: return "SIETE";
-        case 8: return "OCHO";
-        case 9: return "NUEVE";
-    }
-
-    return "";
-}//Unidades()
-
-function Decenas(num) {
-
-    let decena = Math.floor(num / 10);
-    let unidad = num - (decena * 10);
-
-    switch (decena) {
-        case 1:
-            switch (unidad) {
-                case 0: return "DIEZ";
-                case 1: return "ONCE";
-                case 2: return "DOCE";
-                case 3: return "TRECE";
-                case 4: return "CATORCE";
-                case 5: return "QUINCE";
-                default: return "DIECI" + Unidades(unidad);
-            }
-        case 2:
-            switch (unidad) {
-                case 0: return "VEINTE";
-                default: return "VEINTI" + Unidades(unidad);
-            }
-        case 3: return DecenasY("TREINTA", unidad);
-        case 4: return DecenasY("CUARENTA", unidad);
-        case 5: return DecenasY("CINCUENTA", unidad);
-        case 6: return DecenasY("SESENTA", unidad);
-        case 7: return DecenasY("SETENTA", unidad);
-        case 8: return DecenasY("OCHENTA", unidad);
-        case 9: return DecenasY("NOVENTA", unidad);
-        case 0: return Unidades(unidad);
-    }
-}//Unidades()
-
-function DecenasY(strSin, numUnidades) {
-    if (numUnidades > 0)
-        return strSin + " Y " + Unidades(numUnidades)
-
-    return strSin;
-}//DecenasY()
-
-function Centenas(num) {
-    let centenas = Math.floor(num / 100);
-    let decenas = num - (centenas * 100);
-
-    switch (centenas) {
-        case 1:
-            if (decenas > 0)
-                return "CIENTO " + Decenas(decenas);
-            return "CIEN";
-        case 2: return "DOSCIENTOS " + Decenas(decenas);
-        case 3: return "TRESCIENTOS " + Decenas(decenas);
-        case 4: return "CUATROCIENTOS " + Decenas(decenas);
-        case 5: return "QUINIENTOS " + Decenas(decenas);
-        case 6: return "SEISCIENTOS " + Decenas(decenas);
-        case 7: return "SETECIENTOS " + Decenas(decenas);
-        case 8: return "OCHOCIENTOS " + Decenas(decenas);
-        case 9: return "NOVECIENTOS " + Decenas(decenas);
-    }
-
-    return Decenas(decenas);
-}//Centenas()
-
-function Seccion(num, divisor, strSingular, strPlural) {
-    let cientos = Math.floor(num / divisor)
-    let resto = num - (cientos * divisor)
-
-    let letras = "";
-
-    if (cientos > 0)
-        if (cientos > 1)
-            letras = Centenas(cientos) + " " + strPlural;
-        else
-            letras = strSingular;
-
-    if (resto > 0)
-        letras += "";
-
-    return letras;
-}//Seccion()
-
-function Miles(num) {
-    let divisor = 1000;
-    let cientos = Math.floor(num / divisor)
-    let resto = num - (cientos * divisor)
-
-    let strMiles = Seccion(num, divisor, "MIL", "MIL");
-    let strCentenas = Centenas(resto);
-
-    if (strMiles == "")
-        return strCentenas;
-
-    return strMiles + " " + strCentenas;
-}//Miles()
-
-function Millones(num) {
-    let divisor = 1000000;
-    let cientos = Math.floor(num / divisor)
-    let resto = num - (cientos * divisor)
-
-    let strMillones = Seccion(num, divisor, "UN MILLON DE", "MILLONES DE");
-    let strMiles = Miles(resto);
-
-    if (strMillones == "")
-        return strMiles;
-
-    return strMillones + " " + strMiles;
-}//Millones()
-
-function NumeroALetras(num) {
-    var data = {
-        numero: num,
-        enteros: Math.floor(num),
-        centavos: (((Math.round(num * 100)) - (Math.floor(num) * 100))),
-        letrasCentavos: "",
-        letrasMonedaPlural: "Pesos",//"PESOS", "Dólares", "Bolívares", "etcs"
-        letrasMonedaSingular: "Peso", //"PESO", "Dólar", "Bolivar", "etc"
-
-        letrasMonedaCentavoPlural: "CENTAVOS",
-        letrasMonedaCentavoSingular: "CENTAVO"
-    };
-
-    if (data.centavos > 0) {
-        data.letrasCentavos = "CON " + (function () {
-            if (data.centavos == 1)
-                return Millones(data.centavos) + " " + data.letrasMonedaCentavoSingular;
-            else
-                return Millones(data.centavos) + " " + data.letrasMonedaCentavoPlural;
-        })();
-    };
-
-    if (data.enteros == 0)
-        return "CERO " + data.letrasMonedaPlural + " " + data.letrasCentavos;
-    if (data.enteros == 1)
-        return Millones(data.enteros) + " " + data.letrasMonedaSingular + " " + data.letrasCentavos;
-    else
-        return Millones(data.enteros) + " " + data.letrasMonedaPlural + " " + data.letrasCentavos;
-}

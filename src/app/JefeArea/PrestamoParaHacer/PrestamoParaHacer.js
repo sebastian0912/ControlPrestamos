@@ -90,7 +90,7 @@ numemoroM.addEventListener('keyup', (e) => {
     }
 });
 
-async function escribirCodigo(cedulaEmpleado, nuevovalor, cod, cuotas, tipo, valor) {
+async function escribirCodigo(cedulaEmpleado, nuevovalor, codigo, cuotas, tipo, valor) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
@@ -102,7 +102,7 @@ async function escribirCodigo(cedulaEmpleado, nuevovalor, cod, cuotas, tipo, val
             method: 'POST',
             body:
                 JSON.stringify({
-                    codigo: cod,
+                    codigo: codigo,
                     monto: nuevovalor,
                     cuotas: cuotas,
                     estado: true,
@@ -124,7 +124,7 @@ async function escribirCodigo(cedulaEmpleado, nuevovalor, cod, cuotas, tipo, val
                 }
             })
             .then(responseData => {
-                aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + cod, 'success');
+                aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + codigo, 'success');
                 console.log('Respuesta:', responseData);
             })
             .catch(error => {
@@ -169,7 +169,17 @@ function verificaSelect(select) {
     }
 }
 
-
+function verificaSelect2(select) {
+    let encontrado = false;
+    if (select.value == '0') {
+        aviso('Debe seleccionar un concepto', 'error');
+        return false;
+    }
+    else {
+        encontrado = true;
+        return encontrado;
+    }
+}
 
 async function datosEmpleado(cedulaEmpleado) {
     var body = localStorage.getItem('key');
@@ -219,7 +229,6 @@ formaPago.addEventListener('change', (e) => {
     }
 });
 
-
 function verificaCondiciones(datos, nuevovalor) {
     // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
     const fechaIngreso = datos.ingreso;
@@ -259,12 +268,12 @@ function verificaCondiciones(datos, nuevovalor) {
         // conseguir la fecha actual y separarla en dia, mes y año para poder compararla con la fecha de ingreso del empleado            
         let mesActual = fechaActual.getMonth() + 1;
         let anioActual = fechaActual.getFullYear();
-        if ((anioActual == anio) && ((mesActual - mes) >= 2)) {
-            if (parseInt(nuevovalor) >= 200000) {
+        if ((anioActual == anio) && ((parseInt(mesActual) - parseInt(mes)) >= 2)) {
+            if (parseInt(nuevovalor) >= 200001) {
                 aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
                 return false;
             }
-            else if ((sumaTotal + parseInt(nuevovalor)) >= 350000) {
+            else if ((sumaTotal + parseInt(nuevovalor)) >= 350001) {
                 aviso('Ups no se pueden generar prestamos, puede sacar maximo ' + (350000 - (sumaTotal)), 'error');
                 return false;
             }
@@ -272,12 +281,12 @@ function verificaCondiciones(datos, nuevovalor) {
                 return true;
             }
         }
-        else if ((anioActual > anio)) {
-            if (parseInt(nuevovalor) >= 200000) {
+        else if ((parseInt(anioActual) > parseInt(anio))) {
+            if (parseInt(nuevovalor) >= 200001) {
                 aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
                 return false;
             }
-            else if ((sumaTotal + parseInt(nuevovalor)) >= 350000) {
+            else if ((sumaTotal + parseInt(nuevovalor)) >= 350001) {
                 aviso('Ups no se pueden generar prestamos, puede sacar maximo ' + (350000 - (sumaTotal)), 'error');
                 return false;
             }
@@ -288,7 +297,7 @@ function verificaCondiciones(datos, nuevovalor) {
     }
 }
 
-async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo) {
+async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo, codigo) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
@@ -304,8 +313,10 @@ async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo) {
             method: 'POST',
             body:
                 JSON.stringify({
+                    codigo: codigo,
                     cedula: cedulaEmpleado,
-                    nombreQuienEntrego: usernameLocal,
+                    nombreQuienEntrego: '',
+                    generadopor: usernameLocal,
                     valor: nuevovalor,
                     cuotas: cuotas,
                     fechaEfectuado: fecha,
@@ -354,8 +365,7 @@ boton.addEventListener('click', async (e) => {
     cedula.style.display = "none";
     boton2.style.display = "inline-block";
     tipo.style.display = "inline-block";
-    valor.style.display = "inline-block";
-    cuotas.style.display = "inline-block";
+    
     formaPago.style.display = "inline-block";
     celular.style.display = "inline-block";
 
@@ -369,11 +379,26 @@ boton.addEventListener('click', async (e) => {
         let tipo = document.querySelector('#tipo').value;
         let cuotasAux = cuotas;
 
-        if (!verificaCondiciones(datos, parseInt(nuevovalor))) {
+        if (!verificaCondiciones(datos, nuevovalor) == true) {
             return;
         }
 
         if (!verificaSelect(formaPago)) {
+            return;
+        }
+
+        if (!verificaSelect2(tipo)) {
+            return;
+        }
+
+        if (valor == "") {
+            aviso('Ups no se pueden generar mercado, el monto no puede estar vacio', 'error');
+            return;
+        }
+
+        // campo celular debe tener 10 digitos
+        if (celular.value.length != 10) {
+            aviso('Ups no se pueden generar mercado, el número proporcionado debe tener 10 digitos', 'error');
             return;
         }
 
@@ -399,7 +424,7 @@ boton.addEventListener('click', async (e) => {
         }
 
         await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, cuotasAux, tipo, valor)
-        await escribirHistorial(cedulaEmpleado, nuevovalor, cuotasAux, tipo);
+        await escribirHistorial(cedulaEmpleado, nuevovalor, cuotasAux, concepto, codigoOH);
 
         if (datos.temporal.startsWith("Apoyo") || datos.temporal.startsWith("APOYO")) {
             empresa = "APOYO LABORAL TS SAS";
