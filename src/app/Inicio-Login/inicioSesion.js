@@ -55,7 +55,7 @@ signInform.addEventListener('submit', async (e) => {
         } else if (values.rol == 'JEFE-DE-AREA') {
             window.location.href = "../JefeArea/jefeArea.html";
         } else if (values.rol == 'TIENDA') {
-            window.location.href = "../Tienda/tienda.html";
+            window.location.href = "../Tienda/InicioTienda.html";
         }
         else if (values.rol == 'COORDINADOR') {
             window.location.href = "../Coordinador/coordinador.html";

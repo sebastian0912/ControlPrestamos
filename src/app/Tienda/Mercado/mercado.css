@@ -18,18 +18,17 @@ h1 {
 
 .diasT {
     width: 100%;
-    margin: 50px 0 20px 30px;
+    margin: 20px 0 10px 30px;
     font-family: 'Nunito Sans', sans-serif;
-    font-size: 20pt;
+    font-size: 14pt;
     font-weight: 400;
 }
 
 .dias {
     text-align: justify;
-    margin: 10px 0 20px 120px;
-
+    margin: 0px 0 10px 120px;
     font-family: 'Nunito Sans', sans-serif;
-    font-size: 20pt;
+    font-size: 16pt;
     font-weight: 600;
 }
 
@@ -67,7 +66,7 @@ li {
 
 }
 
-li:nth-child(4) {
+li:nth-child(5) {
     background: #bbd0ff;
     color: #000000;
     transform: scale(1.1);
@@ -143,15 +142,12 @@ span {
     font-style: italic;
 }
 
-
-.contenido {
-    width: 80%;
-    height: 100%;
-    float: right;
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: column;
+.titulo-Opciones {
+    padding-left: 20px;
+    font-size: 12pt;
+    margin-top: 10px;
 }
+
 
 .cuadro {
     width: 250px;
@@ -164,16 +160,19 @@ span {
     font-weight: 700;
 }
 
-.titulo-Opciones {
-    padding-left: 20px;
-    font-size: 12pt;
-    margin-top: 10px;
-}
 
+.contenido {
+    width: 80%;
+    height: 100%;
+    float: right;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
 
 .cuadroTexto {
     width: 800px;
-    height: 300px;
+    height: 250px;
     background: #ffffff;
     margin: 50px 0 0 80px;
     border-radius: 15px;
@@ -182,15 +181,44 @@ span {
     font-weight: 700;
 }
 
-.cajaCedula {
-    margin: 0px 0 20px 30px;
+
+.valor {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
 }
 
-.cajaCedula .titulo {
-    margin-top: 30px;
+
+.valor .titulo {
+    margin: 5px 50px 30px 30px;
     float: left;
 }
 
+
+#monto {
+    margin-left: 50px; /* Ajusta este valor según sea necesario */
+}
+
+#formaPago {
+    margin-left: 20px; /* Ajusta este valor según sea necesario */
+}
+
+#celular {
+    margin-top: 20px;
+}
+
+#boton2 {
+    margin-left: 20px; /* Ajusta este valor según sea necesario */
+}
+
+
+select {
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    margin: 0 50px 20px 30px;
+    width: 240px;
+    height: 50px;
+}
 
 
 .input {
@@ -212,12 +240,6 @@ span {
     outline: none;
 }
 
-.valor {
-    flex: 1 100%;
-    height: auto;
-    text-align: center;
-    margin-left: -150px;
-}
 
 .input2 {
     font-family: 'Poppins', sans-serif;
@@ -240,6 +262,21 @@ span {
 }
 
 .btn {
+    height: 50px;
+    font-weight: 600;
+    font-size: 16px;
+    color: #fff;
+    background-color: #0066cc;
+    padding: 10px 30px;
+    border: 2px solid #0066cc;
+    box-shadow: rgb(0, 0, 0) 0px 0px 0px 0px;
+    border-radius: 50px;
+    transition: 1000ms;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+}
+
+.btn2 {
     height: 50px;
     font-weight: 600;
     font-size: 16px;

@@ -282,7 +282,7 @@ function verificaCondiciones(datos, nuevovalor) {
         aviso("Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido", "error");
         return false;
     }
-    
+
     else {
         // conseguir la fecha actual y separarla en dia, mes y año para poder compararla con la fecha de ingreso del empleado   
         let diaActual = fechaActual.getDate();
@@ -787,7 +787,6 @@ boton.addEventListener("click", async (e) => {
     }
 
 
-    let cod = null;
     console.log(parseInt(cantidad) * parseInt(datos2.valorUnidad));
     console.log(parseInt(cantidad2) * auxValorUnidad2);
     console.log(parseInt(cantidad3) * auxValorUnidad3);
@@ -818,22 +817,22 @@ boton.addEventListener("click", async (e) => {
         aviso("No se puede cargar el mercado del producto #1 porque la suma de la cantidad supera el inventario disponible. Lo máximo a sacar es " + (datos.cantidadRecibida - datos.cantidadTotalVendida), "error");
         return;
     }
-    
+
     if (sumaCantidad2 > datos2.cantidadRecibida) {
         aviso("No se puede cargar el mercado del producto #2 porque la suma de la cantidad supera el inventario disponible. Lo máximo a sacar es " + (datos2.cantidadRecibida - datos2.cantidadTotalVendida), "error");
         return;
     }
-    
+
     if (sumaCantidad3 > datos3.cantidadRecibida) {
         aviso("No se puede cargar el mercado del producto #3 porque la suma de la cantidad supera el inventario disponible. Lo máximo a sacar es " + (datos3.cantidadRecibida - datos3.cantidadTotalVendida), "error");
         return;
     }
-    
+
     if (sumaCantidad4 > datos4.cantidadRecibida) {
         aviso("No se puede cargar el mercado del producto #4 porque la suma de la cantidad supera el inventario disponible. Lo máximo a sacar es " + (datos4.cantidadRecibida - datos4.cantidadTotalVendida), "error");
         return;
     }
-    
+
 
     if (!verificarCodigo(codigoA, CodigosMercado)) {
         aviso("El codigo no existe", "error");
@@ -874,11 +873,11 @@ boton.addEventListener("click", async (e) => {
             aviso("El codigo de autorizacion no existe", "error");
             return;
         }
-        else {
-            cod = obtenerCodigo(codigoA, CodigosMercado);
-        }
+        
+        let cod = obtenerCodigo(codigoA, CodigosMercado);
 
-        cod.codigoDescontado = "MOH" + Math.floor(Math.random() * (999999 - 100000)) + 100000;
+
+        let codigAux = "MOH" + Math.floor(Math.random() * 1000000);
         let concepto = datos.concepto;
 
         if (auxConcepto2) {
@@ -894,13 +893,13 @@ boton.addEventListener("click", async (e) => {
         }
 
         // modificar en la tabla codigos el estado del codigo a false para que no pueda ser usado nuevamente
-        await CambiarEstado(cod.codigo, sumaVentas, cod.codigoDescontado);
+        await CambiarEstado(cod.codigo, sumaVentas, codigAux);
 
-        await actualizar(cod.codigoDescontado, cod.codigo, usernameLocal, sumaVentas, 2);
+        await actualizar(codigAux, cod.codigo, usernameLocal, sumaVentas, 2);
 
         await actualizarVentas(cantidad, codigo, usernameLocal);
-        await escribirHistorial(cedula, sumaVentas, 2, "Compra tienda respecto a:" + concepto + " en " + sede, cod.codigoDescontado, cod.generadoPor);
-        await ActualizarHistorial(cod.codigoDescontado);
+        await escribirHistorial(cedula, sumaVentas, 2, "Compra tienda respecto a:" + concepto + " en " + sede, codigAux, cod.generadoPor);
+        await ActualizarHistorial(codigAux);
 
         if (codigo2 != "") {
             await actualizarVentas(cantidad2, codigo2, usernameLocal);

@@ -1,6 +1,6 @@
 
-import { urlBack } from "../models/base.js";
-import { aviso } from "../Avisos/avisos.js";
+import { urlBack } from "../../models/base.js";
+import { aviso } from "../../Avisos/avisos.js";
 
 
 const boton = document.querySelector('#boton');
@@ -105,15 +105,15 @@ else {
     lola.style.display = "none";
 }
 
+
 if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen"
-    || usernameLocal == "Señora Lola" || usernameLocal == "SEÑORA LOLA" || usernameLocal == "señora lola") {
+    || usernameLocal == "Señora Lola" || usernameLocal == "SEÑORA LOLA" || usernameLocal == "señora lola"
+    || usernameLocal == "Señor Luis" || usernameLocal == "SEÑOR LUIS" || usernameLocal == "señor luis") {
     lola2.style.display = "inline-block";
 }
 else {
     lola2.style.display = "none";
 }
-
-
 
 
 function verificarCedula(codigoP, cedulaEmpleado, datos) {
@@ -192,13 +192,13 @@ function verificaCondiciones(datos, nuevovalor) {
         parseInt(datos.saldos) +
         parseInt(datos.fondos) +
         parseInt(datos.mercados) +
-        parseInt(datos.prestamoPaDescontar) +
+        parseInt(datos.prestamoParaDescontar) +
         parseInt(datos.casino) +
         parseInt(datos.valoranchetas) +
         parseInt(datos.fondo) +
         parseInt(datos.carnet) +
         parseInt(datos.seguroFunerario) +
-        parseInt(datos.prestamoPaHacer) +
+        parseInt(datos.prestamoParaHacer) +
         parseInt(datos.anticipoLiquidacion) +
         parseInt(datos.cuentas);
 
@@ -455,7 +455,7 @@ async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo, codig
                     codigo: codigo,
                     cedula: cedulaEmpleado,
                     nombreQuienEntrego: '',
-                    generadopor: generadoPor,                    
+                    generadopor: generadoPor,
                     valor: nuevovalor,
                     cuotas: cuotas,
                     fechaEfectuado: fecha,
@@ -573,8 +573,8 @@ async function ActualizarHistorial(codigo) {
             method: 'POST',
             body:
                 JSON.stringify({
-                    codigo: codigo,                    
-                    nombreQuienEntrego: usernameLocal,                    
+                    codigo: codigo,
+                    nombreQuienEntrego: usernameLocal,
                     jwt: jwtToken
                 })
         })
@@ -608,7 +608,6 @@ boton.addEventListener('click', async (e) => {
     const valor = document.querySelector('#valor').value;
     const nuevovalor = valor.replace(/\,/g, '');
 
-    let encontrado = false;
     let concepto;
 
     if (codigoP == '') {
@@ -636,39 +635,38 @@ boton.addEventListener('click', async (e) => {
             aviso('El codigo no pertenece a este empleado', 'error');
             return;
         }
-        
+
         if (verificaSiesUnPrestamo(codigoP)) {
             aviso('El codigo no es valido solo se admiten mercado', 'error');
             return;
         }
 
-        if (verificaCondiciones(datosUsuario, parseInt(nuevovalor))) {
+        if (!verificaCondiciones(datosUsuario, parseInt(nuevovalor)) == true) {
             return;
         }
 
+        console.log("entro");
 
-        else {
-            const cod = obtenerCodigo(codigoP, datos);
-            concepto = 'Compra tienda de ' + usernameLocal;
-            encontrado = true;
+        const cod = obtenerCodigo(codigoP, datos);
+        concepto = 'Compra tienda de ' + usernameLocal;
 
-            // generar codigo solo numeros aleatorios
-            let codigo = 'MOH' + Math.floor(Math.random() * (999999 - 100000)) + 100000;
+        // generar codigo solo numeros aleatorios
+        let codigo = 'MOH' + Math.floor(Math.random() * 1000000);
 
-            // actualizar el codigo en la base de datos
-            await actualizar(codigo, codigoP, usernameLocal, nuevovalor, 2);
+        // actualizar el codigo en la base de datos
+        await actualizar(codigo, codigoP, usernameLocal, nuevovalor, 2);
 
-            await CambiarEstado(codigoP, nuevovalor, codigo);
+        await CambiarEstado(codigoP, nuevovalor, codigo);
 
-            await escribirHistorial(cedulaEmpleado, nuevovalor, usernameLocal, 2, concepto, codigo, cod.generadoPor);
-            await ActualizarHistorial(codigo);
+        await escribirHistorial(cedulaEmpleado, nuevovalor, 2, concepto, codigo, cod.generadoPor);
+        await ActualizarHistorial(codigo);
 
-            await actualizarDatosBase(concepto, nuevovalor, 2, cedulaEmpleado);
+        await actualizarDatosBase(concepto, nuevovalor, 2, cedulaEmpleado);
 
-            await historialT(nuevovalor);
+        await historialT(nuevovalor);
 
-            aviso('Acaba de pedir un prestamo de ' + valor, 'success');
-        }
+        aviso('Acaba de pedir un prestamo de ' + valor, 'success');
+
     }
 });
 

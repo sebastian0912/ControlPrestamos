@@ -736,7 +736,7 @@ boton.addEventListener('click', async (e) => {
     }
 
     // valor no sea 
-    if (value == '') {
+    if (valor == '') {
         aviso('El campo codigo no puede estar vacio', 'error');
     }
 
@@ -768,7 +768,7 @@ boton.addEventListener('click', async (e) => {
         aviso('El código no es valido solo se admiten prestamos', 'error');
         return;
     }
-    if (!verificaCondiciones(datos, nuevovalor) == true) {
+    if (!verificaCondiciones(usuario, nuevovalor) == true) {
         return;
     }
     
@@ -779,7 +779,6 @@ boton.addEventListener('click', async (e) => {
         let concepto = null;
         concepto2 = 'Dinero_Autorizacion';
         concepto = 'Libranza_Prestamo_Dinero';
-        encontrado = true;
 
         let codigo = 'OH' + Math.floor(Math.random() * 1000000);;
 

@@ -64,7 +64,7 @@ li {
     cursor: pointer;
 }
 
-li:nth-child(3) {
+li:nth-child(4) {
     background: #bbd0ff;
     color: #000000;
     transform: scale(1.1);

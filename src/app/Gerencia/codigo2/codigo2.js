@@ -368,6 +368,7 @@ boton.addEventListener('click', async (e) => {
             aviso('Ups no se pueden generar prestamos perteneces al fondo', 'error');
         }
         else {
+            console.log('suma total: ' + sumaTotal);
             let concepto = null;
             // VERIFICAR EL TIPO QUE SE ESTA SELECCIONANDO        
             if (tipo == "Seguro Funerario") {
@@ -389,16 +390,18 @@ boton.addEventListener('click', async (e) => {
             let anioActual = fechaActual.getFullYear();
             let bandera = false;
             if ((anioActual == anio) && ((parseInt(mesActual) - parseInt(mes)) >= 2)) {
-                if (parseInt(nuevovalor) >= 200000) {
+                if (parseInt(nuevovalor) >= 200001) {
                     aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
-                    return false;
+                    bandera = false;
                 }
-                else if ((sumaTotal + parseInt(nuevovalor)) >= 350000) {
+                else if ((sumaTotal + parseInt(nuevovalor)) >= 350001) {
                     aviso('Ups no se pueden generar prestamos, puede sacar maximo ' + (350000 - (sumaTotal)), 'error');
-                    return false;
+                    bandera = false;
                 }
                 else {
-                    return true;
+                    bandera = true;
+                    await escribirHistorial(cedulaEmpleado, nuevovalor, cuotasAux, concepto, codigoOH);
+                    await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, cuotasAux, tipo, valor);
                 }
             }
             else if ((parseInt(anioActual) > parseInt(anio))) {

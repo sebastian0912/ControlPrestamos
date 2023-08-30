@@ -647,7 +647,7 @@ boton.addEventListener('click', async (e) => {
             concepto = 'Libranza_Prestamo_Dinero';
             concepto2 = 'Dinero_Autorizacion';
             encontrado = true;
-            let codigo = 'OH' + Math.floor(Math.random() * 1000000);;
+            let codigo = 'OH' + Math.floor(Math.random() * 1000000);
 
             if (cod.codigo.startsWith("SF")) {
                 concepto2 = 'Seguro_Funerario_Autorizacion';

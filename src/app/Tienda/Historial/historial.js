@@ -79,7 +79,7 @@ diasLi.innerHTML = dias2;
 
 
 
-if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen" ) {
+if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen") {
     lola.style.display = "inline-block";
 }
 else {
@@ -131,17 +131,17 @@ boton.addEventListener('click', async (e) => {
     e.preventDefault();
     // capturar los datos del formulario
     const cedulaEmpleado = document.querySelector('#cedula').value;
-    
+
     const datosExtraidos = await datosH(cedulaEmpleado);
     console.log(datosExtraidos);
     if (datosExtraidos.historial.length == 0) {
         aviso('No hay datos para mostrar', 'warning');
         return
     }
-    
+
     const oculto = document.querySelector('#oculto');
     oculto.style.display = "block";
-    
+
     tabla.innerHTML = '';
     datosExtraidos.historial.forEach(async (p) => {
         // limpiar la tabla
@@ -154,7 +154,7 @@ boton.addEventListener('click', async (e) => {
                 <td>${p.valor}</td>
                 <td>${p.cuotas}</td>
                 <td>${p.nombreQuienEntrego}</td>
-            </tr>
+                <td>${p.generadopor}</td>            </tr>
             `
     });
 });
