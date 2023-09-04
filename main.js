@@ -10,8 +10,8 @@ const createWindow = () => {
     width: 1300,
     height: 900,
   });
-  //win.setMenu(null)
-  console.log("Iniciando aplicación Electron...");
+
+  win.setMenu(null)
 
   autoUpdater.checkForUpdates();
 

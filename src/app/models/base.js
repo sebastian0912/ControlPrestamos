@@ -42,7 +42,7 @@ export let usuarioR = {
     avatar: '',  // nuevo
     empladode: '', // se mantiene es sede
     sucursalde: '', // se mantiene es sede
-    rol: 'TESORERIA', // se mantiene
+    rol: '-', // se mantiene
     password: '', // se mantiene
     username: '', // se mantiene
     EstadoQuincena: true,

@@ -2,8 +2,6 @@
 import { urlBack } from "../models/base.js";
 import { aviso, avisoConfirmacion, avisoConfirmacionAc, avisoConfirmacionAc2 } from "../Avisos/avisos.js";
 
-
-
 // Capturar el h1 del titulo y perfil
 const titulo = document.querySelector('#username');
 const perfil = document.querySelector('#perfil');
@@ -147,6 +145,7 @@ extrae.addEventListener('click', async () => {
         ['', '', '', '', '', '', '', 'ANTERIOR', '', 'PARA DESCONTAR', '', '', '', '', '', '', '', '', '', 'PARA HACER', '', '', '', '', '', '', '', ''],
         ['CÓDIGO', 'CÉDULA', 'NOMBRE', 'INGRESO', 'TEMPORAL', 'FINCA', 'SALARIO', 'SALDOS', 'FONDOS', 'MERCADOS', 'CUOTAS MERCADOS', 'PRESTAMO PARA DESCONTAR', 'CUOTAS PRESTAMOS PARA DESCONTAR', 'CASINO', 'ANCHETAS', 'CUOTAS ANCHETAS', 'FONDO', 'CARNET', 'SEGURO FUNERARIO', 'PRESTAMO PARA HACER', 'CUOTAS PRESTAMO PARA HACER', 'ANTICIPO LIQUIDACIÓN', 'CUENTAS'],
     ];
+
     console.log(datosExtraidos.datosbase);
     datosExtraidos.datosbase.forEach((doc) => {
         const docData = doc;
@@ -213,7 +212,6 @@ extrae.addEventListener('click', async () => {
     document.body.removeChild(element);
     URL.revokeObjectURL(url);
 });
-
 
 async function datosTCodigos() {
     var body = localStorage.getItem('key');
