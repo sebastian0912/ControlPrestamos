@@ -147,36 +147,50 @@ extrae.addEventListener('click', async () => {
         ['', '', '', '', '', '', '', 'ANTERIOR', '', 'PARA DESCONTAR', '', '', '', '', '', '', '', '', '', 'PARA HACER', '', '', '', '', '', '', '', ''],
         ['CÓDIGO', 'CÉDULA', 'NOMBRE', 'INGRESO', 'TEMPORAL', 'FINCA', 'SALARIO', 'SALDOS', 'FONDOS', 'MERCADOS', 'CUOTAS MERCADOS', 'PRESTAMO PARA DESCONTAR', 'CUOTAS PRESTAMOS PARA DESCONTAR', 'CASINO', 'ANCHETAS', 'CUOTAS ANCHETAS', 'FONDO', 'CARNET', 'SEGURO FUNERARIO', 'PRESTAMO PARA HACER', 'CUOTAS PRESTAMO PARA HACER', 'ANTICIPO LIQUIDACIÓN', 'CUENTAS'],
     ];
-
     console.log(datosExtraidos.datosbase);
-
     datosExtraidos.datosbase.forEach((doc) => {
         const docData = doc;
+        let fechaIngreso;
+        // Transformar la fecha de "ingreso" al formato "mm/dd/yyyy"
+        if (docData.ingreso.includes('-')) {
+            // Formato "d-m-yy"
+            fechaIngreso = docData.ingreso.split('-');
+            if (fechaIngreso[2].length === 2) {
+                fechaIngreso[2] = '20' + fechaIngreso[2];
+            }
+        } else {
+            // Formato "d/mm/yyyy"
+            fechaIngreso = docData.ingreso.split('/');
+        }    
+        
+        fechaIngreso = fechaIngreso.join('/');
+
         excelData.push([
-            docData.codigo,
-            docData.numero_de_documento,
+            docData.codigo, // Convertir a número
+            docData.numero_de_documento, // Convertir a número
             docData.nombre,
-            docData.ingreso,
+            fechaIngreso,
             docData.temporal,
             docData.finca,
-            docData.salario,
-            docData.saldos,
-            docData.fondos,
-            docData.mercados,
-            docData.cuotasMercados,
-            docData.prestamoParaDescontar,
-            docData.cuotasPrestamosParaDescontar,
-            docData.casino,
-            docData.valoranchetas,
-            docData.cuotasAnchetas,
-            docData.fondo,
-            docData.carnet,
-            docData.seguroFunerario,
-            docData.prestamoParaHacer,
-            docData.cuotasPrestamoParahacer,
-            docData.anticipoLiquidacion,
-            docData.cuentas
+            docData.salario, // Convertir a número
+            Number(docData.saldos), // Convertir a número
+            Number(docData.fondos), // Convertir a número
+            Number(docData.mercados), // Convertir a número
+            Number(docData.cuotasMercados), // Convertir a número
+            Number(docData.prestamoParaDescontar), // Convertir a número
+            Number(docData.cuotasPrestamosParaDescontar), // Convertir a número
+            Number(docData.casino), // Convertir a número
+            Number(docData.valoranchetas), // Convertir a número
+            Number(docData.cuotasAnchetas), // Convertir a número
+            Number(docData.fondo), // Convertir a número
+            Number(docData.carnet), // Asumiendo que es texto
+            Number(docData.seguroFunerario), // Convertir a número
+            Number(docData.prestamoParaHacer), // Convertir a número
+            Number(docData.cuotasPrestamoParahacer), // Convertir a número
+            Number(docData.anticipoLiquidacion), // Convertir a número
+            Number(docData.cuentas) // Convertir a número
         ]);
+        fechaIngreso = '';
     });
 
     const ws = XLSX.utils.aoa_to_sheet(excelData);
@@ -199,6 +213,7 @@ extrae.addEventListener('click', async () => {
     document.body.removeChild(element);
     URL.revokeObjectURL(url);
 });
+
 
 async function datosTCodigos() {
     var body = localStorage.getItem('key');
@@ -250,8 +265,8 @@ extraeC.addEventListener('click', async () => {
             doc.codigo,
             doc.cedulaQuienPide,
             doc.generadoPor,
-            doc.monto,
-            doc.cuotas,
+            Number(doc.monto),
+            Number(doc.cuotas),
             doc.fechaGenerado
         ]);
     });
@@ -323,7 +338,7 @@ extraeT.addEventListener('click', async () => {
     } else {
         datosExtraidos.tienda.forEach((doc) => {
             const docData = doc;
-            excelData.push([docData.nombre, docData.valorTotal, docData.numPersonasAtendidas]);
+            excelData.push([docData.nombre, Number(docData.valorTotal), Number(docData.numPersonasAtendidas)]);
         });
 
         const ws = XLSX.utils.aoa_to_sheet(excelData);
@@ -367,7 +382,7 @@ valoresEnCero.addEventListener('click', async () => {
         console.log(jwtToken);
 
         const urlcompleta = urlBack.url + '/Datosbase/reiniciarValores';
-        
+
         try {
             // Mostrar elementos ocultos
             over.style.display = "block";
@@ -389,7 +404,7 @@ valoresEnCero.addEventListener('click', async () => {
                     }
                 })
                 .then(responseData => {
-                    
+
                     console.log('Respuesta:', responseData);
                     document.getElementById('successSound').play();
                     // Ocultar elementos después de completar la operación
@@ -398,7 +413,7 @@ valoresEnCero.addEventListener('click', async () => {
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    
+
                     document.getElementById('errorSound').play();
                     // También ocultar elementos en caso de error
                     over.style.display = "none";
@@ -414,7 +429,7 @@ valoresEnCero.addEventListener('click', async () => {
             loader.style.display = "none";
         }
     }
-    else{
+    else {
         aviso("No se han actualizado los campos", "success");
     }
 });
@@ -571,7 +586,7 @@ async function guardarDatos(datosFinales) {
         })
             .then(response => {
                 if (response.ok) {
-                    document.getElementById('successSound').play();                    
+                    document.getElementById('successSound').play();
                     aviso("Datos guardados correctamente", "success");
                     over.style.display = "none";
                     loader.style.display = "none";
@@ -735,7 +750,7 @@ async function THistorial() {
 extraeHistorialT.addEventListener('click', async () => {
     console.log("entro");
     const datosExtraidos = await THistorial();
-    if (datosExtraidos.historial.length == 0 ) {
+    if (datosExtraidos.historial.length == 0) {
         aviso("No hay registros de compras realizadas en las tiendas", "warning");
         return;
     }
@@ -749,7 +764,7 @@ extraeHistorialT.addEventListener('click', async () => {
 
 
     let excelData = [['Cedula', 'Concepto', 'Cuotas', 'Fecha Efectuado', 'Nombre Quien Entregó', 'Valor']];
-    
+
     historial.forEach((doc) => {
         excelData.push([
             doc.cedula,

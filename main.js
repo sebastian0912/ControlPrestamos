@@ -1,6 +1,5 @@
 const { app, BrowserWindow } = require("electron");
 const { autoUpdater, AppUpdater } = require("electron-updater");
-const { aviso } = require("./src/app/Avisos/avisos.js");
 
 
 autoUpdater.autoDownload = false;
@@ -11,31 +10,40 @@ const createWindow = () => {
     width: 1300,
     height: 900,
   });
-  //win.setMenu(null)  
-  win.loadFile("./src/app/Inicio-Login/index.html");
+  //win.setMenu(null)
+  console.log("Iniciando aplicación Electron...");
 
   autoUpdater.checkForUpdates();
 
+  win.loadFile("./src/app/Inicio-Login/index.html");
 };
 
+
 /*Nueva actualizacion*/
-autoUpdater.on("update-available", () => {
+autoUpdater.on("update-available", async () => {
+  console.log("Actualizacion disponible");
   autoUpdater.downloadUpdate();
-  aviso("Actualizacion disponible", "warning");
 });
 
 
 // MOSTRAR MENSAJE CUANDO SE ESTE DESCARGANDO LA ACTUALIZACION
-autoUpdater.on("update-downloaded", (info) => {
+autoUpdater.on("update-downloaded", async (info) => {
+  console.log("Actualizacion descargada");
   autoUpdater.quitAndInstall();
-  aviso("Actualizacion descargada", "success");
 }
 );
 
 // actualizacion no disponible
 autoUpdater.on("update-not-available", () => {
-  aviso("Actualizacion no disponible", "success");
+  console.log("Actualizacion no disponible");
 });
+
+
+autoUpdater.on("error", (error) => {
+  console.error("Hubo un error con la actualización:", error);
+});
+
+
 
 
 app.whenReady().then(() => {

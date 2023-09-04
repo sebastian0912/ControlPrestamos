@@ -163,7 +163,7 @@ extraeT.addEventListener('click', async () => {
     } else {
         datosExtraidos.tienda.forEach((doc) => {
             const docData = doc;
-            excelData.push([docData.nombre, docData.valorTotal, docData.numPersonasAtendidas]);
+            excelData.push([docData.nombre, Number(docData.valorTotal), docData.numPersonasAtendidas]);
         });
 
         const ws = XLSX.utils.aoa_to_sheet(excelData);
@@ -219,10 +219,10 @@ extraeHistorialT.addEventListener('click', async () => {
         excelData.push([
             doc.cedula,
             doc.concepto,
-            doc.cuotas,
+            Number(doc.cuotas),
             doc.fechaEfectuado,
             doc.nombreQuienEntrego,
-            doc.valor
+            Number(doc.valor)
         ]);
     });
 

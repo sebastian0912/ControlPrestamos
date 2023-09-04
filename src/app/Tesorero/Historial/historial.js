@@ -1,5 +1,5 @@
 import { urlBack } from "../../models/base.js";
-import { aviso, avisoConfirmacion, avisoConfirmacionAc, isoConfirmacionAc2 } from "../../Avisos/avisos.js";
+import { aviso, avisoConfirmacion, avisoConfirmacionAc, avisoConfirmacionAc2 } from "../../Avisos/avisos.js";
 const boton = document.querySelector('#boton');
 
 // capturar el id del usuario logeado del input
@@ -132,44 +132,59 @@ async function datos() {
     }
 }
 
+
 extrae.addEventListener('click', async () => {
 
     const datosExtraidos = await datos();
 
     let excelData = [
-        ['','','','','','','','ANTERIOR', '', 'PARA DESCONTAR', '', '', '','','','','','','', 'PARA HACER', '', '', '', '', '', '', '', ''],
+        ['', '', '', '', '', '', '', 'ANTERIOR', '', 'PARA DESCONTAR', '', '', '', '', '', '', '', '', '', 'PARA HACER', '', '', '', '', '', '', '', ''],
         ['CÓDIGO', 'CÉDULA', 'NOMBRE', 'INGRESO', 'TEMPORAL', 'FINCA', 'SALARIO', 'SALDOS', 'FONDOS', 'MERCADOS', 'CUOTAS MERCADOS', 'PRESTAMO PARA DESCONTAR', 'CUOTAS PRESTAMOS PARA DESCONTAR', 'CASINO', 'ANCHETAS', 'CUOTAS ANCHETAS', 'FONDO', 'CARNET', 'SEGURO FUNERARIO', 'PRESTAMO PARA HACER', 'CUOTAS PRESTAMO PARA HACER', 'ANTICIPO LIQUIDACIÓN', 'CUENTAS'],
     ];
-    
     console.log(datosExtraidos.datosbase);
-
     datosExtraidos.datosbase.forEach((doc) => {
         const docData = doc;
+        let fechaIngreso;
+        // Transformar la fecha de "ingreso" al formato "mm/dd/yyyy"
+        if (docData.ingreso.includes('-')) {
+            // Formato "d-m-yy"
+            fechaIngreso = docData.ingreso.split('-');
+            if (fechaIngreso[2].length === 2) {
+                fechaIngreso[2] = '20' + fechaIngreso[2];
+            }
+        } else {
+            // Formato "d/mm/yyyy"
+            fechaIngreso = docData.ingreso.split('/');
+        }    
+        
+        fechaIngreso = fechaIngreso.join('/');
+
         excelData.push([
-            docData.codigo,
-            docData.numero_de_documento,
+            docData.codigo, // Convertir a número
+            docData.numero_de_documento, // Convertir a número
             docData.nombre,
-            docData.ingreso,
+            fechaIngreso,
             docData.temporal,
             docData.finca,
-            docData.salario,
-            docData.saldos,
-            docData.fondos,
-            docData.mercados,
-            docData.cuotasMercados,
-            docData.prestamoParaDescontar,
-            docData.cuotasPrestamosParaDescontar,
-            docData.casino,
-            docData.valoranchetas,
-            docData.cuotasAnchetas,
-            docData.fondo,
-            docData.carnet,
-            docData.seguroFunerario,
-            docData.prestamoParaHacer,
-            docData.cuotasPrestamoParahacer,
-            docData.anticipoLiquidacion,
-            docData.cuentas
+            docData.salario, // Convertir a número
+            Number(docData.saldos), // Convertir a número
+            Number(docData.fondos), // Convertir a número
+            Number(docData.mercados), // Convertir a número
+            Number(docData.cuotasMercados), // Convertir a número
+            Number(docData.prestamoParaDescontar), // Convertir a número
+            Number(docData.cuotasPrestamosParaDescontar), // Convertir a número
+            Number(docData.casino), // Convertir a número
+            Number(docData.valoranchetas), // Convertir a número
+            Number(docData.cuotasAnchetas), // Convertir a número
+            Number(docData.fondo), // Convertir a número
+            Number(docData.carnet), // Asumiendo que es texto
+            Number(docData.seguroFunerario), // Convertir a número
+            Number(docData.prestamoParaHacer), // Convertir a número
+            Number(docData.cuotasPrestamoParahacer), // Convertir a número
+            Number(docData.anticipoLiquidacion), // Convertir a número
+            Number(docData.cuentas) // Convertir a número
         ]);
+        fechaIngreso = '';
     });
 
     const ws = XLSX.utils.aoa_to_sheet(excelData);
@@ -192,6 +207,7 @@ extrae.addEventListener('click', async () => {
     document.body.removeChild(element);
     URL.revokeObjectURL(url);
 });
+
 
 async function datosTCodigos() {
     var body = localStorage.getItem('key');
@@ -237,14 +253,14 @@ extraeC.addEventListener('click', async () => {
     });
 
     let excelData = [['Código', 'Cédula quien pidió', 'Nombre persona quien dio el código', 'Valor', 'Cuotas', 'Fecha']];
-    
+
     datosFinales.forEach((doc) => {
         excelData.push([
             doc.codigo,
             doc.cedulaQuienPide,
             doc.generadoPor,
-            doc.monto,
-            doc.cuotas,
+            Number(doc.monto),
+            Number(doc.cuotas),
             doc.fechaGenerado
         ]);
     });
@@ -309,14 +325,14 @@ extraeT.addEventListener('click', async () => {
     console.log(datosExtraidos);
 
     let excelData = [['Nombre De la Tienda', 'Monto Total', 'Numero de compras en la tienda']];
-    
-    if (datosExtraidos.message == "error" ) {
+
+    if (datosExtraidos.message == "error") {
         aviso("No se han comprado productos en las tiendas", "warning");
         return;
     } else {
         datosExtraidos.tienda.forEach((doc) => {
             const docData = doc;
-            excelData.push([docData.nombre, docData.valorTotal, docData.numPersonasAtendidas]);
+            excelData.push([docData.nombre, Number(docData.valorTotal), Number(docData.numPersonasAtendidas)]);
         });
 
         const ws = XLSX.utils.aoa_to_sheet(excelData);
@@ -324,7 +340,7 @@ extraeT.addEventListener('click', async () => {
         XLSX.utils.book_append_sheet(wb, ws, 'Datos Tienda');
 
         const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-        
+
         const blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
         const url = URL.createObjectURL(blob);
 
