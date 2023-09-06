@@ -74,6 +74,12 @@ li {
     cursor: pointer;
 }
 
+li:nth-child(1) {
+    background: #bbd0ff;
+    color: #000000;
+    transform: scale(1.1);
+    border-left: #1157fb 8px solid;
+}
 
 
 li:hover {

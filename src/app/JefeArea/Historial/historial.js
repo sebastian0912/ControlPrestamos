@@ -116,22 +116,21 @@ boton.addEventListener('click', async (e) => {
     e.preventDefault();
     // capturar los datos del formulario
     const cedulaEmpleado = document.querySelector('#cedula').value;
-    
+
     const datosExtraidos = await datosH(cedulaEmpleado);
     console.log(datosExtraidos);
     if (datosExtraidos.historial.length == 0) {
         aviso('No hay datos para mostrar', 'warning');
-        return
+        return;
     }
-    
+
     const oculto = document.querySelector('#oculto');
     oculto.style.display = "block";
-    
-    tabla.innerHTML = '';
+
+    const tabla = document.querySelector('#tabla');
     datosExtraidos.historial.forEach(async (p) => {
-        // limpiar la tabla
-        const tabla = document.querySelector('#tabla');
-        tabla.innerHTML += `
+        // Insertar al principio de la tabla
+        tabla.insertAdjacentHTML('afterbegin', `
             <tr>
                 <td>${p.cedula}</td>
                 <td>${p.concepto}</td>            
@@ -141,7 +140,7 @@ boton.addEventListener('click', async (e) => {
                 <td>${p.nombreQuienEntrego}</td>
                 <td>${p.generadopor}</td>
             </tr>
-            `
+        `);
     });
 });
 

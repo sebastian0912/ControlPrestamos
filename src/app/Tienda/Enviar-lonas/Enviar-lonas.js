@@ -44,6 +44,22 @@ for (let i = 0; i < datos2.length; i++) {
 }
 
 
+if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen") {
+    lola.style.display = "inline-block";
+}
+else {
+    lola.style.display = "none";
+}
+
+
+if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen"
+    || usernameLocal == "Señora Lola" || usernameLocal == "SEÑORA LOLA" || usernameLocal == "señora lola"
+    || usernameLocal == "Señor Luis" || usernameLocal == "SEÑOR LUIS" || usernameLocal == "señor luis") {
+    lola2.style.display = "inline-block";
+}
+else {
+    lola2.style.display = "none";
+}
 
 // Obtén la fecha actual
 var ahora = new Date();

@@ -361,11 +361,21 @@ boton.addEventListener('click', async (e) => {
         aviso('Ups no se pueden generar el prestamo, el empleado no existe', 'error');
         return;
     }
+
+    if (parseInt(datos.saldos) > 175000){
+        aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
+        return;
+    }
+    else if (parseInt(datos.fondos) > 0) {
+        aviso('Ups no se pueden generar prestamos perteneces al fondo', 'error');
+        return;
+    }
+    
     boton.style.display = "none";
     cedula.style.display = "none";
     boton2.style.display = "inline-block";
     tipo.style.display = "inline-block";
-    
+
     formaPago.style.display = "inline-block";
     celular.style.display = "inline-block";
 
@@ -396,6 +406,7 @@ boton.addEventListener('click', async (e) => {
             return;
         }
 
+        
         // campo celular debe tener 10 digitos
         if (celular.value.length != 10) {
             aviso('Ups no se pueden generar mercado, el número proporcionado debe tener 10 digitos', 'error');
@@ -421,6 +432,17 @@ boton.addEventListener('click', async (e) => {
         else if (tipo == "Otro") {
             codigoOH = 'OT' + Math.floor(Math.random() * 1000000);
             concepto = "Autorizacion otro concepto";
+        }
+
+        if (cuotasAux == "") {
+            aviso('Ups no se pueden generar mercado, las cuotas no pueden estar vacias', 'error');
+            return;
+        }
+
+        // si cuotas es mayor a 4
+        if (parseInt(cuotasAux) > 4) {
+            aviso('Ups no se pueden generar mercado, las cuotas no pueden ser mayor a 4', 'error');
+            return;
         }
 
         await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, cuotasAux, tipo, valor)
@@ -467,12 +489,13 @@ boton.addEventListener('click', async (e) => {
         docPdf.setFont('Helvetica', 'normal');
 
 
+
         docPdf.text('Yo, ' + datos.nombre + ' mayor de edad,  identificado con la cedula de ciudadania No. '
             + datos.numero_de_documento + ' autorizo', 10, 55);
         docPdf.text('expresa e irrevocablemente para que del sueldo, salario, prestaciones sociales o de cualquier suma de la sea acreedor; me sean', 10, 60);
-        docPdf.text('descontados la cantidad de ' + valor + ' " ' + NumeroALetras(nuevovalor) + ' " ' + 'por concepto de' + ' PRESTAMO, en ' + cuotas + ' cuota(s), ', 10, 65);
-        docPdf.text('quincenal del credito del que soy deudor ante Tu alianza S.A.S. , aun en el evento de encontrarme disfrutando de mis licencias ', 10, 70);
-        docPdf.text('o incapacidades. ', 10, 75);
+        docPdf.text('descontados la cantidad de ' + valor + ' " ' + NumeroALetras(nuevovalor) + ' " ' + 'por concepto de' + ' PRESTAMO, ', 10, 65);
+        docPdf.text('en ' + cuotas + ' cuota(s), quincenal del credito del que soy deudor ante ' + empresa + ', aun en el evento de encontrarme', 10, 70);
+        docPdf.text('disfrutando de mis licencias o incapacidades. ', 10, 75);
 
         docPdf.text('Fecha de ingreso: ' + datos.ingreso, 10, 85);
         docPdf.text('Centro de Costo: ' + datos.finca, 130, 85);
@@ -487,6 +510,9 @@ boton.addEventListener('click', async (e) => {
         // realizar un cuadro para colocar la huella dactilar
         docPdf.rect(130, 97, 25, 30);
         docPdf.text('Codigo de autorización nomina: ' + codigoOH, 10, 120);
+        docPdf.text('___________________________________', 10, 130);
+        docPdf.text(datos.nombre, 10, 135);
+
         docPdf.setFont('Helvetica', 'bold');
         docPdf.setFontSize(6);
         docPdf.text('Huella Indice Derecho', 130, 95);

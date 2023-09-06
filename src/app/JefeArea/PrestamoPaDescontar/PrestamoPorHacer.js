@@ -48,7 +48,6 @@ if (bandera) {
     diasRestantes.innerHTML = dias;
 }
 
-
 var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05'];
 
 function obtenerFecha() {
@@ -69,33 +68,13 @@ function obtenerFecha() {
 var diferencia2 = new Date(obtenerFecha()) - ahora;
 var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
 
-if (dias2 == 0) {
+if (dias2 == 0 || dias2 < 0) {
+    
     diasLi.style.color = "red";
 } else {
     diasLi.style.color = "black";
 }
 diasLi.innerHTML = dias2;
-
-
-// Mostrar en el html el numero de dias Restantes de liquidacion
-var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05']
-// Recorre el arreglo y muestra los dias restantes deacuerdo a la fecha
-for (let i = 0; i < fechaObjetivo2.length; i++) {
-    // separar por año, mes y dia
-    var fechaObjetivo3 = new Date(fechaObjetivo2[i]);
-    if (fechaObjetivo3.getFullYear() == ahora.getFullYear() &&
-        fechaObjetivo3.getMonth() == ahora.getMonth() &&
-        fechaObjetivo3.getDate() >= ahora.getDate()) {
-
-        var diferencia2 = fechaObjetivo3 - ahora;
-        var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
-        if (dias2 == 0) {
-            diasLi.style.color = "red";
-        }
-        diasLi.innerHTML = dias2;
-        break;
-    }
-}
 
 /*Convertir valor a separado por miles*/
 const numemoroM = document.querySelector('#valor');
@@ -661,37 +640,19 @@ boton.addEventListener('click', async (e) => {
             }
 
             await actualizar(codigo, cod.codigo, usernameLocal, nuevovalor, cuotas);
-
+            await sleep(2000); // Pausa de 2 segundos
             console.log("primero" + concepto2);
             await actualizarDatosBase(concepto2, nuevovalor, cuotas, cedulaEmpleado);
+            await sleep(2000); // Pausa de 2 segundos
             // modificar en la tabla codigos el estado del codigo a false para que no pueda ser usado nuevamente
             await CambiarEstado(cod.codigo, nuevovalor, codigo);
-
+            await sleep(2000); // Pausa de 2 segundos
             await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, concepto, codigo, cod.generadoPor)
+            await sleep(2000); // Pausa de 2 segundos
             await ActualizarHistorial(codigo);
-
+            await sleep(2000); // Pausa de 2 segundos
             aviso('Acaba de pedir un prestamo de ' + valor, 'success');
-
-            let empresa = null;
-            let NIT = null;
-            let direcccion = null;
-            if (usuario.temporal.startsWith("Apoyo") || usuario.temporal.startsWith("APOYO")) {
-                empresa = "APOYO LABORAL TS SAS";
-                NIT = "NIT 900814587"
-                direcccion = "CRA 2 N 8-156 FACATATIVA"
-            }
-
-            else if (usuario.temporal.startsWith("Tu") || usuario.temporal.startsWith("TU")) {
-                empresa = "APOYO LABORAL TS SAS";
-                NIT = "NIT 900814587"
-                direcccion = "CRA 2 N 8-156 FACATATIVA"
-            }
-
-            else if (usuario.temporal.startsWith("Comercializadora") || usuario.temporal.startsWith("COMERCIALIZADORA")) {
-                empresa = "COMERCIALIZADORA TS";
-                NIT = "NIT 901602948"
-                direcccion = "CRA 1 N 17-37 BRAZILIA"
-            }
+           
         }
     }
 

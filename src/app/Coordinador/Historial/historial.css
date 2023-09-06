@@ -25,11 +25,11 @@ h1 {
 }
 
 .dias {
-  text-align: justify;
-  margin: 0px 0 10px 120px;
-  font-family: 'Nunito Sans', sans-serif;
-  font-size: 16pt;
-  font-weight: 600;
+    text-align: justify;
+    margin: 10px 0 20px 120px;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 20pt;
+    font-weight: 600;
 }
 
 a {

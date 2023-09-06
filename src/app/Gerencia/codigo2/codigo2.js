@@ -108,6 +108,71 @@ formaPago.addEventListener('change', (e) => {
     }
 });
 
+extraeHistorialT.addEventListener('click', async () => {
+    console.log("entro");
+    const datosExtraidos = await THistorial();
+    if (datosExtraidos.historial.length == 0) {
+        aviso("No hay registros de compras realizadas en las tiendas", "warning");
+        return;
+    }
+    
+    // Crear un objeto para agrupar los datos por mes
+    const historialPorMes = {};
+
+    datosExtraidos.historial.forEach(doc => {
+        if (doc.concepto.startsWith("Compra tienda")) {
+            // Obtener el mes de la fecha en formato 'YYYY-MM'
+            const mes = doc.fechaEfectuado.slice(0, 7);
+
+            if (!historialPorMes[mes]) {
+                historialPorMes[mes] = [];
+            }
+
+            historialPorMes[mes].push(doc);
+        }
+    });
+
+    // Crear un archivo Excel con hojas internas para cada mes
+    const wb = XLSX.utils.book_new();
+
+    for (const mes in historialPorMes) {
+        const historialMes = historialPorMes[mes];
+        const excelData = [['Cedula', 'Concepto', 'Lugar', 'Cuotas', 'Fecha Efectuado', 'Nombre Quien Entregó', 'Valor']];
+
+        historialMes.forEach(doc => {
+            excelData.push([
+                doc.cedula,
+                doc.concepto,
+                doc.lugar,
+                doc.cuotas,
+                doc.fechaEfectuado,
+                doc.nombreQuienEntrego,
+                doc.valor
+            ]);
+        });
+
+        const ws = XLSX.utils.aoa_to_sheet(excelData);
+        XLSX.utils.book_append_sheet(wb, ws, mes);
+    }
+
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+
+    const blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+
+    const element = document.createElement('a');
+    element.href = url;
+    element.download = 'datosHistorialDetallado.xlsx';
+    element.style.display = 'none';
+
+    document.body.appendChild(element);
+    element.click();
+
+    document.body.removeChild(element);
+    URL.revokeObjectURL(url);
+});
+
+
 async function escribirCodigo(cedulaEmpleado, nuevovalor, cod, cuotas, tipo, valor) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
@@ -289,10 +354,22 @@ boton.addEventListener('click', async (e) => {
     console.log(aux.datosbase[0]);
     let datos = aux.datosbase[0];
 
-
-
     console.log(datos.nombre);
     datosPersona.innerHTML = datos.nombre;
+
+    if (datos == undefined) {
+        aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
+        return;
+    }
+
+    if (parseInt(datos.saldos) > 175000){
+        aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
+        return;
+    }
+    else if (parseInt(datos.fondos) > 0) {
+        aviso('Ups no se pueden generar prestamos perteneces al fondo', 'error');
+        return;
+    }
 
     boton.style.display = "none";
     cedula.style.display = "none";
@@ -314,19 +391,14 @@ boton.addEventListener('click', async (e) => {
 
         if (!verificaSelect2(tipo)) {
             return;
-        }
-
-        if (datos == undefined) {
-            aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
-            return;
-        }
+        }        
 
         if (valor == "") {
             aviso('Ups no se pueden generar mercado, el monto no puede estar vacio', 'error');
             return;
         }
 
-        // campo celular debe tener 10 digitos
+         // campo celular debe tener 10 digitos
         if (celular.value.length != 10) {
             aviso('Ups no se pueden generar mercado, el número proporcionado debe tener 10 digitos', 'error');
             return;
@@ -389,6 +461,12 @@ boton.addEventListener('click', async (e) => {
             let mesActual = fechaActual.getMonth() + 1;
             let anioActual = fechaActual.getFullYear();
             let bandera = false;
+
+            if (cuotasAux == "") {
+                aviso('Ups no se pueden generar mercado, las cuotas no pueden estar vacias', 'error');
+                return;
+            }
+            
             if ((anioActual == anio) && ((parseInt(mesActual) - parseInt(mes)) >= 2)) {
                 if (parseInt(nuevovalor) >= 200001) {
                     aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
@@ -465,27 +543,29 @@ boton.addEventListener('click', async (e) => {
                 docPdf.text('ASUNTO: CREDITO (PRESTAMO)', 10, 50);
                 docPdf.setFont('Helvetica', 'normal');
 
-
                 docPdf.text('Yo, ' + datos.nombre + ' mayor de edad,  identificado con la cedula de ciudadania No. '
                     + datos.numero_de_documento + ' autorizo', 10, 55);
                 docPdf.text('expresa e irrevocablemente para que del sueldo, salario, prestaciones sociales o de cualquier suma de la sea acreedor; me sean', 10, 60);
-                docPdf.text('descontados la cantidad de ' + valor + ' " ' + NumeroALetras(nuevovalor) + ' " ' + 'por concepto de' + ' PRESTAMO, en ' + cuotas + ' cuota(s), ', 10, 65);
-                docPdf.text('quincenal del credito del que soy deudor ante Tu alianza S.A.S. , aun en el evento de encontrarme disfrutando de mis licencias ', 10, 70);
-                docPdf.text('o incapacidades. ', 10, 75);
+                docPdf.text('descontados la cantidad de ' + valor + ' " ' + NumeroALetras(nuevovalor) + ' " ' + 'por concepto de' + ' PRESTAMO, ', 10, 65);
+                docPdf.text('en ' + cuotas + ' cuota(s), quincenal del credito del que soy deudor ante ' + empresa + ', aun en el evento de encontrarme', 10, 70);
+                docPdf.text('disfrutando de mis licencias o incapacidades. ', 10, 75);
 
                 docPdf.text('Fecha de ingreso: ' + datos.ingreso, 10, 85);
                 docPdf.text('Centro de Costo: ' + datos.finca, 130, 85);
                 docPdf.text('Forma de pago: ' + formaPago.value, 10, 90);
-                docPdf.text('Telefono: ' + celular, 130, 90);
+                docPdf.text('Telefono: ' + celular.value, 130, 90);
                 docPdf.setFont('Helvetica', 'bold');
                 docPdf.text('Cordialmente ', 10, 100);
                 docPdf.setFont('Helvetica', 'normal');
                 docPdf.text('Firma de Autorización ', 10, 110);
                 docPdf.text('C.C. ' + datos.numero_de_documento, 10, 115);
-
+        
                 // realizar un cuadro para colocar la huella dactilar
                 docPdf.rect(130, 97, 25, 30);
-                docPdf.text('Código de descuento nómina: ' + codigo, 10, 120);
+                docPdf.text('Codigo de autorización nomina: ' + codigoOH, 10, 120);
+                docPdf.text('___________________________________', 10, 130);
+                docPdf.text(datos.nombre, 10, 135);
+        
                 docPdf.setFont('Helvetica', 'bold');
                 docPdf.setFontSize(6);
                 docPdf.text('Huella Indice Derecho', 130, 95);

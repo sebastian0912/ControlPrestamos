@@ -233,35 +233,49 @@ function s2ab(s) {
 extraeHistorialT.addEventListener('click', async () => {
     console.log("entro");
     const datosExtraidos = await THistorial();
-    if (datosExtraidos.historial.length == 0 ) {
+    if (datosExtraidos.historial.length == 0) {
         aviso("No hay registros de compras realizadas en las tiendas", "warning");
         return;
     }
-    let historial = [];
+    
+    // Crear un objeto para agrupar los datos por mes
+    const historialPorMes = {};
+
     datosExtraidos.historial.forEach(doc => {
         if (doc.concepto.startsWith("Compra tienda")) {
-            historial.push(doc);
+            // Obtener el mes de la fecha en formato 'YYYY-MM'
+            const mes = doc.fechaEfectuado.slice(0, 7);
+
+            if (!historialPorMes[mes]) {
+                historialPorMes[mes] = [];
+            }
+
+            historialPorMes[mes].push(doc);
         }
     });
 
-
-
-    let excelData = [['Cedula', 'Concepto', 'Cuotas', 'Fecha Efectuado', 'Nombre Quien Entregó', 'Valor']];
-    
-    historial.forEach((doc) => {
-        excelData.push([
-            doc.cedula,
-            doc.concepto,
-            doc.cuotas,
-            doc.fechaEfectuado,
-            doc.nombreQuienEntrego,
-            doc.valor
-        ]);
-    });
-
-    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    // Crear un archivo Excel con hojas internas para cada mes
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Historial Detallado');
+
+    for (const mes in historialPorMes) {
+        const historialMes = historialPorMes[mes];
+        const excelData = [['Cedula', 'Concepto', 'Lugar', 'Cuotas', 'Fecha Efectuado', 'Nombre Quien Entregó', 'Valor']];
+
+        historialMes.forEach(doc => {
+            excelData.push([
+                doc.cedula,
+                doc.concepto,
+                doc.lugar,
+                doc.cuotas,
+                doc.fechaEfectuado,
+                doc.nombreQuienEntrego,
+                doc.valor
+            ]);
+        });
+
+        const ws = XLSX.utils.aoa_to_sheet(excelData);
+        XLSX.utils.book_append_sheet(wb, ws, mes);
+    }
 
     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
 

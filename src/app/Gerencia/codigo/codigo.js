@@ -551,31 +551,45 @@ extraeHistorialT.addEventListener('click', async () => {
         aviso("No hay registros de compras realizadas en las tiendas", "warning");
         return;
     }
-    let historial = [];
+    
+    // Crear un objeto para agrupar los datos por mes
+    const historialPorMes = {};
+
     datosExtraidos.historial.forEach(doc => {
         if (doc.concepto.startsWith("Compra tienda")) {
-            historial.push(doc);
+            // Obtener el mes de la fecha en formato 'YYYY-MM'
+            const mes = doc.fechaEfectuado.slice(0, 7);
+
+            if (!historialPorMes[mes]) {
+                historialPorMes[mes] = [];
+            }
+
+            historialPorMes[mes].push(doc);
         }
     });
 
-
-
-    let excelData = [['Cedula', 'Concepto', 'Cuotas', 'Fecha Efectuado', 'Nombre Quien Entregó', 'Valor']];
-
-    historial.forEach((doc) => {
-        excelData.push([
-            doc.cedula,
-            doc.concepto,
-            doc.cuotas,
-            doc.fechaEfectuado,
-            doc.nombreQuienEntrego,
-            doc.valor
-        ]);
-    });
-
-    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    // Crear un archivo Excel con hojas internas para cada mes
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Historial Detallado');
+
+    for (const mes in historialPorMes) {
+        const historialMes = historialPorMes[mes];
+        const excelData = [['Cedula', 'Concepto', 'Lugar', 'Cuotas', 'Fecha Efectuado', 'Nombre Quien Entregó', 'Valor']];
+
+        historialMes.forEach(doc => {
+            excelData.push([
+                doc.cedula,
+                doc.concepto,
+                doc.lugar,
+                doc.cuotas,
+                doc.fechaEfectuado,
+                doc.nombreQuienEntrego,
+                doc.valor
+            ]);
+        });
+
+        const ws = XLSX.utils.aoa_to_sheet(excelData);
+        XLSX.utils.book_append_sheet(wb, ws, mes);
+    }
 
     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
 
@@ -740,6 +754,18 @@ boton.addEventListener('click', async (e) => {
         aviso('El campo codigo no puede estar vacio', 'error');
     }
 
+    if (cuotas == "") {
+        aviso('Ups no se pueden generar mercado, las cuotas no pueden estar vacias', 'error');
+        return;
+    }
+
+    // si cuotas es mayor a 4
+    if (parseInt(cuotas) > 4) {
+        aviso('Ups no se pueden generar mercado, las cuotas no pueden ser mayor a 4', 'error');
+        return;
+    }
+
+
     const aux = await datosTCodigos();
     console.log(aux.codigo);
     let aux2 = await datosEmpleado(cedulaEmpleado);
@@ -793,15 +819,17 @@ boton.addEventListener('click', async (e) => {
         }
 
         await actualizar(codigo, cod.codigo, usernameLocal, nuevovalor, cuotas);
-
+        await sleep(2000); // Pausa de 2 segundos
         console.log("primero" + concepto2);
         await actualizarDatosBase(concepto2, nuevovalor, cuotas, cedulaEmpleado);
+        await sleep(2000); // Pausa de 2 segundos
         // modificar en la tabla codigos el estado del codigo a false para que no pueda ser usado nuevamente
         await CambiarEstado(cod.codigo, nuevovalor, codigo);
-
+        await sleep(2000); // Pausa de 2 segundos
         await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, concepto,codigo, cod.generadoPor)
+        await sleep(2000); // Pausa de 2 segundos
         await ActualizarHistorial(codigo);
-
+        await sleep(2000); // Pausa de 2 segundos
         aviso('Acaba de pedir un prestamo de ' + valor, 'success');
 
     }
@@ -813,6 +841,9 @@ boton.addEventListener('click', async (e) => {
     document.querySelector('#cuotas').value = "";
 });
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 
 
 

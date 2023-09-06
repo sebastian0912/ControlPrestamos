@@ -7,7 +7,6 @@ const perfil = document.querySelector('#perfil');
 const perfilLocal = localStorage.getItem("perfil");
 const usernameLocal = localStorage.getItem("username");
 const empleados = localStorage.getItem("CantidadEmpleados");
-const codigos = localStorage.getItem("codigos");
 
 const numeroTotal = document.querySelector('#numeroEmpleados');
 
@@ -200,35 +199,49 @@ function s2ab(s) {
 extraeHistorialT.addEventListener('click', async () => {
     console.log("entro");
     const datosExtraidos = await THistorial();
-    if (datosExtraidos.historial.length == 0 ) {
+    if (datosExtraidos.historial.length == 0) {
         aviso("No hay registros de compras realizadas en las tiendas", "warning");
         return;
     }
-    let historial = [];
+    
+    // Crear un objeto para agrupar los datos por mes
+    const historialPorMes = {};
+
     datosExtraidos.historial.forEach(doc => {
         if (doc.concepto.startsWith("Compra tienda")) {
-            historial.push(doc);
+            // Obtener el mes de la fecha en formato 'YYYY-MM'
+            const mes = doc.fechaEfectuado.slice(0, 7);
+
+            if (!historialPorMes[mes]) {
+                historialPorMes[mes] = [];
+            }
+
+            historialPorMes[mes].push(doc);
         }
     });
 
-
-
-    let excelData = [['Cedula', 'Concepto', 'Cuotas', 'Fecha Efectuado', 'Nombre Quien Entregó', 'Valor']];
-    
-    historial.forEach((doc) => {
-        excelData.push([
-            doc.cedula,
-            doc.concepto,
-            Number(doc.cuotas),
-            doc.fechaEfectuado,
-            doc.nombreQuienEntrego,
-            Number(doc.valor)
-        ]);
-    });
-
-    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    // Crear un archivo Excel con hojas internas para cada mes
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Historial Detallado');
+
+    for (const mes in historialPorMes) {
+        const historialMes = historialPorMes[mes];
+        const excelData = [['Cedula', 'Concepto', 'Lugar', 'Cuotas', 'Fecha Efectuado', 'Nombre Quien Entregó', 'Valor']];
+
+        historialMes.forEach(doc => {
+            excelData.push([
+                doc.cedula,
+                doc.concepto,
+                doc.lugar,
+                doc.cuotas,
+                doc.fechaEfectuado,
+                doc.nombreQuienEntrego,
+                doc.valor
+            ]);
+        });
+
+        const ws = XLSX.utils.aoa_to_sheet(excelData);
+        XLSX.utils.book_append_sheet(wb, ws, mes);
+    }
 
     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
 
@@ -246,6 +259,49 @@ extraeHistorialT.addEventListener('click', async () => {
     document.body.removeChild(element);
     URL.revokeObjectURL(url);
 });
+
+async function datosTCodigos() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Codigo/codigos';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+let coodinador = document.getElementById("coordinadores");
+coodinador.addEventListener('click', async () => {
+    let arrayCodigos = [];
+    const aux = await datosTCodigos();
+    if (aux.message == "error") {
+        aviso("No hay registros de actividades de los coordinadores", "warning");
+        return;
+    }
+    console.log(aux);
+});
+
+
 
 
 

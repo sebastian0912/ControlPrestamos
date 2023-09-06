@@ -72,6 +72,7 @@ var diferencia2 = new Date(obtenerFecha()) - ahora;
 var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
 
 if (dias2 == 0) {
+    console.log(dias2)
     diasLi.style.color = "red";
 } else {
     diasLi.style.color = "black";
@@ -120,7 +121,7 @@ miArray.forEach((p) => {
     if (p.fechaRecibida == null) {
         p.fechaRecibida = "";
     }
-        tabla.innerHTML += `
+    tabla.innerHTML += `
         <tr>
             <td>${p.codigo}</td>
             <td>${p.concepto}</td>
@@ -135,7 +136,7 @@ miArray.forEach((p) => {
             <td>${p.fechaRecibida}</td>
         </tr>
     `
-    
+
 });
 
 let datos = [];
@@ -166,13 +167,16 @@ agrupado = Object.values(agrupado);
 
 // Ahora puedes usar 'agrupado' para generar tu tabla:
 agrupado.forEach((p) => {
-    if ((p.cantidadTotalVendida) > 0){
-        p.resultado = Math.abs(p.cantidadEnvio - p.cantidadTotalVendida); // Restamos las cantidades sumadas anteriormente
+    let aux
+    if (p.cantidadTotalVendida == 0) {
+        aux = 0;
     }
-    else{
-        p.resultado = 0;
+    else {
+        aux = p.cantidadTotalVendida;
     }
-        tabla2.innerHTML += `
+    p.resultado = Math.abs(p.cantidadEnvio - aux); // Restamos las cantidades sumadas anteriormente
+
+    tabla2.innerHTML += `
         <tr>
             <td>${p.concepto}</td>            
             <td>${p.destino}</td>
@@ -182,5 +186,5 @@ agrupado.forEach((p) => {
             <td>${p.resultado}</td>    <!-- Aquí mostramos el resultado de la resta -->
         </tr>
     `;
-    
+
 });

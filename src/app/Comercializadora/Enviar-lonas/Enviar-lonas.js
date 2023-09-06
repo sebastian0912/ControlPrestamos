@@ -110,7 +110,7 @@ let mostrarAviso = false;
 miSelect2.addEventListener('change', async (e) => {
     const otro = document.querySelector('#otro2');
 
-    if (e.target.value == "11") {
+    if (e.target.value == "Otro") {
         mostrarAviso = true;
         otro.style.display = "inline-block";
     } else {

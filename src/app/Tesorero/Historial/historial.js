@@ -435,18 +435,138 @@ extraeC.addEventListener('click', async () => {
 });
 
 
+async function datosEliminar(cedulas){
+    const datosExtraidos = await datos();
+    let datosFinales = [];
+    cedulas.forEach((cedula) => {
+        const docEncontrado = datosExtraidos.datosbase.find((doc) => doc.numero_de_documento == cedula);
+        if (docEncontrado) {
+            datosFinales.push(docEncontrado);
+        } else {
+            // Si no se encuentra la cédula, muestra un aviso.
+            aviso(`El empleado con cédula ${cedula} no se puede eliminar porque no se encuentra`, "warning");
+        }
+    });
+    console.log(datosFinales);
+    return datosFinales;
+}
+
+function extraerDatosEliminar (datos){
+        
+    let excelData = [
+        ['', '', '', '', '', '', '', 'ANTERIOR', '', 'PARA DESCONTAR', '', '', '', '', '', '', '', '', '', 'PARA HACER', '', '', '', '', '', '', '', ''],
+        ['CÓDIGO', 'CÉDULA', 'NOMBRE', 'INGRESO', 'TEMPORAL', 'FINCA', 'SALARIO', 'SALDOS', 'FONDOS', 'MERCADOS', 'CUOTAS MERCADOS', 'PRESTAMO PARA DESCONTAR', 'CUOTAS PRESTAMOS PARA DESCONTAR', 'CASINO', 'ANCHETAS', 'CUOTAS ANCHETAS', 'FONDO', 'CARNET', 'SEGURO FUNERARIO', 'PRESTAMO PARA HACER', 'CUOTAS PRESTAMO PARA HACER', 'ANTICIPO LIQUIDACIÓN', 'CUENTAS'],
+    ];
+    
+    datos.forEach((doc) => {
+        const docData = doc;
+        let fechaIngreso;
+        // Transformar la fecha de "ingreso" al formato "mm/dd/yyyy"
+        if (docData.ingreso.includes('-')) {
+            // Formato "d-m-yy"
+            fechaIngreso = docData.ingreso.split('-');
+            if (fechaIngreso[2].length === 2) {
+                fechaIngreso[2] = '20' + fechaIngreso[2];
+            }
+        } else {
+            // Formato "d/mm/yyyy"
+            fechaIngreso = docData.ingreso.split('/');
+        }    
+        
+        fechaIngreso = fechaIngreso.join('/');
+
+        excelData.push([
+            docData.codigo, // Convertir a número
+            docData.numero_de_documento, // Convertir a número
+            docData.nombre,
+            fechaIngreso,
+            docData.temporal,
+            docData.finca,
+            docData.salario, // Convertir a número
+            Number(docData.saldos), // Convertir a número
+            Number(docData.fondos), // Convertir a número
+            Number(docData.mercados), // Convertir a número
+            Number(docData.cuotasMercados), // Convertir a número
+            Number(docData.prestamoParaDescontar), // Convertir a número
+            Number(docData.cuotasPrestamosParaDescontar), // Convertir a número
+            Number(docData.casino), // Convertir a número
+            Number(docData.valoranchetas), // Convertir a número
+            Number(docData.cuotasAnchetas), // Convertir a número
+            Number(docData.fondo), // Convertir a número
+            Number(docData.carnet), // Asumiendo que es texto
+            Number(docData.seguroFunerario), // Convertir a número
+            Number(docData.prestamoParaHacer), // Convertir a número
+            Number(docData.cuotasPrestamoParahacer), // Convertir a número
+            Number(docData.anticipoLiquidacion), // Convertir a número
+            Number(docData.cuentas) // Convertir a número
+        ]);
+        fechaIngreso = '';
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    const wb = XLSX.utils.book_new();
+    let fecha = new Date().toLocaleString();
+    fecha = fecha.replace(/\//g, "-");
+    
+    XLSX.utils.book_append_sheet(wb, ws, 'Eliminados');
+
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+
+    const blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+
+    const element = document.createElement('a');
+    element.href = url;
+    element.download = 'DatosEliminadosEl_'+ fecha+'.xlsx';
+    element.style.display = 'none';
+
+    document.body.appendChild(element);
+    element.click();
+
+    document.body.removeChild(element);
+    URL.revokeObjectURL(url);
+}
+
+let datosAux = [];
+
+function verificaInfo(datos) {
+    console.log(datos);
+    // verificar que no tenga saldos pendientes
+    const sumaTotal =
+            parseInt(datos.saldos) +
+            parseInt(datos.fondos) +
+            parseInt(datos.mercados) +
+            parseInt(datos.prestamoParaDescontar) +
+            parseInt(datos.casino) +
+            parseInt(datos.valoranchetas) +
+            parseInt(datos.fondo) +
+            parseInt(datos.carnet) +
+            parseInt(datos.seguroFunerario) +
+            parseInt(datos.prestamoParaHacer) +
+            parseInt(datos.anticipoLiquidacion) +
+            parseInt(datos.cuentas);
+
+    if (sumaTotal > 0) {
+        aviso("El empleado con cédula " + datos.numero_de_documento + " tiene saldos pendientes no se puede eliminar", "warning");
+    }
+    else {
+        datosAux.push(datos);
+        EliminarEm(datos.numero_de_documento);
+    }    
+}
+
 eliminar.addEventListener('click', async () => {
     const resultado = await avisoConfirmacion();
+    
     if (resultado) {
         let archivo = eliminar.files[0];
         console.log(archivo);
         let reader = new FileReader();
-        var h1Elemento = document.getElementById("cont");
 
         // leer archivo .csv 
         reader.readAsText(archivo);
 
-        reader.onload = () => {
+        reader.onload = async () => {
             let info = reader.result;
             // Separar por saltos de línea 
             let lineas = info.split('\n');
@@ -465,17 +585,23 @@ eliminar.addEventListener('click', async () => {
                 }
             });
 
-
-
             // Mostrar elementos ocultos
             over.style.display = "block";
             loader.style.display = "block";
 
-            // Eliminar las primeras 4 filas (si es necesario)
-            console.log(datosFinales);
-            for (let i = 0; i < datosFinales.length; i++) {
-                EliminarEm(datosFinales[i]);
+            
+            
+            let datos = await datosEliminar(datosFinales);
+            console.log(datos);
+            
+            //extraerDatosEliminar(datos);
+            
+            for (let i = 0; i < datos.length; i++) {
+                verificaInfo(datos[i]);
             }
+            
+            extraerDatosEliminar(datosAux);
+
             // Mostrar elementos ocultos
             over.style.display = "none";
             loader.style.display = "none";
@@ -484,50 +610,7 @@ eliminar.addEventListener('click', async () => {
         // El usuario canceló la eliminación o cerró el diálogo
         aviso("No se ha eliminado ningún empleado", "success");
     }
-
-
 });
-
-
-async function EliminarEm(cedulaEmpleado) {
-    var body = localStorage.getItem('key');
-    const obj = JSON.parse(body);
-    const jwtToken = obj.jwt;
-    console.log(jwtToken);
-
-    const urlcompleta = urlBack.url + '/Datosbase/eliminardatos/' + cedulaEmpleado;
-    try {
-        fetch(urlcompleta, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': jwtToken
-            },
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
-                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
-                } else {
-                    throw new Error('Error en la petición POST');
-                }
-            })
-            .then(responseData => {
-                console.log('Respuesta:', responseData);
-                if (responseData.message == "error") {
-                    aviso("No se ha podido eliminar el empleado con cédula: " + cedulaEmpleado, "warning");
-                } 
-                return
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-
-    } catch (error) {
-        console.error('Error en la petición HTTP POST');
-        console.error(error);
-    }
-
-}
 
 
 input.addEventListener('change', () => {
@@ -618,27 +701,25 @@ async function guardarDatos(datosFinales) {
 }
 
 // darle click al boton para que se ejecute la funcion
-// darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
     e.preventDefault();
     // capturar los datos del formulario
     const cedulaEmpleado = document.querySelector('#cedula').value;
-    
+
     const datosExtraidos = await datosH(cedulaEmpleado);
     console.log(datosExtraidos);
     if (datosExtraidos.historial.length == 0) {
         aviso('No hay datos para mostrar', 'warning');
-        return
+        return;
     }
-    
+
     const oculto = document.querySelector('#oculto');
     oculto.style.display = "block";
-    
-    tabla.innerHTML = '';
+
+    const tabla = document.querySelector('#tabla');
     datosExtraidos.historial.forEach(async (p) => {
-        // limpiar la tabla
-        const tabla = document.querySelector('#tabla');
-        tabla.innerHTML += `
+        // Insertar al principio de la tabla
+        tabla.insertAdjacentHTML('afterbegin', `
             <tr>
                 <td>${p.cedula}</td>
                 <td>${p.concepto}</td>            
@@ -646,8 +727,9 @@ boton.addEventListener('click', async (e) => {
                 <td>${p.valor}</td>
                 <td>${p.cuotas}</td>
                 <td>${p.nombreQuienEntrego}</td>
+                <td>${p.generadopor}</td>
             </tr>
-            `
+        `);
     });
 });
 
@@ -851,35 +933,49 @@ async function THistorial() {
 extraeHistorialT.addEventListener('click', async () => {
     console.log("entro");
     const datosExtraidos = await THistorial();
-    if (datosExtraidos.historial.length == 0 ) {
+    if (datosExtraidos.historial.length == 0) {
         aviso("No hay registros de compras realizadas en las tiendas", "warning");
         return;
     }
-    let historial = [];
+    
+    // Crear un objeto para agrupar los datos por mes
+    const historialPorMes = {};
+
     datosExtraidos.historial.forEach(doc => {
         if (doc.concepto.startsWith("Compra tienda")) {
-            historial.push(doc);
+            // Obtener el mes de la fecha en formato 'YYYY-MM'
+            const mes = doc.fechaEfectuado.slice(0, 7);
+
+            if (!historialPorMes[mes]) {
+                historialPorMes[mes] = [];
+            }
+
+            historialPorMes[mes].push(doc);
         }
     });
 
-
-
-    let excelData = [['Cedula', 'Concepto', 'Cuotas', 'Fecha Efectuado', 'Nombre Quien Entregó', 'Valor']];
-    
-    historial.forEach((doc) => {
-        excelData.push([
-            doc.cedula,
-            doc.concepto,
-            doc.cuotas,
-            doc.fechaEfectuado,
-            doc.nombreQuienEntrego,
-            doc.valor
-        ]);
-    });
-
-    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    // Crear un archivo Excel con hojas internas para cada mes
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Historial Detallado');
+
+    for (const mes in historialPorMes) {
+        const historialMes = historialPorMes[mes];
+        const excelData = [['Cedula', 'Concepto', 'Lugar', 'Cuotas', 'Fecha Efectuado', 'Nombre Quien Entregó', 'Valor']];
+
+        historialMes.forEach(doc => {
+            excelData.push([
+                doc.cedula,
+                doc.concepto,
+                doc.lugar,
+                doc.cuotas,
+                doc.fechaEfectuado,
+                doc.nombreQuienEntrego,
+                doc.valor
+            ]);
+        });
+
+        const ws = XLSX.utils.aoa_to_sheet(excelData);
+        XLSX.utils.book_append_sheet(wb, ws, mes);
+    }
 
     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
 
@@ -897,3 +993,5 @@ extraeHistorialT.addEventListener('click', async () => {
     document.body.removeChild(element);
     URL.revokeObjectURL(url);
 });
+
+

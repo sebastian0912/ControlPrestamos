@@ -77,27 +77,7 @@ if (dias2 == 0) {
 diasLi.innerHTML = dias2;
 
 
-// Mostrar en el html el numero de dias Restantes de liquidacion
-var fechaObjetivo2 = ['2023-04-10', '2023-04-24', '2023-05-08', '2023-05-23', '2023-06-07', '2023-06-23', '2023-07-05', '2023-07-26', '2023-08-09', '2023-08-23', '2023-09-06', '2023-09-25', '2023-10-06', '2023-10-23', '2023-11-08', '2023-11-22', '2023-11-05', '2023-12-21', '2024-01-05']
-// Recorre el arreglo y muestra los dias restantes deacuerdo a la fecha
-for (let i = 0; i < fechaObjetivo2.length; i++) {
-    // separar por año, mes y dia
-    var fechaObjetivo3 = new Date(fechaObjetivo2[i]);
-    if (fechaObjetivo3.getFullYear() == ahora.getFullYear() &&
-        fechaObjetivo3.getMonth() == ahora.getMonth() &&
-        fechaObjetivo3.getDate() >= ahora.getDate()) {
 
-        var diferencia2 = fechaObjetivo3 - ahora;
-        var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
-        if (dias2 == 0) {
-            diasLi.style.color = "red";
-        }
-        diasLi.innerHTML = dias2;
-        break;
-    }
-}
-
-// mostrar modulo de envio comida
 if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen") {
     lola.style.display = "inline-block";
 }
@@ -105,9 +85,10 @@ else {
     lola.style.display = "none";
 }
 
-//mostrar modulo de autorizacion
+
 if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen"
-    || usernameLocal == "Señora Lola" || usernameLocal == "SEÑORA LOLA" || usernameLocal == "señora lola") {
+    || usernameLocal == "Señora Lola" || usernameLocal == "SEÑORA LOLA" || usernameLocal == "señora lola"
+    || usernameLocal == "Señor Luis" || usernameLocal == "SEÑOR LUIS" || usernameLocal == "señor luis") {
     lola2.style.display = "inline-block";
 }
 else {
@@ -366,6 +347,13 @@ boton.addEventListener('click', async (e) => {
         aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
         return;
     }
+
+    if (parseInt(datos.saldos) > 175000){
+        aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
+        return;
+    }
+    
+    
     boton.style.display = "none";
 
     boton.style.display = "none";
@@ -459,9 +447,9 @@ boton.addEventListener('click', async (e) => {
         docPdf.text('Yo, ' + datos.nombre + ' mayor de edad,  identificado con la cedula de ciudadania No. '
             + datos.numero_de_documento + ' autorizo', 10, 55);
         docPdf.text('expresa e irrevocablemente para que del sueldo, salario, prestaciones sociales o de cualquier suma de la sea acreedor; me sean', 10, 60);
-        docPdf.text('descontados la cantidad de ' + valor + ' " ' + NumeroALetras(nuevovalor) + ' " ' + 'por concepto de' + ' Mercado, en 2 cuota(s), ', 10, 65);
-        docPdf.text('quincenal del credito del que soy deudor ante Tu alianza S.A.S. , aun en el evento de encontrarme disfrutando de mis licencias ', 10, 70);
-        docPdf.text('o incapacidades. ', 10, 75);
+        docPdf.text('descontados la cantidad de ' + valor + ' " ' + NumeroALetras(nuevovalor) + ' " ' + 'por concepto de' + ' Mercado, ', 10, 65);
+        docPdf.text('en 2 cuota(s), quincenal del credito del que soy deudor ante ' + empresa + ' , aun en el evento de encontrarme ', 10, 70);
+        docPdf.text('disfrutando de mis licencias o incapacidades. ', 10, 75);
 
         docPdf.text('Fecha de ingreso: ' + datos.ingreso, 10, 85);
         docPdf.text('Centro de Costo: ' + datos.finca, 130, 85);
@@ -476,6 +464,9 @@ boton.addEventListener('click', async (e) => {
         // realizar un cuadro para colocar la huella dactilar
         docPdf.rect(130, 97, 25, 30);
         docPdf.text('Codigo de autorización nomina: ' + codigoOH, 10, 120);
+        docPdf.text('___________________________________', 10, 130);
+        docPdf.text(datos.nombre, 10, 135);
+        
         docPdf.setFont('Helvetica', 'bold');
         docPdf.setFontSize(6);
         docPdf.text('Huella Indice Derecho', 130, 95);

@@ -71,6 +71,24 @@ function obtenerFecha() {
     }
 }
 
+
+if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen") {
+    lola.style.display = "inline-block";
+}
+else {
+    lola.style.display = "none";
+}
+
+
+if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen"
+    || usernameLocal == "Señora Lola" || usernameLocal == "SEÑORA LOLA" || usernameLocal == "señora lola"
+    || usernameLocal == "Señor Luis" || usernameLocal == "SEÑOR LUIS" || usernameLocal == "señor luis") {
+    lola2.style.display = "inline-block";
+}
+else {
+    lola2.style.display = "none";
+}
+
 var diferencia2 = new Date(obtenerFecha()) - ahora;
 var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
 

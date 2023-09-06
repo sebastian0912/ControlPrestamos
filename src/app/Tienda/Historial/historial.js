@@ -1,4 +1,5 @@
 import { urlBack } from "../../models/base.js";
+import { aviso } from "../../Avisos/avisos.js";
 
 
 const boton = document.querySelector('#boton');
@@ -86,9 +87,10 @@ else {
     lola.style.display = "none";
 }
 
-//mostrar modulo de autorizacion
+
 if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen"
-    || usernameLocal == "Señora Lola" || usernameLocal == "SEÑORA LOLA" || usernameLocal == "señora lola") {
+    || usernameLocal == "Señora Lola" || usernameLocal == "SEÑORA LOLA" || usernameLocal == "señora lola"
+    || usernameLocal == "Señor Luis" || usernameLocal == "SEÑOR LUIS" || usernameLocal == "señor luis") {
     lola2.style.display = "inline-block";
 }
 else {
@@ -126,7 +128,6 @@ async function datosH(cedulaEmpleado) {
 }
 
 // darle click al boton para que se ejecute la funcion
-// darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
     e.preventDefault();
     // capturar los datos del formulario
@@ -136,17 +137,17 @@ boton.addEventListener('click', async (e) => {
     console.log(datosExtraidos);
     if (datosExtraidos.historial.length == 0) {
         aviso('No hay datos para mostrar', 'warning');
-        return
+        return;
     }
 
     const oculto = document.querySelector('#oculto');
     oculto.style.display = "block";
 
+    const tabla = document.querySelector('#tabla');
     tabla.innerHTML = '';
     datosExtraidos.historial.forEach(async (p) => {
-        // limpiar la tabla
-        const tabla = document.querySelector('#tabla');
-        tabla.innerHTML += `
+        // Insertar al principio de la tabla
+        tabla.insertAdjacentHTML('afterbegin', `
             <tr>
                 <td>${p.cedula}</td>
                 <td>${p.concepto}</td>            
@@ -154,7 +155,8 @@ boton.addEventListener('click', async (e) => {
                 <td>${p.valor}</td>
                 <td>${p.cuotas}</td>
                 <td>${p.nombreQuienEntrego}</td>
-                <td>${p.generadopor}</td>            </tr>
-            `
+                <td>${p.generadopor}</td>
+            </tr>
+        `);
     });
 });

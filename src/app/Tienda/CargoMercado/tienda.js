@@ -278,6 +278,7 @@ async function datosTCodigos() {
             return responseData;
         } else {
             throw new Error('Error en la petición GET');
+
         }
     } catch (error) {
         console.error('Error en la petición HTTP GET');
@@ -436,7 +437,7 @@ async function CambiarEstado(cod, valor, codigo) {
 
 }
 
-async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo, codigo, generadoPor) {
+async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo, codigo, generadopor) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
@@ -453,9 +454,8 @@ async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo, codig
             body:
                 JSON.stringify({
                     codigo: codigo,
-                    cedula: cedulaEmpleado,
                     nombreQuienEntrego: '',
-                    generadopor: generadoPor,
+                    generadopor: generadopor,
                     valor: nuevovalor,
                     cuotas: cuotas,
                     fechaEfectuado: fecha,
@@ -651,23 +651,28 @@ boton.addEventListener('click', async (e) => {
         concepto = 'Compra tienda de ' + usernameLocal;
 
         // generar codigo solo numeros aleatorios
-        let codigo = 'MOH' + Math.floor(Math.random() * 1000000);
+        let codigoAux = 'MOH' + Math.floor(Math.random() * 1000000);
 
-        // actualizar el codigo en la base de datos
-        await actualizar(codigo, codigoP, usernameLocal, nuevovalor, 2);
-
-        await CambiarEstado(codigoP, nuevovalor, codigo);
-
-        await escribirHistorial(cedulaEmpleado, nuevovalor, 2, concepto, codigo, cod.generadoPor);
-        await ActualizarHistorial(codigo);
-
-        await actualizarDatosBase(concepto, nuevovalor, 2, cedulaEmpleado);
-
+        await CambiarEstado(codigoP, nuevovalor, codigoAux);
+        await sleep(2000); // Pausa de 2 segundos
+        await actualizar(codigoAux, codigoP, usernameLocal, nuevovalor, 2);
+        await sleep(2000); // Pausa de 2 segundos
+        await escribirHistorial(cedulaEmpleado, nuevovalor, 2, concepto, codigoAux, cod.generadoPor);
+        await sleep(2000); // Pausa de 2 segundos
+        await ActualizarHistorial(codigoAux);
+        await sleep(2000); // Pausa de 2 segundos
         await historialT(nuevovalor);
+        await sleep(2000); // Pausa de 2 segundos
+        await actualizarDatosBase(concepto, nuevovalor, 2, cedulaEmpleado);
+        await sleep(2000); // Pausa de 2 segundos
 
-        aviso('Acaba de pedir un prestamo de ' + valor, 'success');
+        aviso('Acaba de pedir un mercado de ' + valor, 'success');
 
     }
 });
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 
 

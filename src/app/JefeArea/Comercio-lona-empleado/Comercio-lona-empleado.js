@@ -877,7 +877,7 @@ boton.addEventListener("click", async (e) => {
         let cod = obtenerCodigo(codigoA, CodigosMercado);
 
 
-        let codigAux = "MOH" + Math.floor(Math.random() * 1000000);
+        let codigAux = "MOH" + Math.floor(Math.random() * 1000000+1);
         let concepto = datos.concepto;
 
         if (auxConcepto2) {
@@ -899,7 +899,7 @@ boton.addEventListener("click", async (e) => {
 
         await actualizarVentas(cantidad, codigo, usernameLocal);
         await escribirHistorial(cedula, sumaVentas, 2, "Compra tienda respecto a:" + concepto + " en " + sede, codigAux, cod.generadoPor);
-        await ActualizarHistorial(codigAux);
+        await ActualizarHistorial(codigo);
 
         if (codigo2 != "") {
             await actualizarVentas(cantidad2, codigo2, usernameLocal);
