@@ -317,3 +317,140 @@ extraeHistorialT.addEventListener('click', async () => {
     document.body.removeChild(element);
     URL.revokeObjectURL(url);
 });
+
+let coodinador = document.getElementById("coordinadores");
+const nombresApellidos = [
+    "LEYDI CAMACHO",
+    "CLAUDIA BELTRAN",
+    "MARIO MONTERO",
+    "LUIS RUBIANO",
+    "DIANA SIERRA",
+    "ANGIE LEON",
+    "JHONATAN PARRA",
+    "DUMAR NUÑEZ",
+    "DANIEL PEREZ",
+    "SERGIO ROCHA",
+    "DIEGO MENDIETA",
+    "DIEGO FORERO",
+    "ERIKA GALEANO",
+    "DUMAR NUÑEZ",
+    "ANDRES PEÑA",
+    "DANIEL HERNANDEZ",
+    "JULIETH REYES",
+    "MAURY RAMIREZ",
+    "ANGIE CASTILLO",
+    "MARIA MERCHAN",
+    "ANGELICA GOMEZ",
+    "LUISA PEÑA",
+    "SERGIO ROCHA",
+    "ANGIE GUTIERREZ",
+    "NOHORA CASTRO",
+    "BRIGITH ACEVEDO",
+    "ANGIE GARCIA",
+    "FANNY ROBLES",
+    "DUVAN FORERO",
+    "LEIDI CAMARGO",
+    "ANGIE ACOSTA",
+    "SAREN BELLO",
+    "PAOLA MACANA",
+    "ANYI HERNANDEZ",
+    "YESENIA PALACIOS",
+    "LIGIA HUERTAS",
+    "NIKOL SARMIENTO",
+    "DIANA RUBIANO",
+    "YURLEY REYES",
+    "ANTONIO RUIZ",
+    "ESTEFANIA REALPE"
+];
+
+coodinador.addEventListener('click', async () => {
+    let arrayCodigos = [];
+    const aux = await datosTCodigos();
+    if (aux.message == "error") {
+        aviso("No hay registros de actividades de los coordinadores", "warning");
+        return;
+    }
+    console.log(aux);
+    let datosFinales = [];
+    nombresApellidos.forEach((nombre) => {
+        aux.codigo.forEach((doc) => {
+            if (doc.generadoPor == nombre) {
+                datosFinales.push(doc);
+            }
+        }
+        );
+
+    });
+    console.log(datosFinales);
+
+    // Crear un objeto para almacenar los datos por mes
+    const datosPorMes = {};
+
+    datosFinales.forEach((doc) => {
+        const fechaGenerado = new Date(doc.fechaGenerado);
+        const mes = fechaGenerado.getMonth() + 1; // Meses comienzan en 0
+    
+        // Crear una hoja para el mes si aún no existe
+        if (!datosPorMes[mes]) {
+            datosPorMes[mes] = [['Concepto', 'Concepto Palabra Clave', 'Cedula Quien Pide', 'Codigo', 'Codigo Descontado', 'Cuotas', 'Ejecutado Por', 'Estado', 'Fecha Ejecutado', 'Fecha Generado', 'Generado Por', 'Hora Generado', 'Monto']];
+        }
+    
+        const docData = doc;
+        let estado = "";
+        if (docData.estado == true) {
+            estado = "Pendiente";
+        } else if (docData.estado == false) {
+            estado = "Ejecutado";
+        }
+        
+        // Determinar el valor de "Concepto Palabra Clave"
+        let conceptoPalabraClave = "";
+        if (docData.Concepto.startsWith("Mercado")) {
+            conceptoPalabraClave = "Mercado";
+        } else if (docData.Concepto.startsWith("Autorizacion")) {
+            conceptoPalabraClave = "Prestamo dinero";
+        }
+        
+        datosPorMes[mes].push([
+            docData.Concepto,
+            conceptoPalabraClave, // Agregar la nueva columna
+            docData.cedulaQuienPide,            
+            docData.codigo,
+            docData.codigoDescontado,
+            Number(docData.cuotas),
+            docData.ejecutadoPor,
+            estado,
+            docData.fechaEjecutado,
+            docData.fechaGenerado,           
+            docData.generadoPor,
+            docData.horaGenerado,
+            docData.monto,
+        ]);
+    });
+    
+    // Crear un archivo Excel con hojas separadas por mes
+    const wb = XLSX.utils.book_new();
+    for (const mes in datosPorMes) {
+        if (datosPorMes.hasOwnProperty(mes)) {
+            const ws = XLSX.utils.aoa_to_sheet(datosPorMes[mes]);
+            XLSX.utils.book_append_sheet(wb, ws, `DetalleM_${mes}`);
+        }
+    }
+    
+    // Generar el archivo Excel
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+    const blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    
+    const element = document.createElement('a');
+    element.href = url;
+    element.download = 'DetalleCoodinadores.xlsx';
+    element.style.display = 'none';
+    
+    document.body.appendChild(element);
+    element.click();
+    
+    document.body.removeChild(element);
+    URL.revokeObjectURL(url);
+    
+});
