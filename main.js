@@ -11,7 +11,7 @@ const createWindow = () => {
     height: 900,
   });
 
-  //win.setMenu(null)
+  win.setMenu(null)
 
   autoUpdater.checkForUpdates();
 

@@ -162,7 +162,7 @@ aux.forEach((p) => {
 
 
 
-async function actualizar(cod, cantidadRecibida, PersonaRecibe) {
+async function actualizar(cod, cantidadRecibida, PersonaRecibe, comentariosLlegada) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
@@ -176,6 +176,7 @@ async function actualizar(cod, cantidadRecibida, PersonaRecibe) {
                 JSON.stringify({
                     cantidadRecibida: cantidadRecibida,
                     PersonaRecibe: PersonaRecibe,
+                    comentariosRecibido: comentariosLlegada,
                     jwt: jwtToken
                 })
         })
@@ -223,6 +224,7 @@ boton.addEventListener('click', async (e) => {
     const cantidad = document.querySelector('#Cantidad').value;
     //const valorUnidad = document.querySelector('#valorUnidad').value;
     const codigo = document.querySelector('#codigo').value;
+    const comentariosLlegada = document.querySelector('#comentariosLlegada').value;
     ///const otro = document.querySelector('#otro').value;
     const datosCodigo = await obtenerDatosComercio(codigo);
 
@@ -238,10 +240,8 @@ boton.addEventListener('click', async (e) => {
     /* necesito enviar un correo a un @gmail con la informacion de la cantidad recibida, 
     el codigo, el nombre de la persona que recibe, el nombre de la persona que envia, sede, fecha enviado, fecha recibido y la cantidad enviada */
 
+   
 
-
-    
-
-    actualizar(codigo, cantidad, usernameLocal);
+    actualizar(codigo, cantidad, usernameLocal, comentariosLlegada);
     aviso("Se ha cargado la informacion exitosamente", "success");
 });

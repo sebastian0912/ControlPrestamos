@@ -142,7 +142,7 @@ numemoroM.addEventListener('keyup', (e) => {
 });
 
 
-async function enviarLona(cod, destino, concepto, cantidad, valorUnidad, PersonaEnvia) {
+async function enviarLona(cod, destino, concepto, cantidad, valorUnidad, PersonaEnvia, personaLleva, comentarios) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
@@ -161,7 +161,9 @@ async function enviarLona(cod, destino, concepto, cantidad, valorUnidad, Persona
                     destino: destino,
                     cantidadEnvio: cantidad,
                     valorUnidad: valorUnidad,
-                    PersonaEnvia: PersonaEnvia,                    
+                    PersonaEnvia: PersonaEnvia,    
+                    personaQueLleva: personaLleva,
+                    comentariosEnvio: comentarios,                
                     jwt: jwtToken
                 })
         })
@@ -198,7 +200,8 @@ boton.addEventListener('click', async (e) => {
     const otro2 = document.querySelector('#otro2').value;
     let miSelect = document.querySelector('#miSelect').value;
     let miSelect2 = document.querySelector('#miSelect2').value;
-
+    let personalleva = document.querySelector('#quienLleva').value;
+    let comentarios = document.querySelector('#comentarioLleva').value;
     if (otro2 != "") {
         miSelect2 = otro2;
     }
@@ -211,7 +214,7 @@ boton.addEventListener('click', async (e) => {
 
     let uid = Math.floor(Math.random() * 10000000);;
 
-    await enviarLona(uid, miSelect, miSelect2, cantidad, nuevovalor, usernameLocal);
+    await enviarLona(uid, miSelect, miSelect2, cantidad, nuevovalor, usernameLocal, personalleva, comentarios);
 
 
     aviso("Se ha cargado la informacion exitosamente, el codigo es: " + uid, "success");
