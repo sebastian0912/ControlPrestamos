@@ -281,6 +281,8 @@ function s2ab(s) {
 
 extraeHistorialT.addEventListener('click', async () => {
     const datosExtraidos = await THistorial();
+    console.log(datosExtraidos);
+
     if (datosExtraidos.historial.length == 0) {
         aviso("No hay registros de compras realizadas en las tiendas", "warning");
         return;
@@ -319,14 +321,18 @@ extraeHistorialT.addEventListener('click', async () => {
             }
 
             historialPorMes[mes][grupo].push(doc);
-        }
+        }        
     });
+
+    // si no hay datos, mostrar un mensaje de error
+    if (Object.keys(historialPorMes).length === 0) {
+        aviso("No hay registros de compras realizadas en las tiendas", "warning");
+        return;
+    }
 
 
     // Crear un archivo Excel con hojas internas para cada mes
-    const wb = XLSX.utils.book_new();
-
-
+    const wb = XLSX.utils.book_new();    
 
     for (const mes in historialPorMes) {
         const historialMes = historialPorMes[mes];

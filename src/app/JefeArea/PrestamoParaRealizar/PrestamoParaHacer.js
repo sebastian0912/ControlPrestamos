@@ -309,8 +309,7 @@ async function escribirCodigo(cedulaEmpleado, nuevovalor, codigo, cuotas, tipo, 
                     throw new Error('Error en la petición POST');
                 }
             })
-            .then(responseData => {
-                aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + codigo, 'success');
+            .then(responseData => {                
                 console.log('Respuesta:', responseData);
             })
             .catch(error => {
@@ -373,6 +372,14 @@ boton.addEventListener('click', async (e) => {
     await actualizarDatosBase(nuevovalor, cuotas, cedulaEmpleado);
 
     await escribirCodigo(cedulaEmpleado, nuevovalor, codigo, cuotas, valor)
+
+
+    let confirmacion = await avisoConfirmado('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + codigo, 'success');
+    console.log(confirmacion);
+    if (confirmacion) {
+        // recargar la pagina
+        location.reload();
+    }
 
     if (datos.temporal.startsWith("Apoyo") || datos.temporal.startsWith("APOYO")) {
         empresa = "APOYO LABORAL TS SAS";
@@ -444,12 +451,7 @@ boton.addEventListener('click', async (e) => {
     docPdf.save('PrestamoDescontar' + '_' + datos.nombre + "_" + codigo + '.pdf');
 
 
-    let confirmacion = await avisoConfirmado('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + codigo, 'success');
     
-    if (confirmacion) {
-        // recargar la pagina
-        location.reload();
-    }
 
 });
 

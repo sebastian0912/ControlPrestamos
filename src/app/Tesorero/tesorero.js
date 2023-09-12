@@ -401,7 +401,6 @@ extraeC.addEventListener('click', async () => {
 
     document.body.removeChild(element);
     URL.revokeObjectURL(url);
-
     // borrar la colección de códigos
 });
 
