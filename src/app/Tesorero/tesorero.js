@@ -134,11 +134,13 @@ numeroCoordinadores.innerHTML = numCoordinadoresConestadoSolicitudesTrue(datosU)
 const listado = await datosUsuarios();
 let arrayCodigos = [];
 
-listado.forEach((c) => {
-    if (c.estadoSolicitudes == true && c.primer_nombre != null && (c.rol == "COORDINADOR" || c.rol == "JEFE-DE-AREA" || c.rol == "TIENDA") ) {
+listado.forEach((c) => {    
+    if ((c.rol == "COORDINADOR" || c.rol == "JEFE-DE-AREA" || c.rol == "TIENDA") && c.estadoSolicitudes == true && c.primer_nombre != null) {
         arrayCodigos.push(c);
     }
 });
+
+console.log(arrayCodigos);
 
 // Mostar contenido en una tabla
 arrayCodigos.forEach((c) => {
