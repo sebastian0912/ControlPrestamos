@@ -6,23 +6,109 @@ const perfil = document.querySelector('#perfil');
 // Capturar el PERFIL y el USERNAME del local storage
 const perfilLocal = localStorage.getItem("perfil");
 const usernameLocal = localStorage.getItem("username");
-const empleados = localStorage.getItem("CantidadEmpleados");
 
 const numeroTotal = document.querySelector('#numeroEmpleados');
 
 let extrae = document.getElementById("extrae");
 let extraeT = document.getElementById("extraeT");
 
-const coordinadores = localStorage.getItem("CantidadCoordinadores");
-const tiendas = localStorage.getItem("CantidadTiendas");
-
-
 //Muestra en la parte superior el nombre y el perfil
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
-numeroTotal.innerHTML = empleados;
-numeroCoordinadores.innerHTML = coordinadores;
-numeroTiendas.innerHTML = tiendas;
+
+async function datosEmpleado() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Datosbase/datosbase';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
+async function datosUsuarios() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/usuarios/usuarios';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
+function numCoordinador(datos) {
+    let auxCoordinadores = 0;
+    datos.forEach((doc) => {
+        if (doc.rol == "COORDINADOR") {
+            auxCoordinadores++;
+        }
+    });
+    return auxCoordinadores;
+}
+
+function numTiendas(datos) {
+    let auxTiendas = 0;
+    datos.forEach((doc) => {
+        if (doc.rol == "TIENDA") {
+            auxTiendas++;
+        }
+    });
+    return auxTiendas;
+}
+
+
+let aux2 = await datosEmpleado();
+let datosU = await datosUsuarios();
+let datosEmpleados = aux2.datosbase;
+
+
+if (datosEmpleados == "error") {
+    numeroTotal.innerHTML = "0";
+} else {
+    numeroTotal.innerHTML = aux2.datosbase.length;
+}
+numeroCoordinadores.innerHTML = numCoordinador(datosU);
+numeroTiendas.innerHTML = numTiendas(datosU);
 
 // Obtén la fecha actual
 var ahora = new Date();
@@ -106,7 +192,6 @@ async function THistorial() {
 
         if (response.ok) {
             const responseData = await response.json();
-            console.log(responseData);
             return responseData;
         } else {
             throw new Error('Error en la petición GET');
@@ -137,7 +222,6 @@ async function datosT() {
 
         if (response.ok) {
             const responseData = await response.json();
-            console.log(responseData);
             return responseData;
         } else {
             throw new Error('Error en la petición GET');
@@ -152,7 +236,6 @@ async function datosT() {
 extraeT.addEventListener('click', async () => {
     const datosExtraidos = await datosT();
 
-    console.log(datosExtraidos);
 
     let excelData = [['Nombre De la Tienda', 'Monto Total', 'Numero de compras en la tienda']];
 
@@ -197,7 +280,6 @@ function s2ab(s) {
 }
 
 extraeHistorialT.addEventListener('click', async () => {
-    console.log("entro");
     const datosExtraidos = await THistorial();
     if (datosExtraidos.historial.length == 0) {
         aviso("No hay registros de compras realizadas en las tiendas", "warning");
@@ -209,38 +291,64 @@ extraeHistorialT.addEventListener('click', async () => {
 
     datosExtraidos.historial.forEach(doc => {
         if (doc.concepto.startsWith("Compra tienda")) {
-            // Obtener el mes de la fecha en formato 'YYYY-MM'
-            const mes = doc.fechaEfectuado.slice(0, 7);
+            // Obtener el mes y el día de la fecha en formato 'YYYY-MM-DD'
+            const fechaParts = doc.fechaEfectuado.split('-');
+            const mes = fechaParts[1];
+            let dia = fechaParts[2];
 
             if (!historialPorMes[mes]) {
-                historialPorMes[mes] = [];
+                historialPorMes[mes] = { '13-27': [], '28-12': [] };
             }
 
-            historialPorMes[mes].push(doc);
+            // Si el día está en el rango del 28 al 31, asignar el siguiente mes
+            if (dia >= 28) {
+                const siguienteMes = (parseInt(mes) + 1).toString().padStart(2, '0');
+                historialPorMes[siguienteMes] = historialPorMes[siguienteMes] || { '13-27': [], '28-12': [] };
+                dia = dia <= 12 ? `0${dia}` : dia;
+                mes = siguienteMes;
+            }
+
+            const grupo = dia >= 13 && dia <= 27 ? '13-27' : '28-12';
+
+            // Utilizar una expresión regular para encontrar "de" o "en" seguido del lugar
+            const lugarMatch = doc.concepto.match(/(?:de|en)\s+(.+)/i);
+
+            if (lugarMatch) {
+                const lugar = lugarMatch[1]; // El segundo grupo capturado es el lugar
+                doc.lugar = lugar; // Asignar el valor al campo "lugar"
+            }
+
+            historialPorMes[mes][grupo].push(doc);
         }
     });
+
 
     // Crear un archivo Excel con hojas internas para cada mes
     const wb = XLSX.utils.book_new();
 
+
+
     for (const mes in historialPorMes) {
         const historialMes = historialPorMes[mes];
-        const excelData = [['Cedula', 'Concepto', 'Lugar', 'Cuotas', 'Fecha Efectuado', 'Nombre Quien Entregó', 'Valor']];
 
-        historialMes.forEach(doc => {
-            excelData.push([
-                doc.cedula,
-                doc.concepto,
-                doc.lugar,
-                doc.cuotas,
-                doc.fechaEfectuado,
-                doc.nombreQuienEntrego,
-                doc.valor
-            ]);
-        });
+        for (const rango in historialMes) {
+            const excelData = [['Cedula', 'Concepto', 'Lugar', 'Cuotas', 'Fecha Efectuado', 'Nombre Quien Entregó', 'Valor']];
 
-        const ws = XLSX.utils.aoa_to_sheet(excelData);
-        XLSX.utils.book_append_sheet(wb, ws, mes);
+            historialMes[rango].forEach(doc => {
+                excelData.push([
+                    doc.cedula,
+                    doc.concepto,
+                    doc.lugar,
+                    doc.cuotas,
+                    doc.fechaEfectuado,
+                    doc.nombreQuienEntrego,
+                    doc.valor
+                ]);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(excelData);
+            XLSX.utils.book_append_sheet(wb, ws, `${mes} (${rango})`);
+        }
     }
 
     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
@@ -279,7 +387,6 @@ async function datosTCodigos() {
 
         if (response.ok) {
             const responseData = await response.json();
-            console.log(responseData);
             return responseData;
         } else {
             throw new Error('Error en la petición GET');
@@ -290,7 +397,9 @@ async function datosTCodigos() {
         throw error; // Propaga el error para que se pueda manejar fuera de la función
     }
 }
+
 let coodinador = document.getElementById("coordinadores");
+
 const nombresApellidos = [
     "LEYDI CAMACHO",
     "CLAUDIA BELTRAN",
@@ -332,7 +441,19 @@ const nombresApellidos = [
     "DIANA RUBIANO",
     "YURLEY REYES",
     "ANTONIO RUIZ",
-    "ESTEFANIA REALPE"
+    "ESTEFANIA REALPE",
+    "CARLOS ROJAS",
+    "KAREN RAMIREZ",
+    "ANGELA MARIA ALDANA",
+    "SEBASTIAN RODRIGUEZ",
+    "ERIKA GUERRERO",
+    "CAMILA GARCIA",
+    "ANDREA DIAZ",
+    "VALENTINA GUILLEN",
+    "KAREN RIQUETT",
+    "ANGELICA GOMEZ",
+    "CAROL PALACIOS",
+    "LEIDY VANESA QUIÑONES"
 ];
 
 coodinador.addEventListener('click', async () => {
@@ -342,31 +463,35 @@ coodinador.addEventListener('click', async () => {
         aviso("No hay registros de actividades de los coordinadores", "warning");
         return;
     }
-    console.log(aux);
     let datosFinales = [];
     nombresApellidos.forEach((nombre) => {
         aux.codigo.forEach((doc) => {
             if (doc.generadoPor == nombre) {
                 datosFinales.push(doc);
             }
-        }
-        );
-
+        });
     });
-    console.log(datosFinales);
 
-    // Crear un objeto para almacenar los datos por mes
-    const datosPorMes = {};
+    if (datosFinales.length == 0) {
+        aviso("No hay registros de actividades de los coordinadores", "warning");
+        return;
+    }
+
+    // Crear un objeto para almacenar los datos por quincena de forma dinámica
+    const datosPorQuincena = {};
 
     datosFinales.forEach((doc) => {
         const fechaGenerado = new Date(doc.fechaGenerado);
-        const mes = fechaGenerado.getMonth() + 1; // Meses comienzan en 0
-    
-        // Crear una hoja para el mes si aún no existe
-        if (!datosPorMes[mes]) {
-            datosPorMes[mes] = [['Concepto', 'Concepto Palabra Clave', 'Cedula Quien Pide', 'Codigo', 'Codigo Descontado', 'Cuotas', 'Ejecutado Por', 'Estado', 'Fecha Ejecutado', 'Fecha Generado', 'Generado Por', 'Hora Generado', 'Monto']];
+        const dia = fechaGenerado.getDate(); // Obtener el día del mes
+        const mes = fechaGenerado.getMonth() + 1; // Obtener el mes
+
+        // Determinar la quincena según el día del mes
+        const quincena = dia >= 13 ? `Quincena_${mes}_1` : `Quincena_${mes}_2`;
+
+        if (!datosPorQuincena[quincena]) {
+            datosPorQuincena[quincena] = [['Concepto', 'Concepto Palabra Clave', 'Cedula Quien Pide', 'Codigo', 'Codigo Descontado', 'Cuotas', 'Ejecutado Por', 'Estado', 'Fecha Ejecutado', 'Fecha Generado', 'Generado Por', 'Hora Generado', 'Monto']];
         }
-    
+
         const docData = doc;
         let estado = "";
         if (docData.estado == true) {
@@ -374,7 +499,7 @@ coodinador.addEventListener('click', async () => {
         } else if (docData.estado == false) {
             estado = "Ejecutado";
         }
-        
+
         // Determinar el valor de "Concepto Palabra Clave"
         let conceptoPalabraClave = "";
         if (docData.Concepto.startsWith("Mercado")) {
@@ -382,50 +507,98 @@ coodinador.addEventListener('click', async () => {
         } else if (docData.Concepto.startsWith("Autorizacion")) {
             conceptoPalabraClave = "Prestamo dinero";
         }
-        
-        datosPorMes[mes].push([
+
+        datosPorQuincena[quincena].push([
             docData.Concepto,
             conceptoPalabraClave, // Agregar la nueva columna
-            docData.cedulaQuienPide,            
+            docData.cedulaQuienPide,
             docData.codigo,
             docData.codigoDescontado,
             Number(docData.cuotas),
             docData.ejecutadoPor,
             estado,
             docData.fechaEjecutado,
-            docData.fechaGenerado,           
+            docData.fechaGenerado,
             docData.generadoPor,
             docData.horaGenerado,
             docData.monto,
         ]);
     });
-    
-    // Crear un archivo Excel con hojas separadas por mes
+
+    // Crear una hoja de resumen
+    const resumenSheet = [['Generado Por', 'Total Pendiente', 'Total Ejecutado', 'Rol']];
+
+    // Crear un objeto para almacenar el recuento de registros por Generado Por y Rol
+    const countByGeneradoPorYRol = {};
+
+    datosFinales.forEach((doc) => {
+        const generadoPor = doc.generadoPor;
+        const estado = doc.estado ? 'Pendiente' : 'Ejecutado';
+
+        // Determinar el rol de la persona
+        const rol = nombresApellidos.indexOf(generadoPor) >= 40 ? 'JEFE DE AREA' : 'COORDINADOR';
+
+        // Inicializar el contador para el Generado Por y Rol si aún no existe
+        if (!countByGeneradoPorYRol[generadoPor]) {
+            countByGeneradoPorYRol[generadoPor] = { 'COORDINADOR': { 'Pendiente': 0, 'Ejecutado': 0 }, 'JEFE DE AREA': { 'Pendiente': 0, 'Ejecutado': 0 } };
+        }
+
+        // Incrementar el contador correspondiente para el rol y el estado
+        countByGeneradoPorYRol[generadoPor][rol][estado] += 1;
+
+        // Llenar la hoja de resumen con los valores de recuento, el rol y el estado
+    });
+
+    // Calcular el resumen acumulado
+    for (const generadoPor in countByGeneradoPorYRol) {
+        const rol = nombresApellidos.indexOf(generadoPor) >= 40 ? 'JEFE DE AREA' : 'COORDINADOR';
+
+        let totalPendiente = 0;
+        let totalEjecutado = 0;
+
+        for (const estado in countByGeneradoPorYRol[generadoPor][rol]) {
+            if (estado === 'Pendiente') {
+                totalPendiente += countByGeneradoPorYRol[generadoPor][rol][estado];
+            } else {
+                totalEjecutado += countByGeneradoPorYRol[generadoPor][rol][estado];
+            }
+        }
+
+        resumenSheet.push([generadoPor, totalPendiente, totalEjecutado, rol]);
+    }
+
+    // Crear un archivo Excel con hojas separadas por quincena y la hoja de resumen
     const wb = XLSX.utils.book_new();
-    for (const mes in datosPorMes) {
-        if (datosPorMes.hasOwnProperty(mes)) {
-            const ws = XLSX.utils.aoa_to_sheet(datosPorMes[mes]);
-            XLSX.utils.book_append_sheet(wb, ws, `DetalleM_${mes}`);
+
+    // Agregar la hoja de resumen al libro Excel
+    const resumenWs = XLSX.utils.aoa_to_sheet(resumenSheet);
+    XLSX.utils.book_append_sheet(wb, resumenWs, 'Resumen');
+
+    for (const quincena in datosPorQuincena) {
+        if (datosPorQuincena.hasOwnProperty(quincena)) {
+            const ws = XLSX.utils.aoa_to_sheet(datosPorQuincena[quincena]);
+            XLSX.utils.book_append_sheet(wb, ws, quincena);
         }
     }
-    
+
     // Generar el archivo Excel
     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
     const blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
     const url = URL.createObjectURL(blob);
-    
+
     const element = document.createElement('a');
     element.href = url;
     element.download = 'DetalleCoodinadores.xlsx';
     element.style.display = 'none';
-    
+
     document.body.appendChild(element);
     element.click();
-    
+
     document.body.removeChild(element);
     URL.revokeObjectURL(url);
-    
 });
+
+
 
 
 

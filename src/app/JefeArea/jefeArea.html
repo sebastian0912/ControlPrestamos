@@ -24,7 +24,7 @@
                     <img src="../assets/pagina-de-inicio.png" alt="logo" class="logo" />
                     <p> Inicio </p>
                 </a>
-            </li>           
+            </li>
 
             <li>
                 <a href="./PrestamoParaHacer/PrestamoParaHacer.html">
@@ -78,10 +78,24 @@
 
             <h1 class="diasT"> Días restantes antes de fecha cierre de novedades de nómina </h1>
             <span class="dias" id="diasRestantes"></span>
-      
+
             <h1 class="diasT"> Días restantes antes de liquidación </h1>
             <span class="dias" id="diasLi"></span>
+
+            <h1 class="diasT">Aceptación cierre de novedades</h1>
+            <div class="onoffswitch" style="margin-top: -2px;">
+                <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" tabindex="0"
+                    checked>
+                <label class="onoffswitch-label" for="myonoffswitch">
+                    <span class="onoffswitch-inner"></span>
+                    <span class="onoffswitch-switch"></span>
+                </label>
+            </div>
+
         </ul>
+
+
+
     </div>
 
     <header>
@@ -97,19 +111,19 @@
     <div class="contenido">
         <div class="tabla">
             <table class="tabla-contenido">
-              <thead>
-                <tr>
-                  <th>Codigo</th>
-                  <th>Monto</th>
-                  <th>Cuotas</th>
-                  <th>Estado</th>
-                  <th>Concepto</th>
-                  <th>Cedula</th>
-                </tr>
-              </thead>
-              <tbody id="tabla"> </tbody>
+                <thead>
+                    <tr>
+                        <th>Codigo</th>
+                        <th>Monto</th>
+                        <th>Cuotas</th>
+                        <th>Estado</th>
+                        <th>Concepto</th>
+                        <th>Cedula</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla"> </tbody>
             </table>
-          </div>
+        </div>
     </div>
 
 </body>

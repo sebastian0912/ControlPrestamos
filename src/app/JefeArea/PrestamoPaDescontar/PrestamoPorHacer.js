@@ -1,5 +1,5 @@
 import { urlBack } from "../../models/base.js";
-import { aviso } from "../../Avisos/avisos.js";
+import { aviso, avisoConfirmado } from "../../Avisos/avisos.js";
 
 
 const boton = document.querySelector('#boton');
@@ -69,7 +69,7 @@ var diferencia2 = new Date(obtenerFecha()) - ahora;
 var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
 
 if (dias2 == 0 || dias2 < 0) {
-    
+
     diasLi.style.color = "red";
 } else {
     diasLi.style.color = "black";
@@ -348,7 +348,7 @@ async function actualizarDatosBase(concepto, valor, cuotas, cedulaEmpleado) {
                     JSON.stringify({
                         concepto: concepto,
                         prestamoParaDescontar: valor,
-                        cuotasPrestamosParaDescontar: cuotas,                        
+                        cuotasPrestamosParaDescontar: cuotas,
                         jwt: jwtToken
                     })
             })
@@ -379,7 +379,7 @@ async function actualizarDatosBase(concepto, valor, cuotas, cedulaEmpleado) {
                 body:
                     JSON.stringify({
                         concepto: concepto,
-                        seguroFunerario: valor,                        
+                        seguroFunerario: valor,
                         jwt: jwtToken
                     })
             })
@@ -413,7 +413,7 @@ async function actualizarDatosBase(concepto, valor, cuotas, cedulaEmpleado) {
                     JSON.stringify({
                         concepto: concepto,
                         anticipoLiquidacion: valor,
-                        cuentas: cuotas,                        
+                        cuentas: cuotas,
                         jwt: jwtToken
                     })
             })
@@ -457,7 +457,7 @@ async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo, codig
                     codigo: codigo,
                     cedula: cedulaEmpleado,
                     nombreQuienEntrego: '',
-                    generadopor: generadoPor,                    
+                    generadopor: generadoPor,
                     valor: nuevovalor,
                     cuotas: cuotas,
                     fechaEfectuado: fecha,
@@ -511,7 +511,7 @@ async function CambiarEstado(cod, valor, codigo) {
                 }
             })
             .then(responseData => {
-                aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + codigo, 'success');
+
                 console.log('Respuesta:', responseData);
             })
             .catch(error => {
@@ -535,8 +535,8 @@ async function ActualizarHistorial(codigo) {
             method: 'POST',
             body:
                 JSON.stringify({
-                    codigo: codigo,                    
-                    nombreQuienEntrego: usernameLocal,                    
+                    codigo: codigo,
+                    nombreQuienEntrego: usernameLocal,
                     jwt: jwtToken
                 })
         })
@@ -562,6 +562,21 @@ async function ActualizarHistorial(codigo) {
 }
 
 
+function esCodigoValido(fechaGeneradoStr) {
+    const hoy = new Date(); // Obtiene la fecha actual
+    const fechaGenerado = new Date(fechaGeneradoStr);
+    const diaGenerado = fechaGenerado.getDate();
+    const diaLimite = diaGenerado <= 13 ? 27 : 13;
+
+    if (diaGenerado <= diaLimite || diaGenerado === 13) {
+        // El código es válido
+        return true;
+    } else {
+        // El código no es válido
+        return false;
+    }
+}
+
 boton.addEventListener('click', async (e) => {
 
     e.preventDefault();
@@ -571,11 +586,11 @@ boton.addEventListener('click', async (e) => {
     let valor = document.querySelector('#valor').value;
     const nuevovalor = valor.replace(/\,/g, '');
     let cuotas = document.querySelector('#cuotas').value;
-
-
+    
+    
     let encontrado = false;
     let concepto2;
-
+    
     if (codigoP == '') {
         aviso('El campo codigo no puede estar vacio', 'error');
     }
@@ -588,7 +603,8 @@ boton.addEventListener('click', async (e) => {
         console.log(aux2.datosbase[0]);
         let usuario = aux2.datosbase[0];
         console.log(usuario);
-
+        const cod = obtenerCodigo(codigoP, aux.codigo);
+        
         if (!verificarCodigo(codigoP, aux.codigo)) {
             aviso('El codigo no existe', 'error');
             return;
@@ -616,12 +632,27 @@ boton.addEventListener('click', async (e) => {
             aviso('Ups no se pueden generar mercado, el monto no puede estar vacio', 'error');
             return;
         }
-       
-       
+
+        if (cuotas == "") {
+            aviso('Ups no se pueden generar mercado, las cuotas no pueden estar vacias', 'error');
+            return;
+        }
+
+        // si cuotas es mayor a 4
+        if (parseInt(cuotas) > 4) {
+            aviso('Ups no se pueden generar mercado, las cuotas no pueden ser mayor a 4', 'error');
+            return;
+        }
+
+        if (!esCodigoValido(cod.fechaGenerado)) {
+            aviso('El codigo ya expiro', 'error');
+            return;
+        }
+
+
 
 
         else {
-            const cod = obtenerCodigo(codigoP, aux.codigo);
             let concepto = null;
             concepto = 'Libranza_Prestamo_Dinero';
             concepto2 = 'Dinero_Autorizacion';
@@ -640,24 +671,23 @@ boton.addEventListener('click', async (e) => {
             }
 
             await actualizar(codigo, cod.codigo, usernameLocal, nuevovalor, cuotas);
-            await sleep(2000); // Pausa de 2 segundos
-            console.log("primero" + concepto2);
             await actualizarDatosBase(concepto2, nuevovalor, cuotas, cedulaEmpleado);
-            await sleep(2000); // Pausa de 2 segundos
-            // modificar en la tabla codigos el estado del codigo a false para que no pueda ser usado nuevamente
             await CambiarEstado(cod.codigo, nuevovalor, codigo);
-            await sleep(2000); // Pausa de 2 segundos
             await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, concepto, codigo, cod.generadoPor)
             await sleep(2000); // Pausa de 2 segundos
             await ActualizarHistorial(codigo);
-            await sleep(2000); // Pausa de 2 segundos
-            aviso('Acaba de pedir un prestamo de ' + valor, 'success');
-           
+            await sleep(4000); // Pausa de 4 segundos
+            let aviso = await avisoConfirmado('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + codigo, 'success');
+
+            if (aviso) {
+                // recargar la pagina
+                location.reload();
+            }
+
         }
     }
-
-    document.querySelector('#codigo').value = "";
-    document.querySelector('#cedula').value = "";
-    document.querySelector('#valor').value = "";
-    document.querySelector('#cuotas').value = "";
 });
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}

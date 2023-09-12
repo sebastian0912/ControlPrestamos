@@ -1,4 +1,5 @@
 import { urlBack } from "../models/base.js";
+import { aviso } from "../Avisos/avisos.js";
 
 // Capturar el h1 del titulo y perfil
 const titulo = document.querySelector('#username');
@@ -6,6 +7,8 @@ const perfil = document.querySelector('#perfil');
 // Capturar el PERFIL y el USERNAME del local storage
 const perfilLocal = localStorage.getItem("perfil");
 const usernameLocal = localStorage.getItem("username");
+const estado = localStorage.getItem("estadoSolicitudes");
+
 const uid = localStorage.getItem("idUsuario");
 
 //Muestra en la parte superior el nombre y el perfil
@@ -169,3 +172,65 @@ async function crearTienda(cedula){
         console.error(error);
     }
 }
+
+if (estado == 'true') {
+    document.getElementById("myonoffswitch").checked = false;
+}
+else {
+    document.getElementById("myonoffswitch").checked = true;
+}
+
+async function estadoSoli(checked) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+
+    const urlcompleta = urlBack.url + '/usuarios/coordinador/cambioSolicitudes';
+
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    estadoSolicitudes: checked,
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+
+}
+
+/*Inabilitar permisos*/
+document.getElementById("myonoffswitch").addEventListener("click", async function (event) {
+
+    if (this.checked) {
+        estadoSoli("False");
+        localStorage.setItem("estadoSolicitudes", "false");
+        aviso('Se ha notificado que no va a publicar mas codigos para hacer', 'success');
+       
+        
+    } else {
+        estadoSoli("True");
+        localStorage.setItem("estadoSolicitudes", "true");
+        aviso('Se ha notificado que va a publicar mas codigos para hacer', 'success');
+    }
+});

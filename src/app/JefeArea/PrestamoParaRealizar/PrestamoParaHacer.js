@@ -1,5 +1,5 @@
 import { urlBack } from "../../models/base.js";
-import { aviso } from "../../Avisos/avisos.js";
+import { aviso, avisoConfirmado } from "../../Avisos/avisos.js";
 
 // Capturar el h1 del titulo y perfil
 const titulo = document.querySelector('#username');
@@ -276,6 +276,54 @@ async function actualizarDatosBase(valor, cuotas, cedulaEmpleado) {
 
 }
 
+async function escribirCodigo(cedulaEmpleado, nuevovalor, codigo, cuotas, tipo, valor) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+
+    const urlcompleta = urlBack.url + '/Codigo/jefedearea/crearcodigo';
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    codigo: codigo,
+                    monto: nuevovalor,
+                    cuotas: cuotas,
+                    estado: false,
+                    Concepto: 'Prestamo para realizar',
+                    cedulaQuienPide: cedulaEmpleado,
+                    generadoPor: usernameLocal,
+                    ceduladelGenerador: iddatos,
+                    formasdepago: 'none',
+                    numerodepago: 'none',
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + codigo, 'success');
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+
+}
+
 
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
@@ -284,7 +332,7 @@ boton.addEventListener('click', async (e) => {
     let nuevovalor = valor.replace(/\,/g, '');
     let cuotas = document.querySelector('#cuotas').value;
     let cedulaEmpleado = document.querySelector('#cedula').value;
-  
+
     let aux = await datosEmpleado(cedulaEmpleado);
     console.log(aux.datosbase[0]);
     let datos = aux.datosbase[0];
@@ -300,6 +348,22 @@ boton.addEventListener('click', async (e) => {
         return;
     }
 
+    if (valor == "") {
+        aviso('Ups no se pueden generar mercado, el monto no puede estar vacio', 'error');
+        return;
+    }
+
+    if (cuotas == "") {
+        aviso('Ups no se pueden generar mercado, las cuotas no pueden estar vacias', 'error');
+        return;
+    }
+
+    // si cuotas es mayor a 4
+    if (parseInt(cuotas) > 4) {
+        aviso('Ups no se pueden generar mercado, las cuotas no pueden ser mayor a 4', 'error');
+        return;
+    }
+
     let empresa = null;
     let NIT = null;
     let direcccion = null;
@@ -308,6 +372,8 @@ boton.addEventListener('click', async (e) => {
     await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, "Prestamo para hacer", codigo);
     await actualizarDatosBase(nuevovalor, cuotas, cedulaEmpleado);
 
+    await escribirCodigo(cedulaEmpleado, nuevovalor, codigo, cuotas, valor)
+
     if (datos.temporal.startsWith("Apoyo") || datos.temporal.startsWith("APOYO")) {
         empresa = "APOYO LABORAL TS SAS";
         NIT = "NIT 900814587"
@@ -315,14 +381,15 @@ boton.addEventListener('click', async (e) => {
     }
     else if (datos.temporal.startsWith("Tu") || datos.temporal.startsWith("TU")) {
         empresa = "TU ALIANZA SAS";
-        NIT = "NIT 900864596 - 1"
-        direcccion = "CRA 2 N 8- 156 FACATATIVA'"
+        NIT = "NIT 900864596"
+        direcccion = "Calle 7 N 4-49 MADRID'"
     }
     else if (datos.temporal.startsWith("Comercializadora") || datos.temporal.startsWith("COMERCIALIZADORA")) {
         empresa = "COMERCIALIZADORA TS";
         NIT = "NIT 901602948"
         direcccion = "CRA 1 N 17-37 BRAZILIA"
     }
+
     var docPdf = new jsPDF();
 
     docPdf.addFont('Helvetica-Bold', 'Helvetica', 'bold');
@@ -353,9 +420,9 @@ boton.addEventListener('click', async (e) => {
     docPdf.text('Yo, ' + datos.nombre + ' mayor de edad,  identificado con la cedula de ciudadania No. '
         + datos.numero_de_documento + ' autorizo', 10, 55);
     docPdf.text('expresa e irrevocablemente para que del sueldo, salario, prestaciones sociales o de cualquier suma de la sea acreedor; me sean', 10, 60);
-    docPdf.text('descontados la cantidad de ' + valor + ' " ' + NumeroALetras(nuevovalor) + ' " ' + 'por concepto de' + ' PRESTAMO, en ' + cuotas + ' cuota(s), ', 10, 65);
-    docPdf.text('quincenal del credito del que soy deudor ante Tu alianza S.A.S. , aun en el evento de encontrarme disfrutando de mis licencias ', 10, 70);
-    docPdf.text('o incapacidades. ', 10, 75);
+    docPdf.text('descontados la cantidad de ' + valor + ' " ' + NumeroALetras(nuevovalor) + ' " ' + 'por concepto de' + ' PRESTAMO, ', 10, 65);
+    docPdf.text('en ' + cuotas + ' cuota(s), quincenal del credito del que soy deudor ante ' + empresa + ', aun en el evento de encontrarme', 10, 70);
+    docPdf.text('disfrutando de mis licencias o incapacidades. ', 10, 75);
 
     docPdf.text('Fecha de ingreso: ' + datos.ingreso, 10, 85);
     docPdf.text('Centro de Costo: ' + datos.finca, 130, 85);
@@ -376,9 +443,13 @@ boton.addEventListener('click', async (e) => {
 
     docPdf.save('PrestamoDescontar' + '_' + datos.nombre + "_" + codigo + '.pdf');
 
-    document.querySelector('#valor').value = "";
-    document.querySelector('#cuotas').value = "";
-    document.querySelector('#cedula').value = "";
+
+    let confirmacion = await avisoConfirmado('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + codigo, 'success');
+    
+    if (confirmacion) {
+        // recargar la pagina
+        location.reload();
+    }
 
 });
 

@@ -128,7 +128,11 @@ boton.addEventListener('click', async (e) => {
     oculto.style.display = "block";
 
     const tabla = document.querySelector('#tabla');
+    tabla.innerHTML = '';
     datosExtraidos.historial.forEach(async (p) => {
+        // Verificar si p.nombreQuienEntrego es null y mostrar una cadena vacía en su lugar
+        const nombreQuienEntrego = p.nombreQuienEntrego !== null ? p.nombreQuienEntrego : '';
+        
         // Insertar al principio de la tabla
         tabla.insertAdjacentHTML('afterbegin', `
             <tr>
@@ -137,7 +141,7 @@ boton.addEventListener('click', async (e) => {
                 <td>${p.fechaEfectuado}</td>
                 <td>${p.valor}</td>
                 <td>${p.cuotas}</td>
-                <td>${p.nombreQuienEntrego}</td>
+                <td>${nombreQuienEntrego}</td>
                 <td>${p.generadopor}</td>
             </tr>
         `);

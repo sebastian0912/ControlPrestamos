@@ -156,14 +156,12 @@ tipo.addEventListener('change', (e) => {
 });
 
 function verificaSelect(select) {
-    let encontrado = false;
     if (select.value == '0') {
         aviso('Debe seleccionar una forma de pago', 'error');
         return false;
     }
     else {
-        encontrado = true;
-        return encontrado;
+        return true;
     }
 }
 
@@ -242,7 +240,7 @@ function verificaCondiciones(datos, nuevovalor) {
         parseInt(datos.cuentas);
 
     const fechaActual = new Date();
-    console.log (sumaTotal)
+    console.log(sumaTotal)
 
     if (parseInt(datos.saldos) >= 175001) {
         aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
@@ -366,7 +364,7 @@ boton.addEventListener('click', async (e) => {
         return;
     }
 
-    if (parseInt(datos.saldos) > 175000){
+    if (parseInt(datos.saldos) > 175000) {
         aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
         return;
     }
@@ -374,7 +372,7 @@ boton.addEventListener('click', async (e) => {
         aviso('Ups no se pueden generar prestamos perteneces al fondo', 'error');
         return;
     }
-    
+
     boton.style.display = "none";
     cedula.style.display = "none";
     boton2.style.display = "inline-block";
@@ -382,10 +380,11 @@ boton.addEventListener('click', async (e) => {
     formaPago.style.display = "inline-block";
     celular.style.display = "inline-block";
 
-    console.log(datos.nombre);
+    //console.log(datos.nombre);
+
     datosPersona.innerHTML = datos.nombre;
 
-   
+
 
     boton2.addEventListener('click', async (e) => {
         let valor = document.querySelector('#valor').value;
@@ -425,11 +424,12 @@ boton.addEventListener('click', async (e) => {
             return;
         }
 
-
-        // campo celular debe tener 10 digitos
-        if (celular.value.length != 10) {
-            aviso('Ups no se pueden generar mercado, el número proporcionado debe tener 10 digitos', 'error');
-            return;
+        if (formaPago.value != "Efectivo" && formaPago.value != "0") {
+            // campo celular debe tener 10 digitos
+            if (celular.value.length != 10) {
+                aviso('Ups no se pueden generar mercado, el número proporcionado debe tener 10 digitos', 'error');
+                return;
+            }
         }
 
         let codigoOH;

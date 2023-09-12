@@ -1,6 +1,6 @@
 
 import { urlBack } from "../../models/base.js";
-import { aviso } from "../../Avisos/avisos.js";
+import { aviso, avisoConfirmado } from "../../Avisos/avisos.js";
 
 
 const boton = document.querySelector('#boton');
@@ -19,8 +19,6 @@ const usernameLocal = localStorage.getItem("username");
 //Muestra en la parte superior el nombre y el perfil
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
-
-await crearTienda(idUsuario);
 
 // Obtén la fecha actual
 var ahora = new Date();
@@ -180,12 +178,12 @@ function verificaSiesUnPrestamo(codigo) {
 function verificaCondiciones(datos, nuevovalor) {
     // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
     const fechaIngreso = datos.ingreso;
-    let dia = fechaIngreso.split('-')[0];
-    let mes = fechaIngreso.split('-')[1];
-    let anio = fechaIngreso.split('-')[2];
+    let dia = fechaIngreso.split("-")[0];
+    let mes = fechaIngreso.split("-")[1];
+    let anio = fechaIngreso.split("-")[2];
 
     // el año esta en formato xxaa y se debe convertir a 20aa
-    let anioConvertido = '20' + anio;
+    let anioConvertido = "20" + anio;
     anio = anioConvertido;
 
     const sumaTotal =
@@ -205,7 +203,7 @@ function verificaCondiciones(datos, nuevovalor) {
     const fechaActual = new Date();
 
     if (parseInt(datos.saldos) >= 175000) {
-        aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
+        aviso("Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido", "error");
         return false;
     }
     else {
@@ -213,15 +211,15 @@ function verificaCondiciones(datos, nuevovalor) {
         let diaActual = fechaActual.getDate();
         let mesActual = fechaActual.getMonth() + 1;
         let anioActual = fechaActual.getFullYear();
-        let fechaInicio = new Date(anio, mes, dia); // Asume que 'anio', 'mes', 'dia' representan la fecha de inicio del trabajador
-        let fechaActualCompara = new Date(anioActual, mesActual, diaActual); // Asume que 'anioActual', 'mesActual', 'diaActual' representan la fecha actual
+        let fechaInicio = new Date(anio, mes, dia); // Asume que "anio", "mes", "dia" representan la fecha de inicio del trabajador
+        let fechaActualCompara = new Date(anioActual, mesActual, diaActual); // Asume que "anioActual", "mesActual", "diaActual" representan la fecha actual
         let diferencia = Math.abs(fechaActualCompara - fechaInicio); // Diferencia en milisegundos
         let diasTrabajados = Math.ceil(diferencia / (1000 * 60 * 60 * 24)); // Conversión de milisegundos a días
 
         // Si ha trabajado entre 8 y 15 dias puede pedir prestamo de 150.000
-        if ((diasTrabajados > 8 && diasTrabajados < 15)) {
-            if ((sumaTotal + parseInt(nuevovalor) >= 150000)) {
-                aviso('Ups no se pueden generar mercado, puede sacar maximo ' + (150000 - (sumaTotal)), 'error');
+        if ((diasTrabajados > 8 && diasTrabajados <= 15)) {
+            if ((sumaTotal + parseInt(nuevovalor) >= 150001)) {
+                aviso("Ups no se pueden generar mercado, puede sacar maximo " + (150000 - (sumaTotal)), "error");
                 return false;
             }
             else {
@@ -231,9 +229,9 @@ function verificaCondiciones(datos, nuevovalor) {
         }
 
         // Si ha trabajado entre 15 y 30 dias puede pedir prestamo de 250.000
-        else if ((diasTrabajados > 15 && diasTrabajados < 30)) {
-            if ((sumaTotal + parseInt(nuevovalor) >= 250000)) {
-                aviso('Ups no se pueden generar mercado, puede sacar maximo ' + (250000 - (sumaTotal)), 'error');
+        else if ((diasTrabajados > 15 && diasTrabajados <= 30)) {
+            if ((sumaTotal + parseInt(nuevovalor) >= 250001)) {
+                aviso("Ups no se pueden generar mercado, puede sacar maximo " + (250000 - (sumaTotal)), "error");
                 return false;
             }
             else {
@@ -243,8 +241,8 @@ function verificaCondiciones(datos, nuevovalor) {
 
         // Si ha trabajado mas de 30 dias puede pedir prestamo de 350.000
         else if ((diasTrabajados > 30)) {
-            if ((sumaTotal + parseInt(nuevovalor) >= 350000)) {
-                aviso('Ups no se pueden generar mercado, puede sacar maximo ' + (350000 - (sumaTotal)), 'error');
+            if ((sumaTotal + parseInt(nuevovalor) >= 350001)) {
+                aviso("Ups no se pueden generar mercado, puede sacar maximo " + (350000 - (sumaTotal)), "error");
                 return false;
             }
             else {
@@ -423,7 +421,7 @@ async function CambiarEstado(cod, valor, codigo) {
                 }
             })
             .then(responseData => {
-                aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + codigo, 'success');
+
                 console.log('Respuesta:', responseData);
             })
             .catch(error => {
@@ -483,44 +481,6 @@ async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo, codig
         console.error(error);
     }
 
-}
-
-async function crearTienda(cedula) {
-    var body = localStorage.getItem('key');
-    const obj = JSON.parse(body);
-    const jwtToken = obj.jwt;
-    console.log(jwtToken);
-
-    const urlcompleta = urlBack.url + '/Tienda/guardartienda';
-
-    try {
-        fetch(urlcompleta, {
-            method: 'POST',
-            body:
-                JSON.stringify({
-                    nombre: usernameLocal,
-                    codigo: cedula,
-                    jwt: jwtToken
-                })
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
-                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
-                } else {
-                    throw new Error('Error en la petición POST');
-                }
-            })
-            .then(responseData => {
-                console.log('Respuesta:', responseData);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    } catch (error) {
-        console.error('Error en la petición HTTP POST');
-        console.error(error);
-    }
 }
 
 async function historialT(valor) {
@@ -599,6 +559,21 @@ async function ActualizarHistorial(codigo) {
     }
 }
 
+function esCodigoValido(fechaGeneradoStr) {
+    const hoy = new Date(); // Obtiene la fecha actual
+    const fechaGenerado = new Date(fechaGeneradoStr);
+    const diaGenerado = fechaGenerado.getDate();
+    const diaLimite = diaGenerado <= 13 ? 27 : 13;
+
+    if (diaGenerado <= diaLimite || diaGenerado === 13) {
+        // El código es válido
+        return true;
+    } else {
+        // El código no es válido
+        return false;
+    }
+}
+
 boton.addEventListener('click', async (e) => {
     e.preventDefault();
 
@@ -622,15 +597,23 @@ boton.addEventListener('click', async (e) => {
         console.log(aux2.datosbase[0]);
         let datosUsuario = aux2.datosbase[0];
         console.log(datosUsuario);
+        const cod = obtenerCodigo(codigoP, datos);
+
+        if (!esCodigoValido(cod.fechaGenerado)) {
+            aviso('El codigo ya expiro', 'error');
+            return;
+        }
 
         if (!verificarCodigo(codigoP, datos)) {
             aviso('El codigo no existe', 'error');
             return;
         }
+
         if (!verificarCodigoEstado(codigoP, datos)) {
             aviso('El codigo ya fue usado', 'error');
             return
         }
+        
         if (!verificarCedula(codigoP, cedulaEmpleado, datos)) {
             aviso('El codigo no pertenece a este empleado', 'error');
             return;
@@ -647,32 +630,34 @@ boton.addEventListener('click', async (e) => {
 
         console.log("entro");
 
-        const cod = obtenerCodigo(codigoP, datos);
         concepto = 'Compra tienda de ' + usernameLocal;
 
         // generar codigo solo numeros aleatorios
         let codigoAux = 'MOH' + Math.floor(Math.random() * 1000000);
 
         await CambiarEstado(codigoP, nuevovalor, codigoAux);
-        await sleep(2000); // Pausa de 2 segundos
         await actualizar(codigoAux, codigoP, usernameLocal, nuevovalor, 2);
-        await sleep(2000); // Pausa de 2 segundos
+
         await escribirHistorial(cedulaEmpleado, nuevovalor, 2, concepto, codigoAux, cod.generadoPor);
         await sleep(2000); // Pausa de 2 segundos
         await ActualizarHistorial(codigoAux);
-        await sleep(2000); // Pausa de 2 segundos
-        await historialT(nuevovalor);
-        await sleep(2000); // Pausa de 2 segundos
-        await actualizarDatosBase(concepto, nuevovalor, 2, cedulaEmpleado);
-        await sleep(2000); // Pausa de 2 segundos
 
-        aviso('Acaba de pedir un mercado de ' + valor, 'success');
+        await historialT(nuevovalor);
+        await actualizarDatosBase(concepto, nuevovalor, 2, cedulaEmpleado);
+        await sleep(4000); // Pausa de 4 segundos
+
+        let confirmacion = await avisoConfirmado('Acaba de pedir un mercado de ' + valor + ' su codigo es: ' + codigoAux, 'success');
+
+        if (confirmacion) {
+            // recargar la pagina
+            location.reload();
+        }
 
     }
 });
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
-  }
+}
 
 

@@ -360,10 +360,12 @@ boton.addEventListener('click', async (e) => {
             return;
         }
 
-        // campo celular debe tener 10 digitos
-        if (celular.value.length != 10) {
-            aviso('Ups no se pueden generar mercado, el número proporcionado debe tener 10 digitos', 'error');
-            return;
+        if (formaPago.value != "Efectivo" && formaPago.value != "0") {
+            // campo celular debe tener 10 digitos
+            if (celular.value.length != 10) {
+                aviso('Ups no se pueden generar mercado, el número proporcionado debe tener 10 digitos', 'error');
+                return;
+            }
         }
         console.log(nuevovalor)
         console.log(datos)

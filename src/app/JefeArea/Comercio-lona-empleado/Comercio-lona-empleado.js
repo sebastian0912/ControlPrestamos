@@ -1,6 +1,6 @@
 
 import { urlBack } from "../../models/base.js";
-import { aviso } from "../../Avisos/avisos.js";
+import { aviso, avisoConfirmado } from "../../Avisos/avisos.js";
 
 const boton = document.querySelector("#boton");
 
@@ -282,7 +282,6 @@ function verificaCondiciones(datos, nuevovalor) {
         aviso("Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido", "error");
         return false;
     }
-
     else {
         // conseguir la fecha actual y separarla en dia, mes y año para poder compararla con la fecha de ingreso del empleado   
         let diaActual = fechaActual.getDate();
@@ -294,7 +293,7 @@ function verificaCondiciones(datos, nuevovalor) {
         let diasTrabajados = Math.ceil(diferencia / (1000 * 60 * 60 * 24)); // Conversión de milisegundos a días
 
         // Si ha trabajado entre 8 y 15 dias puede pedir prestamo de 150.000
-        if ((diasTrabajados > 8 && diasTrabajados < 15)) {
+        if ((diasTrabajados > 8 && diasTrabajados <= 15)) {
             if ((sumaTotal + parseInt(nuevovalor) >= 150001)) {
                 aviso("Ups no se pueden generar mercado, puede sacar maximo " + (150000 - (sumaTotal)), "error");
                 return false;
@@ -306,7 +305,7 @@ function verificaCondiciones(datos, nuevovalor) {
         }
 
         // Si ha trabajado entre 15 y 30 dias puede pedir prestamo de 250.000
-        else if ((diasTrabajados > 15 && diasTrabajados < 30)) {
+        else if ((diasTrabajados > 15 && diasTrabajados <= 30)) {
             if ((sumaTotal + parseInt(nuevovalor) >= 250001)) {
                 aviso("Ups no se pueden generar mercado, puede sacar maximo " + (250000 - (sumaTotal)), "error");
                 return false;
@@ -629,8 +628,7 @@ async function CambiarEstado(cod, valor, codigo) {
                     throw new Error('Error en la petición POST');
                 }
             })
-            .then(responseData => {
-                aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + codigo, 'success');
+            .then(responseData => {                
                 console.log('Respuesta:', responseData);
             })
             .catch(error => {
@@ -719,6 +717,21 @@ async function ActualizarHistorial(codigo) {
     }
 }
 
+function esCodigoValido(fechaGeneradoStr) {
+    const hoy = new Date(); // Obtiene la fecha actual
+    const fechaGenerado = new Date(fechaGeneradoStr);
+    const diaGenerado = fechaGenerado.getDate();
+    const diaLimite = diaGenerado <= 13 ? 27 : 13;
+
+    if (diaGenerado <= diaLimite || diaGenerado === 13) {
+        // El código es válido
+        return true;
+    } else {
+        // El código no es válido
+        return false;
+    }
+}
+
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener("click", async (e) => {
     let cedula = document.querySelector("#cedula").value;
@@ -803,8 +816,8 @@ boton.addEventListener("click", async (e) => {
     console.log("Codigo2: " + parseInt(datos2.valorUnidad));
     console.log("Codigo3: " + parseInt(datos3.valorUnidad));
     console.log("Codigo4: " + parseInt(datos4.valorUnidad));
-
-
+    
+    
     let sumaVentas = parseInt(cantidad) * parseInt(datos.valorUnidad) + parseInt(cantidad2) * auxValorUnidad2 + parseInt(cantidad3) * auxValorUnidad3 + parseInt(cantidad4) * auxValorUnidad4;
     let sumaCantidad = parseInt(cantidad) + parseInt(datos.cantidadTotalVendida);
     let sumaCantidad2 = parseInt(cantidad2) + parseInt(datos2.cantidadTotalVendida);
@@ -812,7 +825,8 @@ boton.addEventListener("click", async (e) => {
     let sumaCantidad4 = parseInt(cantidad4) + parseInt(datos4.cantidadTotalVendida);
 
     console.log(sumaVentas);
-
+    let cod = obtenerCodigo(codigoA, CodigosMercado);
+    
     if (sumaCantidad > datos.cantidadRecibida) {
         aviso("No se puede cargar el mercado del producto #1 porque la suma de la cantidad supera el inventario disponible. Lo máximo a sacar es " + (datos.cantidadRecibida - datos.cantidadTotalVendida), "error");
         return;
@@ -833,6 +847,10 @@ boton.addEventListener("click", async (e) => {
         return;
     }
 
+    if (!esCodigoValido(cod.fechaGenerado)) {
+        aviso('El codigo ya expiro', 'error');
+        return;
+    }
 
     if (!verificarCodigo(codigoA, CodigosMercado)) {
         aviso("El codigo no existe", "error");
@@ -874,7 +892,7 @@ boton.addEventListener("click", async (e) => {
             return;
         }
         
-        let cod = obtenerCodigo(codigoA, CodigosMercado);
+
 
 
         let codigAux = "MOH" + Math.floor(Math.random() * 1000000+1);
@@ -894,12 +912,8 @@ boton.addEventListener("click", async (e) => {
 
         // modificar en la tabla codigos el estado del codigo a false para que no pueda ser usado nuevamente
         await CambiarEstado(cod.codigo, sumaVentas, codigAux);
-
         await actualizar(codigAux, cod.codigo, usernameLocal, sumaVentas, 2);
-
-        await actualizarVentas(cantidad, codigo, usernameLocal);
-        await escribirHistorial(cedula, sumaVentas, 2, "Compra tienda respecto a:" + concepto + " en " + sede, codigAux, cod.generadoPor);
-        await ActualizarHistorial(codigo);
+        await actualizarVentas(cantidad, codigo, usernameLocal);       
 
         if (codigo2 != "") {
             await actualizarVentas(cantidad2, codigo2, usernameLocal);
@@ -910,30 +924,29 @@ boton.addEventListener("click", async (e) => {
         if (codigo4 != "") {
             await actualizarVentas(cantidad4, codigo4, usernameLocal);
         }
-
-        await actualizarDatos(cedula, sumaVentas, 2);
-
+        
+        await actualizarDatos(cedula, sumaVentas, 2);      
 
         await historialT(sumaVentas);
 
-        aviso("Se ha cargado la informacion exitosamente", "success");
+        await escribirHistorial(cedula, sumaVentas, 2, "Compra tienda respecto a:" + concepto + " en " + sede, codigAux, cod.generadoPor);
+        await sleep(2000); // Pausa de 2 segundos
+        await ActualizarHistorial(codigo);
+        await sleep(4000); // Pausa de 4 segundos
+
+        let confirmacion = await avisoConfirmado('Acaba de pedir un mercado de ' + sumaVentas + ' su codigo es: ' + codigAux, 'success');
+
+        if (confirmacion) {
+            // recargar la pagina
+            location.reload();
+        }
     }
     else {
         aviso("El codigo de autorizacion no existe", "error");
     }
 
-
-    document.querySelector("#Cantidad").value = "";
-    document.querySelector("#Cantidad2").value = "";
-    document.querySelector("#Cantidad3").value = "";
-    document.querySelector("#Cantidad4").value = "";
-
-    document.querySelector("#codigo1").value = "";
-    document.querySelector("#codigo2").value = "";
-    document.querySelector("#codigo3").value = "";
-    document.querySelector("#codigo4").value = "";
-
-    document.querySelector("#cedula").value = "";
-    document.querySelector("#codigoA").value = "";
 });
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}

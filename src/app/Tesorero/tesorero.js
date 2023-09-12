@@ -8,9 +8,7 @@ const perfil = document.querySelector('#perfil');
 // Capturar el PERFIL y el USERNAME del local storage
 const perfilLocal = localStorage.getItem("perfil");
 const usernameLocal = localStorage.getItem("username");
-const empleados = localStorage.getItem("CantidadEmpleados");
-const codigos = localStorage.getItem("CantidadSolicitudes");
-const numCoordinadoresConestadoSolicitudesTrue = localStorage.getItem("CantidadCoordinadoresConEstadoSolicitudesTrue");
+
 //Muestra en la parte superior el nombre y el perfil
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
@@ -30,6 +28,129 @@ let datosFinales = [];
 const over = document.querySelector('#overlay');
 const loader = document.querySelector('#loader');
 
+
+async function datosUsuarios() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/usuarios/usuarios';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
+function verificarCodigoEstado(datos) {
+    let encontrado = 0;
+    datos.forEach(doc => {
+        if (doc.estado == true) {
+            encontrado++;
+        }
+    });
+    return encontrado;
+}
+
+function numCoordinadoresConestadoSolicitudesTrue(datos) {
+
+    let auxCoordinadores = 0;
+    datos.forEach((doc) => {
+        if ( (doc.rol == "COORDINADOR" || doc.rol == "JEFE-DE-AREA" || doc.rol == "TIENDA") && doc.estadoSolicitudes == true) {
+            auxCoordinadores++;
+        }
+    });
+    return auxCoordinadores;
+}
+
+async function datosEmpleado() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Datosbase/datosbase';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
+const aux = await datosTCodigos();
+let aux2 = await datosEmpleado();
+let datosU = await datosUsuarios();
+
+if (aux2.datosbase == "error") {
+    numeroTotal.innerHTML = "0";
+} else {
+    numeroTotal.innerHTML = aux2.datosbase.length;
+}
+
+if (aux == null) {
+    numeroSolicitudesPendientes.innerHTML = 0;
+} else {
+    numeroSolicitudesPendientes.innerHTML = verificarCodigoEstado(aux.codigo);
+}
+numeroCoordinadores.innerHTML = numCoordinadoresConestadoSolicitudesTrue(datosU);
+
+
+/* Obtener codigos de la base de datos */
+const listado = await datosUsuarios();
+let arrayCodigos = [];
+
+listado.forEach((c) => {
+    if (c.estadoSolicitudes == true && c.primer_nombre != null && (c.rol == "COORDINADOR" || c.rol == "JEFE-DE-AREA" || c.rol == "TIENDA") ) {
+        arrayCodigos.push(c);
+    }
+});
+
+// Mostar contenido en una tabla
+arrayCodigos.forEach((c) => {
+    tabla.innerHTML += `
+    <tr>
+        <td>${c.primer_nombre}</td>
+        <td>${c.primer_apellido}</td>
+        <td>${c.correo_electronico}</td>
+        <td>${c.rol}</td>
+    </tr>
+    `
+});
 
 
 // Obtén la fecha actual
@@ -94,18 +215,6 @@ if (dias2 == 0) {
 diasLiqui.innerHTML = dias2;
 
 
-// Base total de empleados
-numeroTotal.innerHTML = empleados;
-
-
-/* Obtener codigos de la base de datos */
-// Numero de codigos activos de la base de datos del coodinador
-
-numeroSolicitudesPendientes.innerHTML = codigos;
-
-
-numeroCoordinadores.innerHTML = numCoordinadoresConestadoSolicitudesTrue;
-
 
 async function datos() {
     var body = localStorage.getItem('key');
@@ -146,7 +255,6 @@ extrae.addEventListener('click', async () => {
         ['CÓDIGO', 'CÉDULA', 'NOMBRE', 'INGRESO', 'TEMPORAL', 'FINCA', 'SALARIO', 'SALDOS', 'FONDOS', 'MERCADOS', 'CUOTAS MERCADOS', 'PRESTAMO PARA DESCONTAR', 'CUOTAS PRESTAMOS PARA DESCONTAR', 'CASINO', 'ANCHETAS', 'CUOTAS ANCHETAS', 'FONDO', 'CARNET', 'SEGURO FUNERARIO', 'PRESTAMO PARA HACER', 'CUOTAS PRESTAMO PARA HACER', 'ANTICIPO LIQUIDACIÓN', 'CUENTAS'],
     ];
 
-    console.log(datosExtraidos.datosbase);
     datosExtraidos.datosbase.forEach((doc) => {
         const docData = doc;
         let fechaIngreso;
@@ -160,8 +268,8 @@ extrae.addEventListener('click', async () => {
         } else {
             // Formato "d/mm/yyyy"
             fechaIngreso = docData.ingreso.split('/');
-        }    
-        
+        }
+
         fechaIngreso = fechaIngreso.join('/');
 
         excelData.push([
@@ -232,7 +340,6 @@ async function datosTCodigos() {
 
         if (response.ok) {
             const responseData = await response.json();
-            console.log(responseData);
             return responseData;
         } else {
             throw new Error('Error en la petición GET');
@@ -248,13 +355,17 @@ extraeC.addEventListener('click', async () => {
     datosFinales = [];
 
     const aux = await datosTCodigos();
-    console.log(aux.codigo);
 
     aux.codigo.forEach((doc) => {
-        if (doc.estado == true) {
+        if (doc.codigo.startsWith('OR')) {
             datosFinales.push(doc);
         }
     });
+
+    if (datosFinales.length == 0) {
+        aviso("No hay datos para exportar", "warning");
+        return;
+    }
 
     let excelData = [['Código', 'Cédula quien pidió', 'Nombre persona quien dio el código', 'Valor', 'Cuotas', 'Fecha']];
 
@@ -311,7 +422,6 @@ async function datosT() {
 
         if (response.ok) {
             const responseData = await response.json();
-            console.log(responseData);
             return responseData;
         } else {
             throw new Error('Error en la petición GET');
@@ -326,7 +436,6 @@ async function datosT() {
 extraeT.addEventListener('click', async () => {
     const datosExtraidos = await datosT();
 
-    console.log(datosExtraidos);
 
     let excelData = [['Nombre De la Tienda', 'Monto Total', 'Numero de compras en la tienda']];
 
@@ -372,12 +481,10 @@ function s2ab(s) {
 
 valoresEnCero.addEventListener('click', async () => {
     const resultado = await avisoConfirmacionAc2();
-    console.log("empezo");
     if (resultado) {
         var body = localStorage.getItem('key');
         const obj = JSON.parse(body);
         const jwtToken = obj.jwt;
-        console.log(jwtToken);
 
         const urlcompleta = urlBack.url + '/Datosbase/reiniciarValores';
 
@@ -394,7 +501,6 @@ valoresEnCero.addEventListener('click', async () => {
             })
                 .then(response => {
                     if (response.ok) {
-                        console.log("termino");
                         document.getElementById('successSound').play();
                         return response.json();
                     } else {
@@ -403,7 +509,6 @@ valoresEnCero.addEventListener('click', async () => {
                 })
                 .then(responseData => {
 
-                    console.log('Respuesta:', responseData);
                     document.getElementById('successSound').play();
                     // Ocultar elementos después de completar la operación
                     over.style.display = "none";
@@ -432,7 +537,7 @@ valoresEnCero.addEventListener('click', async () => {
     }
 });
 
-async function datosEliminar(cedulas){
+async function datosEliminar(cedulas) {
     const datosExtraidos = await datos();
     let datosFinales = [];
     cedulas.forEach((cedula) => {
@@ -444,17 +549,16 @@ async function datosEliminar(cedulas){
             aviso(`El empleado con cédula ${cedula} no se puede eliminar porque no se encuentra`, "warning");
         }
     });
-    console.log(datosFinales);
     return datosFinales;
 }
 
-function extraerDatosEliminar (datos){
-        
+function extraerDatosEliminar(datos) {
+
     let excelData = [
         ['', '', '', '', '', '', '', 'ANTERIOR', '', 'PARA DESCONTAR', '', '', '', '', '', '', '', '', '', 'PARA HACER', '', '', '', '', '', '', '', ''],
         ['CÓDIGO', 'CÉDULA', 'NOMBRE', 'INGRESO', 'TEMPORAL', 'FINCA', 'SALARIO', 'SALDOS', 'FONDOS', 'MERCADOS', 'CUOTAS MERCADOS', 'PRESTAMO PARA DESCONTAR', 'CUOTAS PRESTAMOS PARA DESCONTAR', 'CASINO', 'ANCHETAS', 'CUOTAS ANCHETAS', 'FONDO', 'CARNET', 'SEGURO FUNERARIO', 'PRESTAMO PARA HACER', 'CUOTAS PRESTAMO PARA HACER', 'ANTICIPO LIQUIDACIÓN', 'CUENTAS'],
     ];
-    
+
     datos.forEach((doc) => {
         const docData = doc;
         let fechaIngreso;
@@ -468,8 +572,8 @@ function extraerDatosEliminar (datos){
         } else {
             // Formato "d/mm/yyyy"
             fechaIngreso = docData.ingreso.split('/');
-        }    
-        
+        }
+
         fechaIngreso = fechaIngreso.join('/');
 
         excelData.push([
@@ -504,7 +608,7 @@ function extraerDatosEliminar (datos){
     const wb = XLSX.utils.book_new();
     let fecha = new Date().toLocaleString();
     fecha = fecha.replace(/\//g, "-");
-    
+
     XLSX.utils.book_append_sheet(wb, ws, 'Eliminados');
 
     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
@@ -514,7 +618,7 @@ function extraerDatosEliminar (datos){
 
     const element = document.createElement('a');
     element.href = url;
-    element.download = 'DatosEliminadosEl_'+ fecha+'.xlsx';
+    element.download = 'DatosEliminadosEl_' + fecha + '.xlsx';
     element.style.display = 'none';
 
     document.body.appendChild(element);
@@ -527,21 +631,17 @@ function extraerDatosEliminar (datos){
 let datosAux = [];
 
 function verificaInfo(datos) {
-    console.log(datos);
     // verificar que no tenga saldos pendientes
     const sumaTotal =
-            parseInt(datos.saldos) +
-            parseInt(datos.fondos) +
-            parseInt(datos.mercados) +
-            parseInt(datos.prestamoParaDescontar) +
-            parseInt(datos.casino) +
-            parseInt(datos.valoranchetas) +
-            parseInt(datos.fondo) +
-            parseInt(datos.carnet) +
-            parseInt(datos.seguroFunerario) +
-            parseInt(datos.prestamoParaHacer) +
-            parseInt(datos.anticipoLiquidacion) +
-            parseInt(datos.cuentas);
+        parseInt(datos.mercados) +
+        parseInt(datos.prestamoParaDescontar) +
+        parseInt(datos.casino) +
+        parseInt(datos.valoranchetas) +
+        parseInt(datos.fondo) +
+        parseInt(datos.carnet) +
+        parseInt(datos.seguroFunerario) +
+        parseInt(datos.anticipoLiquidacion) +
+        parseInt(datos.cuentas);
 
     if (sumaTotal > 0) {
         aviso("El empleado con cédula " + datos.numero_de_documento + " tiene saldos pendientes no se puede eliminar", "warning");
@@ -549,15 +649,14 @@ function verificaInfo(datos) {
     else {
         datosAux.push(datos);
         EliminarEm(datos.numero_de_documento);
-    }    
+    }
 }
 
 eliminar.addEventListener('click', async () => {
     const resultado = await avisoConfirmacion();
-    
+
     if (resultado) {
         let archivo = eliminar.files[0];
-        console.log(archivo);
         let reader = new FileReader();
 
         // leer archivo .csv 
@@ -586,17 +685,16 @@ eliminar.addEventListener('click', async () => {
             over.style.display = "block";
             loader.style.display = "block";
 
-            
-            
+
+
             let datos = await datosEliminar(datosFinales);
-            console.log(datos);
-            
+
             //extraerDatosEliminar(datos);
-            
+
             for (let i = 0; i < datos.length; i++) {
                 verificaInfo(datos[i]);
             }
-            
+
             extraerDatosEliminar(datosAux);
 
             // Mostrar elementos ocultos
@@ -613,7 +711,6 @@ async function EliminarEm(cedulaEmpleado) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
-    console.log(jwtToken);
 
     const urlcompleta = urlBack.url + '/Datosbase/eliminardatos/' + cedulaEmpleado;
     try {
@@ -632,7 +729,6 @@ async function EliminarEm(cedulaEmpleado) {
                 }
             })
             .then(responseData => {
-                console.log('Respuesta:', responseData);
                 if (responseData.message == "error") {
                     aviso("No se ha podido eliminar el empleado con cédula: " + cedulaEmpleado, "warning");
                 }
@@ -651,7 +747,6 @@ async function EliminarEm(cedulaEmpleado) {
 
 input.addEventListener('change', () => {
     let archivo = input.files[0];
-    console.log(archivo);
     let reader = new FileReader();
 
     /* leer archivo .csv */
@@ -675,9 +770,8 @@ input.addEventListener('change', () => {
         over.style.display = "block";
         loader.style.display = "block";
 
-        // Eliminar las primeras 4 filas (si es necesario)
-        console.log(datosFinales);
-        datosFinales.splice(0, 4);
+        // Eliminar las primeras 3 filas (si es necesario)
+        datosFinales.splice(0, 3);
 
         // Guardar los datos finales
         guardarDatos(datosFinales);
@@ -687,7 +781,6 @@ input.addEventListener('change', () => {
 async function guardarDatos(datosFinales) {
 
     var body = localStorage.getItem('key');
-    console.log(body);
     const obj = JSON.parse(body);
     const jwtKey = obj.jwt;
 
@@ -724,7 +817,6 @@ async function guardarDatos(datosFinales) {
             })
             .then(responseData => {
                 document.getElementById('successSound').play();
-                console.log('Respuesta:', responseData);
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -742,7 +834,6 @@ archivoActualizarSaldos.addEventListener('click', async () => {
     const resultado = await avisoConfirmacionAc();
     if (resultado) {
         let archivo = archivoActualizarSaldos.files[0];
-        console.log(archivo);
         let reader = new FileReader();
 
 
@@ -784,7 +875,6 @@ archivoActualizarSaldos.addEventListener('click', async () => {
             loader.style.display = "block";
 
             // Eliminar las primeras 4 filas (si es necesario)
-            console.log(datosFinales);
             for (let i = 0; i < datosFinales.length; i++) {
                 ActualizarEm(datosFinales[i].cedula, datosFinales[i].saldo);
             }
@@ -802,7 +892,6 @@ async function ActualizarEm(cedulaEmpleado, valor) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
-    console.log(jwtToken);
 
     const urlcompleta = urlBack.url + '/Datosbase/actualizarSaldos/' + cedulaEmpleado;
     try {
@@ -823,7 +912,6 @@ async function ActualizarEm(cedulaEmpleado, valor) {
                 }
             })
             .then(responseData => {
-                console.log('Respuesta:', responseData);
                 if (responseData.message == "error") {
                     aviso("No se ha podido actualizar el empleado con cédula: " + cedulaEmpleado, "warning");
                 }
@@ -859,7 +947,6 @@ async function THistorial() {
 
         if (response.ok) {
             const responseData = await response.json();
-            console.log(responseData);
             return responseData;
         } else {
             throw new Error('Error en la petición GET');
@@ -872,50 +959,75 @@ async function THistorial() {
 }
 
 extraeHistorialT.addEventListener('click', async () => {
-    console.log("entro");
     const datosExtraidos = await THistorial();
     if (datosExtraidos.historial.length == 0) {
         aviso("No hay registros de compras realizadas en las tiendas", "warning");
         return;
     }
-    
+
     // Crear un objeto para agrupar los datos por mes
     const historialPorMes = {};
 
     datosExtraidos.historial.forEach(doc => {
         if (doc.concepto.startsWith("Compra tienda")) {
-            // Obtener el mes de la fecha en formato 'YYYY-MM'
-            const mes = doc.fechaEfectuado.slice(0, 7);
+            // Obtener el mes y el día de la fecha en formato 'YYYY-MM-DD'
+            const fechaParts = doc.fechaEfectuado.split('-');
+            const mes = fechaParts[1];
+            let dia = fechaParts[2];
 
             if (!historialPorMes[mes]) {
-                historialPorMes[mes] = [];
+                historialPorMes[mes] = { '13-27': [], '28-12': [] };
             }
 
-            historialPorMes[mes].push(doc);
+            // Si el día está en el rango del 28 al 31, asignar el siguiente mes
+            if (dia >= 28) {
+                const siguienteMes = (parseInt(mes) + 1).toString().padStart(2, '0');
+                historialPorMes[siguienteMes] = historialPorMes[siguienteMes] || { '13-27': [], '28-12': [] };
+                dia = dia <= 12 ? `0${dia}` : dia;
+                mes = siguienteMes;
+            }
+
+            const grupo = dia >= 13 && dia <= 27 ? '13-27' : '28-12';
+
+            // Utilizar una expresión regular para encontrar "de" o "en" seguido del lugar
+            const lugarMatch = doc.concepto.match(/(?:de|en)\s+(.+)/i);
+
+            if (lugarMatch) {
+                const lugar = lugarMatch[1]; // El segundo grupo capturado es el lugar
+                doc.lugar = lugar; // Asignar el valor al campo "lugar"
+            }
+
+            historialPorMes[mes][grupo].push(doc);
         }
     });
+
 
     // Crear un archivo Excel con hojas internas para cada mes
     const wb = XLSX.utils.book_new();
 
+
+
     for (const mes in historialPorMes) {
         const historialMes = historialPorMes[mes];
-        const excelData = [['Cedula', 'Concepto', 'Lugar', 'Cuotas', 'Fecha Efectuado', 'Nombre Quien Entregó', 'Valor']];
 
-        historialMes.forEach(doc => {
-            excelData.push([
-                doc.cedula,
-                doc.concepto,
-                doc.lugar,
-                doc.cuotas,
-                doc.fechaEfectuado,
-                doc.nombreQuienEntrego,
-                doc.valor
-            ]);
-        });
+        for (const rango in historialMes) {
+            const excelData = [['Cedula', 'Concepto', 'Lugar', 'Cuotas', 'Fecha Efectuado', 'Nombre Quien Entregó', 'Valor']];
 
-        const ws = XLSX.utils.aoa_to_sheet(excelData);
-        XLSX.utils.book_append_sheet(wb, ws, mes);
+            historialMes[rango].forEach(doc => {
+                excelData.push([
+                    doc.cedula,
+                    doc.concepto,
+                    doc.lugar,
+                    doc.cuotas,
+                    doc.fechaEfectuado,
+                    doc.nombreQuienEntrego,
+                    doc.valor
+                ]);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(excelData);
+            XLSX.utils.book_append_sheet(wb, ws, `${mes} (${rango})`);
+        }
     }
 
     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });

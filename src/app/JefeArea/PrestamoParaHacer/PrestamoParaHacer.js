@@ -1,7 +1,7 @@
 
 
-import { codigo, urlBack } from "../../models/base.js";
-import { aviso } from "../../Avisos/avisos.js";
+import { urlBack } from "../../models/base.js";
+import { aviso, avisoConfirmado } from "../../Avisos/avisos.js";
 
 // Capturar el h1 del titulo y perfil
 const titulo = document.querySelector('#username');
@@ -124,7 +124,6 @@ async function escribirCodigo(cedulaEmpleado, nuevovalor, codigo, cuotas, tipo, 
                 }
             })
             .then(responseData => {
-                aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + codigo, 'success');
                 console.log('Respuesta:', responseData);
             })
             .catch(error => {
@@ -362,7 +361,7 @@ boton.addEventListener('click', async (e) => {
         return;
     }
 
-    if (parseInt(datos.saldos) > 175000){
+    if (parseInt(datos.saldos) > 175000) {
         aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
         return;
     }
@@ -370,7 +369,7 @@ boton.addEventListener('click', async (e) => {
         aviso('Ups no se pueden generar prestamos perteneces al fondo', 'error');
         return;
     }
-    
+
     boton.style.display = "none";
     cedula.style.display = "none";
     boton2.style.display = "inline-block";
@@ -379,7 +378,6 @@ boton.addEventListener('click', async (e) => {
     formaPago.style.display = "inline-block";
     celular.style.display = "inline-block";
 
-    console.log(datos.nombre);
     datosPersona.innerHTML = datos.nombre;
 
     boton2.addEventListener('click', async (e) => {
@@ -387,6 +385,7 @@ boton.addEventListener('click', async (e) => {
         let nuevovalor = valor.replace(/\,/g, '');
         let cuotas = document.querySelector('#cuotas').value;
         let tipo = document.querySelector('#tipo').value;
+        
         let cuotasAux = cuotas;
 
         if (!verificaCondiciones(datos, nuevovalor) == true) {
@@ -406,12 +405,16 @@ boton.addEventListener('click', async (e) => {
             return;
         }
 
-        
-        // campo celular debe tener 10 digitos
-        if (celular.value.length != 10) {
-            aviso('Ups no se pueden generar mercado, el número proporcionado debe tener 10 digitos', 'error');
-            return;
+
+        if (formaPago.value != "Efectivo" && formaPago.value != "0") {
+            // campo celular debe tener 10 digitos
+            if (celular.value.length != 10) {
+                aviso('Ups no se pueden generar mercado, el número proporcionado debe tener 10 digitos', 'error');
+                return;
+            }
         }
+
+
 
         let codigoOH;
         let empresa = null;
@@ -445,8 +448,9 @@ boton.addEventListener('click', async (e) => {
             return;
         }
 
-        await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, cuotasAux, tipo, valor)
         await escribirHistorial(cedulaEmpleado, nuevovalor, cuotasAux, concepto, codigoOH);
+
+        await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, cuotasAux, tipo, valor)
 
         if (datos.temporal.startsWith("Apoyo") || datos.temporal.startsWith("APOYO")) {
             empresa = "APOYO LABORAL TS SAS";
@@ -454,15 +458,16 @@ boton.addEventListener('click', async (e) => {
             direcccion = "CRA 2 N 8-156 FACATATIVA"
         }
         else if (datos.temporal.startsWith("Tu") || datos.temporal.startsWith("TU")) {
-            empresa = "APOYO LABORAL TS SAS";
-            NIT = "NIT 900814587"
-            direcccion = "CRA 2 N 8-156 FACATATIVA"
+            empresa = "TU ALIANZA SAS";
+            NIT = "NIT 900864596"
+            direcccion = "Calle 7 N 4-49 MADRID'"
         }
         else if (datos.temporal.startsWith("Comercializadora") || datos.temporal.startsWith("COMERCIALIZADORA")) {
             empresa = "COMERCIALIZADORA TS";
             NIT = "NIT 901602948"
             direcccion = "CRA 1 N 17-37 BRAZILIA"
         }
+
         var docPdf = new jsPDF();
 
         docPdf.addFont('Helvetica-Bold', 'Helvetica', 'bold');
@@ -519,22 +524,16 @@ boton.addEventListener('click', async (e) => {
 
         docPdf.save('PrestamoDescontar' + '_' + datos.nombre + "_" + codigoOH + '.pdf');
 
-
-
-        document.querySelector('#valor').value = "";
-        document.querySelector('#cuotas').value = "";
-        document.querySelector('#cedula').value = "";
-        document.querySelector('#celular').value = "";
-        document.querySelector('#tipo').value = "0";
-        document.querySelector('#formaPago').value = "0";
+        let confirmacion = await avisoConfirmado('Acaba de pedir una autorización de prestamo de dinero por un valor de ' + valor + ' su codigo es: ' + codigoOH, 'success');
+        
+        
+        if (confirmacion) {
+            // recargar la pagina
+            location.reload();
+        
+        }
     });
-
-
-
-
 });
-
-
 
 
 /*************************************************************/

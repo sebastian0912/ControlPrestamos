@@ -1,5 +1,5 @@
 import { urlBack } from "../../models/base.js";
-import { aviso } from "../../Avisos/avisos.js";
+import { aviso, avisoConfirmado } from "../../Avisos/avisos.js";
 
 
 // Capturar el h1 del titulo y perfil
@@ -128,7 +128,6 @@ async function escribirCodigo(cedulaEmpleado, nuevovalor, cod, valor) {
                 }
             })
             .then(responseData => {
-                aviso('Acaba de pedir un mercado de ' + valor + ' su codigo es: ' + cod, 'success');
                 console.log('Respuesta:', responseData);
             })
             .catch(error => {
@@ -200,7 +199,7 @@ function verificaCondiciones(datos, nuevovalor) {
 
     const fechaActual = new Date();
 
-    if (parseInt(datos.saldos) >= 175001) {
+    if (parseInt(datos.saldos) >= 175000) {
         aviso("Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido", "error");
         return false;
     }
@@ -215,7 +214,7 @@ function verificaCondiciones(datos, nuevovalor) {
         let diasTrabajados = Math.ceil(diferencia / (1000 * 60 * 60 * 24)); // Conversión de milisegundos a días
 
         // Si ha trabajado entre 8 y 15 dias puede pedir prestamo de 150.000
-        if ((diasTrabajados > 8 && diasTrabajados < 15)) {
+        if ((diasTrabajados > 8 && diasTrabajados <= 15)) {
             if ((sumaTotal + parseInt(nuevovalor) >= 150001)) {
                 aviso("Ups no se pueden generar mercado, puede sacar maximo " + (150000 - (sumaTotal)), "error");
                 return false;
@@ -227,7 +226,7 @@ function verificaCondiciones(datos, nuevovalor) {
         }
 
         // Si ha trabajado entre 15 y 30 dias puede pedir prestamo de 250.000
-        else if ((diasTrabajados > 15 && diasTrabajados < 30)) {
+        else if ((diasTrabajados > 15 && diasTrabajados <= 30)) {
             if ((sumaTotal + parseInt(nuevovalor) >= 250001)) {
                 aviso("Ups no se pueden generar mercado, puede sacar maximo " + (250000 - (sumaTotal)), "error");
                 return false;
@@ -332,11 +331,11 @@ boton.addEventListener('click', async (e) => {
         return;
     }
 
-    if (parseInt(datos.saldos) > 175000){
+    if (parseInt(datos.saldos) > 175000) {
         aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
         return;
     }
-    
+
 
     boton.style.display = "none";
     cedula.style.display = "none";
@@ -346,7 +345,6 @@ boton.addEventListener('click', async (e) => {
     formaPago.style.display = "inline-block";
     celular.style.display = "inline-block";
 
-    console.log(datos.nombre);
     datosPersona.innerHTML = datos.nombre;
 
     boton2.addEventListener('click', async (e) => {
@@ -365,18 +363,21 @@ boton.addEventListener('click', async (e) => {
             return;
         }
 
-        // campo celular debe tener 10 digitos
-        if (celular.value.length != 10) {
-            aviso('Ups no se pueden generar mercado, el número proporcionado debe tener 10 digitos', 'error');
-            return;
+        if (formaPago.value != "Efectivo" && formaPago.value != "0") {
+            // campo celular debe tener 10 digitos
+            if (celular.value.length != 10) {
+                aviso('Ups no se pueden generar mercado, el número proporcionado debe tener 10 digitos', 'error');
+                return;
+            }
         }
-
         if (!verificaCondiciones(datos, nuevovalor) == true) {
             return;
         }
 
-        await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, valor)
         await escribirHistorial(cedulaEmpleado, nuevovalor, 2, 'Autorizacion de Mercado', codigoOH);
+
+        await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, valor)
+
 
         let empresa = null;
         let NIT = null;
@@ -388,9 +389,9 @@ boton.addEventListener('click', async (e) => {
             direcccion = "CRA 2 N 8-156 FACATATIVA"
         }
         else if (datos.temporal.startsWith("Tu") || datos.temporal.startsWith("TU")) {
-            empresa = "APOYO LABORAL TS SAS";
-            NIT = "NIT 900814587"
-            direcccion = "CRA 2 N 8-156 FACATATIVA"
+            empresa = "TU ALIANZA SAS";
+            NIT = "NIT 900864596"
+            direcccion = "Calle 7 N 4-49 MADRID'"
         }
         else if (datos.temporal.startsWith("Comercializadora") || datos.temporal.startsWith("COMERCIALIZADORA")) {
             empresa = "COMERCIALIZADORA TS";
@@ -446,7 +447,7 @@ boton.addEventListener('click', async (e) => {
         docPdf.text('Codigo de autorización nomina: ' + codigoOH, 10, 120);
         docPdf.text('___________________________________', 10, 130);
         docPdf.text(datos.nombre, 10, 135);
-        
+
         docPdf.setFont('Helvetica', 'bold');
         docPdf.setFontSize(6);
         docPdf.text('Huella Indice Derecho', 130, 95);
@@ -454,20 +455,11 @@ boton.addEventListener('click', async (e) => {
         docPdf.save('PrestamoDescontar' + '_' + datos.nombre + "_" + codigoOH + '.pdf');
 
 
-
-        document.querySelector('#monto').value = "0";
-        document.querySelector('#cedula').value = "";
-        document.querySelector('#celular').value = "";
-
-        boton.style.display = "inline-block";
-        cedula.style.display = "inline-block";
-
-        monto.style.display = "none";
-        boton2.style.display = "none";
-        formaPago.style.display = "none";
-        celular.style.display = "none";
-        datosPersona.innerHTML = "";
-
+        let confirmacion = await avisoConfirmado('Acaba de pedir una autorización de mercado por un valor de ' + valor + ' su codigo es: ' + codigoOH, 'success');
+        if (confirmacion) {
+            // recargar la pagina
+            location.reload();
+        }
     }
     );
 }

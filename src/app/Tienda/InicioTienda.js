@@ -16,6 +16,7 @@ const estado = localStorage.getItem("estadoSolicitudes");
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
 
+await crearTienda(uid);
 
 const numeroSolicitudesPendientes = document.querySelector('#numeroSolicitudesPendientes');
 
@@ -71,6 +72,44 @@ function obtenerFecha() {
     }
 }
 
+
+async function crearTienda(cedula) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+
+    const urlcompleta = urlBack.url + '/Tienda/guardartienda';
+
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    nombre: usernameLocal,
+                    codigo: cedula,
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+}
 
 if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen") {
     lola.style.display = "inline-block";

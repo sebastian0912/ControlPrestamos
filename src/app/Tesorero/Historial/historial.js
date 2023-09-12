@@ -408,6 +408,12 @@ extraeC.addEventListener('click', async () => {
             }
         });
     });
+
+    if (datosFinales.length == 0) {
+        aviso("No hay datos para exportar", "warning");
+        return;
+    }
+    
     let dataString = 'Código\tCédula quien pidio\tNombre persona quien dio el codigo\tValor\tCuotas\tFecha\n';
 
     datosFinales.forEach((doc) => {
@@ -533,8 +539,6 @@ function verificaInfo(datos) {
     console.log(datos);
     // verificar que no tenga saldos pendientes
     const sumaTotal =
-            parseInt(datos.saldos) +
-            parseInt(datos.fondos) +
             parseInt(datos.mercados) +
             parseInt(datos.prestamoParaDescontar) +
             parseInt(datos.casino) +
@@ -542,7 +546,6 @@ function verificaInfo(datos) {
             parseInt(datos.fondo) +
             parseInt(datos.carnet) +
             parseInt(datos.seguroFunerario) +
-            parseInt(datos.prestamoParaHacer) +
             parseInt(datos.anticipoLiquidacion) +
             parseInt(datos.cuentas);
 
@@ -717,7 +720,11 @@ boton.addEventListener('click', async (e) => {
     oculto.style.display = "block";
 
     const tabla = document.querySelector('#tabla');
+    tabla.innerHTML = '';
     datosExtraidos.historial.forEach(async (p) => {
+        // Verificar si p.nombreQuienEntrego es null y mostrar una cadena vacía en su lugar
+        const nombreQuienEntrego = p.nombreQuienEntrego !== null ? p.nombreQuienEntrego : '';
+        
         // Insertar al principio de la tabla
         tabla.insertAdjacentHTML('afterbegin', `
             <tr>
@@ -726,7 +733,7 @@ boton.addEventListener('click', async (e) => {
                 <td>${p.fechaEfectuado}</td>
                 <td>${p.valor}</td>
                 <td>${p.cuotas}</td>
-                <td>${p.nombreQuienEntrego}</td>
+                <td>${nombreQuienEntrego}</td>
                 <td>${p.generadopor}</td>
             </tr>
         `);
@@ -937,44 +944,70 @@ extraeHistorialT.addEventListener('click', async () => {
         aviso("No hay registros de compras realizadas en las tiendas", "warning");
         return;
     }
-    
+
     // Crear un objeto para agrupar los datos por mes
     const historialPorMes = {};
 
     datosExtraidos.historial.forEach(doc => {
         if (doc.concepto.startsWith("Compra tienda")) {
-            // Obtener el mes de la fecha en formato 'YYYY-MM'
-            const mes = doc.fechaEfectuado.slice(0, 7);
-
+            // Obtener el mes y el día de la fecha en formato 'YYYY-MM-DD'
+            const fechaParts = doc.fechaEfectuado.split('-');
+            const mes = fechaParts[1];
+            let dia = fechaParts[2];
+        
             if (!historialPorMes[mes]) {
-                historialPorMes[mes] = [];
+                historialPorMes[mes] = { '13-27': [], '28-12': [] };
             }
-
-            historialPorMes[mes].push(doc);
+        
+            // Si el día está en el rango del 28 al 31, asignar el siguiente mes
+            if (dia >= 28) {
+                const siguienteMes = (parseInt(mes) + 1).toString().padStart(2, '0');
+                historialPorMes[siguienteMes] = historialPorMes[siguienteMes] || { '13-27': [], '28-12': [] };
+                dia = dia <= 12 ? `0${dia}` : dia;
+                mes = siguienteMes;
+            }
+        
+            const grupo = dia >= 13 && dia <= 27 ? '13-27' : '28-12';
+        
+            // Utilizar una expresión regular para encontrar "de" o "en" seguido del lugar
+            const lugarMatch = doc.concepto.match(/(?:de|en)\s+(.+)/i);
+        
+            if (lugarMatch) {
+                const lugar = lugarMatch[1]; // El segundo grupo capturado es el lugar
+                doc.lugar = lugar; // Asignar el valor al campo "lugar"
+            }
+        
+            historialPorMes[mes][grupo].push(doc);
         }
-    });
+    });     
+
 
     // Crear un archivo Excel con hojas internas para cada mes
     const wb = XLSX.utils.book_new();
 
+
+
     for (const mes in historialPorMes) {
         const historialMes = historialPorMes[mes];
-        const excelData = [['Cedula', 'Concepto', 'Lugar', 'Cuotas', 'Fecha Efectuado', 'Nombre Quien Entregó', 'Valor']];
 
-        historialMes.forEach(doc => {
-            excelData.push([
-                doc.cedula,
-                doc.concepto,
-                doc.lugar,
-                doc.cuotas,
-                doc.fechaEfectuado,
-                doc.nombreQuienEntrego,
-                doc.valor
-            ]);
-        });
+        for (const rango in historialMes) {
+            const excelData = [['Cedula', 'Concepto', 'Lugar', 'Cuotas', 'Fecha Efectuado', 'Nombre Quien Entregó', 'Valor']];
 
-        const ws = XLSX.utils.aoa_to_sheet(excelData);
-        XLSX.utils.book_append_sheet(wb, ws, mes);
+            historialMes[rango].forEach(doc => {
+                excelData.push([
+                    doc.cedula,
+                    doc.concepto,
+                    doc.lugar,
+                    doc.cuotas,
+                    doc.fechaEfectuado,
+                    doc.nombreQuienEntrego,
+                    doc.valor
+                ]);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(excelData);
+            XLSX.utils.book_append_sheet(wb, ws, `${mes} (${rango})`);
+        }
     }
 
     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });

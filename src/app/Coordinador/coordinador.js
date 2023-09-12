@@ -126,6 +126,7 @@ aux.codigo.forEach((c) => {
     }
 });
 console.log(arrayCodigos);
+
 // Mostar contenido en una tabla
 arrayCodigos.forEach((c) => {
     tabla.innerHTML += `

@@ -1,6 +1,6 @@
 
 import { urlBack } from "../../models/base.js";
-import { aviso } from "../../Avisos/avisos.js";
+import { aviso, avisoConfirmado } from "../../Avisos/avisos.js";
 
 
 const boton = document.querySelector('#boton');
@@ -157,75 +157,6 @@ function verificaSiesUnPrestamo(codigo) {
         return false;
     }
 }
-
-function verificaCondiciones(datos, nuevovalor) {
-    // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
-    const fechaIngreso = datos.ingreso;
-    let dia = fechaIngreso.split('-')[0];
-    let mes = fechaIngreso.split('-')[1];
-    let anio = fechaIngreso.split('-')[2];
-
-    // el año esta en formato xxaa y se debe convertir a 20aa
-    let anioConvertido = '20' + anio;
-    anio = anioConvertido;
-
-    const sumaTotal =
-        parseInt(datos.saldos) +
-        parseInt(datos.fondos) +
-        parseInt(datos.mercados) +
-        parseInt(datos.prestamoParaDescontar) +
-        parseInt(datos.casino) +
-        parseInt(datos.valoranchetas) +
-        parseInt(datos.fondo) +
-        parseInt(datos.carnet) +
-        parseInt(datos.seguroFunerario) +
-        parseInt(datos.prestamoParaHacer) +
-        parseInt(datos.anticipoLiquidacion) +
-        parseInt(datos.cuentas);
-
-    const fechaActual = new Date();
-
-    if (parseInt(datos.saldos) >= 175001) {
-        aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
-        return false;
-    }
-    else if (parseInt(datos.fondos) > 0) {
-        aviso('Ups no se pueden generar prestamos perteneces al fondo', 'error');
-        return false;
-    }
-    else {
-        // conseguir la fecha actual y separarla en dia, mes y año para poder compararla con la fecha de ingreso del empleado            
-        let mesActual = fechaActual.getMonth() + 1;
-        let anioActual = fechaActual.getFullYear();
-        if ((anioActual == anio) && ((parseInt(mesActual) - parseInt(mes)) >= 2)) {
-            if (parseInt(nuevovalor) >= 200000) {
-                aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
-                return false;
-            }
-            else if ((sumaTotal + parseInt(nuevovalor)) >= 350000) {
-                aviso('Ups no se pueden generar prestamos, puede sacar maximo ' + (350000 - (sumaTotal)), 'error');
-                return false;
-            }
-            else {
-                return true;
-            }
-        }
-        else if ((parseInt(anioActual) > parseInt(anio))) {
-            if (parseInt(nuevovalor) >= 200000) {
-                aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
-                return false;
-            }
-            else if ((sumaTotal + parseInt(nuevovalor)) >= 350000) {
-                aviso('Ups no se pueden generar prestamos, puede sacar maximo ' + (350000 - (sumaTotal)), 'error');
-                return false;
-            }
-            else {
-                return true;
-            }
-        }
-    }
-}
-
 
 
 async function datosTCodigos() {
@@ -551,44 +482,70 @@ extraeHistorialT.addEventListener('click', async () => {
         aviso("No hay registros de compras realizadas en las tiendas", "warning");
         return;
     }
-    
+
     // Crear un objeto para agrupar los datos por mes
     const historialPorMes = {};
 
     datosExtraidos.historial.forEach(doc => {
         if (doc.concepto.startsWith("Compra tienda")) {
-            // Obtener el mes de la fecha en formato 'YYYY-MM'
-            const mes = doc.fechaEfectuado.slice(0, 7);
-
+            // Obtener el mes y el día de la fecha en formato 'YYYY-MM-DD'
+            const fechaParts = doc.fechaEfectuado.split('-');
+            const mes = fechaParts[1];
+            let dia = fechaParts[2];
+        
             if (!historialPorMes[mes]) {
-                historialPorMes[mes] = [];
+                historialPorMes[mes] = { '13-27': [], '28-12': [] };
             }
-
-            historialPorMes[mes].push(doc);
+        
+            // Si el día está en el rango del 28 al 31, asignar el siguiente mes
+            if (dia >= 28) {
+                const siguienteMes = (parseInt(mes) + 1).toString().padStart(2, '0');
+                historialPorMes[siguienteMes] = historialPorMes[siguienteMes] || { '13-27': [], '28-12': [] };
+                dia = dia <= 12 ? `0${dia}` : dia;
+                mes = siguienteMes;
+            }
+        
+            const grupo = dia >= 13 && dia <= 27 ? '13-27' : '28-12';
+        
+            // Utilizar una expresión regular para encontrar "de" o "en" seguido del lugar
+            const lugarMatch = doc.concepto.match(/(?:de|en)\s+(.+)/i);
+        
+            if (lugarMatch) {
+                const lugar = lugarMatch[1]; // El segundo grupo capturado es el lugar
+                doc.lugar = lugar; // Asignar el valor al campo "lugar"
+            }
+        
+            historialPorMes[mes][grupo].push(doc);
         }
-    });
+    });     
+
 
     // Crear un archivo Excel con hojas internas para cada mes
     const wb = XLSX.utils.book_new();
 
+
+
     for (const mes in historialPorMes) {
         const historialMes = historialPorMes[mes];
-        const excelData = [['Cedula', 'Concepto', 'Lugar', 'Cuotas', 'Fecha Efectuado', 'Nombre Quien Entregó', 'Valor']];
 
-        historialMes.forEach(doc => {
-            excelData.push([
-                doc.cedula,
-                doc.concepto,
-                doc.lugar,
-                doc.cuotas,
-                doc.fechaEfectuado,
-                doc.nombreQuienEntrego,
-                doc.valor
-            ]);
-        });
+        for (const rango in historialMes) {
+            const excelData = [['Cedula', 'Concepto', 'Lugar', 'Cuotas', 'Fecha Efectuado', 'Nombre Quien Entregó', 'Valor']];
 
-        const ws = XLSX.utils.aoa_to_sheet(excelData);
-        XLSX.utils.book_append_sheet(wb, ws, mes);
+            historialMes[rango].forEach(doc => {
+                excelData.push([
+                    doc.cedula,
+                    doc.concepto,
+                    doc.lugar,
+                    doc.cuotas,
+                    doc.fechaEfectuado,
+                    doc.nombreQuienEntrego,
+                    doc.valor
+                ]);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(excelData);
+            XLSX.utils.book_append_sheet(wb, ws, `${mes} (${rango})`);
+        }
     }
 
     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
@@ -650,7 +607,19 @@ const nombresApellidos = [
     "DIANA RUBIANO",
     "YURLEY REYES",
     "ANTONIO RUIZ",
-    "ESTEFANIA REALPE"
+    "ESTEFANIA REALPE",
+    "CARLOS ROJAS",
+    "KAREN RAMIREZ",
+    "ANGELA MARIA ALDANA",
+    "SEBASTIAN RODRIGUEZ",
+    "ERIKA GUERRERO",
+    "CAMILA GARCIA",
+    "ANDREA DIAZ",
+    "VALENTINA GUILLEN",
+    "KAREN RIQUETT",
+    "ANGELICA GOMEZ",
+    "CAROL PALACIOS",
+    "LEIDY VANESA QUIÑONES"
 ];
 
 coodinador.addEventListener('click', async () => {
@@ -660,31 +629,35 @@ coodinador.addEventListener('click', async () => {
         aviso("No hay registros de actividades de los coordinadores", "warning");
         return;
     }
-    console.log(aux);
     let datosFinales = [];
     nombresApellidos.forEach((nombre) => {
         aux.codigo.forEach((doc) => {
             if (doc.generadoPor == nombre) {
                 datosFinales.push(doc);
             }
-        }
-        );
-
+        });
     });
-    console.log(datosFinales);
 
-    // Crear un objeto para almacenar los datos por mes
-    const datosPorMes = {};
+    if (datosFinales.length == 0) {
+        aviso("No hay registros de actividades de los coordinadores", "warning");
+        return;
+    }
+
+    // Crear un objeto para almacenar los datos por quincena de forma dinámica
+    const datosPorQuincena = {};
 
     datosFinales.forEach((doc) => {
         const fechaGenerado = new Date(doc.fechaGenerado);
-        const mes = fechaGenerado.getMonth() + 1; // Meses comienzan en 0
-    
-        // Crear una hoja para el mes si aún no existe
-        if (!datosPorMes[mes]) {
-            datosPorMes[mes] = [['Concepto', 'Concepto Palabra Clave', 'Cedula Quien Pide', 'Codigo', 'Codigo Descontado', 'Cuotas', 'Ejecutado Por', 'Estado', 'Fecha Ejecutado', 'Fecha Generado', 'Generado Por', 'Hora Generado', 'Monto']];
+        const dia = fechaGenerado.getDate(); // Obtener el día del mes
+        const mes = fechaGenerado.getMonth() + 1; // Obtener el mes
+
+        // Determinar la quincena según el día del mes
+        const quincena = dia >= 13 ? `Quincena_${mes}_1` : `Quincena_${mes}_2`;
+
+        if (!datosPorQuincena[quincena]) {
+            datosPorQuincena[quincena] = [['Concepto', 'Concepto Palabra Clave', 'Cedula Quien Pide', 'Codigo', 'Codigo Descontado', 'Cuotas', 'Ejecutado Por', 'Estado', 'Fecha Ejecutado', 'Fecha Generado', 'Generado Por', 'Hora Generado', 'Monto']];
         }
-    
+
         const docData = doc;
         let estado = "";
         if (docData.estado == true) {
@@ -692,7 +665,7 @@ coodinador.addEventListener('click', async () => {
         } else if (docData.estado == false) {
             estado = "Ejecutado";
         }
-        
+
         // Determinar el valor de "Concepto Palabra Clave"
         let conceptoPalabraClave = "";
         if (docData.Concepto.startsWith("Mercado")) {
@@ -700,49 +673,95 @@ coodinador.addEventListener('click', async () => {
         } else if (docData.Concepto.startsWith("Autorizacion")) {
             conceptoPalabraClave = "Prestamo dinero";
         }
-        
-        datosPorMes[mes].push([
+
+        datosPorQuincena[quincena].push([
             docData.Concepto,
             conceptoPalabraClave, // Agregar la nueva columna
-            docData.cedulaQuienPide,            
+            docData.cedulaQuienPide,
             docData.codigo,
             docData.codigoDescontado,
             Number(docData.cuotas),
             docData.ejecutadoPor,
             estado,
             docData.fechaEjecutado,
-            docData.fechaGenerado,           
+            docData.fechaGenerado,
             docData.generadoPor,
             docData.horaGenerado,
             docData.monto,
         ]);
     });
-    
-    // Crear un archivo Excel con hojas separadas por mes
+
+    // Crear una hoja de resumen
+    const resumenSheet = [['Generado Por', 'Total Pendiente', 'Total Ejecutado', 'Rol']];
+
+    // Crear un objeto para almacenar el recuento de registros por Generado Por y Rol
+    const countByGeneradoPorYRol = {};
+
+    datosFinales.forEach((doc) => {
+        const generadoPor = doc.generadoPor;
+        const estado = doc.estado ? 'Pendiente' : 'Ejecutado';
+
+        // Determinar el rol de la persona
+        const rol = nombresApellidos.indexOf(generadoPor) >= 40 ? 'JEFE DE AREA' : 'COORDINADOR';
+
+        // Inicializar el contador para el Generado Por y Rol si aún no existe
+        if (!countByGeneradoPorYRol[generadoPor]) {
+            countByGeneradoPorYRol[generadoPor] = { 'COORDINADOR': { 'Pendiente': 0, 'Ejecutado': 0 }, 'JEFE DE AREA': { 'Pendiente': 0, 'Ejecutado': 0 } };
+        }
+
+        // Incrementar el contador correspondiente para el rol y el estado
+        countByGeneradoPorYRol[generadoPor][rol][estado] += 1;
+
+        // Llenar la hoja de resumen con los valores de recuento, el rol y el estado
+    });
+
+    // Calcular el resumen acumulado
+    for (const generadoPor in countByGeneradoPorYRol) {
+        const rol = nombresApellidos.indexOf(generadoPor) >= 40 ? 'JEFE DE AREA' : 'COORDINADOR';
+
+        let totalPendiente = 0;
+        let totalEjecutado = 0;
+
+        for (const estado in countByGeneradoPorYRol[generadoPor][rol]) {
+            if (estado === 'Pendiente') {
+                totalPendiente += countByGeneradoPorYRol[generadoPor][rol][estado];
+            } else {
+                totalEjecutado += countByGeneradoPorYRol[generadoPor][rol][estado];
+            }
+        }
+
+        resumenSheet.push([generadoPor, totalPendiente, totalEjecutado, rol]);
+    }
+
+    // Crear un archivo Excel con hojas separadas por quincena y la hoja de resumen
     const wb = XLSX.utils.book_new();
-    for (const mes in datosPorMes) {
-        if (datosPorMes.hasOwnProperty(mes)) {
-            const ws = XLSX.utils.aoa_to_sheet(datosPorMes[mes]);
-            XLSX.utils.book_append_sheet(wb, ws, `DetalleM_${mes}`);
+
+    // Agregar la hoja de resumen al libro Excel
+    const resumenWs = XLSX.utils.aoa_to_sheet(resumenSheet);
+    XLSX.utils.book_append_sheet(wb, resumenWs, 'Resumen');
+
+    for (const quincena in datosPorQuincena) {
+        if (datosPorQuincena.hasOwnProperty(quincena)) {
+            const ws = XLSX.utils.aoa_to_sheet(datosPorQuincena[quincena]);
+            XLSX.utils.book_append_sheet(wb, ws, quincena);
         }
     }
-    
+
     // Generar el archivo Excel
     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
     const blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
     const url = URL.createObjectURL(blob);
-    
+
     const element = document.createElement('a');
     element.href = url;
     element.download = 'DetalleCoodinadores.xlsx';
     element.style.display = 'none';
-    
+
     document.body.appendChild(element);
     element.click();
-    
+
     document.body.removeChild(element);
     URL.revokeObjectURL(url);
-    
 });
 
 async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo, codigo, generadoPor) {
@@ -818,8 +837,7 @@ async function CambiarEstado(cod, valor, codigo) {
                     throw new Error('Error en la petición POST');
                 }
             })
-            .then(responseData => {
-                aviso('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + codigo, 'success');
+            .then(responseData => {                
                 console.log('Respuesta:', responseData);
             })
             .catch(error => {
@@ -869,6 +887,21 @@ async function ActualizarHistorial(codigo) {
     }
 }
 
+function esCodigoValido(fechaGeneradoStr) {
+    const hoy = new Date(); // Obtiene la fecha actual
+    const fechaGenerado = new Date(fechaGeneradoStr);
+    const diaGenerado = fechaGenerado.getDate();
+    const diaLimite = diaGenerado <= 13 ? 27 : 13;
+
+    if (diaGenerado <= diaLimite || diaGenerado === 13) {
+        // El código es válido
+        return true;
+    } else {
+        // El código no es válido
+        return false;
+    }
+}
+
 boton.addEventListener('click', async (e) => {
 
     e.preventDefault();
@@ -908,7 +941,13 @@ boton.addEventListener('click', async (e) => {
     console.log(aux2.datosbase[0]);
     let usuario = aux2.datosbase[0];
     console.log(usuario);
+    
+    const cod = obtenerCodigo(codigoP, aux.codigo);
 
+    if (!esCodigoValido(cod.fechaGenerado)) {
+        aviso('El codigo ya expiro', 'error');
+        return;
+    }
 
     if (!verificarCodigo(codigoP, aux.codigo)) {
         aviso('El código no existe', 'error');
@@ -930,14 +969,9 @@ boton.addEventListener('click', async (e) => {
         aviso('El código no es valido solo se admiten prestamos', 'error');
         return;
     }
-    if (!verificaCondiciones(usuario, nuevovalor) == true) {
-        return;
-    }
-    
-
+      
 
     else {
-        const cod = obtenerCodigo(codigoP, aux.codigo);
         let concepto = null;
         concepto2 = 'Dinero_Autorizacion';
         concepto = 'Libranza_Prestamo_Dinero';
@@ -954,27 +988,23 @@ boton.addEventListener('click', async (e) => {
             concepto = 'Libranza_Otro_concepto';
         }
 
-        await actualizar(codigo, cod.codigo, usernameLocal, nuevovalor, cuotas);
-        await sleep(2000); // Pausa de 2 segundos
-        console.log("primero" + concepto2);
-        await actualizarDatosBase(concepto2, nuevovalor, cuotas, cedulaEmpleado);
-        await sleep(2000); // Pausa de 2 segundos
-        // modificar en la tabla codigos el estado del codigo a false para que no pueda ser usado nuevamente
-        await CambiarEstado(cod.codigo, nuevovalor, codigo);
-        await sleep(2000); // Pausa de 2 segundos
-        await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, concepto,codigo, cod.generadoPor)
+        await actualizar(codigo, cod.codigo, usernameLocal, nuevovalor, cuotas);       
+        await actualizarDatosBase(concepto2, nuevovalor, cuotas, cedulaEmpleado);        
+        await CambiarEstado(cod.codigo, nuevovalor, codigo);        
+        await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, concepto,codigo, cod.generadoPor)      
         await sleep(2000); // Pausa de 2 segundos
         await ActualizarHistorial(codigo);
-        await sleep(2000); // Pausa de 2 segundos
-        aviso('Acaba de pedir un prestamo de ' + valor, 'success');
+        await sleep(4000); // Pausa de 2 segundos
+        document.getElementById('successSound').play();
 
+        let confirmacion = await avisoConfirmado('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + codigo, 'success');
+    
+        if (confirmacion) {
+            // recargar la pagina
+            location.reload();
+        }
     }
 
-
-    document.querySelector('#codigo').value = "";
-    document.querySelector('#cedula').value = "";
-    document.querySelector('#valor').value = "";
-    document.querySelector('#cuotas').value = "";
 });
 
 function sleep(ms) {

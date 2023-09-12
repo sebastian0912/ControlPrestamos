@@ -13,6 +13,15 @@ export function aviso(titulo, icono) {
   });
 }
 
+export async function avisoConfirmado(titulo, icono) {
+  const resultado = await Swal.fire({  
+    title: titulo,
+    icon: icono,
+  });
+  
+  return resultado.isConfirmed;
+}
+
 
 export async function avisoConfirmacion() {
   const resultado = await Swal.fire({
