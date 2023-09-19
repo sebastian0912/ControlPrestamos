@@ -366,7 +366,7 @@ async function actualizarDatosBase(concepto, valor, cuotas, cedulaEmpleado) {
 
     try {
         fetch(urlcompleta, {
-            method: 'PUT',
+            method: 'POST',
             body:
                 JSON.stringify({
                     concepto: concepto,
@@ -599,10 +599,10 @@ boton.addEventListener('click', async (e) => {
         console.log(datosUsuario);
         const cod = obtenerCodigo(codigoP, datos);
 
-        if (!esCodigoValido(cod.fechaGenerado)) {
+        /*if (!esCodigoValido(cod.fechaGenerado)) {
             aviso('El codigo ya expiro', 'error');
             return;
-        }
+        }*/
 
         if (!verificarCodigo(codigoP, datos)) {
             aviso('El codigo no existe', 'error');

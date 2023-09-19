@@ -847,10 +847,10 @@ boton.addEventListener("click", async (e) => {
         return;
     }
 
-    if (!esCodigoValido(cod.fechaGenerado)) {
+    /*if (!esCodigoValido(cod.fechaGenerado)) {
         aviso('El codigo ya expiro', 'error');
         return;
-    }
+    }*/
 
     if (!verificarCodigo(codigoA, CodigosMercado)) {
         aviso("El codigo no existe", "error");
@@ -890,10 +890,7 @@ boton.addEventListener("click", async (e) => {
         if (obtenerCodigo(codigoA, CodigosMercado) == null) {
             aviso("El codigo de autorizacion no existe", "error");
             return;
-        }
-        
-
-
+        }  
 
         let codigAux = "MOH" + Math.floor(Math.random() * 1000000+1);
         let concepto = datos.concepto;
@@ -913,6 +910,7 @@ boton.addEventListener("click", async (e) => {
         // modificar en la tabla codigos el estado del codigo a false para que no pueda ser usado nuevamente
         await CambiarEstado(cod.codigo, sumaVentas, codigAux);
         await actualizar(codigAux, cod.codigo, usernameLocal, sumaVentas, 2);
+
         await actualizarVentas(cantidad, codigo, usernameLocal);       
 
         if (codigo2 != "") {
@@ -931,8 +929,7 @@ boton.addEventListener("click", async (e) => {
 
         await escribirHistorial(cedula, sumaVentas, 2, "Compra tienda respecto a:" + concepto + " en " + sede, codigAux, cod.generadoPor);
         await sleep(2000); // Pausa de 2 segundos
-        await ActualizarHistorial(codigo);
-        await sleep(4000); // Pausa de 4 segundos
+        await ActualizarHistorial(codigAux);
 
         let confirmacion = await avisoConfirmado('Acaba de pedir un mercado de ' + sumaVentas + ' su codigo es: ' + codigAux, 'success');
 

@@ -406,7 +406,7 @@ boton.addEventListener('click', async (e) => {
         }
 
 
-        if (formaPago.value != "Efectivo" && formaPago.value != "0") {
+        if (formaPago.value != "Efectivo" && formaPago.value != "0" && formaPago.value != "Otro") {
             // campo celular debe tener 10 digitos
             if (celular.value.length != 10) {
                 aviso('Ups no se pueden generar mercado, el número proporcionado debe tener 10 digitos', 'error');

@@ -4,13 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../../reset.css" />
-    <link rel="stylesheet" href="Editar_envio.css" />
+    <link rel="stylesheet" href="mercadoPaHacer.css" />
 
     <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal@4/minimal.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
 
     <script defer src="../../logOut2.js" type="module"></script>
-    <script defer src="Editar_envio.js" type="module"></script>
+    <script defer src="mercadoPaHacer.js" type="module"></script>
+
+    <script defer type="text/javascript" src="../../jspdf.es.min.js.js" type="module"></script>
 
 </head>
 
@@ -34,9 +36,9 @@
             </li>
 
             <li>
-                <a href="./Editar_envio.html">
+                <a href="../Editar envio/Editar_envio.html">
                     <img src="../../assets/camion-de-reparto.png" alt="logo" class="logo" />
-                    <p> Editar envio mercancía </p>
+                    <p> Editar envio mercancía</p>
                 </a>
             </li>
 
@@ -48,26 +50,29 @@
             </li>
 
             <li>
-                <a href="../MercadoComercio/mercadoPaHacer.html">
+                <a href="./mercadoPaHacer.html">
                     <img src="../../assets/mercado.png" alt="logo" class="logo" />
                     <p> Mercado Ferias </p>
                 </a>
             </li>
 
+
             <li id="logout">
-                
+                <a href="../../Inicio-Login/index.html">
                     <img src="../../assets/cerrar-sesion.png" alt="logo" class="logo" />
                     <p>Cerrar Sesión</p>
-                
+                </a>
             </li>
 
-            <h1 class="diasT"> Dias restantes antes de fecha cierre de novedades de nomina </h1>
+            <h1 class="diasT"> Días restantes antes de fecha cierre de novedades de nómina </h1>
             <span class="dias" id="diasRestantes"></span>
 
-            <h1 class="diasT"> Dias restantes antes liquidacion </h1>
+            <h1 class="diasT"> Días restantes antes de liquidación </h1>
             <span class="dias" id="diasLi"></span>
+
         </ul>
     </div>
+
 
     <header>
         <div class="cajontitulo">
@@ -80,23 +85,41 @@
     </header>
 
     <div class="contenido">
+
         <div class="cuadroTexto">
             <div class="valor">
                 <div class="valoresEscribir">
-                    <h1 class="titulo"> Digite los campos del cargamento a subir </h1>
-                    <input type="text" id="Codigo" placeholder="Código de envio" class="input2" />
+                    <h1 class="titulo" style="margin-right: 10px;"> Digite el número de identificación del empleado a
+                        validar:
+                    </h1>
+                    <input type="text" id="cedula" placeholder="Número de identificación" class="input"
+                        style="margin-left: 50px;" />
+                    <button class="btn2" id="boton">Buscar</button>
 
-                    <button class="btn" id="boton" style="margin-bottom: 15px;">Buscar envio</button>
-                    <input type="text" id="cantidad" placeholder="" class="input2" style="display: none;" />
-                    <input type="text" id="valorUnidad" placeholder="" class="input2" style="display: none;"/>
-                    <select id="miSelect2" style="display: none;"></select>
-                    <input type="text" id="otro2" placeholder="Otro concepto" class="input2" style="display: none;" />
-                    <select id="miSelect" style="display: none;"></select>
-                    <button class="btn" id="boton2" style="display: none; margin-bottom: 15px;">Modificar datos</button>
+                    <input type="text" id="monto" placeholder="Valor" class="input2" style="display: none;" />
+                    <input type="text" id="cuotas" placeholder="Num Cuotas" class="input2"
+                        style="display: none; margin-left: 10px" />
+
+                    <select name="" id="formaPago" class="input2" style="display:none; margin-left: 50px">
+                        <option value="0">Forma Pago</option>
+                        <option value="Daviplata">Daviplata</option>
+                        <option value="Efectivo">Efectivo</option>
+                        <option value="Master">Mastercard</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+
+                    <input type="text" id="celular" placeholder="" class="input2"
+                        style="margin-left: 20px; display:none" />
+
+                    <button class="btn" id="boton2"
+                        style="display: none; margin-left: 50px; margin-top:10px ">Cargar</button>
 
                 </div>
             </div>
+            <h1 id="datosPersona" class="titulo" style="float: left; margin-left: 30px"></h1>
+
         </div>
+
     </div>
 </body>
 

@@ -605,10 +605,11 @@ boton.addEventListener('click', async (e) => {
         console.log(usuario);
         const cod = obtenerCodigo(codigoP, aux.codigo);
         
-        if (!verificarCodigo(codigoP, aux.codigo)) {
+        /*if (!verificarCodigo(codigoP, aux.codigo)) {
             aviso('El codigo no existe', 'error');
             return;
-        }
+        }*/
+        
         if (!verificarCodigoEstado(codigoP, aux.codigo)) {
             aviso('El codigo ya fue usado', 'error');
             return;

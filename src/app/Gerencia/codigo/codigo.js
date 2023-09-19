@@ -441,7 +441,7 @@ extraeT.addEventListener('click', async () => {
     } else {
         datosExtraidos.tienda.forEach((doc) => {
             const docData = doc;
-            excelData.push([docData.nombre, docData.valorTotal, docData.numPersonasAtendidas]);
+            excelData.push([docData.nombre, Number(docData.valorTotal), docData.numPersonasAtendidas]);
         });
 
         const ws = XLSX.utils.aoa_to_sheet(excelData);
@@ -536,10 +536,10 @@ extraeHistorialT.addEventListener('click', async () => {
                     doc.cedula,
                     doc.concepto,
                     doc.lugar,
-                    doc.cuotas,
+                    Number(doc.cuotas),
                     doc.fechaEfectuado,
                     doc.nombreQuienEntrego,
-                    doc.valor
+                    Number(doc.valor)
                 ]);
             });
 
@@ -687,7 +687,7 @@ coodinador.addEventListener('click', async () => {
             docData.fechaGenerado,
             docData.generadoPor,
             docData.horaGenerado,
-            docData.monto,
+            Number(docData.monto),
         ]);
     });
 
@@ -928,13 +928,6 @@ boton.addEventListener('click', async (e) => {
         return;
     }
 
-    // si cuotas es mayor a 4
-    if (parseInt(cuotas) > 4) {
-        aviso('Ups no se pueden generar mercado, las cuotas no pueden ser mayor a 4', 'error');
-        return;
-    }
-
-
     const aux = await datosTCodigos();
     console.log(aux.codigo);
     let aux2 = await datosEmpleado(cedulaEmpleado);
@@ -944,10 +937,10 @@ boton.addEventListener('click', async (e) => {
     
     const cod = obtenerCodigo(codigoP, aux.codigo);
 
-    if (!esCodigoValido(cod.fechaGenerado)) {
+    /*if (!esCodigoValido(cod.fechaGenerado)) {
         aviso('El codigo ya expiro', 'error');
         return;
-    }
+    }*/
 
     if (!verificarCodigo(codigoP, aux.codigo)) {
         aviso('El código no existe', 'error');

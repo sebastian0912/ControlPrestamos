@@ -1,5 +1,5 @@
 import { urlBack } from "../../models/base.js";
-import { aviso } from "../../Avisos/avisos.js";
+import { aviso, avisoConfirmado } from "../../Avisos/avisos.js";
 
 
 // Capturar el h1 del titulo y perfil
@@ -126,7 +126,6 @@ async function escribirCodigo(cedulaEmpleado, nuevovalor, cod, valor) {
                 }
             })
             .then(responseData => {
-                aviso('Acaba de pedir un mercado de ' + valor + ' su codigo es: ' + cod, 'success');
                 console.log('Respuesta:', responseData);
             })
             .catch(error => {
@@ -329,12 +328,12 @@ boton.addEventListener('click', async (e) => {
         return;
     }
 
-    if (parseInt(datos.saldos) > 175000){
+    if (parseInt(datos.saldos) > 175000) {
         aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
         return;
     }
-    
-    
+
+
     boton.style.display = "none";
 
     boton.style.display = "none";
@@ -353,14 +352,14 @@ boton.addEventListener('click', async (e) => {
         let nuevovalor = valor.replace(/\,/g, '');
         e.preventDefault();
 
-        let codigoOH = 'M' + Math.floor(Math.random() * 1000000);        
+        let codigoOH = 'M' + Math.floor(Math.random() * 1000000);
 
         if (valor == "") {
             aviso('Ups no se pueden generar mercado, el monto no puede estar vacio', 'error');
             return;
         }
 
-        if (formaPago.value != "Efectivo" && formaPago.value != "0") {
+        if (formaPago.value != "Efectivo" && formaPago.value != "0" && formaPago.value != "Otro") {
             // campo celular debe tener 10 digitos
             if (celular.value.length != 10) {
                 aviso('Ups no se pueden generar mercado, el número proporcionado debe tener 10 digitos', 'error');
@@ -387,9 +386,9 @@ boton.addEventListener('click', async (e) => {
             direcccion = "CRA 2 N 8-156 FACATATIVA"
         }
         else if (datos.temporal.startsWith("Tu") || datos.temporal.startsWith("TU")) {
-            empresa = "APOYO LABORAL TS SAS";
-            NIT = "NIT 900814587"
-            direcccion = "CRA 2 N 8-156 FACATATIVA"
+            empresa = "TU ALIANZA SAS";
+            NIT = "NIT 900864596"
+            direcccion = "Calle 7 N 4-49 MADRID'"
         }
         else if (datos.temporal.startsWith("Comercializadora") || datos.temporal.startsWith("COMERCIALIZADORA")) {
             empresa = "COMERCIALIZADORA TS";
@@ -445,27 +444,22 @@ boton.addEventListener('click', async (e) => {
         docPdf.text('Codigo de autorización nomina: ' + codigoOH, 10, 120);
         docPdf.text('___________________________________', 10, 130);
         docPdf.text(datos.nombre, 10, 135);
-        
+
         docPdf.setFont('Helvetica', 'bold');
         docPdf.setFontSize(6);
         docPdf.text('Huella Indice Derecho', 130, 95);
 
         docPdf.save('PrestamoDescontar' + '_' + datos.nombre + "_" + codigoOH + '.pdf');
 
+        let confirmacion = await avisoConfirmado('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + codigoOH, 'success');
+
+        if (confirmacion) {
+            // recargar la pagina
+            location.reload();
+        }
+        
 
 
-        document.querySelector('#monto').value = "0";
-        document.querySelector('#cedula').value = "";
-        document.querySelector('#celular').value = "";
-
-        boton.style.display = "inline-block";
-        cedula.style.display = "inline-block";
-
-        monto.style.display = "none";
-        boton2.style.display = "none";
-        formaPago.style.display = "none";
-        celular.style.display = "none";
-        datosPersona.innerHTML = "";
 
     }
     );

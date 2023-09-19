@@ -169,10 +169,10 @@ extraeHistorialT.addEventListener('click', async () => {
                     doc.cedula,
                     doc.concepto,
                     doc.lugar,
-                    doc.cuotas,
+                    Number(doc.cuotas),
                     doc.fechaEfectuado,
                     doc.nombreQuienEntrego,
-                    doc.valor
+                    Number(doc.valor)
                 ]);
             });
 
@@ -523,7 +523,7 @@ coodinador.addEventListener('click', async () => {
             docData.fechaGenerado,
             docData.generadoPor,
             docData.horaGenerado,
-            docData.monto,
+            Number(docData.monto),
         ]);
     });
 
@@ -654,7 +654,7 @@ boton.addEventListener('click', async (e) => {
             return;
         }
 
-        if (formaPago.value != "Efectivo" && formaPago.value != "0") {
+        if (formaPago.value != "Efectivo" && formaPago.value != "0" && formaPago.value != "Otro") {
             // campo celular debe tener 10 digitos
             if (celular.value.length != 10) {
                 aviso('Ups no se pueden generar mercado, el número proporcionado debe tener 10 digitos', 'error');
@@ -718,12 +718,6 @@ boton.addEventListener('click', async (e) => {
 
             if (cuotasAux == "") {
                 aviso('Ups no se pueden generar mercado, las cuotas no pueden estar vacias', 'error');
-                return;
-            }
-
-            // si cuotas es mayor a 4
-            if (parseInt(cuotasAux) > 4) {
-                aviso('Ups no se pueden generar mercado, las cuotas no pueden ser mayor a 4', 'error');
                 return;
             }
 

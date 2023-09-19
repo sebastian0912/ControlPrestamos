@@ -348,7 +348,7 @@ extraeHistorialT.addEventListener('click', async () => {
                     doc.cuotas,
                     doc.fechaEfectuado,
                     doc.nombreQuienEntrego,
-                    doc.valor
+                    Number(doc.valor)
                 ]);
             });
 
@@ -527,7 +527,7 @@ coodinador.addEventListener('click', async () => {
             docData.fechaGenerado,
             docData.generadoPor,
             docData.horaGenerado,
-            docData.monto,
+            Number(docData.monto),
         ]);
     });
 

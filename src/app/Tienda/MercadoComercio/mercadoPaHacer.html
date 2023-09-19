@@ -4,13 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../../reset.css" />
-    <link rel="stylesheet" href="tienda.css" />
+    <link rel="stylesheet" href="mercadoPaHacer.css" />
 
     <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal@4/minimal.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
 
-    <script defer src="../../logOut.js" type="module"></script>
-    <script defer src="tienda.js" type="module"></script>
+    <script defer src="../../logOut2.js" type="module"></script>
+    <script defer src="mercadoPaHacer.js" type="module"></script>
+
+    <script defer type="text/javascript" src="../../jspdf.es.min.js.js" type="module"></script>
 
 </head>
 
@@ -27,7 +29,7 @@
             </li>
 
             <li>
-                <a href="./tienda.html">
+                <a href="../CargoMercado/tienda.html">
                     <img src="../../assets/mercado.png" alt="logo" class="logo" />
                     <p>Cargo de mercado</p>
                 </a>
@@ -61,17 +63,17 @@
                 </a>
             </li>
 
+
             <li id="logout">
-                <a href="">
+                <a href="../../Inicio-Login/index.html">
                     <img src="../../assets/cerrar-sesion.png" alt="logo" class="logo" />
                     <p>Cerrar Sesión</p>
                 </a>
             </li>
 
-
             <h1 class="diasT"> Días restantes antes de fecha cierre de novedades de nómina </h1>
             <span class="dias" id="diasRestantes"></span>
-      
+
             <h1 class="diasT"> Días restantes antes de liquidación </h1>
             <span class="dias" id="diasLi"></span>
 
@@ -90,18 +92,39 @@
     </header>
 
     <div class="contenido">
-        <div class="cuadroTexto">
-            <div class="cajaCedula">
-                <h1 class="titulo"> Digite el número de identificación del empleado a validar: </h1>
-                <input type="text" id="cedula" placeholder="Ingrese el número de cédula a buscar" class="input" />
-                <button class="btn" id="boton">Buscar</button>
-            </div>
 
+        <div class="cuadroTexto">
             <div class="valor">
-                <input type="text" id="valor" placeholder="Valor" class="input2" />
-                <input type="text" id="codigo" placeholder="Código" class="input2" />
+                <div class="valoresEscribir">
+                    <h1 class="titulo" style="margin-right: 10px;"> Digite el número de identificación del empleado a
+                        validar:
+                    </h1>
+                    <input type="text" id="cedula" placeholder="Número de identificación" class="input"
+                        style="margin-left: 50px;" />
+                    <button class="btn2" id="boton">Buscar</button>
+
+                    <input type="text" id="monto" placeholder="Valor" class="input2" style="display: none;" />
+                    <input type="text" id="cuotas" placeholder="Num Cuotas" class="input2" style="display: none; margin-left: 10px" />
+
+                    <select name="" id="formaPago" class="input2" style="display:none; margin-left: 50px">
+                        <option value="0">Forma Pago</option>
+                        <option value="Daviplata">Daviplata</option>
+                        <option value="Efectivo">Efectivo</option>
+                        <option value="Master">Mastercard</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+
+                    <input type="text" id="celular" placeholder="" class="input2"
+                        style="margin-left: 20px; display:none" />
+
+                    <button class="btn" id="boton2" style="display: none; margin-left: 50px; margin-top:10px ">Cargar</button>
+
+                </div>
             </div>
+            <h1 id="datosPersona" class="titulo" style="float: left; margin-left: 30px"></h1>
+
         </div>
+
     </div>
 </body>
 

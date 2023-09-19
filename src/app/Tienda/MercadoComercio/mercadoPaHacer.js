@@ -174,6 +174,7 @@ async function datosEmpleado(cedulaEmpleado) {
 
 function verificaCondiciones(datos, nuevovalor) {
     // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
+    console.log(datos.ingreso);
     const fechaIngreso = datos.ingreso;
     let dia = fechaIngreso.split("-")[0];
     let mes = fechaIngreso.split("-")[1];
@@ -298,6 +299,161 @@ async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo, codig
 
 }
 
+async function actualizarDatosBase(concepto, valor, cuotas, cedulaEmpleado) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+
+    const urlcompleta = urlBack.url + '/Datosbase/tienda/actualizarMercados/' + cedulaEmpleado;
+
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    concepto: concepto,
+                    mercados: valor,
+                    cuotasMercados: cuotas,
+                    ejecutadoPor: username,
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+}
+
+async function CambiarEstado(cod, valor, codigo) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+
+    const urlcompleta = urlBack.url + '/Codigo/jefedearea/cambiarEstadoCodigo/' + cod;
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    estado: false,
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+
+}
+
+async function historialT(valor) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+
+    const urlcompleta = urlBack.url + '/Tienda/actualizarTienda';
+
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    nombre: usernameLocal,
+                    valorTotal: valor,
+                    numPersonasAtendidas: 1,
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+}
+
+async function ActualizarHistorial(codigo) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+    const urlcompleta = urlBack.url + '/Historial/actualizarXcodigo/' + codigo;
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    codigo: codigo,
+                    nombreQuienEntrego: usernameLocal,
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+}
+
 formaPago.addEventListener('change', (e) => {
     const numerodepago = document.querySelector('#celular');
 
@@ -314,6 +470,49 @@ formaPago.addEventListener('change', (e) => {
         numerodepago.placeholder = "Número de cuenta";
     }
 });
+
+
+function obtenerCodigo(codigo, datos) {
+    let cod;
+    datos.forEach(doc => {
+        if (doc.codigo == codigo) {
+            cod = doc;
+        }
+    });
+    return cod;
+}
+
+async function datosTCodigos() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Codigo/codigos';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
 
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
@@ -341,6 +540,7 @@ boton.addEventListener('click', async (e) => {
     cedula.style.display = "none";
 
     monto.style.display = "inline-block";
+    cuotas.style.display = "inline-block";
     boton2.style.display = "inline-block";
     formaPago.style.display = "inline-block";
     celular.style.display = "inline-block";
@@ -348,10 +548,10 @@ boton.addEventListener('click', async (e) => {
     datosPersona.innerHTML = datos.nombre;
 
     boton2.addEventListener('click', async (e) => {
-        let valor = document.querySelector('#monto').value;
-        let nuevovalor = valor.replace(/\,/g, '');
         e.preventDefault();
-
+        let valor = document.querySelector('#monto').value;
+        let cuotas = document.querySelector('#cuotas').value;
+        let nuevovalor = valor.replace(/\,/g, '');
         let codigoOH = 'M' + Math.floor(Math.random() * 1000000);
 
         if (!verificaCondiciones(datos, nuevovalor) == true) {
@@ -363,6 +563,13 @@ boton.addEventListener('click', async (e) => {
             return;
         }
 
+        // si cuotas es mayor a 4
+        if (parseInt(cuotas) > 4) {
+            aviso('Ups no se pueden generar mercado, las cuotas no pueden ser mayor a 4', 'error');
+            return;
+        }
+
+
         if (formaPago.value != "Efectivo" && formaPago.value != "0" && formaPago.value != "Otro") {
             // campo celular debe tener 10 digitos
             if (celular.value.length != 10) {
@@ -370,13 +577,19 @@ boton.addEventListener('click', async (e) => {
                 return;
             }
         }
-        if (!verificaCondiciones(datos, nuevovalor) == true) {
-            return;
-        }
-
-        await escribirHistorial(cedulaEmpleado, nuevovalor, 2, 'Autorizacion de Mercado', codigoOH);
+        
 
         await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, valor)
+        await sleep(2000); // Pausa de 2 segundos
+
+
+        await CambiarEstado(codigoOH, nuevovalor, codigoOH);
+        await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, "Compra tienda de Ferias", codigoOH, usernameLocal);
+        await sleep(2000); // Pausa de 2 segundos
+        await ActualizarHistorial(codigoOH);
+
+        await historialT(nuevovalor);
+        await actualizarDatosBase("Compra tienda de Ferias", nuevovalor, cuotas, cedulaEmpleado);
 
 
         let empresa = null;
@@ -464,6 +677,13 @@ boton.addEventListener('click', async (e) => {
     );
 }
 );
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+
 
 
 /*************************************************************/
