@@ -247,6 +247,10 @@ function verificaCondiciones(datos, nuevovalor) {
                 return true;
             }
         }
+        else {
+            aviso("Ups no se pueden generar mercado, el empleado no tiene los dias suficientes para pedir prestamo", "error");
+            return false;
+        }
     }
 }
 
@@ -514,11 +518,22 @@ async function datosTCodigos() {
     }
 }
 
+let isFunctionExecuting = false; // Variable para rastrear si la función está en ejecución
+
+
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
     e.preventDefault();
-    // capturar los datos del formulario
 
+    if (isFunctionExecuting) {
+        // Puedes mostrar un mensaje o simplemente regresar sin hacer nada
+        aviso('Se esta ejecutando la funcion', 'warning');
+        return;
+    }
+
+    isFunctionExecuting = true; // Marcar la función como en ejecución
+    
+    // capturar los datos del formulario
     let cedulaEmpleado = document.querySelector('#cedula').value;
 
     let aux = await datosEmpleado(cedulaEmpleado);
@@ -526,11 +541,13 @@ boton.addEventListener('click', async (e) => {
     let datos = aux.datosbase[0];
 
     if (datos == undefined) {
+        isFunctionExecuting = false;
         aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
         return;
     }
 
     if (parseInt(datos.saldos) > 175000) {
+        isFunctionExecuting = false;
         aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
         return;
     }
@@ -546,7 +563,6 @@ boton.addEventListener('click', async (e) => {
     celular.style.display = "inline-block";
 
     datosPersona.innerHTML = datos.nombre;
-    console.log(datos.nombre);
 
     boton2.addEventListener('click', async (e) => {
         e.preventDefault();
@@ -556,16 +572,19 @@ boton.addEventListener('click', async (e) => {
         let codigoOH = 'M' + Math.floor(Math.random() * 1000000);
 
         if (!verificaCondiciones(datos, nuevovalor) == true) {
+            isFunctionExecuting = false;
             return;
         }
 
         if (valor == "") {
+            isFunctionExecuting = false;
             aviso('Ups no se pueden generar mercado, el monto no puede estar vacio', 'error');
             return;
         }
 
         // si cuotas es mayor a 4
         if (parseInt(cuotas) > 4) {
+            isFunctionExecuting = false;
             aviso('Ups no se pueden generar mercado, las cuotas no pueden ser mayor a 4', 'error');
             return;
         }
@@ -574,6 +593,7 @@ boton.addEventListener('click', async (e) => {
         if (formaPago.value != "Efectivo" && formaPago.value != "0" && formaPago.value != "Otro") {
             // campo celular debe tener 10 digitos
             if (celular.value.length != 10) {
+                isFunctionExecuting = false;
                 aviso('Ups no se pueden generar mercado, el número proporcionado debe tener 10 digitos', 'error');
                 return;
             }
@@ -668,6 +688,7 @@ boton.addEventListener('click', async (e) => {
 
         docPdf.save('PrestamoDescontar' + '_' + datos.nombre + "_" + codigoOH + '.pdf');
 
+        isFunctionExecuting = false;
 
         let confirmacion = await avisoConfirmado('Acaba de pedir una autorización de mercado por un valor de ' + valor + ' su codigo es: ' + codigoOH, 'success');
         if (confirmacion) {

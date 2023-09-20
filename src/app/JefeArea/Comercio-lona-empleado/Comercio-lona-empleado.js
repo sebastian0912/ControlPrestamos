@@ -325,6 +325,10 @@ function verificaCondiciones(datos, nuevovalor) {
                 return true;
             }
         }
+        else {
+            aviso("Ups no se pueden generar mercado, el empleado no tiene los dias suficientes para pedir prestamo", "error");
+            return false;
+        }
     }
 }
 
@@ -732,8 +736,19 @@ function esCodigoValido(fechaGeneradoStr) {
     }
 }
 
+let isFunctionExecuting = false; // Variable para rastrear si la función está en ejecución
+
+
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener("click", async (e) => {
+    if (isFunctionExecuting) {
+        // Puedes mostrar un mensaje o simplemente regresar sin hacer nada
+        aviso('Se esta ejecutando la funcion', 'warning');
+        return;
+    }
+
+    isFunctionExecuting = true; // Marcar la función como en ejecución
+
     let cedula = document.querySelector("#cedula").value;
     let codigoA = document.querySelector("#codigoA").value;
 
@@ -828,21 +843,25 @@ boton.addEventListener("click", async (e) => {
     let cod = obtenerCodigo(codigoA, CodigosMercado);
     
     if (sumaCantidad > datos.cantidadRecibida) {
+        isFunctionExecuting = false;
         aviso("No se puede cargar el mercado del producto #1 porque la suma de la cantidad supera el inventario disponible. Lo máximo a sacar es " + (datos.cantidadRecibida - datos.cantidadTotalVendida), "error");
         return;
     }
 
     if (sumaCantidad2 > datos2.cantidadRecibida) {
+        isFunctionExecuting = false;
         aviso("No se puede cargar el mercado del producto #2 porque la suma de la cantidad supera el inventario disponible. Lo máximo a sacar es " + (datos2.cantidadRecibida - datos2.cantidadTotalVendida), "error");
         return;
     }
 
     if (sumaCantidad3 > datos3.cantidadRecibida) {
+        isFunctionExecuting = false;
         aviso("No se puede cargar el mercado del producto #3 porque la suma de la cantidad supera el inventario disponible. Lo máximo a sacar es " + (datos3.cantidadRecibida - datos3.cantidadTotalVendida), "error");
         return;
     }
 
     if (sumaCantidad4 > datos4.cantidadRecibida) {
+        isFunctionExecuting = false;
         aviso("No se puede cargar el mercado del producto #4 porque la suma de la cantidad supera el inventario disponible. Lo máximo a sacar es " + (datos4.cantidadRecibida - datos4.cantidadTotalVendida), "error");
         return;
     }
@@ -853,30 +872,31 @@ boton.addEventListener("click", async (e) => {
     }*/
 
     if (!verificarCodigo(codigoA, CodigosMercado)) {
+        isFunctionExecuting = false;
         aviso("El codigo no existe", "error");
         return;
     }
 
     if (!verificarCodigoEstado(codigoA, CodigosMercado)) {
+        isFunctionExecuting = false;
         aviso("El codigo ya fue usado", "error");
         return
     }
 
     if (!verificarCedula(codigoA, cedula, CodigosMercado)) {
+        isFunctionExecuting = false;
         aviso("El codigo no pertenece a este empleado", "error");
         return;
     }
 
     if (!verificarCodigoComercio(codigo, datosArreglo) == true) {
+        isFunctionExecuting = false;
         aviso("El codigo de la comercializadora no existe", "error");
         return;
     }
 
-    if (!verificaCondiciones(usuario, sumaVentas) == true) {
-        return;
-    }
-
     if (codigoA == "") {
+        isFunctionExecuting = false;
         aviso("Por favor ingrese el codigo de autorizacion generado por el coordinador", "error");
         return;
     }
@@ -884,10 +904,12 @@ boton.addEventListener("click", async (e) => {
     if (verificarCodigo(codigoA, CodigosMercado) == true) {
 
         if (!verificaCondiciones(usuario, sumaVentas) == true) {
+            isFunctionExecuting = false;
             return;
         }
 
         if (obtenerCodigo(codigoA, CodigosMercado) == null) {
+            isFunctionExecuting = false;
             aviso("El codigo de autorizacion no existe", "error");
             return;
         }  
@@ -930,6 +952,7 @@ boton.addEventListener("click", async (e) => {
         await escribirHistorial(cedula, sumaVentas, 2, "Compra tienda respecto a:" + concepto + " en " + sede, codigAux, cod.generadoPor);
         await sleep(2000); // Pausa de 2 segundos
         await ActualizarHistorial(codigAux);
+        isFunctionExecuting = false;
 
         let confirmacion = await avisoConfirmado('Acaba de pedir un mercado de ' + sumaVentas + ' su codigo es: ' + codigAux, 'success');
 
@@ -939,6 +962,7 @@ boton.addEventListener("click", async (e) => {
         }
     }
     else {
+        isFunctionExecuting = false;
         aviso("El codigo de autorizacion no existe", "error");
     }
 

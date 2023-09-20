@@ -246,6 +246,10 @@ function verificaCondiciones(datos, nuevovalor) {
                 return true;
             }
         }
+        else {
+            aviso("Ups no se pueden generar mercado, el empleado no tiene los dias suficientes para pedir prestamo", "error");
+            return false;
+        }
     }
 }
 

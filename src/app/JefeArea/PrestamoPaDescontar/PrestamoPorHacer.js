@@ -216,6 +216,10 @@ function verificaCondiciones(datos, nuevovalor) {
                 return true;
             }
         }
+        else {
+            aviso('Ups no se pueden generar prestamos, no llevas 2 meses en la empresa', 'error');
+            return false;
+        }
     }
 }
 
@@ -577,9 +581,20 @@ function esCodigoValido(fechaGeneradoStr) {
     }
 }
 
-boton.addEventListener('click', async (e) => {
+let isFunctionExecuting = false; // Variable para rastrear si la función está en ejecución
 
+
+boton.addEventListener('dblclick', async (e) => {
     e.preventDefault();
+
+    if (isFunctionExecuting) {
+        // Puedes mostrar un mensaje o simplemente regresar sin hacer nada
+        aviso('Se esta ejecutando la funcion', 'warning');
+        return;
+    }
+
+    isFunctionExecuting = true; // Marcar la función como en ejecución
+
     // capturar los datos del formulario
     let cedulaEmpleado = document.querySelector('#cedula').value;
     let codigoP = document.querySelector('#codigo').value;
@@ -592,6 +607,7 @@ boton.addEventListener('click', async (e) => {
     let concepto2;
     
     if (codigoP == '') {
+        isFunctionExecuting = false;
         aviso('El campo codigo no puede estar vacio', 'error');
     }
     else {
@@ -611,41 +627,50 @@ boton.addEventListener('click', async (e) => {
         }*/
         
         if (!verificarCodigoEstado(codigoP, aux.codigo)) {
+            isFunctionExecuting = false;
             aviso('El codigo ya fue usado', 'error');
             return;
         }
         if (!verificarCedula(codigoP, cedulaEmpleado, aux.codigo)) {
+            isFunctionExecuting = false;
             aviso('El codigo no pertenece a este empleado', 'error');
             return;
         }
         if (!verificaMonto(parseInt(nuevovalor), aux.codigo)) {
+            isFunctionExecuting = false;
             aviso('El monto del prestamo es mayor al permitido generado por el coodinador o jefe de area ', 'error');
             return;
         }
         if (!verificaSiesUnPrestamo(codigoP)) {
+            isFunctionExecuting = false;
             aviso('El codigo no es valido solo se admiten prestamos', 'error');
             return;
         }
         if (!verificaCondiciones(usuario, nuevovalor) == true) {
+            isFunctionExecuting = false;
             return;
         }
         if (valor == "") {
+            isFunctionExecuting = false;
             aviso('Ups no se pueden generar mercado, el monto no puede estar vacio', 'error');
             return;
         }
 
         if (cuotas == "") {
+            isFunctionExecuting = false;
             aviso('Ups no se pueden generar mercado, las cuotas no pueden estar vacias', 'error');
             return;
         }
 
         // si cuotas es mayor a 4
         if (parseInt(cuotas) > 4) {
+            isFunctionExecuting = false;
             aviso('Ups no se pueden generar mercado, las cuotas no pueden ser mayor a 4', 'error');
             return;
         }
 
         if (!esCodigoValido(cod.fechaGenerado)) {
+            isFunctionExecuting = false;
             aviso('El codigo ya expiro', 'error');
             return;
         }
@@ -679,6 +704,7 @@ boton.addEventListener('click', async (e) => {
             await ActualizarHistorial(codigo);
             await sleep(4000); // Pausa de 4 segundos
             let aviso = await avisoConfirmado('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + codigo, 'success');
+            isFunctionExecuting = false;
 
             if (aviso) {
                 // recargar la pagina
@@ -687,6 +713,8 @@ boton.addEventListener('click', async (e) => {
 
         }
     }
+    isFunctionExecuting = false;
+
 });
 
 function sleep(ms) {

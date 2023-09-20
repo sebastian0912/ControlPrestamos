@@ -127,9 +127,14 @@ function verificaCondiciones(datos, nuevovalor) {
     let mes = fechaIngreso.split('-')[1];
     let anio = fechaIngreso.split('-')[2];
 
+    console.log(dia);
+    console.log(mes);
+    console.log(anio);
+
     // el año esta en formato xxaa y se debe convertir a 20aa
     let anioConvertido = '20' + anio;
     anio = anioConvertido;
+    console.log(anio);
 
     const sumaTotal =
         parseInt(datos.saldos) +
@@ -145,6 +150,8 @@ function verificaCondiciones(datos, nuevovalor) {
         parseInt(datos.anticipoLiquidacion) +
         parseInt(datos.cuentas);
 
+    console.log(sumaTotal);
+
     const fechaActual = new Date();
 
     if (parseInt(datos.saldos) >= 175001) {
@@ -159,12 +166,26 @@ function verificaCondiciones(datos, nuevovalor) {
         // conseguir la fecha actual y separarla en dia, mes y año para poder compararla con la fecha de ingreso del empleado            
         let mesActual = fechaActual.getMonth() + 1;
         let anioActual = fechaActual.getFullYear();
-        if ((anioActual == anio) && ((mesActual - mes) >= 2)) {
-            if (parseInt(nuevovalor) >= 200000) {
+        if ((anioActual == anio) && ((parseInt(mesActual) - parseInt(mes)) >= 2)) {
+            if (parseInt(nuevovalor) >= 200001) {
                 aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
                 return false;
             }
-            else if ((sumaTotal + parseInt(nuevovalor)) >= 350000) {
+            else if ((sumaTotal + parseInt(nuevovalor)) >= 350001) {
+                aviso('Ups no se pueden generar prestamos, puede sacar maximo ' + (350000 - (sumaTotal)), 'error');
+                return false;
+            }
+            else {
+                console.log("helloTrue");
+                return true;
+            }
+        }
+        else if ((parseInt(anioActual) > parseInt(anio))) {
+            if (parseInt(nuevovalor) >= 200001) {
+                aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
+                return false;
+            }
+            else if ((sumaTotal + parseInt(nuevovalor)) >= 350001) {
                 aviso('Ups no se pueden generar prestamos, puede sacar maximo ' + (350000 - (sumaTotal)), 'error');
                 return false;
             }
@@ -172,19 +193,12 @@ function verificaCondiciones(datos, nuevovalor) {
                 return true;
             }
         }
-        else if ((anioActual > anio)) {
-            if (parseInt(nuevovalor) >= 200000) {
-                aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
-                return false;
-            }
-            else if ((sumaTotal + parseInt(nuevovalor)) >= 350000) {
-                aviso('Ups no se pueden generar prestamos, puede sacar maximo ' + (350000 - (sumaTotal)), 'error');
-                return false;
-            }
-            else {
-                return true;
-            }
+        else {
+            aviso('Ups no se pueden generar prestamos, no tienes la antiguedad suficiente', 'error');
+            return false;
         }
+
+
     }
 }
 
@@ -323,6 +337,7 @@ async function escribirCodigo(cedulaEmpleado, nuevovalor, codigo, cuotas, tipo, 
 
 }
 
+let isFunctionExecuting = false; // Variable para rastrear si la función está en ejecución
 
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
@@ -332,36 +347,63 @@ boton.addEventListener('click', async (e) => {
     let cuotas = document.querySelector('#cuotas').value;
     let cedulaEmpleado = document.querySelector('#cedula').value;
 
+    console.log(cedulaEmpleado);
+
     let aux = await datosEmpleado(cedulaEmpleado);
-    console.log(aux.datosbase[0]);
     let datos = aux.datosbase[0];
 
+    console.log(datos);
+
+    if (isFunctionExecuting) {
+        // Puedes mostrar un mensaje o simplemente regresar sin hacer nada
+        aviso('Se esta ejecutando la funcion', 'warning');
+        return;
+    }
+
+    console.log("hello");
+
+    isFunctionExecuting = true; // Marcar la función como en ejecución
 
     // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
     if (datos == undefined) {
+        isFunctionExecuting = false;
         aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
         return;
     }
+    console.log(datos);
 
-    if (!verificaCondiciones(datos, parseInt(nuevovalor))) {
+    if (!verificaCondiciones(datos, nuevovalor) == true) {
+        isFunctionExecuting = false;
         return;
     }
 
+    console.log("hello1");
+
     if (valor == "") {
+        isFunctionExecuting = false;
         aviso('Ups no se pueden generar mercado, el monto no puede estar vacio', 'error');
         return;
     }
 
+    console.log("hello3");
+
     if (cuotas == "") {
+        isFunctionExecuting = false;
         aviso('Ups no se pueden generar mercado, las cuotas no pueden estar vacias', 'error');
         return;
     }
 
+    console.log("hello4");
+
     // si cuotas es mayor a 4
     if (parseInt(cuotas) > 4) {
+        isFunctionExecuting = false;
         aviso('Ups no se pueden generar mercado, las cuotas no pueden ser mayor a 4', 'error');
         return;
     }
+
+    
+    console.log("hello2");
 
     let empresa = null;
     let NIT = null;
@@ -376,10 +418,13 @@ boton.addEventListener('click', async (e) => {
 
     let confirmacion = await avisoConfirmado('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + codigo, 'success');
     console.log(confirmacion);
+    isFunctionExecuting = false;
+
     if (confirmacion) {
         // recargar la pagina
         location.reload();
     }
+    
 
     if (datos.temporal.startsWith("Apoyo") || datos.temporal.startsWith("APOYO")) {
         empresa = "APOYO LABORAL TS SAS";
@@ -451,7 +496,7 @@ boton.addEventListener('click', async (e) => {
     docPdf.save('PrestamoDescontar' + '_' + datos.nombre + "_" + codigo + '.pdf');
 
 
-    
+
 
 });
 

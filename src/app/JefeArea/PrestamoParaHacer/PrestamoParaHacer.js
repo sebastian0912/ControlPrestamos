@@ -293,6 +293,10 @@ function verificaCondiciones(datos, nuevovalor) {
                 return true;
             }
         }
+        else {
+            aviso('Ups no se pueden generar prestamos, el empleado no lleva mas de 2 meses en la empresa', 'error');
+            return false;
+        }
     }
 }
 
@@ -345,6 +349,8 @@ async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo, codig
 
 }
 
+let isFunctionExecuting = false; // Variable para rastrear si la función está en ejecución
+
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
     e.preventDefault();
@@ -357,15 +363,18 @@ boton.addEventListener('click', async (e) => {
     // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
 
     if (datos == undefined) {
+        isFunctionExecuting = false;
         aviso('Ups no se pueden generar el prestamo, el empleado no existe', 'error');
         return;
     }
 
     if (parseInt(datos.saldos) > 175000) {
+        isFunctionExecuting = false;
         aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
         return;
     }
     else if (parseInt(datos.fondos) > 0) {
+        isFunctionExecuting = false;
         aviso('Ups no se pueden generar prestamos perteneces al fondo', 'error');
         return;
     }
@@ -381,26 +390,39 @@ boton.addEventListener('click', async (e) => {
     datosPersona.innerHTML = datos.nombre;
 
     boton2.addEventListener('click', async (e) => {
+        e.preventDefault();
+        if (isFunctionExecuting) {
+            // Puedes mostrar un mensaje o simplemente regresar sin hacer nada
+            aviso('Se esta ejecutando la funcion', 'warning');
+            return;
+        }
+
+        isFunctionExecuting = true; // Marcar la función como en ejecución
+        
         let valor = document.querySelector('#valor').value;
         let nuevovalor = valor.replace(/\,/g, '');
         let cuotas = document.querySelector('#cuotas').value;
         let tipo = document.querySelector('#tipo').value;
-        
+
         let cuotasAux = cuotas;
 
         if (!verificaCondiciones(datos, nuevovalor) == true) {
+            isFunctionExecuting = false;
             return;
         }
 
         if (!verificaSelect(formaPago)) {
+            isFunctionExecuting = false;
             return;
         }
 
         if (!verificaSelect2(tipo)) {
+            isFunctionExecuting = false;
             return;
         }
 
         if (valor == "") {
+            isFunctionExecuting = false;
             aviso('Ups no se pueden generar mercado, el monto no puede estar vacio', 'error');
             return;
         }
@@ -409,6 +431,7 @@ boton.addEventListener('click', async (e) => {
         if (formaPago.value != "Efectivo" && formaPago.value != "0" && formaPago.value != "Otro") {
             // campo celular debe tener 10 digitos
             if (celular.value.length != 10) {
+                isFunctionExecuting = false;
                 aviso('Ups no se pueden generar mercado, el número proporcionado debe tener 10 digitos', 'error');
                 return;
             }
@@ -438,12 +461,14 @@ boton.addEventListener('click', async (e) => {
         }
 
         if (cuotasAux == "") {
+            isFunctionExecuting = false;
             aviso('Ups no se pueden generar mercado, las cuotas no pueden estar vacias', 'error');
             return;
         }
 
         // si cuotas es mayor a 4
         if (parseInt(cuotasAux) > 4) {
+            isFunctionExecuting = false;
             aviso('Ups no se pueden generar mercado, las cuotas no pueden ser mayor a 4', 'error');
             return;
         }
@@ -525,13 +550,16 @@ boton.addEventListener('click', async (e) => {
         docPdf.save('PrestamoDescontar' + '_' + datos.nombre + "_" + codigoOH + '.pdf');
 
         let confirmacion = await avisoConfirmado('Acaba de pedir una autorización de prestamo de dinero por un valor de ' + valor + ' su codigo es: ' + codigoOH, 'success');
-        
-        
+
+
         if (confirmacion) {
             // recargar la pagina
             location.reload();
-        
+
         }
+
+        isFunctionExecuting = false;
+
     });
 });
 

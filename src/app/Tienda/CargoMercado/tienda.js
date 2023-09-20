@@ -249,6 +249,11 @@ function verificaCondiciones(datos, nuevovalor) {
                 return true;
             }
         }
+        else {
+            aviso("Ups no se pueden generar mercado, el empleado no tiene los dias suficientes para pedir prestamo", "error");
+            return false;
+        }
+
     }
 }
 
@@ -574,9 +579,17 @@ function esCodigoValido(fechaGeneradoStr) {
     }
 }
 
+let isFunctionExecuting = false; // Variable para rastrear si la función está en ejecución
+
 boton.addEventListener('click', async (e) => {
     e.preventDefault();
+    if (isFunctionExecuting) {
+        // Puedes mostrar un mensaje o simplemente regresar sin hacer nada
+        aviso('Se esta ejecutando la funcion', 'warning');
+        return;
+    }
 
+    isFunctionExecuting = true; // Marcar la función como en ejecución
     // capturar los datos del formulario
     const cedulaEmpleado = document.querySelector('#cedula').value;
     const codigoP = document.querySelector('#codigo').value;
@@ -586,6 +599,7 @@ boton.addEventListener('click', async (e) => {
     let concepto;
 
     if (codigoP == '') {
+        isFunctionExecuting = false;
         aviso('El campo codigo no puede estar vacio', 'error');
     }
 
@@ -605,26 +619,31 @@ boton.addEventListener('click', async (e) => {
         }*/
 
         if (!verificarCodigo(codigoP, datos)) {
+            isFunctionExecuting = false;
             aviso('El codigo no existe', 'error');
             return;
         }
 
         if (!verificarCodigoEstado(codigoP, datos)) {
+            isFunctionExecuting = false;
             aviso('El codigo ya fue usado', 'error');
             return
         }
         
         if (!verificarCedula(codigoP, cedulaEmpleado, datos)) {
+            isFunctionExecuting = false;
             aviso('El codigo no pertenece a este empleado', 'error');
             return;
         }
 
         if (verificaSiesUnPrestamo(codigoP)) {
+            isFunctionExecuting = false;
             aviso('El codigo no es valido solo se admiten mercado', 'error');
             return;
         }
 
         if (!verificaCondiciones(datosUsuario, parseInt(nuevovalor)) == true) {
+            isFunctionExecuting = false;
             return;
         }
 
@@ -645,6 +664,7 @@ boton.addEventListener('click', async (e) => {
         await historialT(nuevovalor);
         await actualizarDatosBase(concepto, nuevovalor, 2, cedulaEmpleado);
         await sleep(4000); // Pausa de 4 segundos
+        isFunctionExecuting = false;
 
         let confirmacion = await avisoConfirmado('Acaba de pedir un mercado de ' + valor + ' su codigo es: ' + codigoAux, 'success');
 

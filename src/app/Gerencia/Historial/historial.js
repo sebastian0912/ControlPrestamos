@@ -132,7 +132,7 @@ boton.addEventListener('click', async (e) => {
     datosExtraidos.historial.forEach(async (p) => {
         // Verificar si p.nombreQuienEntrego es null y mostrar una cadena vacía en su lugar
         const nombreQuienEntrego = p.nombreQuienEntrego !== null ? p.nombreQuienEntrego : '';
-        
+
         // Insertar al principio de la tabla
         tabla.insertAdjacentHTML('afterbegin', `
             <tr>
@@ -275,11 +275,11 @@ extraeHistorialT.addEventListener('click', async () => {
             const fechaParts = doc.fechaEfectuado.split('-');
             const mes = fechaParts[1];
             let dia = fechaParts[2];
-        
+
             if (!historialPorMes[mes]) {
                 historialPorMes[mes] = { '13-27': [], '28-12': [] };
             }
-        
+
             // Si el día está en el rango del 28 al 31, asignar el siguiente mes
             if (dia >= 28) {
                 const siguienteMes = (parseInt(mes) + 1).toString().padStart(2, '0');
@@ -287,20 +287,20 @@ extraeHistorialT.addEventListener('click', async () => {
                 dia = dia <= 12 ? `0${dia}` : dia;
                 mes = siguienteMes;
             }
-        
+
             const grupo = dia >= 13 && dia <= 27 ? '13-27' : '28-12';
-        
+
             // Utilizar una expresión regular para encontrar "de" o "en" seguido del lugar
             const lugarMatch = doc.concepto.match(/(?:de|en)\s+(.+)/i);
-        
+
             if (lugarMatch) {
                 const lugar = lugarMatch[1]; // El segundo grupo capturado es el lugar
                 doc.lugar = lugar; // Asignar el valor al campo "lugar"
             }
-        
+
             historialPorMes[mes][grupo].push(doc);
         }
-    });     
+    });
 
 
     // Crear un archivo Excel con hojas internas para cada mes
@@ -355,19 +355,19 @@ async function datosTCodigos() {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtKey = obj.jwt;
-    
+
     const headers = {
         'Authorization': jwtKey
     };
-    
+
     const urlcompleta = urlBack.url + '/Codigo/codigos';
-    
+
     try {
         const response = await fetch(urlcompleta, {
             method: 'GET',
             headers: headers,
         });
-        
+
         if (response.ok) {
             const responseData = await response.json();
             console.log(responseData);

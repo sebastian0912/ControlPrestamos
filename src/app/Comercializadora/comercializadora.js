@@ -116,12 +116,23 @@ datosComercializadoraGeneral = await datosTComercio();
 let miArray = datosComercializadoraGeneral.comercio;
 console.log(miArray);
 
+// ordernar por fecha 
+miArray.sort(function (a, b) {
+    if (a.fechaEnviada > b.fechaEnviada) {
+        return -1;
+    }
+    if (a.fechaEnviada < b.fechaEnviada) {
+        return 1;
+    }
+    return 0;
+});
 
 miArray.forEach((p) => {
     if (p.fechaRecibida == null) {
         p.fechaRecibida = "";
     }
-    tabla.innerHTML += `
+    if (p.PersonaEnvia == usernameLocal) {
+        tabla.innerHTML += `
         <tr>
             <td>${p.codigo}</td>
             <td>${p.concepto}</td>
@@ -135,8 +146,7 @@ miArray.forEach((p) => {
             <td>${p.fechaEnviada}</td>
             <td>${p.fechaRecibida}</td>
         </tr>
-    `
-
+    `}
 });
 
 let datos = [];
@@ -164,6 +174,17 @@ let agrupado = miArray.reduce((acumulador, item) => {
 
 // Convertimos el objeto acumulador a una matriz para su uso posterior
 agrupado = Object.values(agrupado);
+
+// ordenar por lugar 
+agrupado.sort(function (a, b) {
+    if (a.destino > b.destino) {
+        return 1;
+    }
+    if (a.destino < b.destino) {
+        return -1;
+    }
+    return 0;
+});
 
 // Ahora puedes usar 'agrupado' para generar tu tabla:
 agrupado.forEach((p) => {

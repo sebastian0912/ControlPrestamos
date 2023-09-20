@@ -225,8 +225,8 @@ select {
 
 
 .tabla {
-  width: 900px;
-  height: 40%;
+  width: 1000px;
+  height: 300px;
   overflow: auto;
   max-height: 50%;
   background: #ffffff;

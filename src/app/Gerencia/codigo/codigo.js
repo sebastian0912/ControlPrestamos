@@ -492,11 +492,11 @@ extraeHistorialT.addEventListener('click', async () => {
             const fechaParts = doc.fechaEfectuado.split('-');
             const mes = fechaParts[1];
             let dia = fechaParts[2];
-        
+
             if (!historialPorMes[mes]) {
                 historialPorMes[mes] = { '13-27': [], '28-12': [] };
             }
-        
+
             // Si el día está en el rango del 28 al 31, asignar el siguiente mes
             if (dia >= 28) {
                 const siguienteMes = (parseInt(mes) + 1).toString().padStart(2, '0');
@@ -504,20 +504,20 @@ extraeHistorialT.addEventListener('click', async () => {
                 dia = dia <= 12 ? `0${dia}` : dia;
                 mes = siguienteMes;
             }
-        
+
             const grupo = dia >= 13 && dia <= 27 ? '13-27' : '28-12';
-        
+
             // Utilizar una expresión regular para encontrar "de" o "en" seguido del lugar
             const lugarMatch = doc.concepto.match(/(?:de|en)\s+(.+)/i);
-        
+
             if (lugarMatch) {
                 const lugar = lugarMatch[1]; // El segundo grupo capturado es el lugar
                 doc.lugar = lugar; // Asignar el valor al campo "lugar"
             }
-        
+
             historialPorMes[mes][grupo].push(doc);
         }
-    });     
+    });
 
 
     // Crear un archivo Excel con hojas internas para cada mes
@@ -837,7 +837,7 @@ async function CambiarEstado(cod, valor, codigo) {
                     throw new Error('Error en la petición POST');
                 }
             })
-            .then(responseData => {                
+            .then(responseData => {
                 console.log('Respuesta:', responseData);
             })
             .catch(error => {
@@ -902,9 +902,21 @@ function esCodigoValido(fechaGeneradoStr) {
     }
 }
 
+let isFunctionExecuting = false; // Variable para rastrear si la función está en ejecución
+
+
 boton.addEventListener('click', async (e) => {
 
     e.preventDefault();
+
+    if (isFunctionExecuting) {
+        // Puedes mostrar un mensaje o simplemente regresar sin hacer nada
+        aviso('Se esta ejecutando la funcion', 'warning');
+        return;
+    }
+
+    isFunctionExecuting = true; // Marcar la función como en ejecución
+
     // capturar los datos del formulario
     let cedulaEmpleado = document.querySelector('#cedula').value;
     let codigoP = document.querySelector('#codigo').value;
@@ -915,15 +927,18 @@ boton.addEventListener('click', async (e) => {
     let concepto2;
 
     if (codigoP == '') {
+        isFunctionExecuting = false;
         aviso('El campo codigo no puede estar vacio', 'error');
     }
 
     // valor no sea 
     if (valor == '') {
+        isFunctionExecuting = false;
         aviso('El campo codigo no puede estar vacio', 'error');
     }
 
     if (cuotas == "") {
+        isFunctionExecuting = false;
         aviso('Ups no se pueden generar mercado, las cuotas no pueden estar vacias', 'error');
         return;
     }
@@ -934,7 +949,7 @@ boton.addEventListener('click', async (e) => {
     console.log(aux2.datosbase[0]);
     let usuario = aux2.datosbase[0];
     console.log(usuario);
-    
+
     const cod = obtenerCodigo(codigoP, aux.codigo);
 
     /*if (!esCodigoValido(cod.fechaGenerado)) {
@@ -943,26 +958,31 @@ boton.addEventListener('click', async (e) => {
     }*/
 
     if (!verificarCodigo(codigoP, aux.codigo)) {
+        isFunctionExecuting = false;
         aviso('El código no existe', 'error');
         return;
     }
     if (!verificarCodigoEstado(codigoP, aux.codigo)) {
+        isFunctionExecuting = false;
         aviso('El código ya fue usado', 'error');
         return;
     }
     if (!verificarCedula(codigoP, cedulaEmpleado, aux.codigo)) {
+        isFunctionExecuting = false;
         aviso('El código no pertenece a este empleado', 'error');
         return;
     }
     if (!verificaMonto(parseInt(nuevovalor), aux.codigo)) {
+        isFunctionExecuting = false;
         aviso('El monto del prestamo es mayor al permitido generado con el código ', 'error');
         return;
     }
     if (!verificaSiesUnPrestamo(codigoP)) {
+        isFunctionExecuting = false;
         aviso('El código no es valido solo se admiten prestamos', 'error');
         return;
     }
-      
+
 
     else {
         let concepto = null;
@@ -981,17 +1001,19 @@ boton.addEventListener('click', async (e) => {
             concepto = 'Libranza_Otro_concepto';
         }
 
-        await actualizar(codigo, cod.codigo, usernameLocal, nuevovalor, cuotas);       
-        await actualizarDatosBase(concepto2, nuevovalor, cuotas, cedulaEmpleado);        
-        await CambiarEstado(cod.codigo, nuevovalor, codigo);        
-        await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, concepto,codigo, cod.generadoPor)      
+        await actualizar(codigo, cod.codigo, usernameLocal, nuevovalor, cuotas);
+        await actualizarDatosBase(concepto2, nuevovalor, cuotas, cedulaEmpleado);
+        await CambiarEstado(cod.codigo, nuevovalor, codigo);
+        await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, concepto, codigo, cod.generadoPor)
         await sleep(2000); // Pausa de 2 segundos
         await ActualizarHistorial(codigo);
         await sleep(4000); // Pausa de 2 segundos
         document.getElementById('successSound').play();
 
+        isFunctionExecuting = false;
+
         let confirmacion = await avisoConfirmado('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + codigo, 'success');
-    
+
         if (confirmacion) {
             // recargar la pagina
             location.reload();
@@ -1002,7 +1024,7 @@ boton.addEventListener('click', async (e) => {
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
-  }
+}
 
 
 
