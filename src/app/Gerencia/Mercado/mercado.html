@@ -4,14 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../../reset.css" />
-    <link rel="stylesheet" href="historial.css" />
+    <link rel="stylesheet" href="mercado.css" />
 
     <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal@4/minimal.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
 
     <script defer src="../../logOut2.js" type="module"></script>
-    <script defer src="historial.js" type="module"></script>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+    <script defer src="mercado.js" type="module"></script>
+    
+    <script defer type="text/javascript" src="../../jspdf.es.min.js.js" type="module"></script>
 
 </head>
 
@@ -19,7 +20,6 @@
 
     <div class="opciones">
         <ul class="lista-Opciones">
-
 
             <li>
                 <a href="../gerencia.html">
@@ -45,7 +45,7 @@
 
 
             <li>
-                <a href="./historial.html">
+                <a href="../Historial/historial.html">
                     <img src="../../assets/historial-medico.png" alt="logo" class="logo" />
                     <p>Historial</p>
                 </a>
@@ -88,13 +88,13 @@
             </li>
 
             <li id="logout">
-                
+                <a href="">
                     <img src="../../assets/cerrar-sesion.png" alt="logo" class="logo" />
-                    <p>Cerrar Sesión</p>
-                
+                    <p>Cerrar Sesion</p>
+                </a>
             </li>
 
-            <h1 class="diasT"> Días restantes antes de fecha cierre de novedades de nomina </h1>
+            <h1 class="diasT"> Dias restantes antes de fecha cierre de novedades de nomina </h1>
             <span class="dias" id="diasRestantes"></span>
 
             <h1 class="diasT"> Días restantes antes de liquidación </h1>
@@ -116,38 +116,31 @@
 
     <div class="contenido">
         <div class="cuadroTexto">
-            <div class="cajaCedula">
-                <h1 class="titulo"> Digite el número de identificación del empleado a validar: </h1>
-                <input type="text" id="cedula" placeholder="Ingrese el número de identificación" class="input" />
-                <button class="btn" id="boton">Buscar</button>
+            <div class="valor">
+              <div class="valoresEscribir">
+                <h1 class="titulo" style="margin-right: 10px;"> Digite el número de identificación del empleado a validar:
+                </h1>
+                <input type="text" id="cedula" placeholder="Número de identificación" class="input" style="margin-left: 50px;" />
+                <button class="btn2" id="boton">Buscar</button>
+      
+                <input type="text" id="monto" placeholder="Valor" class="input2" style="display: none;" />
+                <select name="" id="formaPago" class="input2" style="display:none; margin-left: 20px">
+                  <option value="0">Forma Pago</option>
+                  <option value="Daviplata">Daviplata</option>
+                  <option value="Efectivo">Efectivo</option>
+                  <option value="Master">Mastercard</option>
+                  <option value="Otro">Otro</option>
+                </select>
+                <input type="text" id="celular" placeholder="" class="input2" style="margin-left: 50px; display:none" />
+                <button class="btn2" id="boton2" style="display: none; ">Cargar</button>
+      
+              </div>
             </div>
-
-        </div>
-
-        <div class="tabla" style="display: none;" id="oculto">
-            <table class="tabla-contenido">
-                <thead>
-                    <tr>
-                        <th>Cédula</th>
-                        <th>Concepto</th>
-                        <th>Fecha Efectuada</th>
-                        <th>Valor</th>
-                        <th>Cuotas</th>
-                        <th>Autorización Ejecutada por</th>
-                        <th>Generada por</th>
-                    </tr>
-                </thead>
-                <tbody id="tabla"> </tbody>
-            </table>
-        </div>
-
+            <h1 id="datosPersona" class="titulo" style="float: left; margin-left: 30px"></h1>
+      
+          </div>
 
     </div>
-
-
-
-
-
 </body>
 
 </html>

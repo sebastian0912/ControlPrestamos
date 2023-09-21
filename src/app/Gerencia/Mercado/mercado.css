@@ -9,6 +9,8 @@ body {
     font-family: 'Poppins', sans-serif;
 }
 
+
+
 h1 {
     margin: 0;
     padding: 0;
@@ -24,9 +26,10 @@ h1 {
 
 .dias {
     text-align: justify;
-    margin: 0px 0 10px 120px;
+    margin: 10px 0 20px 120px;
+
     font-family: 'Nunito Sans', sans-serif;
-    font-size: 16pt;
+    font-size: 20pt;
     font-weight: 600;
 }
 
@@ -64,7 +67,7 @@ li {
 
 }
 
-li:nth-child(1) {
+li:nth-child(7) {
     background: #bbd0ff;
     color: #000000;
     transform: scale(1.1);
@@ -122,7 +125,7 @@ header {
 
 .cajontitulo .titulo {
     float: left;
-    padding-left: 80px;
+    padding-left: 50px;
     padding-top: 20px;
     font-size: 25pt;
     font-weight: 600;
@@ -150,27 +153,9 @@ span {
     flex-direction: column;
 }
 
-.cuadro {
-    width: 250px;
-    height: 150px;
-    background: #ffffff;
-    margin: 50px 0 0 80px;
-    border-radius: 15px;
-    box-shadow: 0px 0px 12px 8px rgba(0, 0, 0, 0.1);
-    font-size: 16pt;
-    font-weight: 700;
-}
-
-.titulo-Opciones {
-    padding-left: 20px;
-    font-size: 12pt;
-    margin-top: 10px;
-}
-
-
 .cuadroTexto {
     width: 800px;
-    height: 300px;
+    height: 250px;
     background: #ffffff;
     margin: 50px 0 0 80px;
     border-radius: 15px;
@@ -179,13 +164,43 @@ span {
     font-weight: 700;
 }
 
-.cajaCedula {
-    margin: 0px 0 20px 30px;
+
+.valor {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
 }
 
-.cajaCedula .titulo {
-    margin-top: 30px;
+
+.valor .titulo {
+    margin: 5px 50px 30px 30px;
     float: left;
+}
+
+
+#monto {
+    margin-left: 50px; /* Ajusta este valor según sea necesario */
+}
+
+#formaPago {
+    margin-left: 20px; /* Ajusta este valor según sea necesario */
+}
+
+#celular {
+    margin-top: 20px;
+}
+
+#boton2 {
+    margin-left: 20px; /* Ajusta este valor según sea necesario */
+}
+
+
+select {
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    margin: 0 50px 20px 30px;
+    width: 240px;
+    height: 50px;
 }
 
 
@@ -209,12 +224,6 @@ span {
     outline: none;
 }
 
-.valor {
-    flex: 1 100%;
-    height: auto;
-    text-align: center;
-    margin-left: -150px;
-}
 
 .input2 {
     font-family: 'Poppins', sans-serif;
@@ -228,7 +237,7 @@ span {
     border-style: solid;
     border-radius: 11px;
     box-shadow: 0px 0px 5px rgba(66, 66, 66, 0.75);
-    margin: 0 50px 0 -25px;
+    margin: 0 50px 0 -300px;
     position: relative;
 }
 
@@ -249,140 +258,19 @@ span {
     transition: 1000ms;
     cursor: pointer;
     font-family: 'Poppins', sans-serif;
-    margin: 40px 0px -40px 630px;
-    
 }
 
-
-.tabla {
-    width: 800px;
-    height: 600px;
-    overflow: auto;
-    max-height: 50%;
-    background: #ffffff;
-    margin: 50px 0 0 80px;
-    border-radius: 15px;
-    box-shadow: 0px 0px 12px 8px rgba(0, 0, 0, 0.1);
-}
-
-.tabla-contenido {
-    width: 100%;
-    margin: 0;
-    border-collapse: collapse;
-    border-spacing: 0;
-    font-family: 'Nunito Sans', sans-serif;
-    font-size: 12pt;
-    text-align: center;
-}
-
-.tabla-contenido tr:nth-child(even) {
-    background-color: #f2f2f2;
-    /* color para filas pares */
-}
-
-.tabla-contenido tr:nth-child(odd) {
-    background-color: #cccccc;
-    /* color para filas impares */
-}
-
-th,
-td {
-    vertical-align: middle;
-}
-
-th {
-    border-bottom: #b9b9b9 1px solid;
-    padding: 15px;
-    background: #5e6a75;
-    color: #ffffff;
-    font-weight: 400;
-}
-
-tr {
-    height: 40px;
-
-}
-
-
-
-/* switch */
-
-.onoffswitch {
-    position: relative;
-    width: 90px;
-    margin: 50px 0 0 95px;
-  }
-  
-  .onoffswitch-checkbox {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-  }
-  
-  .onoffswitch-label {
-    display: block;
-    overflow: hidden;
+.btn2 {
+    height: 50px;
+    font-weight: 600;
+    font-size: 16px;
+    color: #fff;
+    background-color: #0066cc;
+    padding: 10px 30px;
+    border: 2px solid #0066cc;
+    box-shadow: rgb(0, 0, 0) 0px 0px 0px 0px;
+    border-radius: 50px;
+    transition: 1000ms;
     cursor: pointer;
-    border:2px solid #1157FB;
-    border-radius: 21px;
-  }
-  
-  .onoffswitch-inner {
-    display: block;
-    width: 200%;
-    margin-left: -100%;
-    transition: margin 0.3s ease-in 0s;
-  }
-  
-  .onoffswitch-inner:before,
-  .onoffswitch-inner:after {
-    display: block;
-    float: left;
-    width: 50%;
-    height: 30px;
-    padding: 0;
-    line-height: 30px;
-    font-size: 14px;
-    color: white;
-    font-family: Trebuchet, Arial, sans-serif;
-    font-weight: bold;
-    box-sizing: border-box;
-  }
-  
-  .onoffswitch-inner:before {
-    content: "ON";
-    padding-left: 10px;
-    background-color: #1157FB;
-    color: #FFFFFF;
-  }
-  
-  .onoffswitch-inner:after {
-    content: "OFF";
-    padding-right: 10px;
-    background-color: #EEEEEE;
-    color: #1157FB;
-    text-align: right;
-  }
-  
-  .onoffswitch-switch {
-    display: block;
-    width: 18px;
-    margin: 6px;
-    background: #FFFFFF;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 56px;
-    border: 2px solid #1157FB;
-    border-radius: 20px;
-    transition: all 0.3s ease-in 0s;
-  }
-  
-  .onoffswitch-checkbox:checked+.onoffswitch-label .onoffswitch-inner {
-    margin-left: 0;
-  }
-  
-  .onoffswitch-checkbox:checked+.onoffswitch-label .onoffswitch-switch {
-    right: 0px;
-  }
-  
+    font-family: 'Poppins', sans-serif;
+}

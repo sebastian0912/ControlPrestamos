@@ -359,7 +359,7 @@ boton.addEventListener('click', async (e) => {
 
     // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
 
-    if (datos == undefined) {
+    if (datos == undefined || datos == "error") {
         aviso('Ups no se pueden generar el prestamo, el empleado no existe', 'error');
         return;
     }

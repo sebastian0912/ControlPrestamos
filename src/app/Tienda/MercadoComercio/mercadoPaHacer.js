@@ -94,6 +94,24 @@ numemoroM.addEventListener('keyup', (e) => {
 });
 
 
+if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen") {
+    lola.style.display = "inline-block";
+}
+else {
+    lola.style.display = "none";
+}
+
+
+if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen"
+    || usernameLocal == "Señora Lola" || usernameLocal == "SEÑORA LOLA" || usernameLocal == "señora lola"
+    || usernameLocal == "Señor Luis" || usernameLocal == "SEÑOR LUIS" || usernameLocal == "señor luis") {
+    lola2.style.display = "inline-block";
+}
+else {
+    lola2.style.display = "none";
+}
+
+
 async function escribirCodigo(cedulaEmpleado, nuevovalor, cod, valor) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
@@ -531,7 +549,7 @@ boton.addEventListener('click', async (e) => {
     console.log(aux.datosbase[0]);
     let datos = aux.datosbase[0];
 
-    if (datos == undefined) {
+    if (datos == undefined || datos == "error") {
         isFunctionExecuting = false;
         aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
         return;

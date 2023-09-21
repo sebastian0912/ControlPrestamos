@@ -9,6 +9,22 @@ body {
   font-family: 'Poppins', sans-serif;
 }
 
+.btn {
+  height: 50px;
+  font-weight: 600;
+  font-size: 16px;
+  color: #fff;
+  background-color: #0066cc;
+  padding: 10px 30px;
+  border: 2px solid #0066cc;
+  box-shadow: rgb(0, 0, 0) 0px 0px 0px 0px;
+  border-radius: 50px;
+  transition: 1000ms;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  margin: 0px 0px -40px 630px;
+  
+}
 
 h1 {
   margin: 0;

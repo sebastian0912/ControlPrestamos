@@ -343,7 +343,7 @@ boton.addEventListener('click', async (e) => {
     console.log(aux.datosbase[0]);
     let datos = aux.datosbase[0];
 
-    if (datos == undefined) {
+    if (datos == undefined || datos == "error") {
         aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
         return;
     }
@@ -375,7 +375,7 @@ boton.addEventListener('click', async (e) => {
 
         let codigoOH = 'M' + Math.floor(Math.random() * 1000000);
 
-        if (datos == undefined) {
+        if (datos == undefined || datos == "error") {
             aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
             return;
         }

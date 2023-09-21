@@ -931,8 +931,9 @@ boton.addEventListener("click", async (e) => {
 
         // modificar en la tabla codigos el estado del codigo a false para que no pueda ser usado nuevamente
         await CambiarEstado(cod.codigo, sumaVentas, codigAux);
+        await sleep(1000); // Pausa de 2 segundos
         await actualizar(codigAux, cod.codigo, usernameLocal, sumaVentas, 2);
-
+        await sleep(1000); // Pausa de 2 segundos
         await actualizarVentas(cantidad, codigo, usernameLocal);       
 
         if (codigo2 != "") {
@@ -944,13 +945,13 @@ boton.addEventListener("click", async (e) => {
         if (codigo4 != "") {
             await actualizarVentas(cantidad4, codigo4, usernameLocal);
         }
-        
+        await sleep(1000); // Pausa de 2 segundos
         await actualizarDatos(cedula, sumaVentas, 2);      
-
+        await sleep(1000); // Pausa de 2 segundos
         await historialT(sumaVentas);
-
+        await sleep(1000); // Pausa de 2 segundos
         await escribirHistorial(cedula, sumaVentas, 2, "Compra tienda respecto a:" + concepto + " en " + sede, codigAux, cod.generadoPor);
-        await sleep(2000); // Pausa de 2 segundos
+        await sleep(1000); // Pausa de 2 segundos
         await ActualizarHistorial(codigAux);
         isFunctionExecuting = false;
 

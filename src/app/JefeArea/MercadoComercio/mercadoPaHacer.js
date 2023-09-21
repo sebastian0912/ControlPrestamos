@@ -525,13 +525,7 @@ let isFunctionExecuting = false; // Variable para rastrear si la función está 
 boton.addEventListener('click', async (e) => {
     e.preventDefault();
 
-    if (isFunctionExecuting) {
-        // Puedes mostrar un mensaje o simplemente regresar sin hacer nada
-        aviso('Se esta ejecutando la funcion', 'warning');
-        return;
-    }
 
-    isFunctionExecuting = true; // Marcar la función como en ejecución
     
     // capturar los datos del formulario
     let cedulaEmpleado = document.querySelector('#cedula').value;
@@ -539,8 +533,9 @@ boton.addEventListener('click', async (e) => {
     let aux = await datosEmpleado(cedulaEmpleado);
     console.log(aux.datosbase[0]);
     let datos = aux.datosbase[0];
+    console.log(datos);
 
-    if (datos == undefined) {
+    if (datos == undefined || datos == "error") {
         isFunctionExecuting = false;
         aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
         return;
@@ -566,6 +561,15 @@ boton.addEventListener('click', async (e) => {
 
     boton2.addEventListener('click', async (e) => {
         e.preventDefault();
+
+        if (isFunctionExecuting) {
+            // Puedes mostrar un mensaje o simplemente regresar sin hacer nada
+            aviso('Se esta ejecutando la funcion', 'warning');
+            return;
+        }
+    
+        isFunctionExecuting = true; // Marcar la función como en ejecución
+
         let valor = document.querySelector('#monto').value;
         let cuotas = document.querySelector('#cuotas').value;
         let nuevovalor = valor.replace(/\,/g, '');
@@ -601,15 +605,15 @@ boton.addEventListener('click', async (e) => {
         
 
         await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, valor)
-        await sleep(2000); // Pausa de 2 segundos
-
-
+        await sleep(1000); // Pausa de 1 segundos
         await CambiarEstado(codigoOH, nuevovalor, codigoOH);
+        await sleep(1000); // Pausa de 1 segundos
         await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, "Compra tienda de Ferias", codigoOH, usernameLocal);
-        await sleep(2000); // Pausa de 2 segundos
+        await sleep(1000); // Pausa de 1 segundos
         await ActualizarHistorial(codigoOH);
-
+        await sleep(1000); // Pausa de 1 segundos
         await historialT(nuevovalor);
+        await sleep(1000); // Pausa de 1 segundos
         await actualizarDatosBase("Compra tienda de Ferias", nuevovalor, cuotas, cedulaEmpleado);
 
 

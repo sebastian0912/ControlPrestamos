@@ -9,6 +9,7 @@ body {
     font-family: 'Poppins', sans-serif;
 }
 
+
 h1 {
     margin: 0;
     padding: 0;
@@ -64,7 +65,7 @@ li {
 
 }
 
-li:nth-child(1) {
+li:nth-child(6) {
     background: #bbd0ff;
     color: #000000;
     transform: scale(1.1);
@@ -249,140 +250,4 @@ span {
     transition: 1000ms;
     cursor: pointer;
     font-family: 'Poppins', sans-serif;
-    margin: 40px 0px -40px 630px;
-    
 }
-
-
-.tabla {
-    width: 800px;
-    height: 600px;
-    overflow: auto;
-    max-height: 50%;
-    background: #ffffff;
-    margin: 50px 0 0 80px;
-    border-radius: 15px;
-    box-shadow: 0px 0px 12px 8px rgba(0, 0, 0, 0.1);
-}
-
-.tabla-contenido {
-    width: 100%;
-    margin: 0;
-    border-collapse: collapse;
-    border-spacing: 0;
-    font-family: 'Nunito Sans', sans-serif;
-    font-size: 12pt;
-    text-align: center;
-}
-
-.tabla-contenido tr:nth-child(even) {
-    background-color: #f2f2f2;
-    /* color para filas pares */
-}
-
-.tabla-contenido tr:nth-child(odd) {
-    background-color: #cccccc;
-    /* color para filas impares */
-}
-
-th,
-td {
-    vertical-align: middle;
-}
-
-th {
-    border-bottom: #b9b9b9 1px solid;
-    padding: 15px;
-    background: #5e6a75;
-    color: #ffffff;
-    font-weight: 400;
-}
-
-tr {
-    height: 40px;
-
-}
-
-
-
-/* switch */
-
-.onoffswitch {
-    position: relative;
-    width: 90px;
-    margin: 50px 0 0 95px;
-  }
-  
-  .onoffswitch-checkbox {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-  }
-  
-  .onoffswitch-label {
-    display: block;
-    overflow: hidden;
-    cursor: pointer;
-    border:2px solid #1157FB;
-    border-radius: 21px;
-  }
-  
-  .onoffswitch-inner {
-    display: block;
-    width: 200%;
-    margin-left: -100%;
-    transition: margin 0.3s ease-in 0s;
-  }
-  
-  .onoffswitch-inner:before,
-  .onoffswitch-inner:after {
-    display: block;
-    float: left;
-    width: 50%;
-    height: 30px;
-    padding: 0;
-    line-height: 30px;
-    font-size: 14px;
-    color: white;
-    font-family: Trebuchet, Arial, sans-serif;
-    font-weight: bold;
-    box-sizing: border-box;
-  }
-  
-  .onoffswitch-inner:before {
-    content: "ON";
-    padding-left: 10px;
-    background-color: #1157FB;
-    color: #FFFFFF;
-  }
-  
-  .onoffswitch-inner:after {
-    content: "OFF";
-    padding-right: 10px;
-    background-color: #EEEEEE;
-    color: #1157FB;
-    text-align: right;
-  }
-  
-  .onoffswitch-switch {
-    display: block;
-    width: 18px;
-    margin: 6px;
-    background: #FFFFFF;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 56px;
-    border: 2px solid #1157FB;
-    border-radius: 20px;
-    transition: all 0.3s ease-in 0s;
-  }
-  
-  .onoffswitch-checkbox:checked+.onoffswitch-label .onoffswitch-inner {
-    margin-left: 0;
-  }
-  
-  .onoffswitch-checkbox:checked+.onoffswitch-label .onoffswitch-switch {
-    right: 0px;
-  }
-  

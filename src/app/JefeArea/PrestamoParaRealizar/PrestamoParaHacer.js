@@ -365,7 +365,7 @@ boton.addEventListener('click', async (e) => {
     isFunctionExecuting = true; // Marcar la función como en ejecución
 
     // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
-    if (datos == undefined) {
+    if (datos == undefined || datos == "error") {
         isFunctionExecuting = false;
         aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
         return;

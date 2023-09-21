@@ -352,7 +352,7 @@ boton.addEventListener('click', async (e) => {
         let nuevovalor = valor.replace(/\,/g, '');
         e.preventDefault();
 
-        let codigoOH = 'M' + Math.floor(Math.random() * 1000000);
+        let codigoOH = 'MG' + Math.floor(Math.random() * 1000000);
 
         if (valor == "") {
             aviso('Ups no se pueden generar mercado, el monto no puede estar vacio', 'error');
@@ -368,10 +368,6 @@ boton.addEventListener('click', async (e) => {
         }
         console.log(nuevovalor)
         console.log(datos)
-        console.log(verificaCondiciones(datos, nuevovalor))
-        if (!verificaCondiciones(datos, nuevovalor) == true) {
-            return;
-        }
 
         await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, valor)
         await escribirHistorial(cedulaEmpleado, nuevovalor, 2, 'Autorizacion de Mercado', codigoOH);

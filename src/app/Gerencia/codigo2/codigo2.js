@@ -611,7 +611,7 @@ boton.addEventListener('click', async (e) => {
 
     //console.log(datos.nombre);
     
-    if (datos == undefined) {
+    if (datos == undefined || datos == "error") {
         aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
         return;
     }
