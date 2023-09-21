@@ -663,7 +663,8 @@ boton.addEventListener('click', async (e) => {
 
         await historialT(nuevovalor);
         await actualizarDatosBase(concepto, nuevovalor, 2, cedulaEmpleado);
-        await sleep(4000); // Pausa de 4 segundos
+        await sleep(1000); // Pausa de 2 segundos
+
         isFunctionExecuting = false;
 
         let confirmacion = await avisoConfirmado('Acaba de pedir un mercado de ' + valor + ' su codigo es: ' + codigoAux, 'success');

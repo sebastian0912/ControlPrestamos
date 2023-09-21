@@ -535,10 +535,10 @@ boton.addEventListener('click', async (e) => {
     let datos = aux.datosbase[0];
     console.log(datos);
 
-    if (datos == undefined || datos == "error") {
-        isFunctionExecuting = false;
-        aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
-        return;
+    if (datos.datosbase == undefined || datos == "error") {
+        console.log("No existe");
+        aviso('Este usuario no existe, esta retirado o no pertenece a la empresa', 'warning');    
+        return;    
     }
 
     if (parseInt(datos.saldos) > 175000) {

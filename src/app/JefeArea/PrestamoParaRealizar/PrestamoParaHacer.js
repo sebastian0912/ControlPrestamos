@@ -365,11 +365,12 @@ boton.addEventListener('click', async (e) => {
     isFunctionExecuting = true; // Marcar la función como en ejecución
 
     // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
-    if (datos == undefined || datos == "error") {
-        isFunctionExecuting = false;
-        aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
-        return;
+    if (datos.datosbase == undefined || datos == "error") {
+        console.log("No existe");
+        aviso('Este usuario no existe, esta retirado o no pertenece a la empresa', 'warning');    
+        return;    
     }
+    
     console.log(datos);
 
     if (!verificaCondiciones(datos, nuevovalor) == true) {

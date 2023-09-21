@@ -634,15 +634,17 @@ boton.addEventListener('click', async (e) => {
         let codigoAux = 'MOH' + Math.floor(Math.random() * 1000000);
 
         await CambiarEstado(codigoP, nuevovalor, codigoAux);
+        await sleep(1000); // Pausa de 2 segundos
         await actualizar(codigoAux, codigoP, usernameLocal, nuevovalor, 2);
-
+        await sleep(1000); // Pausa de 2 segundos
         await escribirHistorial(cedulaEmpleado, nuevovalor, 2, concepto, codigoAux, cod.generadoPor);
-        await sleep(2000); // Pausa de 2 segundos
+        await sleep(1000); // Pausa de 2 segundos
         await ActualizarHistorial(codigoAux );
-
+        await sleep(1000); // Pausa de 2 segundos
         await historialT(nuevovalor, cod.generadoPor);
+        await sleep(1000); // Pausa de 2 segundos
         await actualizarDatosBase(concepto, nuevovalor, 2, cedulaEmpleado);
-        await sleep(4000); // Pausa de 4 segundos
+        await sleep(1000); // Pausa de 2 segundos
         isFunctionExecuting = false;
 
         let confirmacion = await avisoConfirmado('Acaba de pedir un mercado de ' + valor + ' su codigo es: ' + codigoAux, 'success');

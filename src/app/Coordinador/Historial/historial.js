@@ -104,6 +104,37 @@ async function datosH(cedulaEmpleado) {
     }
 }
 
+async function datosEmpleado(cedulaEmpleado) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Datosbase/tesoreria/' + cedulaEmpleado;
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
     e.preventDefault();
@@ -112,6 +143,15 @@ boton.addEventListener('click', async (e) => {
 
     const datosExtraidos = await datosH(cedulaEmpleado);
     console.log(datosExtraidos);
+
+    let aux = await datosEmpleado(cedulaEmpleado);
+    console.log(aux.datosbase[0]);
+    let datos = aux.datosbase[0];
+
+    if (datos.datosbase == undefined || datos == "error") {
+        console.log("No existe");
+        aviso('Este usuario no existe, esta retirado o no pertenece a la empresa', 'warning');    
+    }
     
     if (datosExtraidos.historial.length == 0) {
         aviso('No hay datos para mostrar', 'warning');

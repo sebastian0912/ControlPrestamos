@@ -549,10 +549,10 @@ boton.addEventListener('click', async (e) => {
     console.log(aux.datosbase[0]);
     let datos = aux.datosbase[0];
 
-    if (datos == undefined || datos == "error") {
-        isFunctionExecuting = false;
-        aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
-        return;
+    if (datos.datosbase == undefined || datos == "error") {
+        console.log("No existe");
+        aviso('Este usuario no existe, esta retirado o no pertenece a la empresa', 'warning');    
+        return;    
     }
 
     if (parseInt(datos.saldos) > 175000) {
@@ -619,15 +619,15 @@ boton.addEventListener('click', async (e) => {
         
 
         await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, valor)
-        await sleep(2000); // Pausa de 2 segundos
-
-
+        await sleep(1000); // Pausa de 2 segundos
         await CambiarEstado(codigoOH, nuevovalor, codigoOH);
+        await sleep(1000); // Pausa de 2 segundos
         await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, "Compra tienda de Ferias", codigoOH, usernameLocal);
-        await sleep(2000); // Pausa de 2 segundos
+        await sleep(1000); // Pausa de 2 segundos
         await ActualizarHistorial(codigoOH);
-
+        await sleep(1000); // Pausa de 2 segundos
         await historialT(nuevovalor);
+        await sleep(1000); // Pausa de 2 segundos
         await actualizarDatosBase("Compra tienda de Ferias", nuevovalor, cuotas, cedulaEmpleado);
 
 
