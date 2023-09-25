@@ -179,9 +179,19 @@ aux.codigo.forEach((c) => {
         arrayCodigos.push(c);
     }
 });
-console.log("a");
-console.log(arrayCodigos);
-console.log("b");
+
+// ordernar por fechaGenerado
+arrayCodigos.sort((a, b) => {
+    if (a.fechaGenerado < b.fechaGenerado) {
+        return 1;
+    }
+    if (a.fechaGenerado > b.fechaGenerado) {
+        return -1;
+    }
+    return 0;
+}
+);
+
 // Mostar contenido en una tabla
 arrayCodigos.forEach((c) => {
     tabla.innerHTML += `

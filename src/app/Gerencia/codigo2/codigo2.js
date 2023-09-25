@@ -299,6 +299,7 @@ async function datosEmpleado(cedulaEmpleado) {
             console.log(responseData);
             return responseData;
         } else {
+            aviso('Ups no se pueden generar prestamo, el empleado no existe', 'error');
             throw new Error('Error en la petición GET');
         }
     } catch (error) {
@@ -611,17 +612,13 @@ boton.addEventListener('click', async (e) => {
 
     //console.log(datos.nombre);
     
-    if (datos.datosbase == undefined || datos == "error") {
+    if (datos.datosbase == "error") {
         console.log("No existe");
         aviso('Este usuario no existe, esta retirado o no pertenece a la empresa', 'warning');    
         return;    
     }
     
-    if (parseInt(datos.saldos) > 175000) {
-        aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
-        return;
-    }
-    else if (parseInt(datos.fondos) > 0) {
+    if (parseInt(datos.fondos) > 0) {
         aviso('Ups no se pueden generar prestamos perteneces al fondo', 'error');
         return;
     }

@@ -368,11 +368,9 @@ function verificarCedula(codigoP, cedula, datos) {
 
 function verificaMonto(monto, datos) {
     let encontrado = false;
-    datos.forEach(doc => {
-        if (parseInt(doc.monto) >= monto) {
-            encontrado = true;
-        }
-    });
+    if (parseInt(datos.monto) >= monto) {
+        encontrado = true;
+    }
     return encontrado;
 }
 
@@ -477,6 +475,7 @@ async function datosEmpleado(cedulaEmpleado) {
             console.log(responseData);
             return responseData;
         } else {
+            aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
             throw new Error('Error en la petición GET');
         }
     } catch (error) {
@@ -632,7 +631,7 @@ async function CambiarEstado(cod, valor, codigo) {
                     throw new Error('Error en la petición POST');
                 }
             })
-            .then(responseData => {                
+            .then(responseData => {
                 console.log('Respuesta:', responseData);
             })
             .catch(error => {
@@ -831,8 +830,8 @@ boton.addEventListener("click", async (e) => {
     console.log("Codigo2: " + parseInt(datos2.valorUnidad));
     console.log("Codigo3: " + parseInt(datos3.valorUnidad));
     console.log("Codigo4: " + parseInt(datos4.valorUnidad));
-    
-    
+
+
     let sumaVentas = parseInt(cantidad) * parseInt(datos.valorUnidad) + parseInt(cantidad2) * auxValorUnidad2 + parseInt(cantidad3) * auxValorUnidad3 + parseInt(cantidad4) * auxValorUnidad4;
     let sumaCantidad = parseInt(cantidad) + parseInt(datos.cantidadTotalVendida);
     let sumaCantidad2 = parseInt(cantidad2) + parseInt(datos2.cantidadTotalVendida);
@@ -841,7 +840,7 @@ boton.addEventListener("click", async (e) => {
 
     console.log(sumaVentas);
     let cod = obtenerCodigo(codigoA, CodigosMercado);
-    
+
     if (sumaCantidad > datos.cantidadRecibida) {
         isFunctionExecuting = false;
         aviso("No se puede cargar el mercado del producto #1 porque la suma de la cantidad supera el inventario disponible. Lo máximo a sacar es " + (datos.cantidadRecibida - datos.cantidadTotalVendida), "error");
@@ -903,18 +902,27 @@ boton.addEventListener("click", async (e) => {
 
     if (verificarCodigo(codigoA, CodigosMercado) == true) {
 
-        if (!verificaCondiciones(usuario, sumaVentas) == true) {
-            isFunctionExecuting = false;
-            return;
+        if (codigoA.startsWith("MG")){
+            if (!verificaMonto(sumaVentas, cod) == true) {
+                isFunctionExecuting = false;
+                aviso("El monto supera el monto maximo permitido solicitado antes", "error");
+                return;
+            }
         }
+        else{
+            if (!verificaCondiciones (usuario, sumaVentas) == true) {
+                isFunctionExecuting = false;
+                return;
+            }
+        }        
 
         if (obtenerCodigo(codigoA, CodigosMercado) == null) {
             isFunctionExecuting = false;
             aviso("El codigo de autorizacion no existe", "error");
             return;
-        }  
+        }
 
-        let codigAux = "MOH" + Math.floor(Math.random() * 1000000+1);
+        let codigAux = "MOH" + Math.floor(Math.random() * 1000000 + 1);
         let concepto = datos.concepto;
 
         if (auxConcepto2) {
@@ -934,7 +942,7 @@ boton.addEventListener("click", async (e) => {
         await sleep(1000); // Pausa de 2 segundos
         await actualizar(codigAux, cod.codigo, usernameLocal, sumaVentas, 2);
         await sleep(1000); // Pausa de 2 segundos
-        await actualizarVentas(cantidad, codigo, usernameLocal);       
+        await actualizarVentas(cantidad, codigo, usernameLocal);
 
         if (codigo2 != "") {
             await actualizarVentas(cantidad2, codigo2, usernameLocal);
@@ -946,7 +954,7 @@ boton.addEventListener("click", async (e) => {
             await actualizarVentas(cantidad4, codigo4, usernameLocal);
         }
         await sleep(1000); // Pausa de 2 segundos
-        await actualizarDatos(cedula, sumaVentas, 2);      
+        await actualizarDatos(cedula, sumaVentas, 2);
         await sleep(1000); // Pausa de 2 segundos
         await historialT(sumaVentas);
         await sleep(1000); // Pausa de 2 segundos

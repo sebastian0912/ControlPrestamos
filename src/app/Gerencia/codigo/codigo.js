@@ -212,6 +212,7 @@ async function datosEmpleado(cedulaEmpleado) {
             console.log(responseData);
             return responseData;
         } else {
+            aviso('Ups no se pueden generar prestamo, el empleado no existe', 'error');
             throw new Error('Error en la petición GET');
         }
     } catch (error) {

@@ -133,6 +133,7 @@ async function datosEmpleado(cedulaEmpleado) {
             console.log(responseData);
             return responseData;
         } else {
+            aviso('Ups no se encuentra el empleado, no existe', 'error');
             throw new Error('Error en la petición GET');
         }
     } catch (error) {
@@ -154,9 +155,9 @@ boton.addEventListener('click', async (e) => {
     console.log(aux.datosbase[0]);
     let datos = aux.datosbase[0];
 
-    if (datos.datosbase == undefined || datos == "error") {
+    if (aux.datosbase == "error") {
         console.log("No existe");
-        aviso('Este usuario no existe, esta retirado o no pertenece a la empresa', 'warning');    
+        aviso('Este usuario no existe, esta retirado o no pertenece a la empresa', 'warning');
     }
 
     console.log(datosExtraidos);
@@ -173,7 +174,7 @@ boton.addEventListener('click', async (e) => {
     datosExtraidos.historial.forEach(async (p) => {
         // Verificar si p.nombreQuienEntrego es null y mostrar una cadena vacía en su lugar
         const nombreQuienEntrego = p.nombreQuienEntrego !== null ? p.nombreQuienEntrego : '';
-        
+
         // Insertar al principio de la tabla
         tabla.insertAdjacentHTML('afterbegin', `
             <tr>
