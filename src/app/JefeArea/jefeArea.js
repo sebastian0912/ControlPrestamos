@@ -110,6 +110,36 @@ async function datosTCodigos() {
     }
 }
 
+async function datos() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Datosbase/tesoreria';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
 /* Obtener codigos de la base de datos */
 const aux = await datosTCodigos();
 let arrayCodigos = [];
@@ -266,8 +296,9 @@ async function estadoSoli(checked) {
 HistorialDe.addEventListener("click", async function () {
     console.log("Historial de entregas");
     let arrayaux, arrayHistorial = [];
-    arrayaux = await THistorial();   
-    
+    arrayaux = await THistorial();
+
+
     arrayaux.historial.forEach((h) => {
         if (h.nombreQuienEntrego == usernameLocal) {
             arrayHistorial.push(h);
@@ -306,15 +337,22 @@ HistorialDe.addEventListener("click", async function () {
 
     // Crear un archivo Excel con hojas internas para cada fecha
     const wb = XLSX.utils.book_new();
+    var nombres = [];
+    const datosbase = await datos();
 
     for (const fecha in historialPorFecha) {
         const historialFecha = historialPorFecha[fecha].registros;
 
-        const excelData = [['Cedula', 'Codigo', 'Concepto', 'Cuotas', 'Fecha Efectuado', 'Generado Por', 'Hora Efectuado', 'Nombre Quien Entregó', 'Valor']];
+        const excelData = [['Cedula', 'Nombre', 'Codigo', 'Concepto', 'Cuotas', 'Fecha Efectuado', 'Generado Por', 'Hora Efectuado', 'Nombre Quien Entregó', 'Valor']];
 
         historialFecha.forEach((h) => {
+            // Buscar el nombre correspondiente en datosbase
+            const nombreEncontrado = datosbase.datosbase.find((persona) => persona.numero_de_documento === h.cedula);
+            const nombre = nombreEncontrado ? nombreEncontrado.nombre : ''; // Nombre si se encuentra, cadena vacía si no
+
             excelData.push([
                 h.cedula,
+                nombre, // Agregar el nombre aquí
                 h.codigo,
                 h.concepto,
                 Number(h.cuotas),
@@ -322,13 +360,36 @@ HistorialDe.addEventListener("click", async function () {
                 h.generadopor,
                 h.horaEfectuado,
                 h.nombreQuienEntrego,
-                Number(h.valor)
+                Number(h.valor),
             ]);
         });
 
         const ws = XLSX.utils.aoa_to_sheet(excelData);
         XLSX.utils.book_append_sheet(wb, ws, fecha);
     }
+
+
+    const TotalHistorial = [['Cedula', 'Nombre', 'Codigo', 'Concepto', 'Cuotas', 'Fecha Efectuado', 'Generado Por', 'Hora Efectuado', 'Nombre Quien Entregó', 'Valor']];
+
+    arrayHistorial.forEach((h) => {
+        const nombreEncontrado = datosbase.datosbase.find((persona) => persona.numero_de_documento === h.cedula);
+        const nombre = nombreEncontrado ? nombreEncontrado.nombre : ''; // Nombre si se encuentra, cadena vacía si no
+        TotalHistorial.push([
+            h.cedula,
+            nombre, // Agregar el nombre aquí
+            h.codigo,
+            h.concepto,
+            Number(h.cuotas),
+            h.fechaEfectuado,
+            h.generadopor,
+            h.horaEfectuado,
+            h.nombreQuienEntrego,
+            Number(h.valor),
+        ]);
+    })
+
+    const ws = XLSX.utils.aoa_to_sheet(TotalHistorial);
+    XLSX.utils.book_append_sheet(wb, ws, "Total");
 
     // Crear hoja de resumen detallado
     const resumenDetalladoData = [['Fecha', 'Concepto', 'Cantidad de Registros', 'Monto Total']];

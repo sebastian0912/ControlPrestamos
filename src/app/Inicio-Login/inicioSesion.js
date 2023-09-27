@@ -4,6 +4,22 @@ import { urlBack, usuarioR } from "../models/base.js";
 
 const signInform = document.querySelector('#signIn-form');
 
+
+const icon = document.querySelector(".bx"), 
+        pas = document.getElementById("signIn-password")
+icon.addEventListener("click", e => {
+    if(pas.type === "password"){
+        pas.type = "text";
+        icon.classList.remove('bx-show-alt')
+        icon.classList.add("bx-hide")
+    }
+    else{
+        pas.type = "password"
+        icon.classList.remove('bc-hide')
+        icon.classList.add('bx-show-alt')
+    }
+})
+
 signInform.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -72,6 +88,7 @@ async function fetchData() {
         }
         return null; // Si no hay valores o hay errores, devuelve null
     } catch (error) {
+        aviso("Contecta el vpn","warning")
         console.error(error);
         return null; // En caso de error, devuelve null
     }

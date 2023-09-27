@@ -16,6 +16,8 @@
 </head>
 
 <body>
+    <div id="overlay" class="loader-overlay" style="display: none;"></div>
+
     <div class="opciones">
         <ul class="lista-Opciones">
 
@@ -48,10 +50,10 @@
             </li>
 
             <li id="logout">
-                
-                    <img src="../../assets/cerrar-sesion.png" alt="logo" class="logo" />
-                    <p>Cerrar Sesión</p>
-                
+
+                <img src="../../assets/cerrar-sesion.png" alt="logo" class="logo" />
+                <p>Cerrar Sesión</p>
+
             </li>
 
             <h1 class="diasT"> Días restantes antes de fecha cierre de novedades de nómina </h1>
@@ -71,6 +73,11 @@
             <h1 id="perfil" class="titulo"></h1>
         </div>
     </header>
+
+    <div id="loader" class="cajaloader" style="display: none;">
+        <h1 id="cont" class="contador" style="display: none;"></h1>
+        <div class="custom-loader"></div>
+    </div>
 
     <div class="contenido">
         <div class="cuadroTexto" id="cuerpo">
@@ -112,7 +119,7 @@
 
                     <input type="text" id="codigoA" placeholder="Código autorización" class="input2"
                         style="margin-top: 20px;" />
-                    
+
                     <button class="btn" id="boton">Cargar información</button>
                 </div>
             </div>

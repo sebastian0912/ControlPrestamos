@@ -581,6 +581,8 @@ function esCodigoValido(fechaGeneradoStr) {
 }
 
 let isFunctionExecuting = false; // Variable para rastrear si la función está en ejecución
+const over = document.querySelector('#overlay');
+const loader = document.querySelector('#loader');
 
 boton.addEventListener('click', async (e) => {
     e.preventDefault();
@@ -589,6 +591,9 @@ boton.addEventListener('click', async (e) => {
         aviso('Se esta ejecutando la funcion', 'warning');
         return;
     }
+
+    over.style.display = "block";
+    loader.style.display = "block";
 
     isFunctionExecuting = true; // Marcar la función como en ejecución
     // capturar los datos del formulario
@@ -630,7 +635,7 @@ boton.addEventListener('click', async (e) => {
             aviso('El codigo ya fue usado', 'error');
             return
         }
-        
+
         if (!verificarCedula(codigoP, cedulaEmpleado, datos)) {
             isFunctionExecuting = false;
             aviso('El codigo no pertenece a este empleado', 'error');
@@ -656,18 +661,20 @@ boton.addEventListener('click', async (e) => {
         let codigoAux = 'MOH' + Math.floor(Math.random() * 1000000);
 
         await CambiarEstado(codigoP, nuevovalor, codigoAux);
-        await actualizar(codigoAux, codigoP, usernameLocal, nuevovalor, 2);
-
-        await escribirHistorial(cedulaEmpleado, nuevovalor, 2, concepto, codigoAux, cod.generadoPor);
-        await sleep(2000); // Pausa de 2 segundos
-        await ActualizarHistorial(codigoAux);
-
-        await historialT(nuevovalor);
-        await actualizarDatosBase(concepto, nuevovalor, 2, cedulaEmpleado);
         await sleep(1000); // Pausa de 2 segundos
+        await actualizar(codigoAux, codigoP, usernameLocal, nuevovalor, 2);
+        await sleep(1000); // Pausa de 2 segundos
+        await escribirHistorial(cedulaEmpleado, nuevovalor, 2, concepto, codigoAux, cod.generadoPor);
+        await sleep(1000); // Pausa de 2 segundos
+        await ActualizarHistorial(codigoAux);
+        await sleep(1000); // Pausa de 2 segundos
+        await historialT(nuevovalor);
+        await sleep(1000); // Pausa de 2 segundos
+        await actualizarDatosBase(concepto, nuevovalor, 2, cedulaEmpleado);
 
         isFunctionExecuting = false;
-
+        over.style.display = "none";
+        loader.style.display = "none";
         let confirmacion = await avisoConfirmado('Acaba de pedir un mercado de ' + valor + ' su codigo es: ' + codigoAux, 'success');
 
         if (confirmacion) {

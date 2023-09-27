@@ -16,7 +16,8 @@ const sede = localStorage.getItem("sede");
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
 
-
+const over = document.querySelector('#overlay');
+const loader = document.querySelector('#loader');
 
 // Obtén la fecha actual
 var ahora = new Date();
@@ -746,6 +747,9 @@ boton.addEventListener("click", async (e) => {
         return;
     }
 
+    over.style.display = "block";
+    loader.style.display = "block";
+
     isFunctionExecuting = true; // Marcar la función como en ejecución
 
     let cedula = document.querySelector("#cedula").value;
@@ -961,6 +965,10 @@ boton.addEventListener("click", async (e) => {
         await escribirHistorial(cedula, sumaVentas, 2, "Compra tienda respecto a:" + concepto + " en " + sede, codigAux, cod.generadoPor);
         await sleep(1000); // Pausa de 2 segundos
         await ActualizarHistorial(codigAux);
+
+        over.style.display = "none";
+        loader.style.display = "none";
+
         isFunctionExecuting = false;
 
         let confirmacion = await avisoConfirmado('Acaba de pedir un mercado de ' + sumaVentas + ' su codigo es: ' + codigAux, 'success');

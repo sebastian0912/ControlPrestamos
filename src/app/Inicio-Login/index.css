@@ -246,3 +246,10 @@ input:focus {
   height: 40px;
   width: 40px;
 }
+
+.bx{
+  font-size: 25px;
+  transform: translateY(-40px);
+  margin-left: 230px;
+  cursor: pointer;
+}

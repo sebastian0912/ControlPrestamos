@@ -703,7 +703,6 @@ boton.addEventListener('dblclick', async (e) => {
             await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, concepto, codigo, cod.generadoPor)
             await sleep(2000); // Pausa de 2 segundos
             await ActualizarHistorial(codigo);
-            await sleep(4000); // Pausa de 4 segundos
             let aviso = await avisoConfirmado('Acaba de pedir un prestamo de ' + valor + ' su codigo es: ' + codigo, 'success');
             isFunctionExecuting = false;
 
