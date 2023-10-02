@@ -20,7 +20,6 @@
     <div class="opciones">
         <ul class="lista-Opciones">
 
-
             <li>
                 <a href="./gerencia.html">
                     <img src="../assets/pagina-de-inicio.png" alt="logo" class="logo" />
@@ -60,58 +59,37 @@
 
             <li>
                 <a href="./CargoMercado/tienda.html">
-                  <img src="../assets/mercado.png" alt="logo" class="logo" />
-                  <p> Cargar Mercado </p>
+                    <img src="../assets/mercado.png" alt="logo" class="logo" />
+                    <p> Cargar Mercado </p>
                 </a>
             </li>
 
             <li>
                 <a href="./Mercado/mercado.html">
-                  <img src="../assets/mercado.png" alt="logo" class="logo" />
-                  <p> Bono de mercado </p>
+                    <img src="../assets/mercado.png" alt="logo" class="logo" />
+                    <p> Bono de mercado </p>
                 </a>
             </li>
 
             <li>
                 <a href="./MercadoComercio/mercadoPaHacer.html">
-                  <img src="../assets/mercado.png" alt="logo" class="logo" />
-                  <p> Mercado Ferias </p>
+                    <img src="../assets/mercado.png" alt="logo" class="logo" />
+                    <p> Mercado Ferias </p>
                 </a>
             </li>
 
-            <li id="extraeT">
-                <img src="../assets/tienda.png" alt="logo" class="logo" />
-                <p>Extraer datos tienda</p>
-            </li>
-
-            <li id="extraeHistorialT">
-                <img src="../assets/tienda.png" alt="logo" class="logo" />
-                <p>Extraer datos tienda detallado</p>
-            </li>
-
-            <li id="coordinadores">
-                <img src="../assets/tienda.png" alt="logo" class="logo" />
-                <p>Extraer actividades coordinadores</p>
+            <li>
+                <a href="./Comercio-lona-empleado/Comercio-lona-empleado.html">
+                    <img src="../assets/mercado.png" alt="logo" class="logo" />
+                    <p> Mercado comercializadora </p>
+                </a>
             </li>
 
             <li id="logout">
-                
-                    <img src="../assets/cerrar-sesion.png" alt="logo" class="logo" />
-                    <p>Cerrar Sesión</p>
-                
+                <img src="../assets/cerrar-sesion.png" alt="logo" class="logo" />
+                <p>Cerrar Sesión</p>
             </li>
-
-
-
-            <h1 class="diasT"> Días restantes antes de fecha cierre de novedades de nómina </h1>
-            <span class="dias" id="diasRestantes"></span>
-      
-            <h1 class="diasT"> Días restantes antes de liquidación </h1>
-            <span class="dias" id="diasLi"></span>
-
-
         </ul>
-
     </div>
 
 
@@ -126,38 +104,80 @@
     </header>
 
     <div class="contenido">
-        <div class="cuadro">
-            <img src="../assets/empleados.png" style="width: 40px;        
-        margin-top: 20px;     
-        padding-left: 20px;">
-            <h3 class="titulo-Opciones"> Número total de
-                empleados</h3>
-            <h1 id="numeroEmpleados" class="titulo-Opciones"></h1>
+        <div class="cuadroPlInea">
+            <div class="cuadro">
+                <img src="../assets/empleados.png" style="width: 40px;        
+            margin-top: 20px;     
+            padding-left: 20px;">
+                <h3 class="titulo-Opciones"> Número total de
+                    empleados</h3>
+                <h1 id="numeroEmpleados" class="titulo-Opciones"></h1>
+            </div>
+    
+            <div class="cuadro">
+                <img src="../assets/solicitud.png" style="width: 40px;        
+            margin-top: 20px;     
+            padding-left: 20px;">
+                <h3 class="titulo-Opciones"> Número total de Coordinadores</h3>
+                <h1 id="numeroCoordinadores" class="titulo-Opciones"></h1>
+            </div>
+    
+            <div class="cuadro" style="">
+                <img src="../assets/mercado.png" style="width: 40px;        
+            margin-top: 20px;     
+            padding-left: 20px;">
+                <h3 class="titulo-Opciones"> Número total de tiendas</h3>
+                <h1 id="numeroTiendas" class="titulo-Opciones" style="margin-top: 25px;"></h1>
+            </div>
         </div>
 
-        <div class="cuadro">
-            <img src="../assets/solicitud.png" style="width: 40px;        
-        margin-top: 20px;     
-        padding-left: 20px;">
-            <h3 class="titulo-Opciones"> Número total de Coordinadores</h3>
-            <h1 id="numeroCoordinadores" class="titulo-Opciones"></h1>
+        <div class="cuadroSlinea">
+            <div class="cuadro" style="height: 170px; ">
+                <img src="../assets/fecha-del-calendario.png" style="width: 40px;        
+            margin-top: 20px;     
+            padding-left: 20px;">
+                <h3 class="titulo-Opciones" style="margin-bottom: -10px;"> Días restantes antes de fecha cierre de novedades de nómina </h3>
+                <h1 id="diasRestantes" class="titulo-Opciones" style="margin-top: 25px;"></h1>
+            </div>
+    
+            <div class="cuadro" style=" height: 170px;">
+                <img src="../assets/fecha-del-calendario.png" style="width: 40px;        
+            margin-top: 20px;     
+            padding-left: 20px;">
+                <h3 class="titulo-Opciones"> Días restantes antes de liquidación </h3>
+                <h1 id="diasLi" class="titulo-Opciones" style="margin-top: 25px;"></h1>
+            </div>
         </div>
 
-        <div class="cuadro">
-            <img src="../assets/mercado.png" style="width: 40px;        
-        margin-top: 20px;     
-        padding-left: 20px;">
-            <h3 class="titulo-Opciones"> Número total de tiendas</h3>
-            <h1 id="numeroTiendas" class="titulo-Opciones" style="margin-top: 25px;"></h1>
+        <div class="cuadroTlinea">
+            <div class="cuadro" id="extraeT">
+                <img src="../assets/tienda.png" style="width: 40px;        
+            margin-top: 20px;     
+            padding-left: 20px;">
+                <h3 class="titulo-Opciones"> Extraer total tiendas </h3>
+                <h1 class="titulo-Opciones" style="margin-top: 25px;"></h1>
+            </div>
+    
+            <div class="cuadro" id="extraeHistorialT">
+                <img src="../assets/tienda.png" style="width: 40px;        
+            margin-top: 20px;     
+            padding-left: 20px;">
+                <h3 class="titulo-Opciones"> Historial tiendas detallado </h3>
+                <h1 class="titulo-Opciones" style="margin-top: 25px;"></h1>
+            </div>
+    
+            <div class="cuadro" id="coordinadores">
+                <img src="../assets/tienda.png" style="width: 40px;        
+            margin-top: 20px;     
+            padding-left: 20px;">
+                <h3 class="titulo-Opciones"> Historial actividades roles </h3>
+                <h1 class="titulo-Opciones" style="margin-top: 25px;"></h1>
+            </div>
         </div>
+
 
 
     </div>
-
-
-
-
-
 </body>
 
 </html>
