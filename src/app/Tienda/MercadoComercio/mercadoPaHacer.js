@@ -545,7 +545,6 @@ boton.addEventListener('click', async (e) => {
     // capturar los datos del formulario
 
     let cedulaEmpleado = document.querySelector('#cedula').value;
-
     let aux = await datosEmpleado(cedulaEmpleado);
     console.log(aux.datosbase[0]);
     let datos = aux.datosbase[0];
@@ -620,15 +619,12 @@ boton.addEventListener('click', async (e) => {
         
 
         await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, valor)
-        await sleep(1000); // Pausa de 2 segundos
         await CambiarEstado(codigoOH, nuevovalor, codigoOH);
-        await sleep(1000); // Pausa de 2 segundos
         await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, "Compra tienda de Ferias", codigoOH, usernameLocal);
         await sleep(1000); // Pausa de 2 segundos
         await ActualizarHistorial(codigoOH);
         await sleep(1000); // Pausa de 2 segundos
         await historialT(nuevovalor);
-        await sleep(1000); // Pausa de 2 segundos
         await actualizarDatosBase("Compra tienda de Ferias", nuevovalor, cuotas, cedulaEmpleado);
 
 

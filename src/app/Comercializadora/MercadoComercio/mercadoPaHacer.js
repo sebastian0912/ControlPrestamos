@@ -601,15 +601,12 @@ boton.addEventListener('click', async (e) => {
 
 
         await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, valor)
-        await sleep(1000); // Pausa de 2 segundos
         await CambiarEstado(codigoOH, nuevovalor, codigoOH);
-        await sleep(1000); // Pausa de 2 segundos
         await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, "Compra tienda de Ferias", codigoOH, usernameLocal);
         await sleep(1000); // Pausa de 2 segundos
         await ActualizarHistorial(codigoOH);
         await sleep(1000); // Pausa de 2 segundos
         await historialT(nuevovalor);
-        await sleep(1000); // Pausa de 2 segundos
         await actualizarDatosBase("Compra tienda de Ferias", nuevovalor, cuotas, cedulaEmpleado);
 
 

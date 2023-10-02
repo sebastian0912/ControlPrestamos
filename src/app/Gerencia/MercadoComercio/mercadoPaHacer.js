@@ -9,6 +9,7 @@ const perfil = document.querySelector('#perfil');
 const perfilLocal = localStorage.getItem("perfil");
 const usernameLocal = localStorage.getItem("username");
 const iddatos = localStorage.getItem("idUsuario");
+const sede = localStorage.getItem("sede");
 //Muestra en la parte superior el nombre y el perfil
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
@@ -106,7 +107,6 @@ async function datosEmpleado(cedulaEmpleado) {
         throw error; // Propaga el error para que se pueda manejar fuera de la función
     }
 }
-
 
 function verificaCondiciones(datos, nuevovalor) {
     // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
@@ -411,7 +411,6 @@ formaPago.addEventListener('change', (e) => {
     }
 });
 
-
 function obtenerCodigo(codigo, datos) {
     let cod;
     datos.forEach(doc => {
@@ -422,40 +421,37 @@ function obtenerCodigo(codigo, datos) {
     return cod;
 }
 
-async function datosTCodigos() {
-    var body = localStorage.getItem('key');
-    const obj = JSON.parse(body);
-    const jwtKey = obj.jwt;
+let isFunctionExecuting = false; // Variable para rastrear si la función está en ejecución
+let datos2 = ["Pollo Suba", "Pollo LuzDary","Fruver", "Carne", "Otro"];
 
-    const headers = {
-        'Authorization': jwtKey
-    };
-
-    const urlcompleta = urlBack.url + '/Codigo/codigos';
-
-    try {
-        const response = await fetch(urlcompleta, {
-            method: 'GET',
-            headers: headers,
-        });
-
-        if (response.ok) {
-            const responseData = await response.json();
-            console.log(responseData);
-            return responseData;
-        } else {
-            throw new Error('Error en la petición GET');
-
-        }
-    } catch (error) {
-        console.error('Error en la petición HTTP GET');
-        console.error(error);
-        throw error; // Propaga el error para que se pueda manejar fuera de la función
-    }
+// recorrer el arreglo y mostrarlo en el select
+for (let i = 0; i < datos2.length; i++) {
+    let opcion = document.createElement("option");
+    opcion.value = datos2[i];
+    opcion.text = datos2[i];
+    concepto.appendChild(opcion);
 }
 
-let isFunctionExecuting = false; // Variable para rastrear si la función está en ejecución
+let mostrarAviso = false;
+concepto.addEventListener('change', async (e) => {
+    const otro = document.querySelector('#otro2');
+    if (e.target.value == "Otro") {
+        mostrarAviso = true;
+        otro.style.display = "inline-block";
+    } else {
+        mostrarAviso = false;
+        otro.style.display = "none";
+    }
+});
 
+boton.addEventListener('click', async (e) => {
+    if (mostrarAviso) {
+        const otro2 = document.querySelector('#otro2');
+        if (otro2.value == "") {
+            aviso("No se ha ingresado ningun valor", "error");
+        }
+    }
+});
 
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
@@ -490,6 +486,7 @@ boton.addEventListener('click', async (e) => {
     boton2.style.display = "inline-block";
     formaPago.style.display = "inline-block";
     celular.style.display = "inline-block";
+    concepto.style.display = "inline-block";
 
     datosPersona.innerHTML = datos.nombre;
 
@@ -508,6 +505,7 @@ boton.addEventListener('click', async (e) => {
         let cuotas = document.querySelector('#cuotas').value;
         let nuevovalor = valor.replace(/\,/g, '');
         let codigoOH = 'M' + Math.floor(Math.random() * 1000000);
+        let otro2 = document.querySelector('#otro2').value;
 
         if (!verificaCondiciones(datos, nuevovalor) == true) {
             isFunctionExecuting = false;
@@ -536,20 +534,20 @@ boton.addEventListener('click', async (e) => {
                 return;
             }
         }
+
+        if (otro2 != "") {
+            concepto = otro2;
+        }
         
 
         await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, valor)
-        await sleep(1000); // Pausa de 1 segundos
         await CambiarEstado(codigoOH, nuevovalor, codigoOH);
-        await sleep(1000); // Pausa de 1 segundos
-        await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, "Compra tienda de Ferias", codigoOH, usernameLocal);
+        await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, "Compra tienda de Ferias respecto a:" + concepto.value + " en " + sede, codigoOH, usernameLocal);
         await sleep(1000); // Pausa de 1 segundos
         await ActualizarHistorial(codigoOH);
         await sleep(1000); // Pausa de 1 segundos
-        await historialT(nuevovalor);
-        await sleep(1000); // Pausa de 1 segundos
-        await actualizarDatosBase("Compra tienda de Ferias", nuevovalor, cuotas, cedulaEmpleado);
-
+        //await historialT(nuevovalor);
+        //await actualizarDatosBase("Compra tienda de Ferias", nuevovalor, cuotas, cedulaEmpleado);
 
         let empresa = null;
         let NIT = null;

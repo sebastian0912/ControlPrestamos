@@ -521,7 +521,6 @@ async function datosTCodigos() {
 
 let isFunctionExecuting = false; // Variable para rastrear si la función está en ejecución
 
-
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
     e.preventDefault();
@@ -606,15 +605,12 @@ boton.addEventListener('click', async (e) => {
         
 
         await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, valor)
-        await sleep(1000); // Pausa de 1 segundos
         await CambiarEstado(codigoOH, nuevovalor, codigoOH);
-        await sleep(1000); // Pausa de 1 segundos
         await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, "Compra tienda de Ferias", codigoOH, usernameLocal);
         await sleep(1000); // Pausa de 1 segundos
         await ActualizarHistorial(codigoOH);
         await sleep(1000); // Pausa de 1 segundos
         await historialT(nuevovalor);
-        await sleep(1000); // Pausa de 1 segundos
         await actualizarDatosBase("Compra tienda de Ferias", nuevovalor, cuotas, cedulaEmpleado);
 
 
