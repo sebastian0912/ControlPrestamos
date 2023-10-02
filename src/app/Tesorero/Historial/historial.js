@@ -619,10 +619,9 @@ eliminar.addEventListener('click', async () => {
 input.addEventListener('change', () => {
     let archivo = input.files[0];
     let reader = new FileReader();
-    var h1Elemento = document.getElementById("cont");
 
-    /* leer archivo .csv */
-    reader.readAsText(archivo);
+    /* Leer archivo .csv */
+    reader.readAsText(archivo, 'UTF-8'); // Asegúrate de usar la codificación correcta
 
     reader.onload = () => {
         let info = reader.result;
@@ -633,22 +632,20 @@ input.addEventListener('change', () => {
         let datosFinales = [];
 
         datos.forEach(dato => {
-            // Separar por tabulaciones y remplazar espacios vacíos por "0"
-            let fila = dato.split('\t').map(item => item.trim() === '' ? "0" : item.trim());
+            // Utilizar el punto y coma (;) como separador en la expresión regular
+            let fila = dato.split(/;/).map(item => item.trim() === '' ? "0" : item.trim());
             datosFinales.push(fila);
         });
 
         // Mostrar elementos ocultos
         over.style.display = "block";
         loader.style.display = "block";
-        h1Elemento.style.display = "block";
 
-        // Eliminar las primeras 4 filas (si es necesario)
-        console.log(datosFinales);
+        // Eliminar las primeras 3 filas (si es necesario)
         datosFinales.splice(0, 4);
 
-        // Guardar los datos finales
         guardarDatos(datosFinales);
+
     };
 });
 

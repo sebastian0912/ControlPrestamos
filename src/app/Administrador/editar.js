@@ -150,6 +150,8 @@ listaU.forEach((doc) => {
     datos.push(aux);
 });
 
+
+
 datos.forEach((opcion) => {
     const option = document.createElement('option');
     option.text = opcion.nombre;

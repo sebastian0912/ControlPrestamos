@@ -702,9 +702,14 @@ async function ActualizarHistorial(codigo) {
         })
             .then(response => {
                 if (response.ok) {
+                    over.style.display = "none";
+                    loader.style.display = "none";
                     return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
                     //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
                 } else {
+
+                    over.style.display = "none";
+                    loader.style.display = "none";
                     throw new Error('Error en la petición POST');
                 }
             })
@@ -712,6 +717,8 @@ async function ActualizarHistorial(codigo) {
                 console.log('Respuesta:', responseData);
             })
             .catch(error => {
+                over.style.display = "none";
+                loader.style.display = "none";
                 console.error('Error:', error);
             });
 
@@ -906,19 +913,19 @@ boton.addEventListener("click", async (e) => {
 
     if (verificarCodigo(codigoA, CodigosMercado) == true) {
 
-        if (codigoA.startsWith("MG")){
+        if (codigoA.startsWith("MG")) {
             if (!verificaMonto(sumaVentas, cod) == true) {
                 isFunctionExecuting = false;
                 aviso("El monto supera el monto maximo permitido solicitado antes", "error");
                 return;
             }
         }
-        else{
-            if (!verificaCondiciones (usuario, sumaVentas) == true) {
+        else {
+            if (!verificaCondiciones(usuario, sumaVentas) == true) {
                 isFunctionExecuting = false;
                 return;
             }
-        }        
+        }
 
         if (obtenerCodigo(codigoA, CodigosMercado) == null) {
             isFunctionExecuting = false;
@@ -943,9 +950,7 @@ boton.addEventListener("click", async (e) => {
 
         // modificar en la tabla codigos el estado del codigo a false para que no pueda ser usado nuevamente
         await CambiarEstado(cod.codigo, sumaVentas, codigAux);
-        await sleep(1000); // Pausa de 2 segundos
         await actualizar(codigAux, cod.codigo, usernameLocal, sumaVentas, 2);
-        await sleep(1000); // Pausa de 2 segundos
         await actualizarVentas(cantidad, codigo, usernameLocal);
 
         if (codigo2 != "") {
@@ -957,9 +962,7 @@ boton.addEventListener("click", async (e) => {
         if (codigo4 != "") {
             await actualizarVentas(cantidad4, codigo4, usernameLocal);
         }
-        await sleep(1000); // Pausa de 2 segundos
         await actualizarDatos(cedula, sumaVentas, 2);
-        await sleep(1000); // Pausa de 2 segundos
         await historialT(sumaVentas);
         await sleep(1000); // Pausa de 2 segundos
         await escribirHistorial(cedula, sumaVentas, 2, "Compra tienda respecto a:" + concepto + " en " + sede, codigAux, cod.generadoPor);

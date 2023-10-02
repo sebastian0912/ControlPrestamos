@@ -75,7 +75,7 @@ function numCoordinadoresConestadoSolicitudesTrue(datos) {
 
     let auxCoordinadores = 0;
     datos.forEach((doc) => {
-        if ( (doc.rol == "COORDINADOR" || doc.rol == "JEFE-DE-AREA" || doc.rol == "TIENDA") && doc.estadoSolicitudes == true) {
+        if ((doc.rol == "COORDINADOR" || doc.rol == "JEFE-DE-AREA" || doc.rol == "TIENDA") && doc.estadoSolicitudes == true) {
             auxCoordinadores++;
         }
     });
@@ -134,7 +134,7 @@ numeroCoordinadores.innerHTML = numCoordinadoresConestadoSolicitudesTrue(datosU)
 const listado = await datosUsuarios();
 let arrayCodigos = [];
 
-listado.forEach((c) => {    
+listado.forEach((c) => {
     if ((c.rol == "COORDINADOR" || c.rol == "JEFE-DE-AREA" || c.rol == "TIENDA") && c.estadoSolicitudes == true && c.primer_nombre != null) {
         arrayCodigos.push(c);
     }
@@ -750,8 +750,8 @@ input.addEventListener('change', () => {
     let archivo = input.files[0];
     let reader = new FileReader();
 
-    /* leer archivo .csv */
-    reader.readAsText(archivo);
+    /* Leer archivo .csv */
+    reader.readAsText(archivo, 'UTF-8'); // Asegúrate de usar la codificación correcta
 
     reader.onload = () => {
         let info = reader.result;
@@ -762,8 +762,8 @@ input.addEventListener('change', () => {
         let datosFinales = [];
 
         datos.forEach(dato => {
-            // Separar por tabulaciones y remplazar espacios vacíos por "0"
-            let fila = dato.split('\t').map(item => item.trim() === '' ? "0" : item.trim());
+            // Utilizar el punto y coma (;) como separador en la expresión regular
+            let fila = dato.split(/;/).map(item => item.trim() === '' ? "0" : item.trim());
             datosFinales.push(fila);
         });
 
@@ -772,10 +772,10 @@ input.addEventListener('change', () => {
         loader.style.display = "block";
 
         // Eliminar las primeras 3 filas (si es necesario)
-        datosFinales.splice(0, 3);
+        datosFinales.splice(0, 4);
 
-        // Guardar los datos finales
         guardarDatos(datosFinales);
+
     };
 });
 
