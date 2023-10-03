@@ -12,6 +12,9 @@ const numeroTotal = document.querySelector('#numeroEmpleados');
 let extrae = document.getElementById("extrae");
 let extraeT = document.getElementById("extraeT");
 
+let input = document.getElementById('archivoInput');
+
+
 //Muestra en la parte superior el nombre y el perfil
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
@@ -170,8 +173,6 @@ if (dias2 == 0) {
     diasLi.style.color = "black";
 }
 diasLi.innerHTML = dias2;
-
-
 
 async function THistorial() {
     var body = localStorage.getItem('key');
@@ -604,6 +605,90 @@ coodinador.addEventListener('click', async () => {
     URL.revokeObjectURL(url);
 });
 
+input.addEventListener('change', () => {
+    let archivo = input.files[0];
+    let reader = new FileReader();
+
+    /* Leer archivo .csv */
+    reader.readAsText(archivo, 'UTF-8'); // Asegúrate de usar la codificación correcta
+
+    reader.onload = () => {
+        let info = reader.result;
+        /* Separar por saltos de línea */
+        let datos = info.split('\n');
+
+        // Array para almacenar los datos finales
+        let datosFinales = [];
+
+        datos.forEach(dato => {
+            // Utilizar el punto y coma (;) como separador en la expresión regular
+            let fila = dato.split(/;/).map(item => item.trim() === '' ? "0" : item.trim());
+            datosFinales.push(fila);
+        });
+
+        // Mostrar elementos ocultos
+        over.style.display = "block";
+        loader.style.display = "block";
+
+        // Eliminar las primeras 3 filas (si es necesario)
+        datosFinales.splice(0, 4);
+
+        guardarDatos(datosFinales);
+
+    };
+});
+
+async function guardarDatos(datosFinales) {
+
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+
+    const bodyData = {
+        jwt: jwtKey,
+        mensaje: "muchos",
+        datos: datosFinales
+    };
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Datosbase/datosbase';
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',// para el resto de peticiónes HTTP le cambias a GET, POST, PUT, DELETE, etc.
+            body: JSON.stringify(bodyData),// Aquí va el body de tu petición tiene que ser asi en json para que el back lo pueda leer y procesar y hay algun problema me dices
+
+        })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('successSound').play();
+                    aviso("Datos guardados correctamente", "success");
+                    over.style.display = "none";
+                    loader.style.display = "none";
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                    return response.json();
+                } else {
+                    throw new Error('Error en la petición POST');
+                    document.getElementById('errorSound').play();
+                }
+            })
+            .then(responseData => {
+                document.getElementById('successSound').play();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('errorSound').play();
+            });
+    } catch (error) {
+        console.error('Error en la petición HTTP PUT');
+        console.error(error);
+    }
+
+
+}
 
 
 

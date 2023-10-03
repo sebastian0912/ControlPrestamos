@@ -312,7 +312,6 @@ async function datosEmpleado(cedulaEmpleado) {
             console.log(responseData);
             return responseData;
         } else {
-            aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
             throw new Error('Error en la petición GET');
         }
     } catch (error) {
@@ -618,6 +617,12 @@ boton.addEventListener('click', async (e) => {
         let datosUsuario = aux2.datosbase[0];
         console.log(datosUsuario);
         const cod = obtenerCodigo(codigoP, datos);
+
+        if (aux2.datosbase == "No se encontró el registro para el ID proporcionado") {
+            console.log("No existe");
+            aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
+            return;    
+        }
 
         /*if (!esCodigoValido(cod.fechaGenerado)) {
             aviso('El codigo ya expiro', 'error');

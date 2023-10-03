@@ -148,7 +148,6 @@ async function datosEmpleado(cedulaEmpleado) {
             console.log(responseData);
             return responseData;
         } else {
-            aviso('Ups no se pueden generar prestamo, el empleado no existe', 'error');
             throw new Error('Error en la petición GET');
         }
     } catch (error) {
@@ -495,6 +494,11 @@ boton.addEventListener('click', async (e) => {
         aviso('El codigo ya expiro', 'error');
         return;
     }*/
+
+    if (aux2.datosbase == "No se encontró el registro para el ID proporcionado") {
+        console.log("No existe");
+        aviso('Ups no se pueden generar prestamo, el empleado no existe', 'error');
+    }
 
     if (!verificarCodigo(codigoP, aux.codigo)) {
         isFunctionExecuting = false;

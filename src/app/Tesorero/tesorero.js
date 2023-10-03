@@ -812,8 +812,8 @@ async function guardarDatos(datosFinales) {
                     //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
                     return response.json();
                 } else {
-                    throw new Error('Error en la petición POST');
                     document.getElementById('errorSound').play();
+                    throw new Error('Error en la petición POST');
                 }
             })
             .then(responseData => {

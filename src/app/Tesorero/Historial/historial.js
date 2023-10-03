@@ -722,7 +722,6 @@ async function datosEmpleado(cedulaEmpleado) {
             console.log(responseData);
             return responseData;
         } else {
-            aviso('Ups no se encuentra el empleado, no existe', 'error');
             throw new Error('Error en la petición GET');
         }
     } catch (error) {
@@ -747,9 +746,10 @@ boton.addEventListener('click', async (e) => {
 
     // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
 
-    if (aux.datosbase == "error") {
+    if (aux.datosbase == "No se encontró el registro para el ID proporcionado") {
         console.log("No existe");
         aviso('Este usuario no existe, esta retirado o no pertenece a la empresa', 'warning');    
+        return;
     }
 
     if (datosExtraidos.historial.length == 0) {

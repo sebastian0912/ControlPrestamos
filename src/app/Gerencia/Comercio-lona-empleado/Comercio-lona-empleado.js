@@ -331,7 +331,6 @@ async function datosEmpleado(cedulaEmpleado) {
             console.log(responseData);
             return responseData;
         } else {
-            aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
             throw new Error('Error en la petición GET');
         }
     } catch (error) {
@@ -633,6 +632,11 @@ boton.addEventListener("click", async (e) => {
     console.log(aux2.datosbase[0]);
     let usuario = aux2.datosbase[0];
     console.log(usuario);
+
+    if (aux2.datosbase == "No se encontró el registro para el ID proporcionado") {
+        console.log("No existe");
+        aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
+    }
 
     datosComercializadoraGeneral = await datosTComercio();
     let datosArreglo = datosComercializadoraGeneral.comercio;

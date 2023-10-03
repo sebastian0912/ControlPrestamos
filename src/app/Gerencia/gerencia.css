@@ -3,6 +3,7 @@
 
 body {
   background-size: 100%;
+  min-width: 100vh;
   min-height: 100vh;
   background: linear-gradient(120deg, #eeeeee 50%, #FEBB2E 40%);
   background-repeat: no-repeat;
@@ -95,7 +96,10 @@ li:nth-child(1) {
 
 .boton {
   position: absolute;
-  width: 100%;
+  background-color: #1157fb;
+  margin-top: -110px;
+  height: 149px;
+  width: 240px;
   opacity: 0;
   cursor: pointer;
 }
@@ -142,6 +146,7 @@ span {
 
 
 .contenido {
+  max-width: 78%;
   width: 80%;
   height: 100%;
   float: right;
@@ -222,4 +227,9 @@ tr {
   transform: scale(1.1);
   transition: transform 0.3s; /* Agregar transición para suavizar el cambio */
   cursor: pointer;
+}
+
+.cuadroSlinea .cuadro:nth-child(3):hover{
+  transform: scale(1.1);
+  transition: transform 0.3s; /* Agregar transición para suavizar el cambio */
 }

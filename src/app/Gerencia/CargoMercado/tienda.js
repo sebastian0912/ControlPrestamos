@@ -537,6 +537,11 @@ boton.addEventListener('click', async (e) => {
         console.log(datosUsuario);
         const cod = obtenerCodigo(codigoP, datos);
 
+        if (aux2.datosbase == "No se encontró el registro para el ID proporcionado") {
+            console.log("No existe");
+            aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
+        }
+
         /*if (!esCodigoValido(cod.fechaGenerado)) {
             aviso('El codigo ya expiro', 'error');
             return;
