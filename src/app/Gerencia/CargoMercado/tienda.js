@@ -125,59 +125,54 @@ function verificaCondiciones(datos, nuevovalor) {
 
     const fechaActual = new Date();
 
-    if (parseInt(datos.saldos) >= 175000) {
-        aviso("Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido", "error");
-        return false;
-    }
-    else {
-        // conseguir la fecha actual y separarla en dia, mes y año para poder compararla con la fecha de ingreso del empleado   
-        let diaActual = fechaActual.getDate();
-        let mesActual = fechaActual.getMonth() + 1;
-        let anioActual = fechaActual.getFullYear();
-        let fechaInicio = new Date(anio, mes, dia); // Asume que "anio", "mes", "dia" representan la fecha de inicio del trabajador
-        let fechaActualCompara = new Date(anioActual, mesActual, diaActual); // Asume que "anioActual", "mesActual", "diaActual" representan la fecha actual
-        let diferencia = Math.abs(fechaActualCompara - fechaInicio); // Diferencia en milisegundos
-        let diasTrabajados = Math.ceil(diferencia / (1000 * 60 * 60 * 24)); // Conversión de milisegundos a días
+    // conseguir la fecha actual y separarla en dia, mes y año para poder compararla con la fecha de ingreso del empleado   
+    let diaActual = fechaActual.getDate();
+    let mesActual = fechaActual.getMonth() + 1;
+    let anioActual = fechaActual.getFullYear();
+    let fechaInicio = new Date(anio, mes, dia); // Asume que "anio", "mes", "dia" representan la fecha de inicio del trabajador
+    let fechaActualCompara = new Date(anioActual, mesActual, diaActual); // Asume que "anioActual", "mesActual", "diaActual" representan la fecha actual
+    let diferencia = Math.abs(fechaActualCompara - fechaInicio); // Diferencia en milisegundos
+    let diasTrabajados = Math.ceil(diferencia / (1000 * 60 * 60 * 24)); // Conversión de milisegundos a días
 
-        // Si ha trabajado entre 8 y 15 dias puede pedir prestamo de 150.000
-        if ((diasTrabajados > 8 && diasTrabajados <= 15)) {
-            if ((sumaTotal + parseInt(nuevovalor) >= 150001)) {
-                aviso("Ups no se pueden generar mercado, puede sacar maximo " + (150000 - (sumaTotal)), "error");
-                return false;
-            }
-            else {
-                return true;
-            }
-
-        }
-
-        // Si ha trabajado entre 15 y 30 dias puede pedir prestamo de 250.000
-        else if ((diasTrabajados > 15 && diasTrabajados <= 30)) {
-            if ((sumaTotal + parseInt(nuevovalor) >= 250001)) {
-                aviso("Ups no se pueden generar mercado, puede sacar maximo " + (250000 - (sumaTotal)), "error");
-                return false;
-            }
-            else {
-                return true;
-            }
-        }
-
-        // Si ha trabajado mas de 30 dias puede pedir prestamo de 350.000
-        else if ((diasTrabajados > 30)) {
-            if ((sumaTotal + parseInt(nuevovalor) >= 350001)) {
-                aviso("Ups no se pueden generar mercado, puede sacar maximo " + (350000 - (sumaTotal)), "error");
-                return false;
-            }
-            else {
-                return true;
-            }
-        }
-        else {
-            aviso("Ups no se pueden generar mercado, el empleado no tiene los dias suficientes para pedir prestamo", "error");
+    // Si ha trabajado entre 8 y 15 dias puede pedir prestamo de 150.000
+    if ((diasTrabajados > 8 && diasTrabajados <= 15)) {
+        if ((sumaTotal + parseInt(nuevovalor) >= 150001)) {
+            aviso("Ups no se pueden generar mercado, puede sacar maximo " + (150000 - (sumaTotal)), "error");
             return false;
         }
+        else {
+            return true;
+        }
 
     }
+
+    // Si ha trabajado entre 15 y 30 dias puede pedir prestamo de 250.000
+    else if ((diasTrabajados > 15 && diasTrabajados <= 30)) {
+        if ((sumaTotal + parseInt(nuevovalor) >= 250001)) {
+            aviso("Ups no se pueden generar mercado, puede sacar maximo " + (250000 - (sumaTotal)), "error");
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
+    // Si ha trabajado mas de 30 dias puede pedir prestamo de 350.000
+    else if ((diasTrabajados > 30)) {
+        if ((sumaTotal + parseInt(nuevovalor) >= 350001)) {
+            aviso("Ups no se pueden generar mercado, puede sacar maximo " + (350000 - (sumaTotal)), "error");
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+    else {
+        aviso("Ups no se pueden generar mercado, el empleado no tiene los dias suficientes para pedir prestamo", "error");
+        return false;
+    }
+
+
 }
 
 
@@ -505,6 +500,7 @@ function esCodigoValido(fechaGeneradoStr) {
 let isFunctionExecuting = false; // Variable para rastrear si la función está en ejecución
 
 boton.addEventListener('click', async (e) => {
+
     e.preventDefault();
 
     if (isFunctionExecuting) {
@@ -558,7 +554,7 @@ boton.addEventListener('click', async (e) => {
             aviso('El codigo ya fue usado', 'error');
             return
         }
-        
+
         if (!verificarCedula(codigoP, cedulaEmpleado, datos)) {
             isFunctionExecuting = false;
             aviso('El codigo no pertenece a este empleado', 'error');
@@ -579,17 +575,13 @@ boton.addEventListener('click', async (e) => {
         let codigoAux = 'MOH' + Math.floor(Math.random() * 1000000);
 
         await CambiarEstado(codigoP, nuevovalor, codigoAux);
-        await sleep(1000); // Pausa de 2 segundos
         await actualizar(codigoAux, codigoP, usernameLocal, nuevovalor, 2);
-        await sleep(1000); // Pausa de 2 segundos
         await escribirHistorial(cedulaEmpleado, nuevovalor, 2, concepto, codigoAux, cod.generadoPor);
-        await sleep(1000); // Pausa de 2 segundos
-        await ActualizarHistorial(codigoAux );
+        await sleep(2000); // Pausa de 2 segundos
+        await ActualizarHistorial(codigoAux);
         await sleep(1000); // Pausa de 2 segundos
         await historialT(nuevovalor, cod.generadoPor);
-        await sleep(1000); // Pausa de 2 segundos
         await actualizarDatosBase(concepto, nuevovalor, 2, cedulaEmpleado);
-        await sleep(1000); // Pausa de 2 segundos
         isFunctionExecuting = false;
 
         let confirmacion = await avisoConfirmado('Acaba de pedir un mercado de ' + valor + ' su codigo es: ' + codigoAux, 'success');

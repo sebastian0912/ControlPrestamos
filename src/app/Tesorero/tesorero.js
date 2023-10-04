@@ -973,7 +973,7 @@ extraeHistorialT.addEventListener('click', async () => {
         if (doc.concepto.startsWith("Compra tienda")) {
             // Obtener el mes y el día de la fecha en formato 'YYYY-MM-DD'
             const fechaParts = doc.fechaEfectuado.split('-');
-            const mes = fechaParts[1];
+            let mes = fechaParts[1];
             let dia = fechaParts[2];
 
             if (!historialPorMes[mes]) {

@@ -197,6 +197,8 @@ function verificaCondiciones(datos, nuevovalor) {
         parseInt(datos.anticipoLiquidacion) +
         parseInt(datos.cuentas);
 
+    console.log(sumaTotal)
+
     const fechaActual = new Date();
 
     if (parseInt(datos.saldos) >= 175000) {

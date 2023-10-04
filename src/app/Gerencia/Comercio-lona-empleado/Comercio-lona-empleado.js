@@ -512,7 +512,7 @@ async function historialT(valor) {
             method: 'POST',
             body:
                 JSON.stringify({
-                    nombre: usernameLocal,
+                    nombre: "KAREN RIQUETT",
                     valorTotal: valor,
                     numPersonasAtendidas: 1,
                     jwt: jwtToken
@@ -635,6 +635,8 @@ boton.addEventListener("click", async (e) => {
 
     if (aux2.datosbase == "No se encontró el registro para el ID proporcionado") {
         console.log("No existe");
+        over.style.display = "none";
+        loader.style.display = "none";
         aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
     }
 
@@ -713,24 +715,32 @@ boton.addEventListener("click", async (e) => {
 
     if (sumaCantidad > datos.cantidadRecibida) {
         isFunctionExecuting = false;
+        over.style.display = "none";
+        loader.style.display = "none";
         aviso("No se puede cargar el mercado del producto #1 porque la suma de la cantidad supera el inventario disponible. Lo máximo a sacar es " + (datos.cantidadRecibida - datos.cantidadTotalVendida), "error");
         return;
     }
 
     if (sumaCantidad2 > datos2.cantidadRecibida) {
         isFunctionExecuting = false;
+        over.style.display = "none";
+        loader.style.display = "none";
         aviso("No se puede cargar el mercado del producto #2 porque la suma de la cantidad supera el inventario disponible. Lo máximo a sacar es " + (datos2.cantidadRecibida - datos2.cantidadTotalVendida), "error");
         return;
     }
 
     if (sumaCantidad3 > datos3.cantidadRecibida) {
         isFunctionExecuting = false;
+        over.style.display = "none";
+        loader.style.display = "none";
         aviso("No se puede cargar el mercado del producto #3 porque la suma de la cantidad supera el inventario disponible. Lo máximo a sacar es " + (datos3.cantidadRecibida - datos3.cantidadTotalVendida), "error");
         return;
     }
 
     if (sumaCantidad4 > datos4.cantidadRecibida) {
         isFunctionExecuting = false;
+        over.style.display = "none";
+        loader.style.display = "none";
         aviso("No se puede cargar el mercado del producto #4 porque la suma de la cantidad supera el inventario disponible. Lo máximo a sacar es " + (datos4.cantidadRecibida - datos4.cantidadTotalVendida), "error");
         return;
     }
@@ -742,24 +752,32 @@ boton.addEventListener("click", async (e) => {
 
     if (!verificarCodigo(codigoA, CodigosMercado)) {
         isFunctionExecuting = false;
+        over.style.display = "none";
+        loader.style.display = "none";
         aviso("El codigo no existe", "error");
         return;
     }
 
     if (!verificarCodigoEstado(codigoA, CodigosMercado)) {
         isFunctionExecuting = false;
+        over.style.display = "none";
+        loader.style.display = "none";
         aviso("El codigo ya fue usado", "error");
         return
     }
 
     if (!verificarCedula(codigoA, cedula, CodigosMercado)) {
         isFunctionExecuting = false;
+        over.style.display = "none";
+        loader.style.display = "none";
         aviso("El codigo no pertenece a este empleado", "error");
         return;
     }
 
     if (codigoA == "") {
         isFunctionExecuting = false;
+        over.style.display = "none";
+        loader.style.display = "none";
         aviso("Por favor ingrese el codigo de autorizacion generado por el coordinador", "error");
         return;
     }
@@ -769,12 +787,16 @@ boton.addEventListener("click", async (e) => {
 
         if (!verificaMonto(sumaVentas, cod) == true) {
             isFunctionExecuting = false;
+            over.style.display = "none";
+            loader.style.display = "none";
             aviso("El monto supera el monto maximo permitido solicitado antes", "error");
             return;
         }
 
         if (obtenerCodigo(codigoA, CodigosMercado) == null) {
             isFunctionExecuting = false;
+            over.style.display = "none";
+            loader.style.display = "none";
             aviso("El codigo de autorizacion no existe", "error");
             return;
         }

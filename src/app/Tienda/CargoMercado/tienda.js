@@ -113,7 +113,6 @@ else {
     lola2.style.display = "none";
 }
 
-
 function verificarCedula(codigoP, cedulaEmpleado, datos) {
     let encontrado = false;
     datos.forEach(doc => {
@@ -621,7 +620,7 @@ boton.addEventListener('click', async (e) => {
         if (aux2.datosbase == "No se encontró el registro para el ID proporcionado") {
             console.log("No existe");
             aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
-            return;    
+            return;
         }
 
         /*if (!esCodigoValido(cod.fechaGenerado)) {
@@ -653,9 +652,11 @@ boton.addEventListener('click', async (e) => {
             return;
         }
 
-        if (!verificaCondiciones(datosUsuario, parseInt(nuevovalor)) == true) {
-            isFunctionExecuting = false;
-            return;
+        if (usernameLocal != "SEÑORA LOLA" || usernameLocal != "SEÑOR LUIS") {
+            if (!verificaCondiciones(datosUsuario, parseInt(nuevovalor)) == true) {
+                isFunctionExecuting = false;
+                return;
+            }
         }
 
         console.log("entro");

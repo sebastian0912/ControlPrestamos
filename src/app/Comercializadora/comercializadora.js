@@ -132,7 +132,8 @@ miArray.forEach((p) => {
         p.fechaRecibida = "";
     }
     if (p.PersonaEnvia == usernameLocal) {
-        tabla.innerHTML += `
+        if (p.cantidadRecibida != p.cantidadTotalVendida || p.cantidadEnvio != p.cantidadRecibida) {
+            tabla.innerHTML += `
         <tr>
             <td>${p.codigo}</td>
             <td>${p.concepto}</td>
@@ -147,6 +148,7 @@ miArray.forEach((p) => {
             <td>${p.fechaRecibida}</td>
         </tr>
     `}
+    }
 });
 
 let datos = [];
@@ -161,16 +163,19 @@ let agrupado = miArray.reduce((acumulador, item) => {
         acumulador[clave] = {
             ...item,
             cantidadEnvio: 0,       // Inicializamos la suma de las cantidades enviadas
-            cantidadTotalVendida: 0 // Inicializamos la suma de las cantidades totales vendidas
+            cantidadTotalVendida: 0, // Inicializamos la suma de las cantidades totales vendidas
+            cantidadRecibida: 0     // Inicializamos la suma de las cantidades recibidas
         };
     }
 
-    // Sumamos las cantidades enviadas y totales vendidas al grupo correspondiente
+    // Sumamos las cantidades enviadas, totales vendidas y recibidas al grupo correspondiente
     acumulador[clave].cantidadEnvio += Number(item.cantidadEnvio);
     acumulador[clave].cantidadTotalVendida += Number(item.cantidadTotalVendida);
+    acumulador[clave].cantidadRecibida += Number(item.cantidadRecibida);
 
     return acumulador;
 }, {});
+
 
 // Convertimos el objeto acumulador a una matriz para su uso posterior
 agrupado = Object.values(agrupado);
@@ -196,6 +201,7 @@ agrupado.forEach((p) => {
         aux = p.cantidadTotalVendida;
     }
     p.resultado = Math.abs(p.cantidadEnvio - aux); // Restamos las cantidades sumadas anteriormente
+    let cantidad =   Math.abs(parseInt(p.cantidadEnvio) - parseInt(p.cantidadRecibida))
 
     tabla2.innerHTML += `
         <tr>
@@ -203,9 +209,11 @@ agrupado.forEach((p) => {
             <td>${p.destino}</td>
             <td>${p.cantidadEnvio}</td>
             <td>${p.cantidadRecibida}</td>
+            <td>${cantidad}</td>
             <td>${p.valorUnidad}</td>
             <td>${p.resultado}</td>    <!-- Aquí mostramos el resultado de la resta -->
         </tr>
     `;
+
 
 });

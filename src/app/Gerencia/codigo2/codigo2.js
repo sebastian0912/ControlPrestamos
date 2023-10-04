@@ -306,10 +306,8 @@ boton.addEventListener('click', async (e) => {
         const fechaActual = new Date();
         let codigoOH = null;
 
-        if (parseInt(datos.saldos) >= 175000) {
-            aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
-        }
-        else if (parseInt(datos.fondos) > 0) {
+
+        if (parseInt(datos.fondos) > 0) {
             aviso('Ups no se pueden generar prestamos perteneces al fondo', 'error');
         }
         else {

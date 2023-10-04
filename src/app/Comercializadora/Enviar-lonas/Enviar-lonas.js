@@ -26,6 +26,23 @@ perfil.innerHTML = perfilLocal;
 let datos = ["FACA_PRINCIPAL", "FACA_CENTRO", "ROSAL", "CARTAGENITA", "MADRID", "FUNZA", "SOACHA", "FONTIBÓN", "SUBA", "TOCANCIPÁ", "BOSA", "BOGOTÁ"];
 let datos2 = ["Mercado", "Kit escolar", "Kit aseo", "Anchetas", "Matrimonios", "Kit velitas", "Kit amor y amistad", "Kit Día de las Madres", "Juguetes", "Kit dulces", "Combo Carne", "Otro"];
 
+
+// recorrer el arreglo y mostrarlo en el select
+for (let i = 0; i < datos.length; i++) {
+    let opcion = document.createElement("option");
+    opcion.value = datos[i];
+    opcion.text = datos[i];
+    miSelect.appendChild(opcion);
+}
+
+// recorrer el arreglo y mostrarlo en el select
+for (let i = 0; i < datos2.length; i++) {
+    let opcion = document.createElement("option");
+    opcion.value = datos2[i];
+    opcion.text = datos2[i];
+    miSelect2.appendChild(opcion);
+}
+
 // Obtén la fecha actual
 var ahora = new Date();
 var anio = ahora.getFullYear();

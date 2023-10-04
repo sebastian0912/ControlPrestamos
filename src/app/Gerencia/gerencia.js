@@ -296,7 +296,7 @@ extraeHistorialT.addEventListener('click', async () => {
         if (doc.concepto.startsWith("Compra tienda")) {
             // Obtener el mes y el día de la fecha en formato 'YYYY-MM-DD'
             const fechaParts = doc.fechaEfectuado.split('-');
-            const mes = fechaParts[1];
+            let mes = fechaParts[1];
             let dia = fechaParts[2];
 
             if (!historialPorMes[mes]) {
@@ -460,7 +460,7 @@ const nombresApellidos = [
     "KAREN RIQUETT",
     "ANGELICA GOMEZ",
     "CAROL PALACIOS",
-    "LEIDY VANESA QUIÑONES"
+    "LEIDY VANESA"
 ];
 
 coodinador.addEventListener('click', async () => {
@@ -626,10 +626,6 @@ input.addEventListener('change', () => {
             datosFinales.push(fila);
         });
 
-        // Mostrar elementos ocultos
-        over.style.display = "block";
-        loader.style.display = "block";
-
         // Eliminar las primeras 3 filas (si es necesario)
         datosFinales.splice(0, 4);
 
@@ -666,13 +662,11 @@ async function guardarDatos(datosFinales) {
                 if (response.ok) {
                     document.getElementById('successSound').play();
                     aviso("Datos guardados correctamente", "success");
-                    over.style.display = "none";
-                    loader.style.display = "none";
                     //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
                     return response.json();
                 } else {
-                    throw new Error('Error en la petición POST');
                     document.getElementById('errorSound').play();
+                    throw new Error('Error en la petición POST');
                 }
             })
             .then(responseData => {
