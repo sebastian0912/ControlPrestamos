@@ -1,11 +1,9 @@
 
 import { urlBack } from "../models/base.js";
-import { aviso } from "../Avisos/avisos.js";
+import { aviso, avisoConfirmacion } from "../Avisos/avisos.js";
 
 // capturar el id del usuario logeado del input
 const idUsuario = localStorage.getItem("idUsuario");
-let extraeT = document.getElementById("extraeT");
-
 
 // MOSTRAR EN EL HTML EL NOMBRE DEL USUARIO LOGEADO
 // Capturar el h1 del titulo y perfil
@@ -72,15 +70,11 @@ var diferencia2 = new Date(obtenerFecha()) - ahora;
 var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
 
 if (dias2 == 0) {
-    console.log(dias2)
     diasLi.style.color = "red";
 } else {
     diasLi.style.color = "black";
 }
 diasLi.innerHTML = dias2;
-
-
-
 
 const miSelect = document.getElementById('miSelect');
 
@@ -103,7 +97,6 @@ async function listaUsuarios() {
 
         if (response.ok) {
             const responseData = await response.json();
-            console.log(responseData);
             return responseData;
         } else {
             throw new Error('Error en la petición GET');
@@ -125,13 +118,6 @@ let datos = [
     }
 ];
 
-let datos2 = [
-    {
-        codigo: '0',
-        nombre: 'Seleccione un usuario',
-    }
-];
-
 listaU.forEach((doc) => {
     let aux = {
         codigo: '',
@@ -140,11 +126,27 @@ listaU.forEach((doc) => {
     //console.log(doc.id);
     aux.codigo = doc.numero_de_documento;
     aux.nombre = doc.primer_nombre + ' ' + doc.primer_apellido;
-    console.log(aux);
     datos.push(aux);
 });
 
-datos.forEach((opcion) => {
+// Excluye el primer elemento (posición 0) del arreglo
+var datosSinPrimero = datos.slice(1);
+
+// Ordena el nuevo arreglo por nombre
+datosSinPrimero.sort(function(a, b) {
+    if (a.nombre > b.nombre) {
+        return 1;
+    }
+    if (a.nombre < b.nombre) {
+        return -1;
+    }
+    return 0;
+});
+
+// Vuelve a unir el primer elemento al principio del arreglo ordenado
+var datosOrdenados = [datos[0]].concat(datosSinPrimero);
+
+datosOrdenados.forEach((opcion) => {
     const option = document.createElement('option');
     option.text = opcion.nombre;
     option.value = opcion.codigo;
@@ -155,7 +157,6 @@ async function EliminarU(cedulaEmpleado) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
-    console.log(jwtToken);
 
     const urlcompleta = urlBack.url + '/usuarios/administrador/eliminarUsuario/' + cedulaEmpleado;
     try {
@@ -192,8 +193,12 @@ miSelect.addEventListener('change', async (e) => {
 
     const boton = document.querySelector('#boton');
 
-    EliminarU(e.target.value);
-    document.querySelector('#miSelect').value = 0;
-    aviso('Usuario eliminado con exito', 'success');
+    const resultado = await avisoConfirmacion();
+
+    if (resultado){
+        EliminarU(e.target.value);
+        document.querySelector('#miSelect').value = 0;
+    }
+
 
 });

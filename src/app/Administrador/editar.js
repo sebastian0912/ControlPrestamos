@@ -72,7 +72,6 @@ var diferencia2 = new Date(obtenerFecha()) - ahora;
 var dias2 = Math.ceil(diferencia2 / (1000 * 60 * 60 * 24));
 
 if (dias2 == 0) {
-    console.log(dias2)
     diasLi.style.color = "red";
 } else {
     diasLi.style.color = "black";
@@ -103,7 +102,6 @@ async function listaUsuarios() {
 
         if (response.ok) {
             const responseData = await response.json();
-            console.log(responseData);
             return responseData;
         } else {
             throw new Error('Error en la petición GET');
@@ -141,18 +139,29 @@ listaU.forEach((doc) => {
         codigo: '',
         nombre: '',
     };
-    //console.log(doc.id);
     aux.codigo = doc.numero_de_documento;
     aux.nombre = doc.primer_nombre + ' ' + doc.primer_apellido;
-    
-
-    console.log(aux);
     datos.push(aux);
 });
 
+// Excluye el primer elemento (posición 0) del arreglo
+var datosSinPrimero = datos.slice(1);
 
+// Ordena el nuevo arreglo por nombre
+datosSinPrimero.sort(function(a, b) {
+    if (a.nombre > b.nombre) {
+        return 1;
+    }
+    if (a.nombre < b.nombre) {
+        return -1;
+    }
+    return 0;
+});
 
-datos.forEach((opcion) => {
+// Vuelve a unir el primer elemento al principio del arreglo ordenado
+var datosOrdenados = [datos[0]].concat(datosSinPrimero);
+
+datosOrdenados.forEach((opcion) => {
     const option = document.createElement('option');
     option.text = opcion.nombre;
     option.value = opcion.codigo;
@@ -160,13 +169,10 @@ datos.forEach((opcion) => {
 });
 
 
-
-
 async function cambioR(cedulaEmpleado, nuevoRol) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
-    console.log(jwtToken);
 
     const urlcompleta = urlBack.url + '/usuarios/administrador/cambioRol';
     try {
@@ -206,8 +212,7 @@ async function cambioR(cedulaEmpleado, nuevoRol) {
 editar.addEventListener('change', async (e) => {
     var boton = document.getElementById('boton');
     boton.style.display = 'block';
-    console.log(editar.value);
-    console.log(rol.value);
+
     boton.addEventListener('click', async (e) => {
         cambioR(editar.value, rol.value);
         aviso('Se cambio el rol correctamente', 'success');

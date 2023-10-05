@@ -346,6 +346,9 @@ async function datosComercializadora(codigo, listaC) {
         if (listaC[i].codigo == codigo) {
             return listaC[i];
         }
+        else{
+            return null;
+        }
     }
 }
 
@@ -392,8 +395,7 @@ async function actualizarVentas(cantidad, cod, username) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
-    console.log(jwtToken);
-    console.log(cantidad);
+
     const urlcompleta = urlBack.url + '/Comercio/jefedearea/ActualizarCantidadVendida/' + cod;
     try {
         fetch(urlcompleta, {
@@ -401,7 +403,7 @@ async function actualizarVentas(cantidad, cod, username) {
             body:
                 JSON.stringify({
                     cantidadTotalVendida: cantidad,
-                    PersonaRecibe: username,
+                    PersonaRecibe: "KAREN RIQUETT",
                     jwt: jwtToken
                 })
         })
@@ -599,7 +601,6 @@ function esCodigoValido(fechaGeneradoStr) {
 
 let isFunctionExecuting = false; // Variable para rastrear si la función está en ejecución
 
-
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener("click", async (e) => {
     if (isFunctionExecuting) {
@@ -615,6 +616,7 @@ boton.addEventListener("click", async (e) => {
 
     let cedula = document.querySelector("#cedula").value;
     let codigoA = document.querySelector("#codigoA").value;
+    codigoA = codigoA.replace(/\s+/g, ''); // Esto quitará todos los espacios en blanco de 'codigo'
 
     let cantidad = document.querySelector("#Cantidad").value;
     let cantidad2 = document.querySelector("#Cantidad2").value;
@@ -643,10 +645,49 @@ boton.addEventListener("click", async (e) => {
     datosComercializadoraGeneral = await datosTComercio();
     let datosArreglo = datosComercializadoraGeneral.comercio;
 
+    codigo = codigo.replace(/\s+/g, ''); // Esto quitará todos los espacios en blanco de 'codigo'
+    codigo2 = codigoA.replace(/\s+/g, ''); // Esto quitará todos los espacios en blanco de 'codigo'
+    codigo3 = codigoA.replace(/\s+/g, ''); // Esto quitará todos los espacios en blanco de 'codigo'
+    codigo4 = codigoA.replace(/\s+/g, ''); // Esto quitará todos los espacios en blanco de 'codigo'
+
+    
     let datos = await datosComercializadora(codigo, datosArreglo);
+    if (datos == null){
+        isFunctionExecuting = false;
+        over.style.display = "none";
+        loader.style.display = "none";
+        aviso("El codigo 1 de la comercializadora no existe","error")
+        return;
+    }
+
     let datos2 = await datosComercializadora(codigo2, datosArreglo);
+    if (datos2 == null){
+        isFunctionExecuting = false;
+        over.style.display = "none";
+        loader.style.display = "none";
+        aviso("El codigo 2 de la comercializadora no existe","error")
+        return;
+    }
+
     let datos3 = await datosComercializadora(codigo3, datosArreglo);
+    if (datos3 == null){
+        isFunctionExecuting = false;
+        over.style.display = "none";
+        loader.style.display = "none";
+        aviso("El codigo 3 de la comercializadora no existe","error")
+        return;
+    }
+
     let datos4 = await datosComercializadora(codigo4, datosArreglo);
+    if (datos4 == null){
+        isFunctionExecuting = false;
+        over.style.display = "none";
+        loader.style.display = "none";
+        aviso("El codigo 4 de la comercializadora no existe","error")
+        return;
+    }
+
+
     let auxValorUnidad2 = 0;
     let auxValorUnidad3 = 0;
     let auxValorUnidad4 = 0;
@@ -684,25 +725,6 @@ boton.addEventListener("click", async (e) => {
     if (cantidad4 == "") {
         cantidad4 = 0;
     }
-
-
-    console.log(parseInt(cantidad) * parseInt(datos2.valorUnidad));
-    console.log(parseInt(cantidad2) * auxValorUnidad2);
-    console.log(parseInt(cantidad3) * auxValorUnidad3);
-    console.log(parseInt(cantidad4) * auxValorUnidad4);
-    console.log("Datos: " + datos);
-    console.log("Datos2: " + datos2);
-    console.log("Datos3: " + datos3);
-    console.log("Datos4: " + datos4);
-    console.log("Cantidad: " + cantidad);
-    console.log("Cantidad2: " + cantidad2);
-    console.log("Cantidad3: " + cantidad3);
-    console.log("Cantidad4: " + cantidad4);
-    console.log("Codigo: " + parseInt(datos.valorUnidad));
-    console.log("Codigo2: " + parseInt(datos2.valorUnidad));
-    console.log("Codigo3: " + parseInt(datos3.valorUnidad));
-    console.log("Codigo4: " + parseInt(datos4.valorUnidad));
-
 
     let sumaVentas = parseInt(cantidad) * parseInt(datos.valorUnidad) + parseInt(cantidad2) * auxValorUnidad2 + parseInt(cantidad3) * auxValorUnidad3 + parseInt(cantidad4) * auxValorUnidad4;
     let sumaCantidad = parseInt(cantidad) + parseInt(datos.cantidadTotalVendida);
@@ -820,7 +842,7 @@ boton.addEventListener("click", async (e) => {
         await CambiarEstado(cod.codigo, sumaVentas, codigAux);
         await actualizar(codigAux, cod.codigo, usernameLocal, sumaVentas, 2);
         await actualizarVentas(cantidad, codigo, usernameLocal);
-
+        
         if (codigo2 != "") {
             await actualizarVentas(cantidad2, codigo2, usernameLocal);
         }
