@@ -114,83 +114,6 @@ async function datosEmpleado(cedulaEmpleado) {
     }
 }
 
-function verificaCondiciones(datos, nuevovalor) {
-    // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
-    console.log(datos.ingreso);
-    const fechaIngreso = datos.ingreso;
-    let dia = fechaIngreso.split("-")[0];
-    let mes = fechaIngreso.split("-")[1];
-    let anio = fechaIngreso.split("-")[2];
-
-    // el año esta en formato xxaa y se debe convertir a 20aa
-    let anioConvertido = "20" + anio;
-    anio = anioConvertido;
-
-    const sumaTotal =
-        parseInt(datos.saldos) +
-        parseInt(datos.fondos) +
-        parseInt(datos.mercados) +
-        parseInt(datos.prestamoParaDescontar) +
-        parseInt(datos.casino) +
-        parseInt(datos.valoranchetas) +
-        parseInt(datos.fondo) +
-        parseInt(datos.carnet) +
-        parseInt(datos.seguroFunerario) +
-        parseInt(datos.prestamoParaHacer) +
-        parseInt(datos.anticipoLiquidacion) +
-        parseInt(datos.cuentas);
-
-    const fechaActual = new Date();
-
-    // conseguir la fecha actual y separarla en dia, mes y año para poder compararla con la fecha de ingreso del empleado   
-    let diaActual = fechaActual.getDate();
-    let mesActual = fechaActual.getMonth() + 1;
-    let anioActual = fechaActual.getFullYear();
-    let fechaInicio = new Date(anio, mes, dia); // Asume que "anio", "mes", "dia" representan la fecha de inicio del trabajador
-    let fechaActualCompara = new Date(anioActual, mesActual, diaActual); // Asume que "anioActual", "mesActual", "diaActual" representan la fecha actual
-    let diferencia = Math.abs(fechaActualCompara - fechaInicio); // Diferencia en milisegundos
-    let diasTrabajados = Math.ceil(diferencia / (1000 * 60 * 60 * 24)); // Conversión de milisegundos a días
-
-    // Si ha trabajado entre 8 y 15 dias puede pedir prestamo de 150.000
-    if ((diasTrabajados > 8 && diasTrabajados <= 15)) {
-        if ((sumaTotal + parseInt(nuevovalor) >= 150001)) {
-            aviso("Ups no se pueden generar mercado, puede sacar maximo " + (150000 - (sumaTotal)), "error");
-            return false;
-        }
-        else {
-            return true;
-        }
-
-    }
-
-    // Si ha trabajado entre 15 y 30 dias puede pedir prestamo de 250.000
-    else if ((diasTrabajados > 15 && diasTrabajados <= 30)) {
-        if ((sumaTotal + parseInt(nuevovalor) >= 250001)) {
-            aviso("Ups no se pueden generar mercado, puede sacar maximo " + (250000 - (sumaTotal)), "error");
-            return false;
-        }
-        else {
-            return true;
-        }
-    }
-
-    // Si ha trabajado mas de 30 dias puede pedir prestamo de 350.000
-    else if ((diasTrabajados > 30)) {
-        if ((sumaTotal + parseInt(nuevovalor) >= 350001)) {
-            aviso("Ups no se pueden generar mercado, puede sacar maximo " + (350000 - (sumaTotal)), "error");
-            return false;
-        }
-        else {
-            return true;
-        }
-    }
-    else {
-        aviso("Ups no se pueden generar mercado, el empleado no tiene los dias suficientes para pedir prestamo", "error");
-        return false;
-    }
-
-}
-
 async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo, codigo2) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
@@ -535,8 +458,8 @@ boton.addEventListener('click', async (e) => {
         await sleep(1000); // Pausa de 1 segundos
         await ActualizarHistorial(codigoOH);
         await sleep(1000); // Pausa de 1 segundos
-        //await historialT(nuevovalor);
-        //await actualizarDatosBase("Compra tienda de Ferias", nuevovalor, cuotas, cedulaEmpleado);
+        await historialT(nuevovalor);
+        await actualizarDatosBase("Compra tienda de Ferias", nuevovalor, cuotas, cedulaEmpleado);
 
         let empresa = null;
         let NIT = null;

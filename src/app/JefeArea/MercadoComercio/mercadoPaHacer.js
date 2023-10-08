@@ -9,6 +9,8 @@ const perfil = document.querySelector('#perfil');
 const perfilLocal = localStorage.getItem("perfil");
 const usernameLocal = localStorage.getItem("username");
 const iddatos = localStorage.getItem("idUsuario");
+const sede = localStorage.getItem("sede");
+
 //Muestra en la parte superior el nombre y el perfil
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
@@ -66,7 +68,6 @@ function obtenerFecha() {
 
 var diferencia2 = new Date(obtenerFecha()) - ahora;
 var dias2 = Math.abs(Math.ceil(diferencia2 / (1000 * 60 * 60 * 24)));
-console.log(dias2);
 if (dias2 == 0) {
     diasLi.style.color = "red";
 } else {
@@ -74,7 +75,6 @@ if (dias2 == 0) {
 }
 diasLi.innerHTML = dias2;
 
-console.log(dias2);
 
 
 
@@ -93,12 +93,76 @@ numemoroM.addEventListener('keyup', (e) => {
     }
 });
 
+async function datosTComercio() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/Comercio/comercio';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
+
+// Mostar contenido en una tabla
+const tabla = document.querySelector("#tabla");
+
+let datosComercializadoraGeneral = [];
+datosComercializadoraGeneral = await datosTComercio();
+let datosArreglo = datosComercializadoraGeneral.comercio;
+datosArreglo.forEach((p) => {
+    if (p.destino == sede && p.cantidadRecibida != p.cantidadTotalVendida) {
+        tabla.innerHTML += `
+        <tr>
+            <td>${p.codigo}</td>
+            <td>${p.concepto}</td>
+            <td>${p.destino}</td>
+            <td>${p.cantidadEnvio}</td>
+            <td>${p.cantidadRecibida}</td>
+            <td>${p.valorUnidad}</td>
+            <td>${p.cantidadTotalVendida}</td>
+            <td>${p.PersonaEnvia}</td>
+            <td>${p.PersonaRecibe}</td>
+        </tr>
+    `
+    }
+});
+
+let datos2 = ["Pollo Suba", "Pollo LuzDary", "Fruver", "Carne", "Otro"];
+
+// recorrer el arreglo y mostrarlo en el select
+for (let i = 0; i < datos2.length; i++) {
+    let opcion = document.createElement("option");
+    opcion.value = datos2[i];
+    opcion.text = datos2[i];
+    concepto.appendChild(opcion);
+}
+
+
 
 async function escribirCodigo(cedulaEmpleado, nuevovalor, cod, valor) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
-    console.log(jwtToken);
 
     const urlcompleta = urlBack.url + '/Codigo/jefedearea/crearcodigo';
     try {
@@ -159,7 +223,6 @@ async function datosEmpleado(cedulaEmpleado) {
 
         if (response.ok) {
             const responseData = await response.json();
-            console.log(responseData);
             return responseData;
         } else {
             throw new Error('Error en la petición GET');
@@ -171,10 +234,8 @@ async function datosEmpleado(cedulaEmpleado) {
     }
 }
 
-
 function verificaCondiciones(datos, nuevovalor) {
     // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
-    console.log(datos.ingreso);
     const fechaIngreso = datos.ingreso;
     let dia = fechaIngreso.split("-")[0];
     let mes = fechaIngreso.split("-")[1];
@@ -258,7 +319,6 @@ async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo, codig
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
-    console.log(jwtToken);
     var dia = new Date().getDate();
     var mes = new Date().getMonth() + 1;
     var anio = new Date().getFullYear();
@@ -307,7 +367,6 @@ async function actualizarDatosBase(concepto, valor, cuotas, cedulaEmpleado) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
-    console.log(jwtToken);
 
     const urlcompleta = urlBack.url + '/Datosbase/tienda/actualizarMercados/' + cedulaEmpleado;
 
@@ -520,24 +579,143 @@ async function datosTCodigos() {
 
 let isFunctionExecuting = false; // Variable para rastrear si la función está en ejecución
 
+
+let mostrarAviso = false;
+concepto.addEventListener('change', async (e) => {
+    const otro = document.querySelector('#otro2');
+    if (e.target.value == "Otro") {
+        mostrarAviso = true;
+        otro.style.display = "inline-block";
+    } else {
+        mostrarAviso = false;
+        otro.style.display = "none";
+    }
+});
+
+boton.addEventListener('click', async (e) => {
+    if (mostrarAviso) {
+        const otro2 = document.querySelector('#otro2');
+        if (otro2.value == "") {
+            aviso("No se ha ingresado ningun valor", "error");
+        }
+    }
+});
+
+comercializadora.addEventListener('change', async (e) => {
+    const codigoComercializadora = document.querySelector('#codigoComercializadora');
+    const cantidad = document.querySelector('#cantidad');
+    console.log(e.target.value)
+
+    if (e.target.value == "si") {
+        codigoComercializadora.style.display = "inline-block";
+        cantidad.style.display = "inline-block";
+        mostrarT.style.display = "inline-block";
+    } else {
+        codigoComercializadora.style.display = "none";
+        cantidad.style.display = "none";
+        mostrarT.style.display = "none";
+    }
+});
+
+// ENCONTRAR EL CODIGO DE LA COMERCIALIZADORA
+async function datosComercializadora(codigo, listaC) {
+    for (let i = 0; i < listaC.length; i++) {
+        if (listaC[i].codigo == codigo) {
+            return listaC[i];
+        }
+    }
+}
+
+async function actualizar(codigo, cod, username, monto2, cuotas2) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+
+    const urlcompleta = urlBack.url + '/Codigo/jefedearea/actualizarCodigo/' + cod;
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    codigoDescontado: codigo,
+                    ejecutadoPor: username,
+                    nuevomonto: monto2,
+                    cuotas: cuotas2,
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+}
+
+async function actualizarVentas(cantidad, cod, username) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+    console.log(jwtToken);
+    console.log(cantidad);
+    const urlcompleta = urlBack.url + '/Comercio/jefedearea/ActualizarCantidadVendida/' + cod;
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body:
+                JSON.stringify({
+                    cantidadTotalVendida: cantidad,
+                    PersonaRecibe: username,
+                    jwt: jwtToken
+                })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                console.log('Respuesta:', responseData);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+}
+
+
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
     e.preventDefault();
 
-
-    
     // capturar los datos del formulario
     let cedulaEmpleado = document.querySelector('#cedula').value;
 
     let aux = await datosEmpleado(cedulaEmpleado);
-    console.log(aux.datosbase[0]);
     let datos = aux.datosbase[0];
-    console.log(datos);
 
     if (aux.datosbase == "No se encontró el registro para el ID proporcionado") {
-        console.log("No existe");
         aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
-        return;    
+        return;
     }
 
     if (parseInt(datos.saldos) > 175000) {
@@ -545,7 +723,6 @@ boton.addEventListener('click', async (e) => {
         aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
         return;
     }
-
 
     boton.style.display = "none";
     cedula.style.display = "none";
@@ -555,6 +732,8 @@ boton.addEventListener('click', async (e) => {
     boton2.style.display = "inline-block";
     formaPago.style.display = "inline-block";
     celular.style.display = "inline-block";
+    concepto.style.display = "inline-block";
+    comercializadora.style.display = "inline-block";
 
     datosPersona.innerHTML = datos.nombre;
 
@@ -566,13 +745,18 @@ boton.addEventListener('click', async (e) => {
             aviso('Se esta ejecutando la funcion', 'warning');
             return;
         }
-    
+
         isFunctionExecuting = true; // Marcar la función como en ejecución
 
         let valor = document.querySelector('#monto').value;
         let cuotas = document.querySelector('#cuotas').value;
         let nuevovalor = valor.replace(/\,/g, '');
         let codigoOH = 'M' + Math.floor(Math.random() * 1000000);
+        let otro2 = document.querySelector('#otro2').value;
+        let comercializadora = document.querySelector('#comercializadora').value;
+        let codigoComercializadora = document.querySelector('#codigoComercializadora').value;
+        let cantidad = document.querySelector('#cantidad').value;
+        let conceptoTexto;
 
         if (!verificaCondiciones(datos, nuevovalor) == true) {
             isFunctionExecuting = false;
@@ -586,12 +770,11 @@ boton.addEventListener('click', async (e) => {
         }
 
         // si cuotas es mayor a 4
-        if (parseInt(cuotas) > 4) {
+        if (parseInt(cuotas) > 2) {
             isFunctionExecuting = false;
-            aviso('Ups no se pueden generar mercado, las cuotas no pueden ser mayor a 4', 'error');
+            aviso('Ups no se pueden generar mercado, las cuotas no pueden ser mayor a 2', 'error');
             return;
         }
-
 
         if (formaPago.value != "Efectivo" && formaPago.value != "0" && formaPago.value != "Otro") {
             // campo celular debe tener 10 digitos
@@ -601,16 +784,80 @@ boton.addEventListener('click', async (e) => {
                 return;
             }
         }
-        
 
         await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, valor)
+        await sleep(1000); // Pausa de 2 segundos
         await CambiarEstado(codigoOH, nuevovalor, codigoOH);
-        await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, "Compra tienda de Ferias", codigoOH, usernameLocal);
-        await sleep(1000); // Pausa de 1 segundos
-        await ActualizarHistorial(codigoOH);
-        await sleep(1000); // Pausa de 1 segundos
-        await historialT(nuevovalor);
-        await actualizarDatosBase("Compra tienda de Ferias", nuevovalor, cuotas, cedulaEmpleado);
+        await sleep(1000); // Pausa de 2 segundos
+        await actualizar(codigoOH, codigoOH, usernameLocal, valor, cuotas);
+
+        if (comercializadora == "si") {
+
+            datosComercializadoraGeneral = await datosTComercio();
+            let datosArreglo = datosComercializadoraGeneral.comercio;
+            isFunctionExecuting = false;
+
+            if (codigoComercializadora == "") {
+                aviso('Ups no se pueden generar mercado, el codigo de la comercializadora no puede estar vacio', 'error');
+                return
+            }
+            if (cantidad == "") {
+                aviso('Ups no se pueden generar mercado, la cantidad de la comercializadora no puede estar vacio', 'error');
+                return
+            }
+            codigoComercializadora = codigoComercializadora.replace(/\s+/g, ''); // Esto quitará todos los espacios en blanco de 'codigo'
+            let datos = await datosComercializadora(codigoComercializadora, datosArreglo);
+            console.log(datos)
+            let concepto2 = datos.concepto;
+
+            let sumaVentas = parseInt(cantidad) * parseInt(datos.valorUnidad);
+            let sumaCantidad = parseInt(cantidad) + parseInt(datos.cantidadTotalVendida);
+
+            if (sumaCantidad > datos.cantidadRecibida) {
+                isFunctionExecuting = false;
+                over.style.display = "none";
+                loader.style.display = "none";
+                aviso("No se puede cargar el mercado del producto #1 porque la suma de la cantidad supera el inventario disponible. Lo máximo a sacar es " + (datos.cantidadRecibida - datos.cantidadTotalVendida), "error");
+                return;
+            }
+
+            await actualizarVentas(cantidad, codigoComercializadora, usernameLocal);
+            await actualizarDatosBase("", nuevovalor, cuotas, cedulaEmpleado);
+            await historialT(sumaVentas);
+            await escribirHistorial(cedulaEmpleado, sumaVentas, cuotas, "Compra tienda ferias respecto a:" + concepto2 + " en " + sede, codigoOH, usernameLocal);
+            await sleep(1000); // Pausa de 2 segundos
+            await ActualizarHistorial(codigoOH);
+
+            isFunctionExecuting = false;
+
+            let confirmacion = await avisoConfirmado('Acaba de pedir un mercado de ' + sumaVentas + ' su codigo es: ' + codigoOH, 'success');
+
+            if (confirmacion) {
+                // recargar la pagina
+                location.reload();
+            }
+        }
+        
+        else {
+            if (otro2 != "") {
+                concepto = otro2;
+            }            
+            await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, "Compra tienda de Ferias respecto a:" + concepto.value + " en " + sede, codigoOH, usernameLocal);
+            await sleep(1000); // Pausa de 1 segundos
+            await ActualizarHistorial(codigoOH);
+            await historialT(nuevovalor);
+            await actualizarDatosBase("Compra tienda de Ferias", nuevovalor, cuotas, cedulaEmpleado);
+            
+            isFunctionExecuting = false;
+
+            let confirmacion = await avisoConfirmado('Acaba de pedir un mercado de ' + valor + ' su codigo es: ' + codigoOH, 'success');
+
+            if (confirmacion) {
+                // recargar la pagina
+                location.reload();
+            }
+        }
+
 
 
         let empresa = null;
@@ -690,11 +937,6 @@ boton.addEventListener('click', async (e) => {
 
         isFunctionExecuting = false;
 
-        let confirmacion = await avisoConfirmado('Acaba de pedir una autorización de mercado por un valor de ' + valor + ' su codigo es: ' + codigoOH, 'success');
-        if (confirmacion) {
-            // recargar la pagina
-            location.reload();
-        }
     }
     );
 }

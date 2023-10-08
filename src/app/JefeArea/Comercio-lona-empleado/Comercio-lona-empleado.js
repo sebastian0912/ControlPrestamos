@@ -490,9 +490,11 @@ async function datosComercializadora(codigo, listaC) {
     for (let i = 0; i < listaC.length; i++) {
         if (listaC[i].codigo == codigo) {
             return listaC[i];
+        }
         }        
     }
-}
+
+
 
 async function actualizar(codigo, cod, username, monto2, cuotas2) {
     var body = localStorage.getItem('key');
@@ -795,7 +797,7 @@ boton.addEventListener("click", async (e) => {
     let datos3 = await datosComercializadora(codigo3, datosArreglo);
     let datos4 = await datosComercializadora(codigo4, datosArreglo);
 
-   
+
     let auxValorUnidad2 = 0;
     let auxValorUnidad3 = 0;
     let auxValorUnidad4 = 0;
@@ -980,9 +982,8 @@ boton.addEventListener("click", async (e) => {
         }
         await actualizarDatos(cedula, sumaVentas, 2);
         await historialT(sumaVentas);
-        await sleep(1000); // Pausa de 2 segundos
         await escribirHistorial(cedula, sumaVentas, 2, "Compra tienda respecto a:" + concepto + " en " + sede, codigAux, cod.generadoPor);
-        await sleep(1000); // Pausa de 2 segundos
+        await sleep(2000); // Pausa de 2 segundos
         await ActualizarHistorial(codigAux);
 
         over.style.display = "none";
