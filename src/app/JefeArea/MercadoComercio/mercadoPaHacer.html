@@ -118,9 +118,11 @@
                     <button class="btn2" id="boton">Buscar</button>
 
                     <input type="text" id="monto" placeholder="Valor" class="input2" style="display: none;" />
-                    <input type="text" id="cuotas" placeholder="Num Cuotas" class="input2" style="display: none; margin-left: 10px" />
+                    <input type="text" id="cuotas" placeholder="Num Cuotas" class="input2"
+                        style="display: none; margin-left: 10px" />
 
-                    <select name="" id="formaPago" class="input2" style="display:none; margin-left: 50px">
+                    <select name="" id="formaPago" class="input2"
+                        style="display:none; margin-left: 50px; margin-top:20px ">
                         <option value="0">Forma Pago</option>
                         <option value="Daviplata">Daviplata</option>
                         <option value="Efectivo">Efectivo</option>
@@ -131,7 +133,29 @@
                     <input type="text" id="celular" placeholder="" class="input2"
                         style="margin-left: 20px; display:none" />
 
-                    <button class="btn" id="boton2" style="display: none; margin-left: 50px; margin-top:10px ">Cargar</button>
+                    <select name="" id="concepto" class="input2"
+                        style="display:none; margin-left: 50px; margin-top:20px">
+                        <option value="0">Concepto </option>
+                    </select>
+                    <select name="" id="comercializadora" class="input2" style="display:none; margin-left: 20px; ">
+
+                        <option value="0"> Ingresara mercancia de la comercializadora? </option>
+                        <option value="si">Si</option>
+                        <option value="no">No</option>
+                    </select>
+
+                    <input type="text" id="otro2" placeholder="Otro concepto" class="input2"
+                        style="display: none; margin-left:50px; margin-top:20px" />
+
+                    <input type="text" id="codigoComercializadora" placeholder="Codigo Comercializadora?" class="input2"
+                        style="display: none; margin-left:50px; margin-top:20px" />
+
+
+                    <input type="text" id="cantidad" placeholder="Cantidad comerizilizadora?" class="input2"
+                        style="display: none; margin-left:10px" />
+
+                    <button class="btn" id="boton2"
+                        style="display: none; margin-left: 50px; margin-top:10px ">Cargar</button>
 
                 </div>
             </div>
@@ -139,7 +163,27 @@
 
         </div>
 
+        <div class="tabla" id="mostrarT" style="display: none;">
+            <table class="tabla-contenido">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Concepto</th>
+                        <th>Lugar a donde llega</th>
+                        <th>Cantidad Enviada</th>
+                        <th>Cantidad Recibida</th>
+                        <th>Valor Unidad</th>
+                        <th>Cantidad Total Entregada</th>
+                        <th>Persona Quien Envia</th>
+                        <th>Persona Quien Recibe</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla"> </tbody>
+            </table>
+        </div>
+
     </div>
+
 </body>
 
 </html>

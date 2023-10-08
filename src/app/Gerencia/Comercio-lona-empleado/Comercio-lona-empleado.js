@@ -346,9 +346,6 @@ async function datosComercializadora(codigo, listaC) {
         if (listaC[i].codigo == codigo) {
             return listaC[i];
         }
-        else{
-            return null;
-        }
     }
 }
 
@@ -649,7 +646,6 @@ boton.addEventListener("click", async (e) => {
     codigo2 = codigoA.replace(/\s+/g, ''); // Esto quitará todos los espacios en blanco de 'codigo'
     codigo3 = codigoA.replace(/\s+/g, ''); // Esto quitará todos los espacios en blanco de 'codigo'
     codigo4 = codigoA.replace(/\s+/g, ''); // Esto quitará todos los espacios en blanco de 'codigo'
-
     
     let datos = await datosComercializadora(codigo, datosArreglo);
     if (datos == null){

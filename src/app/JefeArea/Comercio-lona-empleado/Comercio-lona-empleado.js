@@ -491,9 +491,6 @@ async function datosComercializadora(codigo, listaC) {
         if (listaC[i].codigo == codigo) {
             return listaC[i];
         }
-        else{
-            return null;
-        }
     }
 }
 
