@@ -17,6 +17,14 @@ titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
 
 
+if (usernameLocal == "YENY SOTELO"){
+    mercado.style.display = "inline-block"
+}
+else{
+    mercado.style.display = "none"
+}
+
+
 var body = localStorage.getItem('key');
 const obj = JSON.parse(body);
 const jwtKey = obj.jwt;
@@ -26,6 +34,7 @@ const headers = {
 };
 
 const urlcompleta = urlBack.url + '/HistorialModificaciones/Comercializadora/verModificaciones';
+
 
 try {
     const response = await fetch(urlcompleta, {

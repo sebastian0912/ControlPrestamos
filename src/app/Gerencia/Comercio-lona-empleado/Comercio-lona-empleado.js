@@ -346,9 +346,6 @@ async function datosComercializadora(codigo, listaC) {
         if (listaC[i].codigo == codigo) {
             return listaC[i];
         }
-        else{
-            return null;
-        }
     }
 }
 
@@ -649,44 +646,11 @@ boton.addEventListener("click", async (e) => {
     codigo2 = codigoA.replace(/\s+/g, ''); // Esto quitará todos los espacios en blanco de 'codigo'
     codigo3 = codigoA.replace(/\s+/g, ''); // Esto quitará todos los espacios en blanco de 'codigo'
     codigo4 = codigoA.replace(/\s+/g, ''); // Esto quitará todos los espacios en blanco de 'codigo'
-
     
     let datos = await datosComercializadora(codigo, datosArreglo);
-    if (datos == null){
-        isFunctionExecuting = false;
-        over.style.display = "none";
-        loader.style.display = "none";
-        aviso("El codigo 1 de la comercializadora no existe","error")
-        return;
-    }
-
     let datos2 = await datosComercializadora(codigo2, datosArreglo);
-    if (datos2 == null){
-        isFunctionExecuting = false;
-        over.style.display = "none";
-        loader.style.display = "none";
-        aviso("El codigo 2 de la comercializadora no existe","error")
-        return;
-    }
-
     let datos3 = await datosComercializadora(codigo3, datosArreglo);
-    if (datos3 == null){
-        isFunctionExecuting = false;
-        over.style.display = "none";
-        loader.style.display = "none";
-        aviso("El codigo 3 de la comercializadora no existe","error")
-        return;
-    }
-
     let datos4 = await datosComercializadora(codigo4, datosArreglo);
-    if (datos4 == null){
-        isFunctionExecuting = false;
-        over.style.display = "none";
-        loader.style.display = "none";
-        aviso("El codigo 4 de la comercializadora no existe","error")
-        return;
-    }
-
 
     let auxValorUnidad2 = 0;
     let auxValorUnidad3 = 0;

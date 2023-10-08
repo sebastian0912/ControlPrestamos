@@ -29,6 +29,13 @@ numemoroM.addEventListener('keyup', (e) => {
     }
 });
 
+if (usernameLocal == "YENY SOTELO"){
+    mercado.style.display = "inline-block"
+}
+else{
+    mercado.style.display = "none"
+}
+
 
 async function escribirCodigo(cedulaEmpleado, nuevovalor, cod, valor) {
     var body = localStorage.getItem('key');

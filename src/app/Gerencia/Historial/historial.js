@@ -15,6 +15,15 @@ const numCoordinadoresConestadoSolicitudesTrue = localStorage.getItem("coordinad
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
 
+
+if (usernameLocal == "YENY SOTELO"){
+    mercado.style.display = "inline-block"
+}
+else{
+    mercado.style.display = "none"
+}
+
+
 async function datosH(cedulaEmpleado) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);

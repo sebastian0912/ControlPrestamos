@@ -20,6 +20,12 @@ const usernameLocal = localStorage.getItem("username");
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
 
+if (usernameLocal == "YENY SOTELO"){
+    mercado.style.display = "inline-block"
+}
+else{
+    mercado.style.display = "none"
+}
 
 /*Convertir valor a separado por miles*/
 const numemoroM = document.querySelector('#valor');

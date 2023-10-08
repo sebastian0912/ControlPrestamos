@@ -28,6 +28,13 @@ numemoroM.addEventListener('keyup', (e) => {
     }
 });
 
+if (usernameLocal == "YENY SOTELO"){
+    mercado.style.display = "inline-block"
+}
+else{
+    mercado.style.display = "none"
+}
+
 
 formaPago.addEventListener('change', (e) => {
     const numerodepago = document.querySelector('#celular');

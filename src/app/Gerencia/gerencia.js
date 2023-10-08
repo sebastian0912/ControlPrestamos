@@ -14,6 +14,12 @@ let extraeT = document.getElementById("extraeT");
 
 let input = document.getElementById('archivoInput');
 
+if (usernameLocal == "YENY SOTELO"){
+    mercado.style.display = "inline-block"
+}
+else{
+    mercado.style.display = "none"
+}
 
 //Muestra en la parte superior el nombre y el perfil
 titulo.innerHTML = usernameLocal;

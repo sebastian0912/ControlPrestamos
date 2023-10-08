@@ -490,10 +490,7 @@ async function datosComercializadora(codigo, listaC) {
     for (let i = 0; i < listaC.length; i++) {
         if (listaC[i].codigo == codigo) {
             return listaC[i];
-        }
-        else{
-            return null;
-        }
+        }        
     }
 }
 
@@ -775,15 +772,11 @@ boton.addEventListener("click", async (e) => {
     let codigo4 = document.querySelector("#codigo4").value;
 
     const aux = await datosTCodigos();
-    console.log(aux.codigo);
     let CodigosMercado = aux.codigo;
     let aux2 = await datosEmpleado(cedula);
-    console.log(aux2.datosbase[0]);
     let usuario = aux2.datosbase[0];
-    console.log(usuario);
 
     if (aux2.datosbase == "No se encontró el registro para el ID proporcionado") {
-        console.log("No existe");
         over.style.display = "none";
         loader.style.display = "none";
         aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
@@ -792,48 +785,17 @@ boton.addEventListener("click", async (e) => {
     datosComercializadoraGeneral = await datosTComercio();
     let datosArreglo = datosComercializadoraGeneral.comercio;
 
-    
     codigo = codigo.replace(/\s+/g, ''); // Esto quitará todos los espacios en blanco de 'codigo'
     codigo2 = codigoA.replace(/\s+/g, ''); // Esto quitará todos los espacios en blanco de 'codigo'
     codigo3 = codigoA.replace(/\s+/g, ''); // Esto quitará todos los espacios en blanco de 'codigo'
     codigo4 = codigoA.replace(/\s+/g, ''); // Esto quitará todos los espacios en blanco de 'codigo'
 
-
-    if (datos == null){
-        isFunctionExecuting = false;
-        over.style.display = "none";
-        loader.style.display = "none";
-        aviso("El codigo 1 de la comercializadora no existe","error")
-        return;
-    }
-
+    let datos = await datosComercializadora(codigo, datosArreglo);
     let datos2 = await datosComercializadora(codigo2, datosArreglo);
-    if (datos2 == null){
-        isFunctionExecuting = false;
-        over.style.display = "none";
-        loader.style.display = "none";
-        aviso("El codigo 2 de la comercializadora no existe","error")
-        return;
-    }
-
     let datos3 = await datosComercializadora(codigo3, datosArreglo);
-    if (datos3 == null){
-        isFunctionExecuting = false;
-        over.style.display = "none";
-        loader.style.display = "none";
-        aviso("El codigo 3 de la comercializadora no existe","error")
-        return;
-    }
-
     let datos4 = await datosComercializadora(codigo4, datosArreglo);
-    if (datos4 == null){
-        isFunctionExecuting = false;
-        over.style.display = "none";
-        loader.style.display = "none";
-        aviso("El codigo 4 de la comercializadora no existe","error")
-        return;
-    }
-    
+
+   
     let auxValorUnidad2 = 0;
     let auxValorUnidad3 = 0;
     let auxValorUnidad4 = 0;
@@ -874,12 +836,12 @@ boton.addEventListener("click", async (e) => {
 
 
     let sumaVentas = parseInt(cantidad) * parseInt(datos.valorUnidad) + parseInt(cantidad2) * auxValorUnidad2 + parseInt(cantidad3) * auxValorUnidad3 + parseInt(cantidad4) * auxValorUnidad4;
+    console.log(sumaVentas);
     let sumaCantidad = parseInt(cantidad) + parseInt(datos.cantidadTotalVendida);
     let sumaCantidad2 = parseInt(cantidad2) + parseInt(datos2.cantidadTotalVendida);
     let sumaCantidad3 = parseInt(cantidad3) + parseInt(datos3.cantidadTotalVendida);
     let sumaCantidad4 = parseInt(cantidad4) + parseInt(datos4.cantidadTotalVendida);
 
-    console.log(sumaVentas);
     let cod = obtenerCodigo(codigoA, CodigosMercado);
 
     if (sumaCantidad > datos.cantidadRecibida) {

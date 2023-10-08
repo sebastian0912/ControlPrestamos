@@ -33,6 +33,14 @@ numemoroM.addEventListener('keyup', (e) => {
     }
 });
 
+if (usernameLocal == "YENY SOTELO"){
+    mercado.style.display = "inline-block"
+}
+else{
+    mercado.style.display = "none"
+}
+
+
 function verificarCedula(codigoP, cedulaEmpleado, datos) {
     let encontrado = false;
     datos.forEach(doc => {
