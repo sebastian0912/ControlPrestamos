@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../reset.css" />
+    <link rel="stylesheet" href="fecha.css" />
+
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal@4/minimal.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+
+    <script defer src="../../logOut2.js" type="module"></script>
+    <script defer src="fecha.js" type="module"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+
+</head>
+
+<body>
+
+    <div class="opciones">
+        <ul class="lista-Opciones">
+
+            <li>
+                <a href="../gerencia.html">
+                    <img src="../../assets/pagina-de-inicio.png" alt="logo" class="logo" />
+                    <p> Inicio </p>
+                </a>
+            </li>
+
+
+            <li>
+                <a href=".codigo/codigo.html">
+                    <img src="../../assets/prestamo.png" alt="logo" class="logo" />
+                    <p> Prestamo Calamidad</p>
+                </a>
+            </li>
+
+            <li>
+                <a href="../codigo2/codigo2.html">
+                    <img src="../../assets/sello.png" alt="logo" class="logo" />
+                    <p> Autorización prestamo</p>
+                </a>
+            </li>
+
+
+            <li>
+                <a href="../Historial/historial.html">
+                    <img src="../../assets/historial-medico.png" alt="logo" class="logo" />
+                    <p>Historial</p>
+                </a>
+            </li>
+
+            <li>
+                <a href="../HistorialM/HistorialM.html">
+                    <img src="../../assets/intercambio.png" alt="logo" class="logo" />
+                    <p>Historial Modificaciones</p>
+                </a>
+            </li>
+
+            <li>
+                <a href="../CargoMercado/tienda.html">
+                    <img src="../../assets/mercado.png" alt="logo" class="logo" />
+                    <p> Cargar Mercado </p>
+                </a>
+            </li>
+
+            <li>
+                <a href="../Mercado/mercado.html">
+                    <img src="../../assets/mercado.png" alt="logo" class="logo" />
+                    <p> Bono de mercado </p>
+                </a>
+            </li>
+
+            <li>
+                <a href="../MercadoComercio/mercadoPaHacer.html">
+                    <img src="../../assets/mercado.png" alt="logo" class="logo" />
+                    <p> Mercado Ferias </p>
+                </a>
+            </li>
+
+            <li id="mercado">
+                <a href="./Comercio-lona-empleado/Comercio-lona-empleado.html">
+                    <img src="../../assets/mercado.png" alt="logo" class="logo" />
+                    <p> Mercado comercializadora </p>
+                </a>
+            </li>
+
+            <li id="logout">
+                <img src="../../assets/cerrar-sesion.png" alt="logo" class="logo" />
+                <p>Cerrar Sesión</p>
+            </li>
+        </ul>
+    </div>
+
+
+    <header>
+        <div class="cajontitulo">
+            <h1 class="titulo">Bienvenido</h1>
+        </div>
+        <div class="perfil">
+            <h1 clas class="titulo">Hola, <span id="username"></span></h1>
+            <h1 id="perfil" class="titulo"></h1>
+        </div>
+    </header>
+
+    <div class="contenido" >
+        <div class="cuadroTexto">
+            <div class="cajaCedula">
+                <h1 class="titulo" style="margin-right: 250px;"> Seleccione la(s) fechas para generar reporte:       </h1>
+                <label for="fechaInicio">Fecha de inicio:</label>
+                <input type="date" id="fechaInicio" name="fechaInicio" style="margin-right: 50px;">
+                
+                <label for="fechaFin">Fecha de fin:</label>
+                <input type="date" id="fechaFin" name="fechaFin">
+
+                <button class="btn" id="boton">Buscar</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
