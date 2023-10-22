@@ -404,9 +404,8 @@ input.addEventListener('change', () => {
 
         // Eliminar las primeras 3 filas (si es necesario)
         datosFinales.splice(0, 4);
-
+        console.log(datosFinales);
         guardarDatos(datosFinales);
-
     };
 });
 
