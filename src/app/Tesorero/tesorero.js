@@ -745,40 +745,60 @@ async function EliminarEm(cedulaEmpleado) {
 }
 
 input.addEventListener('change', () => {
-    let archivo = input.files[0];
-    let reader = new FileReader();
+    const file = input.files[0];
+    const reader = new FileReader();
 
-    /* Leer archivo .csv */
-    reader.readAsText(archivo, 'UTF-8'); // Asegúrate de usar la codificación correcta
+    let datosFinales = [];
 
-    reader.onload = () => {
-        let info = reader.result;
-        /* Separar por saltos de línea */
-        let datos = info.split('\n');
+    reader.onload = (event) => {
+        const fileContent = event.target.result;
+        const workbook = XLSX.read(fileContent, { type: 'binary' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-        // Array para almacenar los datos finales
-        let datosFinales = [];
+        // Comienza a leer desde la quinta fila
+        for (let i = 4; i < rows.length; i++) {
+            const rowData = rows[i];
 
-        datos.forEach(dato => {
-            // Utilizar el punto y coma (;) como separador en la expresión regular
-            let fila = dato.split(/;/).map(item => item.trim() === '' ? "0" : item.trim());
-            datosFinales.push(fila);
-        });
+            // Convierte el número serial de fecha en una cadena de texto en formato "dd/mm/yyyy"
+            const fechaSerial = rowData[3]; 
+            const fechaCadena = excelSerialToJSDate(fechaSerial);
 
-        // Mostrar elementos ocultos
-        over.style.display = "block";
+            // Reemplaza el valor numérico con la cadena de texto formateada
+            rowData[3] = fechaCadena;
+
+            datosFinales.push(rowData);
+        }
+
+        console.log('Datos cargados desde Excel:', datosFinales);
+
+        // Llama a la función para procesar los datos (guardarDatos) si es necesario
         loader.style.display = "block";
-
-        // Eliminar las primeras 3 filas (si es necesario)
-        datosFinales.splice(0, 4);
-
-        guardarDatos(datosFinales);
+        over.style.display = "block";
+        //guardarDatos(datosFinales);
 
     };
+
+    reader.readAsBinaryString(file);
+
+    // Función para convertir el número serial de fecha de Excel en una cadena de texto en formato "dd/mm/yyyy"
+    function excelSerialToJSDate(serial) {
+        const utcDays = Math.floor(serial - 25569);
+        const utcValue = utcDays * 86400; // 86400 seconds in a day
+        const dateInfo = new Date(utcValue * 1000);
+
+        const day = dateInfo.getUTCDate();
+        const month = dateInfo.getUTCMonth() + 1; // JS months are 0-based
+        const year = dateInfo.getUTCFullYear() % 100; // Obtener los últimos dos dígitos del año
+
+        return `${day}-${month}-${year.toString().padStart(2, '0')}`;
+    }
+
 });
 
-async function guardarDatos(datosFinales) {
 
+async function guardarDatos(datosFinales) {
+    console.log('Datos a guardar:', datosFinales);
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtKey = obj.jwt;
@@ -815,7 +835,6 @@ async function guardarDatos(datosFinales) {
                 }
             })
             .then(responseData => {
-                document.getElementById('successSound').play();
             })
             .catch(error => {
                 console.error('Error:', error);

@@ -43,6 +43,8 @@ signupForm.addEventListener('submit', async (e) => {
             console.error(error);
             return false;
         });
+
+    await sleep(2000);
     aviso('Usuario registrado correctamente', 'success');
 
 
@@ -50,4 +52,9 @@ signupForm.addEventListener('submit', async (e) => {
 
 
 });
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 

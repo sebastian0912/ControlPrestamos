@@ -123,7 +123,23 @@ let datos = [
     }
 ];
 
-let roles = [ "SELECCIONE EL ROL", "ADMIN", "COORDINADOR", "TIENDA", "GERENCIA", "JEFE-DE-AREA", "TESORERIA", "COMERCIALIZADORA"];
+let roles = ["SELECCIONE EL ROL", "ADMIN",
+    "AFILIACIONES",
+    "COMERCIALIZADORA",
+    "CONTRATACION",
+    "CONTRATACIONSELECCIONGENERAL",
+    "COORDINADOR",
+    "EMPLEADO",
+    "GERENCIA",
+    "JEFE-DE-AREA",
+    "RECEPCION",
+    "RECURSOS-HUMANOS",
+    "SELECCION",
+    "SIN-ASIGNAR",
+    "SISTEMAS",
+    "SUPERVISOR",
+    "TESORERIA",
+    "TIENDA"];
 
 // llenar roles con el arreglo roles
 roles.forEach((opcion) => {
@@ -148,7 +164,7 @@ listaU.forEach((doc) => {
 var datosSinPrimero = datos.slice(1);
 
 // Ordena el nuevo arreglo por nombre
-datosSinPrimero.sort(function(a, b) {
+datosSinPrimero.sort(function (a, b) {
     if (a.nombre > b.nombre) {
         return 1;
     }
@@ -219,7 +235,7 @@ editar.addEventListener('change', async (e) => {
         document.querySelector('#editar').value = 0;
         document.querySelector('#rol').value = 0;
         boton.style.display = 'none';
-        
+
     });
 }
 );
