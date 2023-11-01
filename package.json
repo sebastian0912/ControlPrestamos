@@ -1,6 +1,6 @@
 {
   "name": "control_prestamos_tesoreria",
-  "version": "1.0.66",
+  "version": "1.0.70",
   "description": "Programa para control de prestamos a tesoreria",
   "GITHUB_TOKEN": "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",
   "main": "main.js",
@@ -46,7 +46,7 @@
   "dependencies": {
     "electron-fetch": "^1.9.1",
     "electron-squirrel-startup": "^1.0.0",
-    "electron-updater": "^6.1.1",
+    "electron-updater": "^6.1.4",
     "file-saver": "^2.0.5",
     "jspdf": "^2.5.1"
   }

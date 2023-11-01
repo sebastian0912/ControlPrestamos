@@ -203,6 +203,11 @@ agrupado.forEach((p) => {
     p.resultado = Math.abs(p.cantidadEnvio - aux); // Restamos las cantidades sumadas anteriormente
     let cantidad =   Math.abs(parseInt(p.cantidadEnvio) - parseInt(p.cantidadRecibida))
 
+    console.log(p.destino)
+    console.log(p.concepto)
+    console.log(p.cantidadEnvio)
+    console.log(aux)
+    console.log("------------------")
     tabla2.innerHTML += `
         <tr>
             <td>${p.concepto}</td>            

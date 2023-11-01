@@ -48,7 +48,6 @@ async function datosUsuarios() {
 
         if (response.ok) {
             const responseData = await response.json();
-            console.log(responseData);
 
             return responseData;
         } else {
@@ -140,7 +139,6 @@ listado.forEach((c) => {
     }
 });
 
-console.log(arrayCodigos);
 
 // Mostar contenido en una tabla
 arrayCodigos.forEach((c) => {
@@ -837,19 +835,13 @@ archivoActualizarSaldos.addEventListener('click', async () => {
         let archivo = archivoActualizarSaldos.files[0];
         let reader = new FileReader();
 
-
-        // leer archivo .csv 
         reader.readAsText(archivo);
 
-        reader.onload = () => {
+        reader.onload = async () => {  // Asegúrate de que esta función también sea async
             let info = reader.result;
-            // Separar por saltos de línea 
             let lineas = info.split('\n');
-
-            // Array para almacenar los datos finales
             let datosFinales = [];
 
-            // Iterar a través de las líneas del archivo CSV
             lineas.forEach((linea, index) => {
                 // Dividir cada línea en columnas utilizando el carácter de tabulación como separador
                 let columnas = linea.split('\t');
@@ -871,20 +863,20 @@ archivoActualizarSaldos.addEventListener('click', async () => {
                 }
             });
 
-            // Mostrar elementos ocultos
+
             over.style.display = "block";
             loader.style.display = "block";
 
-            // Eliminar las primeras 4 filas (si es necesario)
-            for (let i = 0; i < datosFinales.length; i++) {
-                ActualizarEm(datosFinales[i].cedula, datosFinales[i].saldo);
+            // Divide los datos en lotes de 200
+            for (let i = 0; i < datosFinales.length; i += 200) {
+                let lote = datosFinales.slice(i, i + 200);
+                await procesarLote(lote);  // Espera a que se procese cada lote antes de continuar
             }
-            // Mostrar elementos ocultos
+
             over.style.display = "none";
             loader.style.display = "none";
         };
     } else {
-        // El usuario canceló la eliminación o cerró el diálogo
         aviso("No se ha actualizado ningún saldo de algún empleado", "success");
     }
 });

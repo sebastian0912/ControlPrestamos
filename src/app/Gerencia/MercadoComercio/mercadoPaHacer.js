@@ -447,8 +447,12 @@ boton.addEventListener('click', async (e) => {
             }
         }
 
-        if (otro2 != "") {
-            concepto = otro2;
+        // si concepto es otro y se ha ingresado un valor en el campo otro2
+        if (concepto.value == "Otro" && otro2 != "") {
+            conceptoTexto = otro2;
+        }
+        else {
+            conceptoTexto = concepto.value;
         }
 
 

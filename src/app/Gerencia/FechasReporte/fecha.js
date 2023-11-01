@@ -60,47 +60,6 @@ async function datosTCodigos() {
 let coodinador = document.getElementById("boton");
 
 const nombresApellidos = [
-    "LEYDI CAMACHO",
-    "CLAUDIA BELTRAN",
-    "MARIO MONTERO",
-    "LUIS RUBIANO",
-    "DIANA SIERRA",
-    "ANGIE LEON",
-    "JHONATAN PARRA",
-    "DUMAR NUÑEZ",
-    "DANIEL PEREZ",
-    "SERGIO ROCHA",
-    "DIEGO MENDIETA",
-    "DIEGO FORERO",
-    "ERIKA GALEANO",
-    "DUMAR NUÑEZ",
-    "ANDRES PEÑA",
-    "DANIEL HERNANDEZ",
-    "JULIETH REYES",
-    "MAURY RAMIREZ",
-    "ANGIE CASTILLO",
-    "MARIA MERCHAN",
-    "ANGELICA GOMEZ",
-    "LUISA PEÑA",
-    "SERGIO ROCHA",
-    "ANGIE GUTIERREZ",
-    "NOHORA CASTRO",
-    "BRIGITH ACEVEDO",
-    "ANGIE GARCIA",
-    "FANNY ROBLES",
-    "DUVAN FORERO",
-    "LEIDI CAMARGO",
-    "ANGIE ACOSTA",
-    "SAREN BELLO",
-    "PAOLA MACANA",
-    "ANYI HERNANDEZ",
-    "YESENIA PALACIOS",
-    "LIGIA HUERTAS",
-    "NIKOL SARMIENTO",
-    "DIANA RUBIANO",
-    "YURLEY REYES",
-    "ANTONIO RUIZ",
-    "ESTEFANIA REALPE",
     "CARLOS ROJAS",
     "KAREN RAMIREZ",
     "ANGELA MARIA ALDANA",
@@ -112,7 +71,9 @@ const nombresApellidos = [
     "KAREN RIQUETT",
     "ANGELICA GOMEZ",
     "CAROL PALACIOS",
-    "LEIDY VANESA"
+    "LEIDY VANESA",
+    "VALENTINA GUILLEN",
+    "ANGELICA GOMEZ",
 ];
 
 const rolesAsignados = nombresApellidos.map((nombre, indice) => {
@@ -515,10 +476,22 @@ coodinador.addEventListener('click', async () => {
         for (const nombreCoordinador in datosAgrupados) {
             if (datosAgrupados.hasOwnProperty(nombreCoordinador)) {
                 const datosCoordinador = datosAgrupados[nombreCoordinador];
+
+                // Convertir la columna "monto" a valores numéricos
+                datosCoordinador.forEach(fila => {
+                    fila.monto = parseFloat(fila.monto); // Parsea a número
+                    fila.cedulaQuienPide = parseInt(fila.cedulaQuienPide); // Parsea a número
+                });
+
                 const ws = XLSX.utils.json_to_sheet(datosCoordinador);
+
+                // Establecer el formato de celda para la columna "monto"
+                ws['A1'].z = '0.00'; // Puedes ajustar el formato según tus necesidades
+
                 XLSX.utils.book_append_sheet(wb, ws, nombreCoordinador);
             }
         }
+
 
         // Generar el archivo Excel
         const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });

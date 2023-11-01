@@ -769,6 +769,8 @@ boton.addEventListener('click', async (e) => {
             return;
         }
 
+
+
         // si cuotas es mayor a 4
         if (parseInt(cuotas) > 2) {
             isFunctionExecuting = false;
@@ -837,17 +839,26 @@ boton.addEventListener('click', async (e) => {
                 location.reload();
             }
         }
-        
+
         else {
-            if (otro2 != "") {
-                concepto = otro2;
-            }            
-            await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, "Compra tienda de Ferias respecto a:" + concepto.value + " en " + sede, codigoOH, usernameLocal);
+
+            // si concepto es otro y se ha ingresado un valor en el campo otro2
+            if (concepto.value == "Otro" && otro2 != "") {
+                conceptoTexto = otro2;
+            }
+            else {
+                conceptoTexto = concepto.value;
+            }
+
+
+
+
+            await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, "Compra tienda de Ferias respecto a:" + conceptoTexto + " en " + sede, codigoOH, usernameLocal);
             await sleep(1000); // Pausa de 1 segundos
             await ActualizarHistorial(codigoOH);
             await historialT(nuevovalor);
             await actualizarDatosBase("Compra tienda de Ferias", nuevovalor, cuotas, cedulaEmpleado);
-            
+
             isFunctionExecuting = false;
 
             let confirmacion = await avisoConfirmado('Acaba de pedir un mercado de ' + valor + ' su codigo es: ' + codigoOH, 'success');
