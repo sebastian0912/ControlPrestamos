@@ -24,8 +24,8 @@ perfil.innerHTML = perfilLocal;
 
 
 // Arreglo con las sedes y conceptos
-let datos = ["Sede", "Faca Principal", "Faca Centro", "Rosal", "Cartagenita", "Madrid", "Funza", "Soacha", "Fontibón", "Suba", "Tocancipá", "Bosa"];
-let datos2 = ["Concepto", "Fruver", "Verdura", "Carne"];
+let datos = ["FACA_PRINCIPAL", "FACA_CENTRO", "ROSAL", "CARTAGENITA", "MADRID", "FUNZA", "SOACHA", "FONTIBÓN", "SUBA", "TOCANCIPÁ", "BOSA", "BOGOTÁ"];
+let datos2 = ["Concepto", "Fruver", "Verdura", "Carne", "Pollo", "Embutidos", "OTRO"];
 
 // recorrer el arreglo y mostrarlo en el select
 for (let i = 0; i < datos.length; i++) {
@@ -44,13 +44,13 @@ for (let i = 0; i < datos2.length; i++) {
 }
 
 
-if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen") {
+if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen"
+    || usernameLocal == "Señora luzdary" || usernameLocal == "SEÑORA LUZDARY" || usernameLocal == "señora luzdary") {
     lola.style.display = "inline-block";
 }
 else {
     lola.style.display = "none";
 }
-
 
 if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen"
     || usernameLocal == "Señora Lola" || usernameLocal == "SEÑORA LOLA" || usernameLocal == "señora lola"
@@ -127,7 +127,7 @@ let mostrarAviso = false;
 miSelect2.addEventListener('change', async (e) => {
     const otro = document.querySelector('#otro2');
 
-    if (e.target.value == "11") {
+    if (e.target.value == "OTRO") {
         mostrarAviso = true;
         otro.style.display = "inline-block";
     } else {
@@ -159,7 +159,8 @@ numemoroM.addEventListener('keyup', (e) => {
     }
 });
 
-async function enviarLona(cod, destino, concepto, cantidad, valorUnidad, PersonaEnvia) {
+
+async function enviarLona(cod, destino, concepto, cantidad, valorUnidad, PersonaEnvia, personaLleva, comentarios) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
@@ -178,7 +179,9 @@ async function enviarLona(cod, destino, concepto, cantidad, valorUnidad, Persona
                     destino: destino,
                     cantidadEnvio: cantidad,
                     valorUnidad: valorUnidad,
-                    PersonaEnvia: PersonaEnvia,                    
+                    PersonaEnvia: PersonaEnvia,    
+                    personaQueLleva: personaLleva,
+                    comentariosEnvio: comentarios,                
                     jwt: jwtToken
                 })
         })
@@ -201,19 +204,20 @@ async function enviarLona(cod, destino, concepto, cantidad, valorUnidad, Persona
         console.error('Error en la petición HTTP POST');
         console.error(error);
     }
+
 }
+
 
 
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
-
     e.preventDefault();
+
     const cantidad = document.querySelector('#cantidad').value;
     const valorUnidad = document.querySelector('#valorUnidad').value;
     const nuevovalor = valorUnidad.replace(/\,/g, '');
     const otro2 = document.querySelector('#otro2').value;
     let miSelect = document.querySelector('#miSelect').value;
-    let miSelect2 = document.querySelector('#miSelect2').value;
 
     if (otro2 != "") {
         miSelect2 = otro2;
@@ -225,13 +229,13 @@ boton.addEventListener('click', async (e) => {
         return;
     }
 
-    
-    let uid = Math.floor(Math.random() * 10000000);
+    let uid = Math.floor(Math.random() * 10000000);;
 
-    await enviarLona(uid, miSelect, miSelect2, cantidad, nuevovalor, usernameLocal);
-   
+    await enviarLona(uid, miSelect, "", cantidad, nuevovalor, usernameLocal, "", "");
+
+
     aviso("Se ha cargado la informacion exitosamente, el codigo es: " + uid, "success");
-
+    // Limpiar los campos
     document.querySelector('#cantidad').value = "";
     document.querySelector('#valorUnidad').value = "";
     document.querySelector('#otro2').value = "";

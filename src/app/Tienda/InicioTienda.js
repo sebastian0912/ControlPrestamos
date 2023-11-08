@@ -111,7 +111,8 @@ async function crearTienda(cedula) {
     }
 }
 
-if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen") {
+if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen"
+    || usernameLocal == "Señora luzdary" || usernameLocal == "SEÑORA LUZDARY" || usernameLocal == "señora luzdary") {
     lola.style.display = "inline-block";
 }
 else {
@@ -304,8 +305,8 @@ async function THistorial() {
 HistorialDe.addEventListener("click", async function () {
     console.log("Historial de entregas");
     let arrayaux, arrayHistorial = [];
-    arrayaux = await THistorial();   
-    
+    arrayaux = await THistorial();
+
     arrayaux.historial.forEach((h) => {
         if (h.nombreQuienEntrego == usernameLocal) {
             arrayHistorial.push(h);
@@ -436,8 +437,8 @@ document.getElementById("myonoffswitch").addEventListener("click", async functio
         estadoSoli("False");
         localStorage.setItem("estadoSolicitudes", "false");
         aviso('Se ha notificado que no va a publicar mas codigos para hacer', 'success');
-       
-        
+
+
     } else {
         estadoSoli("True");
         localStorage.setItem("estadoSolicitudes", "true");

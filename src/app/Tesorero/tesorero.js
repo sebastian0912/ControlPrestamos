@@ -775,7 +775,7 @@ input.addEventListener('change', () => {
         // Llama a la función para procesar los datos (guardarDatos) si es necesario
         loader.style.display = "block";
         over.style.display = "block";
-        //guardarDatos(datosFinales);
+        guardarDatos(datosFinales);
 
     };
 

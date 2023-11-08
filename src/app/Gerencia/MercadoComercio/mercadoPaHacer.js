@@ -423,6 +423,8 @@ boton.addEventListener('click', async (e) => {
         let nuevovalor = valor.replace(/\,/g, '');
         let codigoOH = 'M' + Math.floor(Math.random() * 1000000);
         let otro2 = document.querySelector('#otro2').value;
+        let conceptoTexto;
+
 
         if (valor == "") {
             isFunctionExecuting = false;

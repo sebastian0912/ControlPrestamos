@@ -155,8 +155,8 @@ let datos = [];
 datos = miArray
 
 let agrupado = miArray.reduce((acumulador, item) => {
-    // Creamos una llave única para cada grupo de 'concepto' y 'destino'
-    let clave = `${item.concepto}-${item.destino}`;
+    // Creamos una llave única para cada grupo de 'concepto', 'destino', y 'valorUnidad'
+    let clave = `${item.concepto}-${item.destino}-${item.valorUnidad}`;
 
     // Si este grupo no existe en el acumulador, lo inicializamos con los datos del item actual
     if (!acumulador[clave]) {
@@ -175,6 +175,7 @@ let agrupado = miArray.reduce((acumulador, item) => {
 
     return acumulador;
 }, {});
+
 
 
 // Convertimos el objeto acumulador a una matriz para su uso posterior

@@ -223,7 +223,6 @@ function verificaCondiciones(datos, nuevovalor) {
     // el año esta en formato xxaa y se debe convertir a 20aa
     let anioConvertido = '20' + anio;
     anio = anioConvertido;
-    console.log(anio);
 
     const sumaTotal =
         parseInt(datos.saldos) +
@@ -240,7 +239,6 @@ function verificaCondiciones(datos, nuevovalor) {
         parseInt(datos.cuentas);
 
     const fechaActual = new Date();
-    console.log(sumaTotal)
 
     if (parseInt(datos.saldos) >= 175001) {
         aviso('Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido', 'error');
@@ -251,10 +249,8 @@ function verificaCondiciones(datos, nuevovalor) {
         return false;
     }
     else {
-        console.log("entro");
         // conseguir la fecha actual y separarla en dia, mes y año para poder compararla con la fecha de ingreso del empleado            
         let mesActual = fechaActual.getMonth() + 1;
-        console.log(mesActual);
         let anioActual = fechaActual.getFullYear();
         if ((anioActual == anio) && ((parseInt(mesActual) - parseInt(mes)) >= 2)) {
             if (parseInt(nuevovalor) >= 200001) {
@@ -281,6 +277,10 @@ function verificaCondiciones(datos, nuevovalor) {
             else {
                 return true;
             }
+        }
+        else {
+            aviso('Ups no se pueden generar prestamos, el empleado no lleva mas de 2 meses en la empresa', 'error');
+            return false;
         }
     }
 }
@@ -362,6 +362,7 @@ boton.addEventListener('click', async (e) => {
     if (aux.datosbase == "No se encontró el registro para el ID proporcionado") {
         console.log("No existe");
         aviso('Ups no se pueden generar prestamo, el empleado no existe', 'error');
+        return;
     }
 
     if (parseInt(datos.saldos) > 175000) {

@@ -77,8 +77,8 @@ if (dias2 == 0) {
 diasLi.innerHTML = dias2;
 
 
-
-if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen") {
+if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen"
+    || usernameLocal == "Señora luzdary" || usernameLocal == "SEÑORA LUZDARY" || usernameLocal == "señora luzdary") {
     lola.style.display = "inline-block";
 }
 else {
@@ -213,6 +213,8 @@ function verificaCondiciones(datos, nuevovalor) {
         parseInt(datos.anticipoLiquidacion) +
         parseInt(datos.cuentas);
 
+    console.log(sumaTotal)
+
     const fechaActual = new Date();
 
     if (parseInt(datos.saldos) >= 175000) {
@@ -261,6 +263,10 @@ function verificaCondiciones(datos, nuevovalor) {
             else {
                 return true;
             }
+        }
+        else {
+            aviso("Ups no se pueden generar mercado, el empleado no tiene los dias suficientes para pedir prestamo", "error");
+            return false;
         }
     }
 }
@@ -333,6 +339,8 @@ formaPago.addEventListener('change', (e) => {
     }
 });
 
+let isFunctionExecuting = false; // Variable para rastrear si la función está en ejecución
+
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener('click', async (e) => {
     e.preventDefault();
@@ -346,7 +354,7 @@ boton.addEventListener('click', async (e) => {
     if (aux.datosbase == "No se encontró el registro para el ID proporcionado") {
         console.log("No existe");
         aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
-        return;    
+        return;
     }
 
     if (parseInt(datos.saldos) > 175000) {
@@ -394,9 +402,10 @@ boton.addEventListener('click', async (e) => {
             }
         }
 
-        if (!verificaCondiciones(datos, nuevovalor) == true) {
+        if (!verificaCondiciones(datos, parseInt(nuevovalor)) == true) {
             return;
         }
+
 
         await escribirHistorial(cedulaEmpleado, nuevovalor, 2, 'Autorizacion de Mercado', codigoOH);
 
