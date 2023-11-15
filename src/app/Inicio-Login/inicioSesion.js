@@ -59,10 +59,10 @@ signInform.addEventListener('submit', async (e) => {
 });
 
 async function fetchData() {
-    const email = signInform['signIn-email'].value;
+    let email = signInform['signIn-email'].value;
     const password = signInform['signIn-password'].value;
     // quitar espacios en blanco a email
-    email.trim();
+    email = email.trim();
     const urlcompleta = urlBack.url + '/usuarios/ingresar';
 
     try {
