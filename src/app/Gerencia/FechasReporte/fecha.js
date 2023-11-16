@@ -7,7 +7,7 @@ const perfil = document.querySelector('#perfil');
 const perfilLocal = localStorage.getItem("perfil");
 const usernameLocal = localStorage.getItem("username");
 
-if (usernameLocal == "YENY SOTELO") {
+if (usernameLocal == "YENY SOTELO" || "HEIDY TORRES"){
     mercado.style.display = "inline-block"
 }
 else {

@@ -29,7 +29,7 @@ numemoroM.addEventListener('keyup', (e) => {
     }
 });
 
-if (usernameLocal == "YENY SOTELO"){
+if (usernameLocal == "YENY SOTELO" || "HEIDY TORRES"){
     mercado.style.display = "inline-block"
 }
 else{
@@ -460,7 +460,7 @@ boton.addEventListener('click', async (e) => {
 
         await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, valor)
         await CambiarEstado(codigoOH, nuevovalor, codigoOH);
-        await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, "Compra tienda de Ferias respecto a:" + concepto.value + " en " + sede, codigoOH, usernameLocal);
+        await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, "Compra tienda de Ferias respecto a: " + concepto.value + " en " + sede, codigoOH, usernameLocal);
         await sleep(1000); // Pausa de 1 segundos
         await ActualizarHistorial(codigoOH);
         await sleep(1000); // Pausa de 1 segundos

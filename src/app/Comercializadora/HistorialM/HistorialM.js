@@ -109,6 +109,13 @@ try {
 }
 
 console.log(datos);
+
+// ordenar por fecha
+
+datos.historialModificaciones.sort(function (a, b) {
+    return new Date(b.fechaEfectuado) - new Date(a.fechaEfectuado);
+});
+
 datos.historialModificaciones.forEach((doc) => {
     const datos = doc;
     tabla.innerHTML += `

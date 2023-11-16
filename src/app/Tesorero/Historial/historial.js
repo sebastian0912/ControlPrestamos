@@ -1,5 +1,5 @@
 import { urlBack } from "../../models/base.js";
-import { aviso, avisoConfirmacion, avisoConfirmacionAc, avisoConfirmacionAc2 } from "../../Avisos/avisos.js";
+import { aviso, avisoConfirmacion, avisoConfirmacionAc, avisoConfirmacionAc2, avisoConfirmado } from "../../Avisos/avisos.js";
 const boton = document.querySelector('#boton');
 
 // capturar el id del usuario logeado del input
@@ -155,8 +155,8 @@ extrae.addEventListener('click', async () => {
         } else {
             // Formato "d/mm/yyyy"
             fechaIngreso = docData.ingreso.split('/');
-        }    
-        
+        }
+
         fechaIngreso = fechaIngreso.join('/');
 
         excelData.push([
@@ -206,6 +206,13 @@ extrae.addEventListener('click', async () => {
 
     document.body.removeChild(element);
     URL.revokeObjectURL(url);
+
+    // generar numero aleatorio con la inicial T
+    let numero = Math.floor(Math.random() * (999999 - 100000)) + 100000;
+    let codigo = "T" + numero;
+
+    await historialModificaciones("Extraer documento base", codigo);
+
 });
 
 
@@ -355,6 +362,11 @@ extraeT.addEventListener('click', async () => {
         document.body.removeChild(element);
         URL.revokeObjectURL(url);
     }
+    // generar numero aleatorio con la inicial T
+    let numero = Math.floor(Math.random() * (999999 - 100000)) + 100000;
+    let codigo = "T" + numero;
+
+    await historialModificaciones("Extraer total tiendas", codigo);
 });
 
 function s2ab(s) {
@@ -375,7 +387,7 @@ async function datosH(cedulaEmpleado) {
         'Authorization': jwtKey
     };
 
-    const urlcompleta = urlBack.url + '/Historial/tesoreria/'+ cedulaEmpleado;
+    const urlcompleta = urlBack.url + '/Historial/tesoreria/' + cedulaEmpleado;
 
     try {
         const response = await fetch(urlcompleta, {
@@ -413,7 +425,7 @@ extraeC.addEventListener('click', async () => {
         aviso("No hay datos para exportar", "warning");
         return;
     }
-    
+
     let dataString = 'Código\tCédula quien pidio\tNombre persona quien dio el codigo\tValor\tCuotas\tFecha\n';
 
     datosFinales.forEach((doc) => {
@@ -441,7 +453,7 @@ extraeC.addEventListener('click', async () => {
 });
 
 
-async function datosEliminar(cedulas){
+async function datosEliminar(cedulas) {
     const datosExtraidos = await datos();
     let datosFinales = [];
     cedulas.forEach((cedula) => {
@@ -457,13 +469,13 @@ async function datosEliminar(cedulas){
     return datosFinales;
 }
 
-function extraerDatosEliminar (datos){
-        
+function extraerDatosEliminar(datos) {
+
     let excelData = [
         ['', '', '', '', '', '', '', 'ANTERIOR', '', 'PARA DESCONTAR', '', '', '', '', '', '', '', '', '', 'PARA HACER', '', '', '', '', '', '', '', ''],
         ['CÓDIGO', 'CÉDULA', 'NOMBRE', 'INGRESO', 'TEMPORAL', 'FINCA', 'SALARIO', 'SALDOS', 'FONDOS', 'MERCADOS', 'CUOTAS MERCADOS', 'PRESTAMO PARA DESCONTAR', 'CUOTAS PRESTAMOS PARA DESCONTAR', 'CASINO', 'ANCHETAS', 'CUOTAS ANCHETAS', 'FONDO', 'CARNET', 'SEGURO FUNERARIO', 'PRESTAMO PARA HACER', 'CUOTAS PRESTAMO PARA HACER', 'ANTICIPO LIQUIDACIÓN', 'CUENTAS'],
     ];
-    
+
     datos.forEach((doc) => {
         const docData = doc;
         let fechaIngreso;
@@ -477,8 +489,8 @@ function extraerDatosEliminar (datos){
         } else {
             // Formato "d/mm/yyyy"
             fechaIngreso = docData.ingreso.split('/');
-        }    
-        
+        }
+
         fechaIngreso = fechaIngreso.join('/');
 
         excelData.push([
@@ -513,7 +525,7 @@ function extraerDatosEliminar (datos){
     const wb = XLSX.utils.book_new();
     let fecha = new Date().toLocaleString();
     fecha = fecha.replace(/\//g, "-");
-    
+
     XLSX.utils.book_append_sheet(wb, ws, 'Eliminados');
 
     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
@@ -523,7 +535,7 @@ function extraerDatosEliminar (datos){
 
     const element = document.createElement('a');
     element.href = url;
-    element.download = 'DatosEliminadosEl_'+ fecha+'.xlsx';
+    element.download = 'DatosEliminadosEl_' + fecha + '.xlsx';
     element.style.display = 'none';
 
     document.body.appendChild(element);
@@ -539,15 +551,15 @@ function verificaInfo(datos) {
     console.log(datos);
     // verificar que no tenga saldos pendientes
     const sumaTotal =
-            parseInt(datos.mercados) +
-            parseInt(datos.prestamoParaDescontar) +
-            parseInt(datos.casino) +
-            parseInt(datos.valoranchetas) +
-            parseInt(datos.fondo) +
-            parseInt(datos.carnet) +
-            parseInt(datos.seguroFunerario) +
-            parseInt(datos.anticipoLiquidacion) +
-            parseInt(datos.cuentas);
+        parseInt(datos.mercados) +
+        parseInt(datos.prestamoParaDescontar) +
+        parseInt(datos.casino) +
+        parseInt(datos.valoranchetas) +
+        parseInt(datos.fondo) +
+        parseInt(datos.carnet) +
+        parseInt(datos.seguroFunerario) +
+        parseInt(datos.anticipoLiquidacion) +
+        parseInt(datos.cuentas);
 
     if (sumaTotal > 0) {
         aviso("El empleado con cédula " + datos.numero_de_documento + " tiene saldos pendientes no se puede eliminar", "warning");
@@ -555,104 +567,120 @@ function verificaInfo(datos) {
     else {
         datosAux.push(datos);
         EliminarEm(datos.numero_de_documento);
-    }    
+    }
 }
 
-eliminar.addEventListener('click', async () => {
-    const resultado = await avisoConfirmacion();
-    
-    if (resultado) {
-        let archivo = eliminar.files[0];
-        console.log(archivo);
-        let reader = new FileReader();
+eliminar.addEventListener('change', async () => {
+    const archivo = eliminar.files[0];
+    const reader = new FileReader();
 
-        // leer archivo .csv 
-        reader.readAsText(archivo);
+    let datosFinales = [];
 
-        reader.onload = async () => {
-            let info = reader.result;
-            // Separar por saltos de línea 
-            let lineas = info.split('\n');
+    reader.onload = async (event) => {
+        const fileContent = event.target.result;
+        const workbook = XLSX.read(fileContent, { type: 'binary' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-            // Array para almacenar los datos finales
-            let datosFinales = [];
+        for (let i = 0; i < rows.length; i++) {
+            const rowData = rows[i];
+            const cedula = rowData[0].toString().replace(/\./g, ''); // Eliminar puntos
 
-            // Iterar a través de las líneas del archivo CSV
-            lineas.forEach(linea => {
-                // Eliminar espacios en blanco y otros caracteres no deseados de la línea
-                let cedula = linea.trim();
-
-                // Verificar si la cédula es válida antes de agregarla al arreglo
-                if (cedula !== "" && cedula !== "CEDULA") {
-                    datosFinales.push(cedula);
-                }
-            });
-
-            // Mostrar elementos ocultos
-            over.style.display = "block";
-            loader.style.display = "block";
-
-            
-            
-            let datos = await datosEliminar(datosFinales);
-            console.log(datos);
-            
-            //extraerDatosEliminar(datos);
-            
-            for (let i = 0; i < datos.length; i++) {
-                verificaInfo(datos[i]);
+            if (cedula && cedula !== "CEDULA") {
+                datosFinales.push(cedula);
             }
-            
-            extraerDatosEliminar(datosAux);
-
-            // Mostrar elementos ocultos
-            over.style.display = "none";
-            loader.style.display = "none";
-        };
-    } else {
-        // El usuario canceló la eliminación o cerró el diálogo
-        aviso("No se ha eliminado ningún empleado", "success");
-    }
-});
-
-
-input.addEventListener('change', () => {
-    let archivo = input.files[0];
-    let reader = new FileReader();
-
-    /* Leer archivo .csv */
-    reader.readAsText(archivo, 'UTF-8'); // Asegúrate de usar la codificación correcta
-
-    reader.onload = () => {
-        let info = reader.result;
-        /* Separar por saltos de línea */
-        let datos = info.split('\n');
-
-        // Array para almacenar los datos finales
-        let datosFinales = [];
-
-        datos.forEach(dato => {
-            // Utilizar el punto y coma (;) como separador en la expresión regular
-            let fila = dato.split(/;/).map(item => item.trim() === '' ? "0" : item.trim());
-            datosFinales.push(fila);
-        });
+        }
 
         // Mostrar elementos ocultos
         over.style.display = "block";
         loader.style.display = "block";
 
-        // Eliminar las primeras 3 filas (si es necesario)
-        datosFinales.splice(0, 4);
+        console.log('Datos a eliminar:', datosFinales);
+        
+        const datos = await datosEliminar(datosFinales);
 
+        for (let i = 0; i < datos.length; i++) {
+            verificaInfo(datos[i]);
+        }
+
+        extraerDatosEliminar(datosAux);
+
+        // Ocultar elementos al finalizar
+        over.style.display = "none";
+        loader.style.display = "none";
+
+        // Generar número aleatorio con la inicial 'T'
+        const numero = Math.floor(Math.random() * (999999 - 100000)) + 100000;
+        const codigo = "T" + numero;
+
+        await historialModificaciones("Eliminar liquidados", codigo);
+    };
+
+    reader.readAsBinaryString(archivo);
+});
+
+
+input.addEventListener('change', async () => {
+    const file = input.files[0];
+    const reader = new FileReader();
+
+    let datosFinales = [];
+
+    reader.onload = (event) => {
+        const fileContent = event.target.result;
+        const workbook = XLSX.read(fileContent, { type: 'binary' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+        // Comienza a leer desde la quinta fila
+        for (let i = 4; i < rows.length; i++) {
+            const rowData = rows[i];
+
+            // Convierte el número serial de fecha en una cadena de texto en formato "dd/mm/yyyy"
+            const fechaSerial = rowData[3];
+            const fechaCadena = excelSerialToJSDate(fechaSerial);
+
+            // Reemplaza el valor numérico con la cadena de texto formateada
+            rowData[3] = fechaCadena;
+
+            datosFinales.push(rowData);
+        }
+
+        console.log('Datos cargados desde Excel:', datosFinales);
+
+        // Llama a la función para procesar los datos (guardarDatos) si es necesario
+        loader.style.display = "block";
+        over.style.display = "block";
         guardarDatos(datosFinales);
 
     };
+
+    reader.readAsBinaryString(file);
+
+    // Función para convertir el número serial de fecha de Excel en una cadena de texto en formato "dd/mm/yyyy"
+    function excelSerialToJSDate(serial) {
+        const utcDays = Math.floor(serial - 25569);
+        const utcValue = utcDays * 86400; // 86400 seconds in a day
+        const dateInfo = new Date(utcValue * 1000);
+
+        const day = dateInfo.getUTCDate();
+        const month = dateInfo.getUTCMonth() + 1; // JS months are 0-based
+        const year = dateInfo.getUTCFullYear() % 100; // Obtener los últimos dos dígitos del año
+
+        return `${day}-${month}-${year.toString().padStart(2, '0')}`;
+    }
+    // generar numero aleatorio con la inicial T
+    let numero = Math.floor(Math.random() * (999999 - 100000)) + 100000;
+    let codigo = "T" + numero;
+
+    await historialModificaciones("Insertar nuevos empleados", codigo);
+
 });
 
-async function guardarDatos(datosFinales) {
 
+async function guardarDatos(datosFinales) {
+    console.log('Datos a guardar:', datosFinales);
     var body = localStorage.getItem('key');
-    console.log(body);
     const obj = JSON.parse(body);
     const jwtKey = obj.jwt;
 
@@ -674,30 +702,33 @@ async function guardarDatos(datosFinales) {
             body: JSON.stringify(bodyData),// Aquí va el body de tu petición tiene que ser asi en json para que el back lo pueda leer y procesar y hay algun problema me dices
 
         })
-            .then(response => {
+            .then(async response => {
                 if (response.ok) {
-                    aviso("Datos guardados correctamente", "success");
+                    document.getElementById('successSound').play();
                     over.style.display = "none";
                     loader.style.display = "none";
-                    h1Elemento.style.display = "none";
+                    let aviso = await avisoConfirmado("Datos guardados correctamente", "success");
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal                    
+                    if (aviso) {
+                        location.reload();
+                    }
                     //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
                     return response.json();
                 } else {
+                    document.getElementById('errorSound').play();
                     throw new Error('Error en la petición POST');
                 }
             })
             .then(responseData => {
-                console.log('Respuesta:', responseData);
             })
             .catch(error => {
                 console.error('Error:', error);
+                document.getElementById('errorSound').play();
             });
     } catch (error) {
         console.error('Error en la petición HTTP PUT');
         console.error(error);
     }
-
-
 }
 
 async function datosEmpleado(cedulaEmpleado) {
@@ -748,7 +779,7 @@ boton.addEventListener('click', async (e) => {
 
     if (aux.datosbase == "No se encontró el registro para el ID proporcionado") {
         console.log("No existe");
-        aviso('Este usuario no existe, esta retirado o no pertenece a la empresa', 'warning');    
+        aviso('Este usuario no existe, esta retirado o no pertenece a la empresa', 'warning');
         return;
     }
 
@@ -765,7 +796,7 @@ boton.addEventListener('click', async (e) => {
     datosExtraidos.historial.forEach(async (p) => {
         // Verificar si p.nombreQuienEntrego es null y mostrar una cadena vacía en su lugar
         const nombreQuienEntrego = p.nombreQuienEntrego !== null ? p.nombreQuienEntrego : '';
-        
+
         // Insertar al principio de la tabla
         tabla.insertAdjacentHTML('afterbegin', `
             <tr>
@@ -837,6 +868,12 @@ archivoActualizarSaldos.addEventListener('click', async () => {
             over.style.display = "none";
             loader.style.display = "none";
         };
+        // generar numero aleatorio con la inicial T
+        let numero = Math.floor(Math.random() * (999999 - 100000)) + 100000;
+        let codigo = "T" + numero;
+
+        await historialModificaciones("Actualizar saldos", codigo);
+
     } else {
         // El usuario canceló la eliminación o cerró el diálogo
         aviso("No se ha eliminado ningún empleado", "success");
@@ -896,7 +933,7 @@ valoresEnCero.addEventListener('click', async () => {
         console.log(jwtToken);
 
         const urlcompleta = urlBack.url + '/Datosbase/reiniciarValores';
-        
+
         try {
             // Mostrar elementos ocultos
             over.style.display = "block";
@@ -918,7 +955,7 @@ valoresEnCero.addEventListener('click', async () => {
                     }
                 })
                 .then(responseData => {
-                    
+
                     console.log('Respuesta:', responseData);
                     document.getElementById('successSound').play();
                     // Ocultar elementos después de completar la operación
@@ -941,8 +978,13 @@ valoresEnCero.addEventListener('click', async () => {
             over.style.display = "none";
             loader.style.display = "none";
         }
+        // generar numero aleatorio con la inicial T
+        let numero = Math.floor(Math.random() * (999999 - 100000)) + 100000;
+        let codigo = "T" + numero;
+
+        await historialModificaciones("Colocar valores en 0", codigo);
     }
-    else{
+    else {
         aviso("No se han actualizado los campos", "success");
     }
 });
@@ -995,11 +1037,11 @@ extraeHistorialT.addEventListener('click', async () => {
             const fechaParts = doc.fechaEfectuado.split('-');
             const mes = fechaParts[1];
             let dia = fechaParts[2];
-        
+
             if (!historialPorMes[mes]) {
                 historialPorMes[mes] = { '13-27': [], '28-12': [] };
             }
-        
+
             // Si el día está en el rango del 28 al 31, asignar el siguiente mes
             if (dia >= 28) {
                 const siguienteMes = (parseInt(mes) + 1).toString().padStart(2, '0');
@@ -1007,20 +1049,20 @@ extraeHistorialT.addEventListener('click', async () => {
                 dia = dia <= 12 ? `0${dia}` : dia;
                 mes = siguienteMes;
             }
-        
+
             const grupo = dia >= 13 && dia <= 27 ? '13-27' : '28-12';
-        
+
             // Utilizar una expresión regular para encontrar "de" o "en" seguido del lugar
             const lugarMatch = doc.concepto.match(/(?:de|en)\s+(.+)/i);
-        
+
             if (lugarMatch) {
                 const lugar = lugarMatch[1]; // El segundo grupo capturado es el lugar
                 doc.lugar = lugar; // Asignar el valor al campo "lugar"
             }
-        
+
             historialPorMes[mes][grupo].push(doc);
         }
-    });     
+    });
 
 
     // Crear un archivo Excel con hojas internas para cada mes
@@ -1066,6 +1108,13 @@ extraeHistorialT.addEventListener('click', async () => {
 
     document.body.removeChild(element);
     URL.revokeObjectURL(url);
+
+    // generar numero aleatorio con la inicial T
+    let numero = Math.floor(Math.random() * (999999 - 100000)) + 100000;
+    let codigo = "T" + numero;
+
+    await historialModificaciones("Extraer historial detallado", codigo);
+
 });
 
 

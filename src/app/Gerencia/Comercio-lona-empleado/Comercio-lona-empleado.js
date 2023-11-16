@@ -393,6 +393,14 @@ async function actualizarVentas(cantidad, cod, username) {
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
 
+    let user
+    if (usernameLocal == "YENY SOTELO") {
+        user = "KAREN RIQUETT"
+    }
+    else if (usernameLocal == "HEIDY TORRES") {
+        user = "CAROL PALACIOS"
+    }
+
     const urlcompleta = urlBack.url + '/Comercio/jefedearea/ActualizarCantidadVendida/' + cod;
     try {
         fetch(urlcompleta, {
@@ -400,7 +408,7 @@ async function actualizarVentas(cantidad, cod, username) {
             body:
                 JSON.stringify({
                     cantidadTotalVendida: cantidad,
-                    PersonaRecibe: "KAREN RIQUETT",
+                    PersonaRecibe: user,
                     jwt: jwtToken
                 })
         })
@@ -506,12 +514,20 @@ async function historialT(valor) {
 
     const urlcompleta = urlBack.url + '/Tienda/actualizarTienda';
 
+    let user
+    if (usernameLocal == "YENY SOTELO") {
+        user = "KAREN RIQUETT"
+    }
+    else if (usernameLocal == "HEIDY TORRES") {
+        user = "CAROL PALACIOS"
+    }
+
     try {
         fetch(urlcompleta, {
             method: 'POST',
             body:
                 JSON.stringify({
-                    nombre: "KAREN RIQUETT",
+                    nombre: user,
                     valorTotal: valor,
                     numPersonasAtendidas: 1,
                     jwt: jwtToken
@@ -542,6 +558,15 @@ async function ActualizarHistorial(codigo) {
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
     console.log(jwtToken);
+
+    let user 
+    if (usernameLocal == "YENY SOTELO" ) {
+        user = "KAREN RIQUETT"
+    }
+    else if (usernameLocal == "HEIDY TORRES") {
+        user = "CAROL PALACIOS"
+    }
+
     const urlcompleta = urlBack.url + '/Historial/actualizarXcodigo/' + codigo;
     try {
         fetch(urlcompleta, {
@@ -549,7 +574,7 @@ async function ActualizarHistorial(codigo) {
             body:
                 JSON.stringify({
                     codigo: codigo,
-                    nombreQuienEntrego: usernameLocal,
+                    nombreQuienEntrego: user,
                     jwt: jwtToken
                 })
         })

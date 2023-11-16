@@ -147,7 +147,17 @@ datosArreglo.forEach((p) => {
     }
 });
 
-let datos2 = ["Pollo Suba", "Pollo LuzDary", "Fruver", "Carne", "Otro"];
+let datos2 = ["Pollo Suba",
+    "Pollo Luz Dary",
+    "Embutidos Luz Dary",
+    "Emb carmen",
+    "Fruver",
+    "Fruver Carmen",
+    "Embutidos",
+    "Carne",
+    "Babuchas",
+    "Otro"];
+
 
 // recorrer el arreglo y mostrarlo en el select
 for (let i = 0; i < datos2.length; i++) {
@@ -746,6 +756,14 @@ boton.addEventListener('click', async (e) => {
             return;
         }
 
+        if (sede == "SUBA"){
+            if (concepto.value == ""){
+                aviso('Ups no se pueden generar mercado, debe seleccionar un concepto', 'error');
+                isFunctionExecuting = false;
+                return;
+            }
+        }
+
         isFunctionExecuting = true; // Marcar la función como en ejecución
 
         let valor = document.querySelector('#monto').value;
@@ -826,7 +844,7 @@ boton.addEventListener('click', async (e) => {
             await actualizarVentas(cantidad, codigoComercializadora, usernameLocal);
             await actualizarDatosBase("", nuevovalor, cuotas, cedulaEmpleado);
             await historialT(sumaVentas);
-            await escribirHistorial(cedulaEmpleado, sumaVentas, cuotas, "Compra tienda ferias respecto a:" + concepto2 + " en " + sede, codigoOH, usernameLocal);
+            await escribirHistorial(cedulaEmpleado, sumaVentas, cuotas, "Compra tienda ferias respecto a: " + concepto2 + " en " + sede, codigoOH, usernameLocal);
             await sleep(1000); // Pausa de 2 segundos
             await ActualizarHistorial(codigoOH);
 

@@ -17,7 +17,7 @@ titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
 
 
-if (usernameLocal == "YENY SOTELO"){
+if (usernameLocal == "YENY SOTELO" || "HEIDY TORRES"){
     mercado.style.display = "inline-block"
 }
 else{
@@ -54,6 +54,12 @@ try {
     console.error(error);
     throw error; // Propaga el error para que se pueda manejar fuera de la función
 }
+
+// ordenar por fecha
+
+datos.historialModificaciones.sort(function (a, b) {
+    return new Date(b.fechaEfectuado) - new Date(a.fechaEfectuado);
+});
 
 console.log(datos);
 datos.historialModificaciones.forEach((doc) => {
