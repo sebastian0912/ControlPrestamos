@@ -796,6 +796,123 @@ async function EliminarEm(cedulaEmpleado) {
 
 }
 
+
+archivoActualizarSaldos.addEventListener('change', async () => {
+    const resultado = await avisoConfirmacionAc();
+
+    if (resultado) {
+        const archivo = archivoActualizarSaldos.files[0];
+        const reader = new FileReader();
+
+        reader.onload = async (event) => {
+            const fileContent = event.target.result;
+            const workbook = XLSX.read(fileContent, { type: 'binary' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+            // Array para almacenar los datos finales
+            const datosFinales = [];
+
+            // Iterar a través de las filas del archivo Excel
+            for (let i = 0; i < rows.length; i++) {
+                const rowData = rows[i];
+
+                // Verificar si la fila tiene al menos dos columnas (CEDULA y SALDO)
+                if (rowData.length >= 2) {
+                    const cedula = rowData[0].toString().trim();
+                    const saldo = parseFloat(rowData[1].toString().trim()); // Convertir a número si es necesario
+
+                    // Verificar si la cédula y el saldo son válidos antes de agregarlos al arreglo
+                    if (cedula !== "" && !isNaN(saldo)) {
+                        datosFinales.push({ cedula, saldo });
+                    }
+                }
+            }
+
+            // Mostrar elementos ocultos
+            over.style.display = "block";
+            loader.style.display = "block";
+
+            // Divide los datos en lotes de 200
+            for (let i = 0; i < datosFinales.length; i += 200) {
+                const lote = datosFinales.slice(i, i + 200);
+                await procesarLote(lote);
+            }
+
+            // Ocultar elementos al finalizar
+            over.style.display = "none";
+            loader.style.display = "none";
+
+            // sonido de exito
+            document.getElementById('successSound').play();
+
+            // Generar número aleatorio con la inicial 'T'
+            const numero = Math.floor(Math.random() * (999999 - 100000)) + 100000;
+            const codigo = "T" + numero;
+
+            await historialModificaciones("Actualizar saldos", codigo);
+        };
+
+        reader.readAsBinaryString(archivo);
+    } else {
+        // El usuario canceló la actualización de saldos o cerró el diálogo
+        aviso("No se ha actualizado ningún saldo de algún empleado", "success");
+    }
+});
+
+async function procesarLote(lote) {
+    // Aquí debes implementar la lógica para procesar cada elemento del lote
+    // En este ejemplo, simplemente se llama a la función ActualizarEm para cada elemento
+    for (const elemento of lote) {
+        await ActualizarEm(elemento.cedula, elemento.saldo);
+    }
+}
+
+
+async function ActualizarEm(cedulaEmpleado, valor) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+
+    const urlcompleta = urlBack.url + '/Datosbase/actualizarSaldos/' + cedulaEmpleado;
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body: JSON.stringify({
+                saldos: valor,
+                jwt: jwtToken
+
+            })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                if (responseData.message == "error") {
+                    aviso("No se ha podido actualizar el empleado con cédula: " + cedulaEmpleado, "warning");
+                }
+                return
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+
+}
+
+
+
+
+
 input.addEventListener('change', async () => {
     const file = input.files[0];
     const reader = new FileReader();
@@ -910,117 +1027,7 @@ async function guardarDatos(datosFinales) {
 
 }
 
-archivoActualizarSaldos.addEventListener('change', async () => {
-    const resultado = await avisoConfirmacionAc();
 
-    if (resultado) {
-        const archivo = archivoActualizarSaldos.files[0];
-        const reader = new FileReader();
-
-        reader.onload = async (event) => {
-            const fileContent = event.target.result;
-            const workbook = XLSX.read(fileContent, { type: 'binary' });
-            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-            // Array para almacenar los datos finales
-            const datosFinales = [];
-
-            // Iterar a través de las filas del archivo Excel
-            for (let i = 0; i < rows.length; i++) {
-                const rowData = rows[i];
-
-                // Verificar si la fila tiene al menos dos columnas (CEDULA y SALDO)
-                if (rowData.length >= 2) {
-                    const cedula = rowData[0].toString().trim();
-                    const saldo = parseFloat(rowData[1].toString().trim()); // Convertir a número si es necesario
-
-                    // Verificar si la cédula y el saldo son válidos antes de agregarlos al arreglo
-                    if (cedula !== "" && !isNaN(saldo)) {
-                        datosFinales.push({ cedula, saldo });
-                    }
-                }
-            }
-
-            // Mostrar elementos ocultos
-            over.style.display = "block";
-            loader.style.display = "block";
-
-            // Divide los datos en lotes de 200
-            for (let i = 0; i < datosFinales.length; i += 200) {
-                const lote = datosFinales.slice(i, i + 200);
-                await procesarLote(lote);
-            }
-
-            // Ocultar elementos al finalizar
-            over.style.display = "none";
-            loader.style.display = "none";
-
-            // sonido de exito
-            document.getElementById('successSound').play();
-
-            // Generar número aleatorio con la inicial 'T'
-            const numero = Math.floor(Math.random() * (999999 - 100000)) + 100000;
-            const codigo = "T" + numero;
-
-            await historialModificaciones("Actualizar saldos", codigo);
-        };
-
-        reader.readAsBinaryString(archivo);
-    } else {
-        // El usuario canceló la actualización de saldos o cerró el diálogo
-        aviso("No se ha actualizado ningún saldo de algún empleado", "success");
-    }
-});
-
-async function procesarLote(lote) {
-    // Aquí debes implementar la lógica para procesar cada elemento del lote
-    // En este ejemplo, simplemente se llama a la función ActualizarEm para cada elemento
-    for (const elemento of lote) {
-        await ActualizarEm(elemento.cedula, elemento.saldo);
-    }
-}
-
-
-async function ActualizarEm(cedulaEmpleado, valor) {
-    var body = localStorage.getItem('key');
-    const obj = JSON.parse(body);
-    const jwtToken = obj.jwt;
-
-    const urlcompleta = urlBack.url + '/Datosbase/actualizarSaldos/' + cedulaEmpleado;
-    try {
-        fetch(urlcompleta, {
-            method: 'POST',
-            body: JSON.stringify({
-                saldos: valor,
-                jwt: jwtToken
-
-            })
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
-                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
-                } else {
-                    throw new Error('Error en la petición POST');
-                }
-            })
-            .then(responseData => {
-                if (responseData.message == "error") {
-                    aviso("No se ha podido actualizar el empleado con cédula: " + cedulaEmpleado, "warning");
-                }
-                return
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-
-    } catch (error) {
-        console.error('Error en la petición HTTP POST');
-        console.error(error);
-    }
-
-}
 
 async function THistorial() {
     var body = localStorage.getItem('key');

@@ -453,6 +453,7 @@ extraeC.addEventListener('click', async () => {
 });
 
 
+
 async function datosEliminar(cedulas) {
     const datosExtraidos = await datos();
     let datosFinales = [];
@@ -465,7 +466,6 @@ async function datosEliminar(cedulas) {
             aviso(`El empleado con cédula ${cedula} no se puede eliminar porque no se encuentra`, "warning");
         }
     });
-    console.log(datosFinales);
     return datosFinales;
 }
 
@@ -548,7 +548,6 @@ function extraerDatosEliminar(datos) {
 let datosAux = [];
 
 function verificaInfo(datos) {
-    console.log(datos);
     // verificar que no tenga saldos pendientes
     const sumaTotal =
         parseInt(datos.mercados) +
@@ -618,6 +617,159 @@ eliminar.addEventListener('change', async () => {
 
     reader.readAsBinaryString(archivo);
 });
+
+
+async function EliminarEm(cedulaEmpleado) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+
+    const urlcompleta = urlBack.url + '/Datosbase/eliminardatos/' + cedulaEmpleado;
+    try {
+        fetch(urlcompleta, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': jwtToken
+            },
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                if (responseData.message == "error") {
+                    aviso("No se ha podido eliminar el empleado con cédula: " + cedulaEmpleado, "warning");
+                }
+                return
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+
+}
+
+
+archivoActualizarSaldos.addEventListener('change', async () => {
+    const resultado = await avisoConfirmacionAc();
+
+    if (resultado) {
+        const archivo = archivoActualizarSaldos.files[0];
+        const reader = new FileReader();
+
+        reader.onload = async (event) => {
+            const fileContent = event.target.result;
+            const workbook = XLSX.read(fileContent, { type: 'binary' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+            // Array para almacenar los datos finales
+            const datosFinales = [];
+
+            // Iterar a través de las filas del archivo Excel
+            for (let i = 0; i < rows.length; i++) {
+                const rowData = rows[i];
+
+                // Verificar si la fila tiene al menos dos columnas (CEDULA y SALDO)
+                if (rowData.length >= 2) {
+                    const cedula = rowData[0].toString().trim();
+                    const saldo = parseFloat(rowData[1].toString().trim()); // Convertir a número si es necesario
+
+                    // Verificar si la cédula y el saldo son válidos antes de agregarlos al arreglo
+                    if (cedula !== "" && !isNaN(saldo)) {
+                        datosFinales.push({ cedula, saldo });
+                    }
+                }
+            }
+
+            // Mostrar elementos ocultos
+            over.style.display = "block";
+            loader.style.display = "block";
+
+            // Divide los datos en lotes de 200
+            for (let i = 0; i < datosFinales.length; i += 200) {
+                const lote = datosFinales.slice(i, i + 200);
+                await procesarLote(lote);
+            }
+
+            // Ocultar elementos al finalizar
+            over.style.display = "none";
+            loader.style.display = "none";
+
+            // sonido de exito
+            document.getElementById('successSound').play();
+
+            // Generar número aleatorio con la inicial 'T'
+            const numero = Math.floor(Math.random() * (999999 - 100000)) + 100000;
+            const codigo = "T" + numero;
+
+            await historialModificaciones("Actualizar saldos", codigo);
+        };
+
+        reader.readAsBinaryString(archivo);
+    } else {
+        // El usuario canceló la actualización de saldos o cerró el diálogo
+        aviso("No se ha actualizado ningún saldo de algún empleado", "success");
+    }
+});
+
+async function procesarLote(lote) {
+    // Aquí debes implementar la lógica para procesar cada elemento del lote
+    // En este ejemplo, simplemente se llama a la función ActualizarEm para cada elemento
+    for (const elemento of lote) {
+        await ActualizarEm(elemento.cedula, elemento.saldo);
+    }
+}
+
+
+async function ActualizarEm(cedulaEmpleado, valor) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtToken = obj.jwt;
+
+    const urlcompleta = urlBack.url + '/Datosbase/actualizarSaldos/' + cedulaEmpleado;
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body: JSON.stringify({
+                saldos: valor,
+                jwt: jwtToken
+
+            })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
+                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
+                } else {
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                if (responseData.message == "error") {
+                    aviso("No se ha podido actualizar el empleado con cédula: " + cedulaEmpleado, "warning");
+                }
+                return
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+    } catch (error) {
+        console.error('Error en la petición HTTP POST');
+        console.error(error);
+    }
+
+}
+
 
 
 input.addEventListener('change', async () => {
@@ -814,113 +966,6 @@ boton.addEventListener('click', async (e) => {
 
 
 
-archivoActualizarSaldos.addEventListener('click', async () => {
-    const resultado = await avisoConfirmacionAc();
-    if (resultado) {
-        let archivo = archivoActualizarSaldos.files[0];
-        console.log(archivo);
-        let reader = new FileReader();
-
-
-        // leer archivo .csv 
-        reader.readAsText(archivo);
-
-        reader.onload = () => {
-            let info = reader.result;
-            // Separar por saltos de línea 
-            let lineas = info.split('\n');
-
-            // Array para almacenar los datos finales
-            let datosFinales = [];
-
-            // Iterar a través de las líneas del archivo CSV
-            lineas.forEach((linea, index) => {
-                // Dividir cada línea en columnas utilizando el carácter de tabulación como separador
-                let columnas = linea.split('\t');
-
-                // Saltar la primera línea (encabezado)
-                if (index === 0) {
-                    return;
-                }
-
-                // Verificar si la línea tiene al menos dos columnas (CEDULA y SALDOS)
-                if (columnas.length >= 2) {
-                    let cedula = columnas[0].trim();
-                    let saldo = columnas[1].trim();
-
-                    // Verificar si la cédula es válida antes de agregarla al arreglo
-                    if (cedula !== "") {
-                        datosFinales.push({ cedula, saldo });
-                    }
-                }
-            });
-
-            // Mostrar elementos ocultos
-            over.style.display = "block";
-            loader.style.display = "block";
-
-            // Eliminar las primeras 4 filas (si es necesario)
-            console.log(datosFinales);
-            for (let i = 0; i < datosFinales.length; i++) {
-                ActualizarEm(datosFinales[i].cedula, datosFinales[i].saldo);
-            }
-            // Mostrar elementos ocultos
-            over.style.display = "none";
-            loader.style.display = "none";
-        };
-        // generar numero aleatorio con la inicial T
-        let numero = Math.floor(Math.random() * (999999 - 100000)) + 100000;
-        let codigo = "T" + numero;
-
-        await historialModificaciones("Actualizar saldos", codigo);
-
-    } else {
-        // El usuario canceló la eliminación o cerró el diálogo
-        aviso("No se ha eliminado ningún empleado", "success");
-    }
-});
-
-async function ActualizarEm(cedulaEmpleado, valor) {
-    var body = localStorage.getItem('key');
-    const obj = JSON.parse(body);
-    const jwtToken = obj.jwt;
-    console.log(jwtToken);
-
-    const urlcompleta = urlBack.url + '/Datosbase/actualizarSaldos/' + cedulaEmpleado;
-    try {
-        fetch(urlcompleta, {
-            method: 'POST',
-            body: JSON.stringify({
-                saldos: valor,
-                jwt: jwtToken
-
-            })
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
-                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
-                } else {
-                    throw new Error('Error en la petición POST');
-                }
-            })
-            .then(responseData => {
-                console.log('Respuesta:', responseData);
-                if (responseData.message == "error") {
-                    aviso("No se ha podido actualizar el empleado con cédula: " + cedulaEmpleado, "warning");
-                }
-                return
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-
-    } catch (error) {
-        console.error('Error en la petición HTTP POST');
-        console.error(error);
-    }
-
-}
 
 
 valoresEnCero.addEventListener('click', async () => {
