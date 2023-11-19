@@ -834,8 +834,8 @@ archivoActualizarSaldos.addEventListener('change', async () => {
             loader.style.display = "block";
 
             // Divide los datos en lotes de 200
-            for (let i = 0; i < datosFinales.length; i += 200) {
-                const lote = datosFinales.slice(i, i + 200);
+            for (let i = 0; i < datosFinales.length; i += 100) {
+                const lote = datosFinales.slice(i, i + 100);
                 await procesarLote(lote);
             }
 
@@ -865,9 +865,13 @@ async function procesarLote(lote) {
     // En este ejemplo, simplemente se llama a la función ActualizarEm para cada elemento
     for (const elemento of lote) {
         await ActualizarEm(elemento.cedula, elemento.saldo);
+        await sleep(100); // Esperar 1 segundo antes de procesar el siguiente elemento
     }
 }
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 async function ActualizarEm(cedulaEmpleado, valor) {
     var body = localStorage.getItem('key');
@@ -899,7 +903,10 @@ async function ActualizarEm(cedulaEmpleado, valor) {
                 return
             })
             .catch(error => {
-                console.error('Error:', error);
+                //console.error('Error:', error);
+                console.log(cedulaEmpleado)
+                
+
             });
 
     } catch (error) {
