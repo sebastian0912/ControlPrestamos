@@ -494,6 +494,11 @@ boton.addEventListener('click', async (e) => {
             NIT = "NIT 901602948"
             direcccion = "CRA 1 N 17-37 BRAZILIA"
         }
+        else{
+            empresa = "TU ALIANZA SAS";
+            NIT = "NIT 900864596"
+            direcccion = "Calle 7 N 4-49 MADRID'"
+        }
 
         var docPdf = new jsPDF();
 

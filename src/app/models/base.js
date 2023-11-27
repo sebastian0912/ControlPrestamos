@@ -25,7 +25,7 @@ export let datosbase = {
 }
 
 export let urlBack = {
-    url: 'http://10.10.20.60:4545'
+    url: 'http://10.10.10.60:4545'
 }
 
 export let usuarioR = {
@@ -41,8 +41,8 @@ export let usuarioR = {
     correo_electronico: '', // Se mantiene
     avatar: '',  // nuevo
     empladode: '', // se mantiene es sede
-    sucursalde: '', // se mantiene es sede
-    rol: 'SIN-ASIGNAR', // se mantiene
+    sucursalde: 'FACA_CENTRO', // se mantiene es sede
+    rol: 'JEFE-DE-AREA', // se mantiene
     password: '', // se mantiene
     username: '', // se mantiene
     EstadoQuincena: true,

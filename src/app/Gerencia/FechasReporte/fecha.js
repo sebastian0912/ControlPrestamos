@@ -7,7 +7,7 @@ const perfil = document.querySelector('#perfil');
 const perfilLocal = localStorage.getItem("perfil");
 const usernameLocal = localStorage.getItem("username");
 
-if (usernameLocal == "YENY SOTELO" || "HEIDY TORRES"){
+if (usernameLocal == "YENY SOTELO" || "HEIDY TORRES") {
     mercado.style.display = "inline-block"
 }
 else {
@@ -60,20 +60,7 @@ async function datosTCodigos() {
 let coodinador = document.getElementById("boton");
 
 const nombresApellidos = [
-    "CARLOS ROJAS",
-    "KAREN RAMIREZ",
-    "ANGELA MARIA ALDANA",
-    "SEBASTIAN RODRIGUEZ",
-    "ERIKA GUERRERO",
-    "CAMILA GARCIA",
-    "ANDREA DIAZ",
-    "VALENTINA GUILLEN",
-    "KAREN RIQUETT",
-    "ANGELICA GOMEZ",
-    "CAROL PALACIOS",
-    "LEIDY VANESA",
-    "VALENTINA GUILLEN",
-    "ANGELICA GOMEZ",
+    "JACOBO PAREDES", "ANYI HERNANDEZ", "YESENIA PALACIOS", "LIGIA HUERTAS", "NIKOL SARMIENTO", "YURLEY REYES", "CLAUDIA BELTRAN", "ANDRES PEÑA", "LEYDI CAMACHO", "ANTONIO RUIZ", "ESTEFANIA REALPE", "ANGELA ALDANA", "ANGELICA GOMEZ", "MARIO MAESTRE", "LUIS RUBIANO", "DIANA RINCON", "ANGIE LEON", "JHONATAN PARRA", "DUMAR NUÑEZ", "DANIEL PEREZ", "SERGIO ACOSTA", "DIEGO MENDIETA", "DIEGO FORERO", "ERIKA GAITAN", "DUMAR NUÑEZ", "DANIEL HERNANDEZ", "JULIETH REYES", "MAURY RAMIREZ", "ANGIE CASTILLO", "MARIA MERCHAN", "ANGELICA GOMEZ", "LUISA PEÑA", "ANGIE GUTIERREZ", "NOHOR CASTRO", "BRIGITH ACEVEDO", "ANGIE GARCIA", "FANNY ROBLES", "ANGIE ACOSTA", "SAREN BUITRAGO", "PAOLA MACANA", "SEBASTIAN RODRIGUEZ", "Daniela Neiza", "CAMILA GARCIA", "ERIKA GUERRERO", "KAREN RAMIREZ", "CARLOS ROJAS", "LEIDY VANESA", "CAROL PALACIOS", "Juliana Vargas", "DUVAN FORERO", "VALENTINA GUILLEN", "LEIDI CAMARGO", "KAREN RIQUETT", "ANDREA DIAZ"
 ];
 
 const rolesAsignados = nombresApellidos.map((nombre, indice) => {
