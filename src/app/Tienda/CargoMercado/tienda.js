@@ -257,7 +257,6 @@ function verificaCondiciones(datos, nuevovalor) {
     }
 }
 
-
 async function datosTCodigos() {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);

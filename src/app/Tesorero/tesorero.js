@@ -1,6 +1,6 @@
 
 import { urlBack } from "../models/base.js";
-import { aviso, avisoConfirmacion, avisoConfirmacionAc, avisoConfirmacionAc2, } from "../Avisos/avisos.js";
+import { aviso, avisoConfirmado, avisoConfirmacionAc, avisoConfirmacionAc2, } from "../Avisos/avisos.js";
 
 // Capturar el h1 del titulo y perfil
 const titulo = document.querySelector('#username');
@@ -313,9 +313,18 @@ extrae.addEventListener('click', async () => {
 
         fechaIngreso = fechaIngreso.join('/');
 
+        let cedulaString = String(docData.numero_de_documento);
+
+        // Si la cédula comienza con un número, convertir a número, de lo contrario, dejar como texto
+        if (!isNaN(cedulaString.charAt(0))) {
+            cedulaString = Number(cedulaString);
+        } else {
+            cedulaString = cedulaString; // Dejar como texto
+        }
+
         excelData.push([
-            docData.codigo, // Convertir a número
-            docData.numero_de_documento, // Convertir a número
+            docData.codigo, // Convertir a número            
+            cedulaString,
             docData.nombre,
             fechaIngreso,
             docData.temporal,
@@ -722,7 +731,7 @@ eliminar.addEventListener('change', async () => {
 
         for (let i = 0; i < rows.length; i++) {
             const rowData = rows[i];
-            const cedula = rowData[0].toString().replace(/\./g, ''); // Eliminar puntos
+            const cedula = rowData[0].toString().replace(/\./g, '').toUpperCase();
 
             if (cedula && cedula !== "CEDULA") {
                 datosFinales.push(cedula);
@@ -734,7 +743,7 @@ eliminar.addEventListener('change', async () => {
         loader.style.display = "block";
 
         console.log('Datos a eliminar:', datosFinales);
-        
+
         const datos = await datosEliminar(datosFinales);
 
         for (let i = 0; i < datos.length; i++) {
@@ -819,7 +828,7 @@ archivoActualizarSaldos.addEventListener('change', async () => {
 
                 // Verificar si la fila tiene al menos dos columnas (CEDULA y SALDO)
                 if (rowData.length >= 2) {
-                    const cedula = rowData[0].toString().trim();
+                    const cedula = rowData[0].toString().trim().toUpperCase();
                     const saldo = parseFloat(rowData[1].toString().trim()); // Convertir a número si es necesario
 
                     // Verificar si la cédula y el saldo son válidos antes de agregarlos al arreglo
@@ -905,7 +914,7 @@ async function ActualizarEm(cedulaEmpleado, valor) {
             .catch(error => {
                 //console.error('Error:', error);
                 console.log(cedulaEmpleado)
-                
+
 
             });
 
@@ -915,9 +924,6 @@ async function ActualizarEm(cedulaEmpleado, valor) {
     }
 
 }
-
-
-
 
 
 input.addEventListener('change', async () => {
@@ -935,6 +941,9 @@ input.addEventListener('change', async () => {
         // Comienza a leer desde la quinta fila
         for (let i = 4; i < rows.length; i++) {
             const rowData = rows[i];
+
+            // Asegurarse de que rowData[0] es una cadena antes de convertir a mayúsculas
+            rowData[1] = String(rowData[1]).toUpperCase();
 
             // Convierte el número serial de fecha en una cadena de texto en formato "dd/mm/yyyy"
             const fechaSerial = rowData[3];
@@ -1005,12 +1014,12 @@ async function guardarDatos(datosFinales) {
             .then(async response => {
                 if (response.ok) {
                     document.getElementById('successSound').play();
-                    
+
                     over.style.display = "none";
                     loader.style.display = "none";
-                    let aviso = await avisoConfirmado("Datos guardados correctamente", "success");                    
+                    let aviso = await avisoConfirmado("Datos guardados correctamente", "success");
                     //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal                    
-                    if (aviso){
+                    if (aviso) {
                         location.reload();
                     }
                     //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
@@ -1033,8 +1042,6 @@ async function guardarDatos(datosFinales) {
 
 
 }
-
-
 
 async function THistorial() {
     var body = localStorage.getItem('key');

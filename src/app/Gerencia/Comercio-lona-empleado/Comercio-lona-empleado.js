@@ -141,20 +141,39 @@ datosComercializadoraGeneral = await datosTComercio();
 let datosArreglo = datosComercializadoraGeneral.comercio;
 
 datosArreglo.forEach((p) => {
-    if (p.destino == sede && p.cantidadRecibida != p.cantidadTotalVendida) {
-        tabla.innerHTML += `
-        <tr>
-            <td>${p.codigo}</td>
-            <td>${p.concepto}</td>
-            <td>${p.destino}</td>
-            <td>${p.cantidadEnvio}</td>
-            <td>${p.cantidadRecibida}</td>
-            <td>${p.valorUnidad}</td>
-            <td>${p.cantidadTotalVendida}</td>
-            <td>${p.PersonaEnvia}</td>
-            <td>${p.PersonaRecibe}</td>
-        </tr>
-    `
+    if (usernameLocal == "HEIDY TORRES") {
+        if ((p.destino == "ROSAL" || p.destino == "CARTAGENITA") && p.cantidadRecibida != p.cantidadTotalVendida) {
+            tabla.innerHTML += `
+            <tr>
+                <td>${p.codigo}</td>
+                <td>${p.concepto}</td>
+                <td>${p.destino}</td>
+                <td>${p.cantidadEnvio}</td>
+                <td>${p.cantidadRecibida}</td>
+                <td>${p.valorUnidad}</td>
+                <td>${p.cantidadTotalVendida}</td>
+                <td>${p.PersonaEnvia}</td>
+                <td>${p.PersonaRecibe}</td>
+            </tr>
+        `
+        }
+    }
+    else {
+        if (p.destino == sede && p.cantidadRecibida != p.cantidadTotalVendida) {
+            tabla.innerHTML += `
+            <tr>
+                <td>${p.codigo}</td>
+                <td>${p.concepto}</td>
+                <td>${p.destino}</td>
+                <td>${p.cantidadEnvio}</td>
+                <td>${p.cantidadRecibida}</td>
+                <td>${p.valorUnidad}</td>
+                <td>${p.cantidadTotalVendida}</td>
+                <td>${p.PersonaEnvia}</td>
+                <td>${p.PersonaRecibe}</td>
+            </tr>
+        `
+        }
     }
 });
 
@@ -559,8 +578,8 @@ async function ActualizarHistorial(codigo) {
     const jwtToken = obj.jwt;
     console.log(jwtToken);
 
-    let user 
-    if (usernameLocal == "YENY SOTELO" ) {
+    let user
+    if (usernameLocal == "YENY SOTELO") {
         user = "KAREN RIQUETT"
     }
     else if (usernameLocal == "HEIDY TORRES") {
@@ -671,7 +690,7 @@ boton.addEventListener("click", async (e) => {
     codigo2 = codigoA.replace(/\s+/g, ''); // Esto quitará todos los espacios en blanco de 'codigo'
     codigo3 = codigoA.replace(/\s+/g, ''); // Esto quitará todos los espacios en blanco de 'codigo'
     codigo4 = codigoA.replace(/\s+/g, ''); // Esto quitará todos los espacios en blanco de 'codigo'
-    
+
     let datos = await datosComercializadora(codigo, datosArreglo);
     let datos2 = await datosComercializadora(codigo2, datosArreglo);
     let datos3 = await datosComercializadora(codigo3, datosArreglo);
@@ -831,7 +850,7 @@ boton.addEventListener("click", async (e) => {
         await CambiarEstado(cod.codigo, sumaVentas, codigAux);
         await actualizar(codigAux, cod.codigo, usernameLocal, sumaVentas, 2);
         await actualizarVentas(cantidad, codigo, usernameLocal);
-        
+
         if (codigo2 != "") {
             await actualizarVentas(cantidad2, codigo2, usernameLocal);
         }
