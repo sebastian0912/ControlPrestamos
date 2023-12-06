@@ -199,6 +199,9 @@ miSelect.addEventListener('change', async (e) => {
         EliminarU(e.target.value);
         document.querySelector('#miSelect').value = 0;
     }
+    else{
+        document.querySelector('#miSelect').value = 0;
+    }
 
 
 });
