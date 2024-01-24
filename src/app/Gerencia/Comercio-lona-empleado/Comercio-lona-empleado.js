@@ -141,20 +141,39 @@ datosComercializadoraGeneral = await datosTComercio();
 let datosArreglo = datosComercializadoraGeneral.comercio;
 
 datosArreglo.forEach((p) => {
-    if (p.destino == sede && p.cantidadRecibida != p.cantidadTotalVendida) {
-        tabla.innerHTML += `
-        <tr>
-            <td>${p.codigo}</td>
-            <td>${p.concepto}</td>
-            <td>${p.destino}</td>
-            <td>${p.cantidadEnvio}</td>
-            <td>${p.cantidadRecibida}</td>
-            <td>${p.valorUnidad}</td>
-            <td>${p.cantidadTotalVendida}</td>
-            <td>${p.PersonaEnvia}</td>
-            <td>${p.PersonaRecibe}</td>
-        </tr>
-    `
+    if (usernameLocal == "HEIDY TORRES") {
+        if ((p.destino == "ROSAL" || p.destino == "CARTAGENITA") && p.cantidadRecibida != p.cantidadTotalVendida) {
+            tabla.innerHTML += `
+            <tr>
+                <td>${p.codigo}</td>
+                <td>${p.concepto}</td>
+                <td>${p.destino}</td>
+                <td>${p.cantidadEnvio}</td>
+                <td>${p.cantidadRecibida}</td>
+                <td>${p.valorUnidad}</td>
+                <td>${p.cantidadTotalVendida}</td>
+                <td>${p.PersonaEnvia}</td>
+                <td>${p.PersonaRecibe}</td>
+            </tr>
+        `
+        }
+    }
+    else {
+        if (p.destino == sede && p.cantidadRecibida != p.cantidadTotalVendida) {
+            tabla.innerHTML += `
+            <tr>
+                <td>${p.codigo}</td>
+                <td>${p.concepto}</td>
+                <td>${p.destino}</td>
+                <td>${p.cantidadEnvio}</td>
+                <td>${p.cantidadRecibida}</td>
+                <td>${p.valorUnidad}</td>
+                <td>${p.cantidadTotalVendida}</td>
+                <td>${p.PersonaEnvia}</td>
+                <td>${p.PersonaRecibe}</td>
+            </tr>
+        `
+        }
     }
 });
 
@@ -393,6 +412,14 @@ async function actualizarVentas(cantidad, cod, username) {
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
 
+    let user
+    if (usernameLocal == "YENY SOTELO") {
+        user = "KAREN RIQUETT"
+    }
+    else if (usernameLocal == "HEIDY TORRES") {
+        user = "CAROL PALACIOS"
+    }
+
     const urlcompleta = urlBack.url + '/Comercio/jefedearea/ActualizarCantidadVendida/' + cod;
     try {
         fetch(urlcompleta, {
@@ -400,7 +427,7 @@ async function actualizarVentas(cantidad, cod, username) {
             body:
                 JSON.stringify({
                     cantidadTotalVendida: cantidad,
-                    PersonaRecibe: "KAREN RIQUETT",
+                    PersonaRecibe: user,
                     jwt: jwtToken
                 })
         })
@@ -506,12 +533,20 @@ async function historialT(valor) {
 
     const urlcompleta = urlBack.url + '/Tienda/actualizarTienda';
 
+    let user
+    if (usernameLocal == "YENY SOTELO") {
+        user = "KAREN RIQUETT"
+    }
+    else if (usernameLocal == "HEIDY TORRES") {
+        user = "CAROL PALACIOS"
+    }
+
     try {
         fetch(urlcompleta, {
             method: 'POST',
             body:
                 JSON.stringify({
-                    nombre: "KAREN RIQUETT",
+                    nombre: user,
                     valorTotal: valor,
                     numPersonasAtendidas: 1,
                     jwt: jwtToken
@@ -542,6 +577,15 @@ async function ActualizarHistorial(codigo) {
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
     console.log(jwtToken);
+
+    let user
+    if (usernameLocal == "YENY SOTELO") {
+        user = "KAREN RIQUETT"
+    }
+    else if (usernameLocal == "HEIDY TORRES") {
+        user = "CAROL PALACIOS"
+    }
+
     const urlcompleta = urlBack.url + '/Historial/actualizarXcodigo/' + codigo;
     try {
         fetch(urlcompleta, {
@@ -549,7 +593,7 @@ async function ActualizarHistorial(codigo) {
             body:
                 JSON.stringify({
                     codigo: codigo,
-                    nombreQuienEntrego: usernameLocal,
+                    nombreQuienEntrego: user,
                     jwt: jwtToken
                 })
         })
@@ -646,7 +690,7 @@ boton.addEventListener("click", async (e) => {
     codigo2 = codigoA.replace(/\s+/g, ''); // Esto quitará todos los espacios en blanco de 'codigo'
     codigo3 = codigoA.replace(/\s+/g, ''); // Esto quitará todos los espacios en blanco de 'codigo'
     codigo4 = codigoA.replace(/\s+/g, ''); // Esto quitará todos los espacios en blanco de 'codigo'
-    
+
     let datos = await datosComercializadora(codigo, datosArreglo);
     let datos2 = await datosComercializadora(codigo2, datosArreglo);
     let datos3 = await datosComercializadora(codigo3, datosArreglo);
@@ -806,7 +850,7 @@ boton.addEventListener("click", async (e) => {
         await CambiarEstado(cod.codigo, sumaVentas, codigAux);
         await actualizar(codigAux, cod.codigo, usernameLocal, sumaVentas, 2);
         await actualizarVentas(cantidad, codigo, usernameLocal);
-        
+
         if (codigo2 != "") {
             await actualizarVentas(cantidad2, codigo2, usernameLocal);
         }

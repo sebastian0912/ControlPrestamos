@@ -80,11 +80,12 @@ diasLi.innerHTML = dias2;
 
 
 
-if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen") {
+if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen"
+    || usernameLocal == "Señora luzdary" || usernameLocal == "SEÑORA LUZDARY" || usernameLocal == "señora luzdary") {
     lola.style.display = "inline-block";
 }
 else {
-    lola.style.display = "none";
+    lola.style.display = "none";    
 }
 
 

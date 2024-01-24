@@ -41,8 +41,8 @@ export let usuarioR = {
     correo_electronico: '', // Se mantiene
     avatar: '',  // nuevo
     empladode: '', // se mantiene es sede
-    sucursalde: 'BOGOTÁ', // se mantiene es sede
     rol: 'ADMIN', // se mantiene
+    sucursalde: 'FACA_CENTRO', // se mantiene es sede
     password: '', // se mantiene
     username: '', // se mantiene
     EstadoQuincena: true,

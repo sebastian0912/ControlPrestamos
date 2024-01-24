@@ -29,7 +29,7 @@ numemoroM.addEventListener('keyup', (e) => {
     }
 });
 
-if (usernameLocal == "YENY SOTELO"){
+if (usernameLocal == "YENY SOTELO" || "HEIDY TORRES"){
     mercado.style.display = "inline-block"
 }
 else{
@@ -423,6 +423,8 @@ boton.addEventListener('click', async (e) => {
         let nuevovalor = valor.replace(/\,/g, '');
         let codigoOH = 'M' + Math.floor(Math.random() * 1000000);
         let otro2 = document.querySelector('#otro2').value;
+        let conceptoTexto;
+
 
         if (valor == "") {
             isFunctionExecuting = false;
@@ -458,7 +460,7 @@ boton.addEventListener('click', async (e) => {
 
         await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, valor)
         await CambiarEstado(codigoOH, nuevovalor, codigoOH);
-        await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, "Compra tienda de Ferias respecto a:" + concepto.value + " en " + sede, codigoOH, usernameLocal);
+        await escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, "Compra tienda de Ferias respecto a: " + concepto.value + " en " + sede, codigoOH, usernameLocal);
         await sleep(1000); // Pausa de 1 segundos
         await ActualizarHistorial(codigoOH);
         await sleep(1000); // Pausa de 1 segundos
@@ -483,6 +485,11 @@ boton.addEventListener('click', async (e) => {
             empresa = "COMERCIALIZADORA TS";
             NIT = "NIT 901602948"
             direcccion = "CRA 1 N 17-37 BRAZILIA"
+        }
+        else{
+            empresa = "TU ALIANZA SAS";
+            NIT = "NIT 900864596"
+            direcccion = "Calle 7 N 4-49 MADRID'"
         }
 
         var docPdf = new jsPDF();

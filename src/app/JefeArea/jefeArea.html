@@ -12,8 +12,10 @@
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
 
 
+
     <script defer src="../logOut.js" type="module"></script>
     <script defer src="jefeArea.js" type="module"></script>
+
 
 </head>
 
@@ -78,6 +80,12 @@
                 </a>
             </li>
 
+            <li id="carol" style="display: none;">
+                <input type="file" id="subidaMasiva" class="boton" style="cursor: pointer;" />
+                <img src="../assets/mercado.png" alt="logo" class="logo" />
+                <p style="float: right;"> Subida Masiva Carol </p>
+            </li>
+
             <li id="logout">
                 <a href="../Inicio-Login/index.html">
                     <img src="../assets/cerrar-sesion.png" alt="logo" class="logo" />
@@ -117,8 +125,14 @@
         </div>
     </header>
 
+    <a href="../CambioContrase/cambio.html" style="margin-left: -120px;">
+        <h1 class="titulo">Cambiar contraseña</h1>
+    </a>
+
+
     <div class="contenido">
         <button class="btn" id="HistorialDe" style="width: 250px;"> Descargar Excel </button>
+
         <div class="tabla">
             <table class="tabla-contenido">
                 <thead>

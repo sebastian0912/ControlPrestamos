@@ -28,7 +28,7 @@ numemoroM.addEventListener('keyup', (e) => {
     }
 });
 
-if (usernameLocal == "YENY SOTELO"){
+if (usernameLocal == "YENY SOTELO" || "HEIDY TORRES"){
     mercado.style.display = "inline-block"
 }
 else{
@@ -361,6 +361,11 @@ boton.addEventListener('click', async (e) => {
                 empresa = "COMERCIALIZADORA TS";
                 NIT = "NIT 901602948"
                 direcccion = "CRA 1 N 17-37 BRAZILIA"
+            }
+            else{
+                empresa = "TU ALIANZA SAS";
+                NIT = "NIT 900864596"
+                direcccion = "Calle 7 N 4-49 MADRID'"
             }
             
             var docPdf = new jsPDF();

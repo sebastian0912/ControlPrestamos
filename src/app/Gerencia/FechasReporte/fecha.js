@@ -7,7 +7,7 @@ const perfil = document.querySelector('#perfil');
 const perfilLocal = localStorage.getItem("perfil");
 const usernameLocal = localStorage.getItem("username");
 
-if (usernameLocal == "YENY SOTELO") {
+if (usernameLocal == "YENY SOTELO" || "HEIDY TORRES") {
     mercado.style.display = "inline-block"
 }
 else {
@@ -36,7 +36,7 @@ async function datosTCodigos() {
         'Authorization': jwtKey
     };
 
-    const urlcompleta = urlBack.url + '/Codigo/codigos';
+    const urlcompleta = urlBack.url + '/Historial/historial';
 
     try {
         const response = await fetch(urlcompleta, {
@@ -60,26 +60,14 @@ async function datosTCodigos() {
 let coodinador = document.getElementById("boton");
 
 const nombresApellidos = [
-    "CARLOS ROJAS",
-    "KAREN RAMIREZ",
-    "ANGELA MARIA ALDANA",
-    "SEBASTIAN RODRIGUEZ",
-    "ERIKA GUERRERO",
-    "CAMILA GARCIA",
-    "ANDREA DIAZ",
-    "VALENTINA GUILLEN",
-    "KAREN RIQUETT",
-    "ANGELICA GOMEZ",
-    "CAROL PALACIOS",
-    "LEIDY VANESA",
-    "VALENTINA GUILLEN",
-    "ANGELICA GOMEZ",
+    "JACOBO PAREDES", "ANYI HERNANDEZ", "YESENIA PALACIOS", "LIGIA HUERTAS", "NIKOL SARMIENTO", "YURLEY REYES", "CLAUDIA BELTRAN", "ANDRES PEÑA", "LEYDI CAMACHO", "ANTONIO RUIZ", "ESTEFANIA REALPE", "ANGELA ALDANA", "ANGELICA GOMEZ", "MARIO MAESTRE", "LUIS RUBIANO", "DIANA RINCON", "ANGIE LEON", "JHONATAN PARRA", "DUMAR NUÑEZ", "DANIEL PEREZ", "SERGIO ACOSTA", "DIEGO MENDIETA", "DIEGO FORERO", "ERIKA GAITAN", "DUMAR NUÑEZ", "DANIEL HERNANDEZ", "JULIETH REYES", "MAURY RAMIREZ", "ANGIE CASTILLO", "MARIA MERCHAN", "ANGELICA GOMEZ", "LUISA PEÑA", "ANGIE GUTIERREZ", "NOHOR CASTRO", "BRIGITH ACEVEDO", "ANGIE GARCIA", "FANNY ROBLES", "ANGIE ACOSTA", "SAREN BUITRAGO", "PAOLA MACANA", "SEBASTIAN RODRIGUEZ", "Daniela Neiza", "CAMILA GARCIA", "ERIKA GUERRERO", "KAREN RAMIREZ", "CARLOS ROJAS", "LEIDY VANESA", "CAROL PALACIOS", "Juliana Vargas", "DUVAN FORERO", "VALENTINA GUILLEN", "LEIDI CAMARGO", "KAREN RIQUETT", "ANDREA DIAZ", "WENDY SALAZAR"
 ];
 
 const rolesAsignados = nombresApellidos.map((nombre, indice) => {
     const rol = indice < 41 ? 'COORDINADOR' : 'JEFE DE OFICINA';
     return { nombre, rol };
 });
+
 
 coodinador.addEventListener('click', async () => {
 
@@ -97,11 +85,9 @@ coodinador.addEventListener('click', async () => {
         return;
     }
 
-    // si la fecha final esta vacia
     if (fechaFin == "") {
-        // realizar el reporte solo con la fecha de inicio
-        let arrayCodigos = [];
         const aux = await datosTCodigos();
+
         if (aux.message == "error") {
             aviso("No hay registros de actividades de los coordinadores", "warning");
             // resetear los campos
@@ -111,8 +97,8 @@ coodinador.addEventListener('click', async () => {
         let datosFinales = [];
 
         nombresApellidos.forEach((nombre) => {
-            aux.codigo.forEach((doc) => {
-                if (doc.generadoPor == nombre) {
+            aux.historial.forEach((doc) => {
+                if (doc.generadopor == nombre) {
                     datosFinales.push(doc);
                 }
             });
@@ -124,12 +110,11 @@ coodinador.addEventListener('click', async () => {
             document.getElementById("fechaInicio").value = "";
             return;
         }
-        console.log(fechaInicio);
 
-        // sacar los datos de los coordinadores donde la fecha de inicio sea igual a fechaGenerado
+        // sacar los datos de los coordinadores donde la fecha de inicio sea igual a fechaEfectuado
         let datosFinalesFecha = [];
         datosFinales.forEach((doc) => {
-            const fechaGenerado = new Date(doc.fechaGenerado);
+            const fechaGenerado = new Date(doc.fechaEfectuado);
             const fechaInicioDate = new Date(fechaInicio);
             if (fechaGenerado.getTime() == fechaInicioDate.getTime()) {
                 datosFinalesFecha.push(doc);
@@ -146,8 +131,9 @@ coodinador.addEventListener('click', async () => {
         // crear objeto donde se guardaran los datos de cada coordinador por separado teniendo en cuenta la fecha de inicio
         const datosAgrupados = {};
 
+
         datosFinalesFecha.forEach((item) => {
-            const key = item.generadoPor;
+            const key = item.generadopor;
 
             if (!datosAgrupados[key]) {
                 datosAgrupados[key] = [];
@@ -162,8 +148,9 @@ coodinador.addEventListener('click', async () => {
         // agrupar por generadoPor sumar los montos
         let datosFinalesFechaGeneradoPor = [];
         let datosFinalesFechaGeneradoPorSuma = [];
+
         datosFinalesFecha.forEach((doc) => {
-            const generadoPor = doc.generadoPor;
+            const generadoPor = doc.generadopor;
             if (datosFinalesFechaGeneradoPor.includes(generadoPor)) {
                 // no hacer nada
             } else {
@@ -171,16 +158,24 @@ coodinador.addEventListener('click', async () => {
             }
         });
 
+
+
+        let sumaAutorizado = 0;
+        let sumaEjecutado = 0;
+
         datosFinalesFechaGeneradoPor.forEach((doc) => {
-            let sumaAutorizado = 0;
-            let sumaEjecutado = 0;
+            sumaAutorizado = 0;
+            sumaEjecutado = 0;
 
             datosFinalesFecha.forEach((doc2) => {
-                if (doc == doc2.generadoPor) {
-                    if (doc2.ejecutadoPor != "0") {
-                        sumaEjecutado += parseInt(doc2.monto);
+                if (doc == doc2.generadopor) {
+                    if (doc2.nombreQuienEntrego !== null) {
+                        sumaEjecutado += parseInt(doc2.valor);
                     }
-                    sumaAutorizado += parseInt(doc2.monto);
+                    else {
+                        sumaAutorizado += parseInt(doc2.valor);
+                    }
+
                 }
             });
 
@@ -191,6 +186,7 @@ coodinador.addEventListener('click', async () => {
             });
         });
 
+        console.log(datosFinalesFechaGeneradoPorSuma)
 
         let datosFinalesFechaGeneradoPorSumaRol = [];
         let nombresProcesados = new Set();
@@ -202,67 +198,26 @@ coodinador.addEventListener('click', async () => {
                     datosFinalesFechaGeneradoPorSumaRol.push({
                         "Generado Por": doc.generadoPor,
                         "Rol": doc2.rol,
-                        "Valor Total Autorizado": doc.valorAutorizado,
-                        "Valor sin Ejecutar": doc.valorAutorizado - doc.valorEjecutado,
                         "valor Ejecutado": doc.valorEjecutado
                     });
                     nombresProcesados.add(nombre); // Marcar el nombre como procesado
                 }
             });
         });
-
-        let datosFinalesFechaGeneradoPorSumaRolCantidad = [];
-        let nombresProcesados2 = new Set();
-
-        datosFinalesFechaGeneradoPorSumaRol.forEach((doc) => {
-            const nombre = doc["Generado Por"];
-            let cantidadConEjecucion = 0;
-            let cantidadSinEjecucion = 0;
-
-            datosFinalesFecha.forEach((doc2) => {
-                if (doc2.generadoPor == nombre) {
-                    if (doc2.ejecutadoPor !== "0") {
-                        cantidadConEjecucion++;
-                    } else {
-                        cantidadSinEjecucion++;
-                    }
-                }
-            });
-
-            if (!nombresProcesados2.has(nombre)) {
-                datosFinalesFechaGeneradoPorSumaRolCantidad.push({
-                    "Generado Por": doc["Generado Por"],
-                    "Rol": doc.Rol,
-                    "Valor Total Autorizado": doc["Valor Total Autorizado"],
-                    "Valor sin Ejecutar": doc["Valor sin Ejecutar"],
-                    "valor Ejecutado": doc["valor Ejecutado"],
-                    "Cantidad con Ejecución": cantidadConEjecucion,
-                    "Cantidad sin Ejecución": cantidadSinEjecucion
-                });
-                nombresProcesados2.add(nombre); // Marcar el nombre como procesado
-            }
-        });
-
-        console.log(datosFinalesFechaGeneradoPorSumaRolCantidad);
-
-        // generar el excel con datosFinalesFechaGeneradoPorSumaRolCantidad y que tenga hojas internas separadas por coordinador con datosAgrupados
+        console.log(datosFinalesFechaGeneradoPorSumaRol)
 
         // Crear un libro Excel
         const wb = XLSX.utils.book_new();
 
         const datosParaHoja = [
-            ["Generado Por", "Rol", "Valor Total Autorizado", "Valor sin Ejecutar", "valor Ejecutado", "Cantidad con Ejecución", "Cantidad sin Ejecución"]
+            ["Generado Por", "Rol", "Total Vendido o Autorizado"]
         ];
 
-        datosFinalesFechaGeneradoPorSumaRolCantidad.forEach((doc) => {
+        datosFinalesFechaGeneradoPorSumaRol.forEach((doc) => {
             datosParaHoja.push([
                 doc["Generado Por"],
                 doc.Rol,
-                Number(doc["Valor Total Autorizado"]),
-                Number(doc["Valor sin Ejecutar"]),
                 Number(doc["valor Ejecutado"]),
-                Number(doc["Cantidad con Ejecución"]),
-                Number(doc["Cantidad sin Ejecución"])
             ]);
         });
 
@@ -270,16 +225,36 @@ coodinador.addEventListener('click', async () => {
         const ws = XLSX.utils.aoa_to_sheet(datosParaHoja);
 
         // Luego, agrega la hoja al libro Excel
-        XLSX.utils.book_append_sheet(wb, ws, 'NombreDeLaHoja');
+        XLSX.utils.book_append_sheet(wb, ws, 'Resumen');
 
         // Crear hojas internas para cada coordinador agrupado
         for (const nombreCoordinador in datosAgrupados) {
             if (datosAgrupados.hasOwnProperty(nombreCoordinador)) {
                 const datosCoordinador = datosAgrupados[nombreCoordinador];
+
+                datosCoordinador.forEach((dato) => {
+                    // Convertir cedula a string para garantizar que charAt funcione
+                    const cedulaString = String(dato.cedula);
+
+                    // Si la cédula comienza con un número, convertir a número, de lo contrario, dejar como texto
+                    if (!isNaN(cedulaString.charAt(0))) {
+                        dato.cedula = Number(cedulaString);
+                    } else {
+                        dato.cedula = cedulaString; // Dejar como texto
+                    }
+                    dato.valor = Number(dato.valor);
+                });
+
+
+
                 const ws = XLSX.utils.json_to_sheet(datosCoordinador);
+
+                // Agregar hoja al libro de trabajo
                 XLSX.utils.book_append_sheet(wb, ws, nombreCoordinador);
             }
         }
+
+
 
         // Generar el archivo Excel
         const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
@@ -297,10 +272,11 @@ coodinador.addEventListener('click', async () => {
         document.body.removeChild(element);
         URL.revokeObjectURL(url);
     }
+
+    // si la fecha final esta vacia
     else {
-        // realizar el reporte solo con la fecha de inicio
-        let arrayCodigos = [];
         const aux = await datosTCodigos();
+
         if (aux.message == "error") {
             aviso("No hay registros de actividades de los coordinadores", "warning");
             // resetear los campos
@@ -310,8 +286,8 @@ coodinador.addEventListener('click', async () => {
         let datosFinales = [];
 
         nombresApellidos.forEach((nombre) => {
-            aux.codigo.forEach((doc) => {
-                if (doc.generadoPor == nombre) {
+            aux.historial.forEach((doc) => {
+                if (doc.generadopor == nombre) {
                     datosFinales.push(doc);
                 }
             });
@@ -323,12 +299,11 @@ coodinador.addEventListener('click', async () => {
             document.getElementById("fechaInicio").value = "";
             return;
         }
-        console.log(fechaInicio);
 
-        // sacar los datos de los coordinadores donde la fecha de inicio sea igual a fechaGenerado
+        // sacar los datos de los coordinadores donde la fecha de inicio sea igual a fechaEfectuado
         let datosFinalesFecha = [];
         datosFinales.forEach((doc) => {
-            const fechaGenerado = new Date(doc.fechaGenerado);
+            const fechaGenerado = new Date(doc.fechaEfectuado);
             const fechaInicioDate = new Date(fechaInicio);
             const fechaFinDate = new Date(fechaFin);
             if (fechaGenerado >= fechaInicioDate && fechaGenerado <= fechaFinDate) {
@@ -346,8 +321,9 @@ coodinador.addEventListener('click', async () => {
         // crear objeto donde se guardaran los datos de cada coordinador por separado teniendo en cuenta la fecha de inicio
         const datosAgrupados = {};
 
+
         datosFinalesFecha.forEach((item) => {
-            const key = item.generadoPor;
+            const key = item.generadopor;
 
             if (!datosAgrupados[key]) {
                 datosAgrupados[key] = [];
@@ -362,8 +338,9 @@ coodinador.addEventListener('click', async () => {
         // agrupar por generadoPor sumar los montos
         let datosFinalesFechaGeneradoPor = [];
         let datosFinalesFechaGeneradoPorSuma = [];
+
         datosFinalesFecha.forEach((doc) => {
-            const generadoPor = doc.generadoPor;
+            const generadoPor = doc.generadopor;
             if (datosFinalesFechaGeneradoPor.includes(generadoPor)) {
                 // no hacer nada
             } else {
@@ -371,16 +348,24 @@ coodinador.addEventListener('click', async () => {
             }
         });
 
+
+
+        let sumaAutorizado = 0;
+        let sumaEjecutado = 0;
+
         datosFinalesFechaGeneradoPor.forEach((doc) => {
-            let sumaAutorizado = 0;
-            let sumaEjecutado = 0;
+            sumaAutorizado = 0;
+            sumaEjecutado = 0;
 
             datosFinalesFecha.forEach((doc2) => {
-                if (doc == doc2.generadoPor) {
-                    if (doc2.ejecutadoPor != "0") {
-                        sumaEjecutado += parseInt(doc2.monto);
+                if (doc == doc2.generadopor) {
+                    if (doc2.nombreQuienEntrego !== null) {
+                        sumaEjecutado += parseInt(doc2.valor);
                     }
-                    sumaAutorizado += parseInt(doc2.monto);
+                    else {
+                        sumaAutorizado += parseInt(doc2.valor);
+                    }
+
                 }
             });
 
@@ -391,6 +376,7 @@ coodinador.addEventListener('click', async () => {
             });
         });
 
+        console.log(datosFinalesFechaGeneradoPorSuma)
 
         let datosFinalesFechaGeneradoPorSumaRol = [];
         let nombresProcesados = new Set();
@@ -402,67 +388,26 @@ coodinador.addEventListener('click', async () => {
                     datosFinalesFechaGeneradoPorSumaRol.push({
                         "Generado Por": doc.generadoPor,
                         "Rol": doc2.rol,
-                        "Valor Total Autorizado": doc.valorAutorizado,
-                        "Valor sin Ejecutar": doc.valorAutorizado - doc.valorEjecutado,
                         "valor Ejecutado": doc.valorEjecutado
                     });
                     nombresProcesados.add(nombre); // Marcar el nombre como procesado
                 }
             });
         });
-
-        let datosFinalesFechaGeneradoPorSumaRolCantidad = [];
-        let nombresProcesados2 = new Set();
-
-        datosFinalesFechaGeneradoPorSumaRol.forEach((doc) => {
-            const nombre = doc["Generado Por"];
-            let cantidadConEjecucion = 0;
-            let cantidadSinEjecucion = 0;
-
-            datosFinalesFecha.forEach((doc2) => {
-                if (doc2.generadoPor == nombre) {
-                    if (doc2.ejecutadoPor !== "0") {
-                        cantidadConEjecucion++;
-                    } else {
-                        cantidadSinEjecucion++;
-                    }
-                }
-            });
-
-            if (!nombresProcesados2.has(nombre)) {
-                datosFinalesFechaGeneradoPorSumaRolCantidad.push({
-                    "Generado Por": doc["Generado Por"],
-                    "Rol": doc.Rol,
-                    "Valor Total Autorizado": doc["Valor Total Autorizado"],
-                    "Valor sin Ejecutar": doc["Valor sin Ejecutar"],
-                    "valor Ejecutado": doc["valor Ejecutado"],
-                    "Cantidad con Ejecución": cantidadConEjecucion,
-                    "Cantidad sin Ejecución": cantidadSinEjecucion
-                });
-                nombresProcesados2.add(nombre); // Marcar el nombre como procesado
-            }
-        });
-
-        console.log(datosFinalesFechaGeneradoPorSumaRolCantidad);
-
-        // generar el excel con datosFinalesFechaGeneradoPorSumaRolCantidad y que tenga hojas internas separadas por coordinador con datosAgrupados
+        console.log(datosFinalesFechaGeneradoPorSumaRol)
 
         // Crear un libro Excel
         const wb = XLSX.utils.book_new();
 
         const datosParaHoja = [
-            ["Generado Por", "Rol", "Valor Total Autorizado", "Valor sin Ejecutar", "valor Ejecutado", "Cantidad con Ejecución", "Cantidad sin Ejecución"]
+            ["Generado Por", "Rol", "Total Vendido o Autorizado"]
         ];
 
-        datosFinalesFechaGeneradoPorSumaRolCantidad.forEach((doc) => {
+        datosFinalesFechaGeneradoPorSumaRol.forEach((doc) => {
             datosParaHoja.push([
                 doc["Generado Por"],
                 doc.Rol,
-                Number(doc["Valor Total Autorizado"]),
-                Number(doc["Valor sin Ejecutar"]),
                 Number(doc["valor Ejecutado"]),
-                Number(doc["Cantidad con Ejecución"]),
-                Number(doc["Cantidad sin Ejecución"])
             ]);
         });
 
@@ -470,27 +415,38 @@ coodinador.addEventListener('click', async () => {
         const ws = XLSX.utils.aoa_to_sheet(datosParaHoja);
 
         // Luego, agrega la hoja al libro Excel
-        XLSX.utils.book_append_sheet(wb, ws, 'NombreDeLaHoja');
+        XLSX.utils.book_append_sheet(wb, ws, 'Resumen');
 
         // Crear hojas internas para cada coordinador agrupado
         for (const nombreCoordinador in datosAgrupados) {
             if (datosAgrupados.hasOwnProperty(nombreCoordinador)) {
                 const datosCoordinador = datosAgrupados[nombreCoordinador];
 
-                // Convertir la columna "monto" a valores numéricos
-                datosCoordinador.forEach(fila => {
-                    fila.monto = parseFloat(fila.monto); // Parsea a número
-                    fila.cedulaQuienPide = parseInt(fila.cedulaQuienPide); // Parsea a número
+                datosCoordinador.forEach((dato) => {
+                    // Convertir cedula a string para garantizar que charAt funcione
+                    const cedulaString = String(dato.cedula);
+
+                    // Si la cédula comienza con un número, convertir a número, de lo contrario, dejar como texto
+                    if (!isNaN(cedulaString.charAt(0))) {
+                        dato.cedula = Number(cedulaString);
+                    } else {
+                        dato.cedula = cedulaString; // Dejar como texto
+                    }
+                    dato.valor = Number(dato.valor);
                 });
+
+
+
+
+
 
                 const ws = XLSX.utils.json_to_sheet(datosCoordinador);
 
-                // Establecer el formato de celda para la columna "monto"
-                ws['A1'].z = '0.00'; // Puedes ajustar el formato según tus necesidades
-
+                // Agregar hoja al libro de trabajo
                 XLSX.utils.book_append_sheet(wb, ws, nombreCoordinador);
             }
         }
+
 
 
         // Generar el archivo Excel

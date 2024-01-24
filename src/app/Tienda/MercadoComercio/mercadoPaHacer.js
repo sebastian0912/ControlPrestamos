@@ -94,11 +94,12 @@ numemoroM.addEventListener('keyup', (e) => {
 });
 
 
-if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen") {
+if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen"
+    || usernameLocal == "Señora luzdary" || usernameLocal == "SEÑORA LUZDARY" || usernameLocal == "señora luzdary") {
     lola.style.display = "inline-block";
 }
 else {
-    lola.style.display = "none";
+    lola.style.display = "none";    
 }
 
 
@@ -192,7 +193,6 @@ async function datosEmpleado(cedulaEmpleado) {
 
 function verificaCondiciones(datos, nuevovalor) {
     // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
-    console.log(datos.ingreso);
     const fechaIngreso = datos.ingreso;
     let dia = fechaIngreso.split("-")[0];
     let mes = fechaIngreso.split("-")[1];
@@ -215,6 +215,8 @@ function verificaCondiciones(datos, nuevovalor) {
         parseInt(datos.prestamoParaHacer) +
         parseInt(datos.anticipoLiquidacion) +
         parseInt(datos.cuentas);
+
+    console.log(sumaTotal)
 
     const fechaActual = new Date();
 
@@ -266,7 +268,7 @@ function verificaCondiciones(datos, nuevovalor) {
             }
         }
         else {
-            aviso("Ups no se pueden generar mercado, el empleado no tiene suficiente tiempo laborado", "error");
+            aviso("Ups no se pueden generar mercado, el empleado no tiene los dias suficientes para pedir prestamo", "error");
             return false;
         }
     }
@@ -588,13 +590,11 @@ boton.addEventListener('click', async (e) => {
         let nuevovalor = valor.replace(/\,/g, '');
         let codigoOH = 'M' + Math.floor(Math.random() * 1000000);
 
-        if (usernameLocal != "Señora Lola" || usernameLocal != "Señor Luis") {
-            if (!verificaCondiciones(datosUsuario, parseInt(nuevovalor)) == true) {
-                isFunctionExecuting = false;
-                return;
-            }
+        if (!verificaCondiciones(datos, nuevovalor) == true) {
+            isFunctionExecuting = false;
+            return;
         }
-
+        
         if (valor == "") {
             isFunctionExecuting = false;
             aviso('Ups no se pueden generar mercado, el monto no puede estar vacio', 'error');

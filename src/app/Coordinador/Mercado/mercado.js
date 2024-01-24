@@ -194,9 +194,11 @@ function verificaCondiciones(datos, nuevovalor) {
         parseInt(datos.anticipoLiquidacion) +
         parseInt(datos.cuentas);
 
+    console.log(sumaTotal)
+
     const fechaActual = new Date();
 
-    if (parseInt(datos.saldos) >= 175001) {
+    if (parseInt(datos.saldos) >= 175000) {
         aviso("Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido", "error");
         return false;
     }
@@ -211,7 +213,7 @@ function verificaCondiciones(datos, nuevovalor) {
         let diasTrabajados = Math.ceil(diferencia / (1000 * 60 * 60 * 24)); // Conversión de milisegundos a días
 
         // Si ha trabajado entre 8 y 15 dias puede pedir prestamo de 150.000
-        if ((diasTrabajados > 8 && diasTrabajados < 15)) {
+        if ((diasTrabajados > 8 && diasTrabajados <= 15)) {
             if ((sumaTotal + parseInt(nuevovalor) >= 150001)) {
                 aviso("Ups no se pueden generar mercado, puede sacar maximo " + (150000 - (sumaTotal)), "error");
                 return false;
@@ -223,7 +225,7 @@ function verificaCondiciones(datos, nuevovalor) {
         }
 
         // Si ha trabajado entre 15 y 30 dias puede pedir prestamo de 250.000
-        else if ((diasTrabajados > 15 && diasTrabajados < 30)) {
+        else if ((diasTrabajados > 15 && diasTrabajados <= 30)) {
             if ((sumaTotal + parseInt(nuevovalor) >= 250001)) {
                 aviso("Ups no se pueden generar mercado, puede sacar maximo " + (250000 - (sumaTotal)), "error");
                 return false;
@@ -242,6 +244,10 @@ function verificaCondiciones(datos, nuevovalor) {
             else {
                 return true;
             }
+        }
+        else {
+            aviso("Ups no se pueden generar mercado, el empleado no tiene los dias suficientes para pedir prestamo", "error");
+            return false;
         }
     }
 }
@@ -323,8 +329,7 @@ boton.addEventListener('click', async (e) => {
     console.log(aux.datosbase[0]);
     let datos = aux.datosbase[0];
 
-    if (aux.datosbase == "error") {
-        console.log("No existe");
+    if (aux.datosbase == "No se encontró el registro para el ID proporcionado") {
         aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
         return;    
     }
@@ -395,6 +400,11 @@ boton.addEventListener('click', async (e) => {
             empresa = "COMERCIALIZADORA TS";
             NIT = "NIT 901602948"
             direcccion = "CRA 1 N 17-37 BRAZILIA"
+        }
+        else{
+            empresa = "TU ALIANZA SAS";
+            NIT = "NIT 900864596"
+            direcccion = "Calle 7 N 4-49 MADRID'"
         }
 
         var docPdf = new jsPDF();

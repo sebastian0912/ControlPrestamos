@@ -96,11 +96,12 @@ numemoroM.addEventListener('keyup', (e) => {
 });
 
 
-if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen") {
+if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen"
+    || usernameLocal == "Señora luzdary" || usernameLocal == "SEÑORA LUZDARY" || usernameLocal == "señora luzdary") {
     lola.style.display = "inline-block";
 }
 else {
-    lola.style.display = "none";
+    lola.style.display = "none";    
 }
 
 
@@ -255,7 +256,6 @@ function verificaCondiciones(datos, nuevovalor) {
 
     }
 }
-
 
 async function datosTCodigos() {
     var body = localStorage.getItem('key');
@@ -652,14 +652,14 @@ boton.addEventListener('click', async (e) => {
             return;
         }
 
-        if (usernameLocal != "Señora Lola" || usernameLocal != "Señor Luis") {
+        if (usernameLocal != "Señora Lola" || usernameLocal != "SEÑOR LUIS") {
             if (!verificaCondiciones(datosUsuario, parseInt(nuevovalor)) == true) {
                 isFunctionExecuting = false;
                 return;
             }
         }
+        
 
-        console.log("entro");
 
         concepto = 'Compra tienda de ' + usernameLocal;
 

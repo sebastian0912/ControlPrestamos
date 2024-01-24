@@ -16,7 +16,7 @@ titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
 
 
-if (usernameLocal == "YENY SOTELO"){
+if (usernameLocal == "YENY SOTELO" || "HEIDY TORRES"){
     mercado.style.display = "inline-block"
 }
 else{

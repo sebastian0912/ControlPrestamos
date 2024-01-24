@@ -14,7 +14,7 @@ let extraeT = document.getElementById("extraeT");
 
 let input = document.getElementById('archivoInput');
 
-if (usernameLocal == "YENY SOTELO"){
+if (usernameLocal == "YENY SOTELO" || "HEIDY TORRES"){
     mercado.style.display = "inline-block"
 }
 else{
