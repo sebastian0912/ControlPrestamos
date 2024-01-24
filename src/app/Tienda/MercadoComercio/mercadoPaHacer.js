@@ -588,9 +588,11 @@ boton.addEventListener('click', async (e) => {
         let nuevovalor = valor.replace(/\,/g, '');
         let codigoOH = 'M' + Math.floor(Math.random() * 1000000);
 
-        if (!verificaCondiciones(datos, nuevovalor) == true) {
-            isFunctionExecuting = false;
-            return;
+        if (usernameLocal != "Señora Lola" || usernameLocal != "Señor Luis") {
+            if (!verificaCondiciones(datosUsuario, parseInt(nuevovalor)) == true) {
+                isFunctionExecuting = false;
+                return;
+            }
         }
 
         if (valor == "") {

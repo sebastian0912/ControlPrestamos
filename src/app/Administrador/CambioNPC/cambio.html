@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../reset.css" />
+    <link rel="stylesheet" href="./cambio.css" />
+
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal@4/minimal.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+
+    <script defer src="../../logOut2.js" type="module"></script>
+    <script defer src="cambio.js" type="module"></script>
+
+</head>
+
+<body>
+
+    <div class="opciones">
+        <ul class="lista-Opciones">
+
+            <li>
+                <a href="../editar.html">
+                    <img src="../../assets/editar.png" alt="logo" class="logo" />
+                    <p>Editar Rol</p>
+                </a>
+            </li>
+
+            <li>
+                <a href="../eliminar.html">
+                    <img src="../../assets/basura.png" alt="logo" class="logo" />
+                    <p>Eliminar</p>
+                </a>
+            </li>
+
+            <li>
+                <a href="./cambio.html">
+                    <img src="../../assets/editar2.png" alt="logo" class="logo" />
+                    <p>Cambio nombres</p>
+                </a>
+            </li>
+
+            <li id="logout">
+                <a href="">
+                    <img src="../../assets/cerrar-sesion.png" alt="logo" class="logo" />
+                    <p>Cerrar Sesión</p>
+                </a>
+            </li>
+
+            <h1 class="diasT"> Días restantes antes de fecha cierre de novedades de nómina </h1>
+            <span class="dias" id="diasRestantes"></span>      
+            <h1 class="diasT"> Días restantes antes de liquidación </h1>
+            <span class="dias" id="diasLi"></span>
+
+        </ul>
+    </div>
+
+
+    <header>
+        <div class="cajontitulo">
+            <h1 class="titulo">Bienvenido</h1>
+        </div>
+        <div class="perfil">
+            <h1 clas class="titulo">Hola, <span id="username"></span></h1>
+            <h1 id="perfil" class="titulo"></h1>
+        </div>
+    </header>
+
+    <a href="../../CambioContrase/cambio.html" style="margin-left: -120px;">
+        <h1 class="titulo" >Cambiar contraseña</h1>
+    </a>
+
+    <div class="contenido">
+        <div class="cuadroTexto">
+            <div class="valor">
+                <div class="valoresEscribir">
+                    <h1 class="titulo"> Seleccione el correo del empleado a modificar: </h1>
+                    <select id="editar"></select>
+                    
+                    <input type="text" id="pnombre" placeholder="Primer Nombre" class="input2"  />
+                    <input type="text" id="snombre" placeholder="Segundo Nombre" class="input2"  />
+                    <input type="text" id="papellido" placeholder="Primer Apellido" class="input2"  />
+                    <input type="text" id="sapellido" placeholder="Segundo Apellido" class="input2"  />
+                    <input type="text" id="contrasena" placeholder="Nueva contraseña" class="input2"  />
+
+                    <button class="btn" id="boton" style="display: none;">Editar</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>
+
