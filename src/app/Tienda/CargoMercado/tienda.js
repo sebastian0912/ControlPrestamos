@@ -652,10 +652,8 @@ boton.addEventListener('click', async (e) => {
             return;
         }
 
-        
-        if (usernameLocal != "Señora Lola" && usernameLocal != "Señor Luis") {
-            console.log(usernameLocal)
-            if (!verificaCondiciones(datosUsuario, parseInt(nuevovalor))) {
+        if (usernameLocal != "Señora Lola" || usernameLocal != "SEÑOR LUIS") {
+            if (!verificaCondiciones(datosUsuario, parseInt(nuevovalor)) == true) {
                 isFunctionExecuting = false;
                 return;
             }

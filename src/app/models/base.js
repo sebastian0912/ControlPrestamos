@@ -45,6 +45,7 @@ export let usuarioR = {
     empladode: '', // se mantiene es sede
     sucursalde: '', // se mantiene es sede
     rol: 'GERENCIA', // se mantiene
+    sucursalde: 'FACA_CENTRO', // se mantiene es sede
     password: '', // se mantiene
     username: '', // se mantiene
     EstadoQuincena: true,

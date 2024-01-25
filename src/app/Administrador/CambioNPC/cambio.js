@@ -204,7 +204,7 @@ async function cambioNombreRaul(pnombre, snombre, papellido, sapellido, contrase
                     segundonombre : snombre,
                     primerapellido : papellido,
                     segundoapellido : sapellido,
-                    nuevapasswd : contrasena,
+                    newpassword : contrasena,
                     numero_de_documento : cedula,
                     correo_electronico : correo,
                     jwt: jwtToken

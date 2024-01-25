@@ -36,22 +36,17 @@ signupForm.addEventListener('submit', async (e) => {
             var body = window.sessionStorage.getItem('key');
             console.log(body);
             const obj = JSON.parse(body);
+            aviso('Usuario registrado correctamente', 'success');
             return true;
 
         })
         .catch(error => {
             console.error(error);
+            aviso('Error al registrar usuario', 'error');
             return false;
         });
-
-    await sleep(2000);
-    aviso('Usuario registrado correctamente', 'success');
-
-
-
-
-
 });
+
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
