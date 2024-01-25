@@ -9,8 +9,6 @@ body {
     font-family: 'Poppins', sans-serif;
 }
 
-
-
 h1 {
     margin: 0;
     padding: 0;
@@ -59,13 +57,13 @@ li {
     list-style: none;
     height: 30px;
     width: 100%;
-    padding: 20px 0 10px 30px;
+    padding: 20px 10px 10px 30px;
     display: flex;
     align-items: center;
     cursor: pointer;
 }
 
-li:nth-child(4) {
+li:nth-child(1) {
     background: #bbd0ff;
     color: #000000;
     transform: scale(1.1);
@@ -123,7 +121,7 @@ header {
 
 .cajontitulo .titulo {
     float: left;
-    padding-left: 50px;
+    padding-left: 80px;
     padding-top: 20px;
     font-size: 25pt;
     font-weight: 600;
@@ -152,8 +150,8 @@ span {
 }
 
 .cuadroTexto {
-    width: 900px;
-    height: 210px;
+    width: 800px;
+    height: 400px;
     background: #ffffff;
     margin: 50px 0 0 80px;
     border-radius: 15px;
@@ -162,41 +160,25 @@ span {
     font-weight: 700;
 }
 
-.cajaCedula {
-    margin: 0px 0 20px 30px;
+
+.valor {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
 }
 
-.cajaCedula .titulo {
-    margin-top: 20px;
+
+.valor .titulo {
+    margin: 5px 50px 30px 30px;
     float: left;
 }
 
-
-
-.input {
+select {
     font-family: 'Poppins', sans-serif;
-    width: 500px;
-    height: 40px;
-    padding: 5px;
     font-size: 16px;
-    border-width: 0px;
-    border-color: #cccccc;
-    background-color: #ffffff;
-    border-style: solid;
-    border-radius: 11px;
-    box-shadow: 0px 0px 5px rgba(66, 66, 66, 0.75);
-    margin: 50px 20px 0 0;
-}
-
-.input:focus {
-    outline: none;
-}
-
-.valor {
-    flex: 1 100%;
-    height: auto;
-    text-align: center;
-    margin-left: -150px;
+    margin: 0 50px 20px 30px;
+    width: 240px;
+    height: 50px;
 }
 
 .input2 {
@@ -211,7 +193,7 @@ span {
     border-style: solid;
     border-radius: 11px;
     box-shadow: 0px 0px 5px rgba(66, 66, 66, 0.75);
-    margin: 0 50px 0 -25px;
+    margin: 0 50px 20px 30px;
     position: relative;
 }
 
@@ -232,58 +214,7 @@ span {
     transition: 1000ms;
     cursor: pointer;
     font-family: 'Poppins', sans-serif;
-}
-
-
-.tabla {
-    width: 900px;
-    height: 40%;
-    overflow: auto;
-    max-height: 400px;
-    background: #ffffff;
-    margin: 20px 0 0 80px;
-    border-radius: 15px;
-    box-shadow: 0px 0px 12px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 50px;
-}
-
-.tabla-contenido {
-    width: 100%;
-    margin: 0;
-    border-collapse: collapse;
-    border-spacing: 0;
-    font-family: 'Nunito Sans', sans-serif;
-    font-size: 12pt;
-    text-align: center;
-}
-
-.tabla-contenido tr:nth-child(even) {
-    background-color: #f2f2f2;
-    /* color para filas pares */
-}
-
-.tabla-contenido tr:nth-child(odd) {
-    background-color: #cccccc;
-    /* color para filas impares */
-}
-
-th,
-td {
-    vertical-align: middle;
-}
-
-
-th {
-    border-bottom: #b9b9b9 1px solid;
-    padding: 15px;
-    background: #5e6a75;
-    color: #ffffff;
-    font-weight: 400;
-    top: 0;
-    position: sticky;
-}
-
-tr {
-    height: 40px;
+    margin: 20px 0 0 30px;
+    width: 71%;
 
 }
