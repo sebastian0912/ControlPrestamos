@@ -16,9 +16,10 @@ titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
 
 await crearTienda(uid);
+const correo = localStorage.getItem("correo_electronico");
 
 
-if (usernameLocal == "CAROL PALACIOS"){
+if (correo == "tuafiliacion@tsservicios.co") {
     carol.style.display = "block"
 }
 
@@ -103,7 +104,6 @@ async function datosTCodigos() {
 
         if (response.ok) {
             const responseData = await response.json();
-            console.log(responseData);
             return responseData;
         } else {
             throw new Error('Error en la petición GET');
@@ -154,8 +154,6 @@ aux.codigo.forEach((c) => {
         arrayCodigos.push(c);
     }
 });
-
-console.log(arrayCodigos);
 
 // ordernar por fechaGenerado
 arrayCodigos.sort((a, b) => {
@@ -471,7 +469,6 @@ document.getElementById("myonoffswitch").addEventListener("click", async functio
 });
 
 let input = document.getElementById('subidaMasiva');
-let isFunctionExecuting = false; // Variable para rastrear si la función está en ejecución
 
 input.addEventListener('change', async () => {
 
@@ -492,6 +489,7 @@ input.addEventListener('change', async () => {
 
             // Asegurarse de que rowData[0] es una cadena antes de convertir a mayúsculas
             rowData[0] = String(rowData[0]).toUpperCase();
+            rowData[1] = String(rowData[1]).toUpperCase();
 
             datosFinales.push(rowData);
         }
@@ -505,79 +503,86 @@ input.addEventListener('change', async () => {
 });
 
 async function datosCarol(datos) {
+    let errores = [];
+    const datos3 = (await datosTCodigosT()).codigo;
 
-    let datos2 = []
+    for (const doc of datos) {
+        try {
+            console.log('Procesando documento:', doc);
+            let aux2 = await datosEmpleado(doc[0]);
+            console.log('Datos del empleado obtenidos:', aux2);
 
-    const aux = await datosTCodigosT();
-    console.log(aux.codigo);
-    let datos3 = aux.codigo;
-    datos.forEach(async (doc) => {
+            const cod = obtenerCodigo(doc[2], datos3);
+            let codigoP = doc[2];
 
-        let aux2 = await datosEmpleado(doc[0]);
-        console.log(aux2);
+            if (aux2.datosbase == "No se encontró el registro para el ID proporcionado") {
+                errores.push({ cedula: doc[0], razon: 'Empleado no existe' });
+                console.log('Empleado no existe');
+            }
+            else if (!verificarCodigo(codigoP, datos3)) {
+                errores.push({ cedula: doc[0], razon: 'Código no existe' });
+                console.log('Codigo no existe');
 
-        let datosUsuario = aux2.datosbase[0];
-        const cod = obtenerCodigo(doc[2], datos3);
+            }
+            else if (!verificarCodigoEstado(codigoP, datos3)) {
+                errores.push({ cedula: doc[0], razon: 'Código ya fue usado' })
+                console.log('Codigo ya fue usado');
+            }
+            else if (!verificarCedula(codigoP, doc[0], datos3)) {
+                errores.push({ cedula: doc[0], razon: 'El codigo no pertenece a este empleado' })
+                console.log('El codigo no pertenece a este empleado');
+            }
+            else if (verificaSiesUnPrestamo(codigoP)) {
+                errores.push({ cedula: doc[0], razon: 'El codigo no es valido solo se admiten mercados' })
+                console.log('El codigo no es valido solo se admiten mercados');
+            }
 
-        if (aux2.datosbase == "No se encontró el registro para el ID proporcionado") {
-            console.log("No existe");
-            aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
-            return;
+            let concepto = 'Compra tienda de Señor Luis';
+
+            // generar codigo solo numeros aleatorios
+            let codigoAux = 'MOH' + Math.floor(Math.random() * 1000000);
+
+            if (cod != undefined) {
+                await CambiarEstado(codigoP, doc[1], codigoAux);
+                await actualizar(codigoAux, codigoP, usernameLocal, doc[1], 2);
+                await escribirHistorial(doc[0], doc[1], 2, concepto, codigoAux, cod.generadoPor);
+                await sleep(2000); // Pausa de 2 segundos
+                await ActualizarHistorial(codigoAux);
+                await historialT(doc[1]);
+                await actualizarDatosBase(concepto, doc[1], 2, doc[0]);
+            }
+
+            console.log('Llega');
+
+            let confirmacion = await avisoConfirmado('Termino de subir el archivo', "success");
+
+            await exportarErroresAExcel(errores);
+
+            if (confirmacion) {
+                // recargar la pagina
+                location.reload();
+            }
+            console.log('Documento procesado:', doc);
+
+        } catch (error) {
+            console.error('Error procesando el documento:', doc, 'Error:', error);
+            errores.push({ cedula: doc[0], razon: 'Error durante el procesamiento' });
         }
-
-        console.log(datosUsuario)
-        console.log(cod)
-
-        let codigoP = doc[2];
-
-        if (!verificarCodigo(codigoP, datos3)) {
-            isFunctionExecuting = false;
-            aviso('El codigo no existe', 'error');
-            return;
-        }
-
-        if (!verificarCodigoEstado(codigoP, datos3)) {
-            isFunctionExecuting = false;
-            aviso('El codigo ya fue usado', 'error');
-            return
-        }
-
-        if (!verificarCedula(codigoP, doc[0], datos3)) {
-            isFunctionExecuting = false;
-            aviso('El codigo no pertenece a este empleado', 'error');
-            return;
-        }
-
-        if (verificaSiesUnPrestamo(codigoP)) {
-            isFunctionExecuting = false;
-            aviso('El codigo no es valido solo se admiten mercado', 'error');
-            return;
-        }
-
-        let concepto = 'Compra tienda de Señor Luis';
-
-        // generar codigo solo numeros aleatorios
-        let codigoAux = 'MOH' + Math.floor(Math.random() * 1000000);
-
-        await CambiarEstado(codigoP, doc[1], codigoAux);
-        await actualizar(codigoAux, codigoP, usernameLocal, doc[1], 2);
-        await escribirHistorial(doc[0], doc[1], 2, concepto, codigoAux, cod.generadoPor);
-        await sleep(2000); // Pausa de 2 segundos
-        await ActualizarHistorial(codigoAux);
-        await historialT(doc[1]);
-        await actualizarDatosBase(concepto, doc[1], 2, doc[0]);
-        isFunctionExecuting = false;
-
-    });
-
-    let confirmacion = await avisoConfirmado('Termino de subir el archivo', "success");
-
-        if (confirmacion) {
-            // recargar la pagina
-            location.reload();
-        }
-
+    }
 }
+
+async function exportarErroresAExcel(errores) {
+    // Crear una hoja de cálculo a partir de un arreglo de objetos
+    const worksheet = XLSX.utils.json_to_sheet(errores);
+
+    // Crear un nuevo libro de trabajo y añadir la hoja de cálculo
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Errores");
+
+    // Generar el archivo Excel y forzar la descarga en el navegador
+    XLSX.writeFile(workbook, "ErroresSubidaMasiva.xlsx");
+}
+
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -602,7 +607,6 @@ async function datosTCodigosT() {
 
         if (response.ok) {
             const responseData = await response.json();
-            console.log(responseData);
             return responseData;
         } else {
             throw new Error('Error en la petición GET');
@@ -647,18 +651,8 @@ function verificarCodigoEstado(codigo, datos) {
     return encontrado;
 }
 
-function verificaMonto(monto, datos) {
-    let encontrado = false;
-    datos.forEach(doc => {
-        if (parseInt(doc.monto) >= monto) {
-            encontrado = true;
-        }
-    });
-    return encontrado;
-}
-
 function obtenerCodigo(codigo, datos) {
-    let cod;
+    let cod = undefined;
     datos.forEach(doc => {
         if (doc.codigo == codigo) {
             cod = doc;
@@ -673,88 +667,6 @@ function verificaSiesUnPrestamo(codigo) {
     }
     else {
         return true;
-    }
-}
-
-function verificaCondiciones(datos, nuevovalor) {
-    // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
-    const fechaIngreso = datos.ingreso;
-    let dia = fechaIngreso.split("-")[0];
-    let mes = fechaIngreso.split("-")[1];
-    let anio = fechaIngreso.split("-")[2];
-
-    // el año esta en formato xxaa y se debe convertir a 20aa
-    let anioConvertido = "20" + anio;
-    anio = anioConvertido;
-
-    const sumaTotal =
-        parseInt(datos.saldos) +
-        parseInt(datos.fondos) +
-        parseInt(datos.mercados) +
-        parseInt(datos.prestamoParaDescontar) +
-        parseInt(datos.casino) +
-        parseInt(datos.valoranchetas) +
-        parseInt(datos.fondo) +
-        parseInt(datos.carnet) +
-        parseInt(datos.seguroFunerario) +
-        parseInt(datos.prestamoParaHacer) +
-        parseInt(datos.anticipoLiquidacion) +
-        parseInt(datos.cuentas);
-
-    const fechaActual = new Date();
-
-    if (parseInt(datos.saldos) >= 175000) {
-        aviso("Ups no se pueden generar prestamos porque superas los 175000 de saldo permitido", "error");
-        return false;
-    }
-    else {
-        // conseguir la fecha actual y separarla en dia, mes y año para poder compararla con la fecha de ingreso del empleado   
-        let diaActual = fechaActual.getDate();
-        let mesActual = fechaActual.getMonth() + 1;
-        let anioActual = fechaActual.getFullYear();
-        let fechaInicio = new Date(anio, mes, dia); // Asume que "anio", "mes", "dia" representan la fecha de inicio del trabajador
-        let fechaActualCompara = new Date(anioActual, mesActual, diaActual); // Asume que "anioActual", "mesActual", "diaActual" representan la fecha actual
-        let diferencia = Math.abs(fechaActualCompara - fechaInicio); // Diferencia en milisegundos
-        let diasTrabajados = Math.ceil(diferencia / (1000 * 60 * 60 * 24)); // Conversión de milisegundos a días
-
-        // Si ha trabajado entre 8 y 15 dias puede pedir prestamo de 150.000
-        if ((diasTrabajados > 8 && diasTrabajados <= 15)) {
-            if ((sumaTotal + parseInt(nuevovalor) >= 150001)) {
-                aviso("Ups no se pueden generar mercado, puede sacar maximo " + (150000 - (sumaTotal)), "error");
-                return false;
-            }
-            else {
-                return true;
-            }
-
-        }
-
-        // Si ha trabajado entre 15 y 30 dias puede pedir prestamo de 250.000
-        else if ((diasTrabajados > 15 && diasTrabajados <= 30)) {
-            if ((sumaTotal + parseInt(nuevovalor) >= 250001)) {
-                aviso("Ups no se pueden generar mercado, puede sacar maximo " + (250000 - (sumaTotal)), "error");
-                return false;
-            }
-            else {
-                return true;
-            }
-        }
-
-        // Si ha trabajado mas de 30 dias puede pedir prestamo de 350.000
-        else if ((diasTrabajados > 30)) {
-            if ((sumaTotal + parseInt(nuevovalor) >= 350001)) {
-                aviso("Ups no se pueden generar mercado, puede sacar maximo " + (350000 - (sumaTotal)), "error");
-                return false;
-            }
-            else {
-                return true;
-            }
-        }
-        else {
-            aviso("Ups no se pueden generar mercado, el empleado no tiene los dias suficientes para pedir prestamo", "error");
-            return false;
-        }
-
     }
 }
 
@@ -1030,19 +942,3 @@ async function ActualizarHistorial(codigo) {
         console.error(error);
     }
 }
-
-function esCodigoValido(fechaGeneradoStr) {
-    const hoy = new Date(); // Obtiene la fecha actual
-    const fechaGenerado = new Date(fechaGeneradoStr);
-    const diaGenerado = fechaGenerado.getDate();
-    const diaLimite = diaGenerado <= 13 ? 27 : 13;
-
-    if (diaGenerado <= diaLimite || diaGenerado === 13) {
-        // El código es válido
-        return true;
-    } else {
-        // El código no es válido
-        return false;
-    }
-}
-

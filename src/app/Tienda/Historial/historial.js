@@ -80,18 +80,16 @@ diasLi.innerHTML = dias2;
 
 
 
-if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen"
-    || usernameLocal == "Señora luzdary" || usernameLocal == "SEÑORA LUZDARY" || usernameLocal == "señora luzdary") {
+const correo = localStorage.getItem("correo_electronico");
+
+if (correo == "carmen@gmail.com" || correo == "luzdary@gmail.com") {
     lola.style.display = "inline-block";
 }
 else {
-    lola.style.display = "none";    
+    lola.style.display = "none";
 }
 
-
-if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen"
-    || usernameLocal == "Señora Lola" || usernameLocal == "SEÑORA LOLA" || usernameLocal == "señora lola"
-    || usernameLocal == "Señor Luis" || usernameLocal == "SEÑOR LUIS" || usernameLocal == "señor luis") {
+if (correo == "carmen@gmail.com" || correo == "lola@gmail.com" || correo == "luis@gmail.com") {
     lola2.style.display = "inline-block";
 }
 else {

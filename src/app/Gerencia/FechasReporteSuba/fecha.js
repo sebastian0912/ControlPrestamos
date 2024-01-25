@@ -7,7 +7,9 @@ const perfil = document.querySelector('#perfil');
 const perfilLocal = localStorage.getItem("perfil");
 const usernameLocal = localStorage.getItem("username");
 
-if (usernameLocal == "YENY SOTELO" || "HEIDY TORRES") {
+const correo = localStorage.getItem("correo_electronico");
+
+if (correo == "a.sotelotualianza@gmail.com" || correo == "contaduria.rtc@gmail.com"){
     mercado.style.display = "inline-block"
 }
 else {

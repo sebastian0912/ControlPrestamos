@@ -100,7 +100,6 @@ async function datosTComercio() {
 
         if (response.ok) {
             const responseData = await response.json();
-            console.log(responseData);
             return responseData;
         } else {
             throw new Error('Error en la petición GET');
@@ -122,9 +121,7 @@ let datosArreglo = datosComercializadoraGeneral.comercio;
 
 
 
-console.log(datosArreglo);
 let aux = [];
-console.log(sede);
 
 datosArreglo.forEach((p) => {
     if (p.destino == sede && p.cantidadRecibida == 0) {
@@ -132,11 +129,10 @@ datosArreglo.forEach((p) => {
     }
 });
 
-console.log(aux);
 
 if (aux.length == 0) {
     aviso("No hay envios por recibir", "warning")
-    
+
     tabla.innerHTML += `
         <tr>
             <td colspan="9">No envios por recibir</td>
@@ -237,10 +233,6 @@ boton.addEventListener('click', async (e) => {
         return;
     }
 
-    /* necesito enviar un correo a un @gmail con la informacion de la cantidad recibida, 
-    el codigo, el nombre de la persona que recibe, el nombre de la persona que envia, sede, fecha enviado, fecha recibido y la cantidad enviada */
-
-   
 
     actualizar(codigo, cantidad, usernameLocal, comentariosLlegada);
     aviso("Se ha cargado la informacion exitosamente", "success");

@@ -94,18 +94,16 @@ numemoroM.addEventListener('keyup', (e) => {
 });
 
 
-if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen"
-    || usernameLocal == "Señora luzdary" || usernameLocal == "SEÑORA LUZDARY" || usernameLocal == "señora luzdary") {
+const correo = localStorage.getItem("correo_electronico");
+
+if (correo == "carmen@gmail.com" || correo == "luzdary@gmail.com") {
     lola.style.display = "inline-block";
 }
 else {
-    lola.style.display = "none";    
+    lola.style.display = "none";
 }
 
-
-if (usernameLocal == "Señora Carmen" || usernameLocal == "SEÑORA CARMEN" || usernameLocal == "señora carmen"
-    || usernameLocal == "Señora Lola" || usernameLocal == "SEÑORA LOLA" || usernameLocal == "señora lola"
-    || usernameLocal == "Señor Luis" || usernameLocal == "SEÑOR LUIS" || usernameLocal == "señor luis") {
+if (correo == "carmen@gmail.com" || correo == "lola@gmail.com" || correo == "luis@gmail.com") {
     lola2.style.display = "inline-block";
 }
 else {
@@ -189,7 +187,6 @@ async function datosEmpleado(cedulaEmpleado) {
         throw error; // Propaga el error para que se pueda manejar fuera de la función
     }
 }
-
 
 function verificaCondiciones(datos, nuevovalor) {
     // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
@@ -553,7 +550,7 @@ boton.addEventListener('click', async (e) => {
     if (aux.datosbase == "No se encontró el registro para el ID proporcionado") {
         console.log("No existe");
         aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
-        return;    
+        return;
     }
 
     if (parseInt(datos.saldos) > 175000) {
@@ -582,7 +579,7 @@ boton.addEventListener('click', async (e) => {
             aviso('Se esta ejecutando la funcion', 'warning');
             return;
         }
-    
+
         isFunctionExecuting = true; // Marcar la función como en ejecución
 
         let valor = document.querySelector('#monto').value;
@@ -590,14 +587,13 @@ boton.addEventListener('click', async (e) => {
         let nuevovalor = valor.replace(/\,/g, '');
         let codigoOH = 'M' + Math.floor(Math.random() * 1000000);
 
-        if (usernameLocal != "Señora Lola" && usernameLocal != "Señor Luis") {
-            console.log(usernameLocal)
+        if (correo != "lola@gmail.com" && correo != "luis@gmail.com") {
             if (!verificaCondiciones(datos, parseInt(nuevovalor))) {
                 isFunctionExecuting = false;
                 return;
             }
         }
-        
+
         if (valor == "") {
             isFunctionExecuting = false;
             aviso('Ups no se pueden generar mercado, el monto no puede estar vacio', 'error');
@@ -620,7 +616,7 @@ boton.addEventListener('click', async (e) => {
                 return;
             }
         }
-        
+
 
         await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, valor)
         await CambiarEstado(codigoOH, nuevovalor, codigoOH);

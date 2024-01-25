@@ -184,7 +184,6 @@ async function datosTComercio() {
 
         if (response.ok) {
             const responseData = await response.json();
-            console.log(responseData);
             return responseData;
         } else {
             throw new Error('Error en la petición GET');
@@ -203,7 +202,7 @@ const tabla = document.querySelector("#tabla");
 let datosComercializadoraGeneral = [];
 datosComercializadoraGeneral = await datosTComercio();
 let datosArreglo = datosComercializadoraGeneral.comercio;
-console.log(datosArreglo);
+
 datosArreglo.forEach((p) => {
     if (p.destino == sede && p.cantidadRecibida != p.cantidadTotalVendida) {
         tabla.innerHTML += `

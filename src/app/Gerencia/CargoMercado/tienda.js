@@ -20,7 +20,8 @@ const usernameLocal = localStorage.getItem("username");
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
 
-if (usernameLocal == "YENY SOTELO" || "HEIDY TORRES"){
+const correo = localStorage.getItem("correo_electronico");
+if (correo == "a.sotelotualianza@gmail.com" || correo == "contaduria.rtc@gmail.com"){
     mercado.style.display = "inline-block"
 }
 else{

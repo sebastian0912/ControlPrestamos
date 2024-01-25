@@ -7,7 +7,8 @@ const perfil = document.querySelector('#perfil');
 const perfilLocal = localStorage.getItem("perfil");
 const usernameLocal = localStorage.getItem("username");
 
-if (usernameLocal == "YENY SOTELO" || "HEIDY TORRES") {
+const correo = localStorage.getItem("correo_electronico");
+if (correo == "a.sotelotualianza@gmail.com" || correo == "contaduria.rtc@gmail.com") {
     mercado.style.display = "inline-block"
 }
 else {
@@ -59,20 +60,91 @@ async function datosTCodigos() {
 
 let coodinador = document.getElementById("boton");
 
-const nombresApellidos = [
-    "JACOBO PAREDES", "ANYI HERNANDEZ", "YESENIA PALACIOS", "LIGIA HUERTAS", "NIKOL SARMIENTO", "YURLEY REYES", "CLAUDIA BELTRAN", "ANDRES PEÑA", "LEYDI CAMACHO", "ANTONIO RUIZ", "ESTEFANIA REALPE", "ANGELA ALDANA", "ANGELICA GOMEZ", "MARIO MAESTRE", "LUIS RUBIANO", "DIANA RINCON", "ANGIE LEON", "JHONATAN PARRA", "DUMAR NUÑEZ", "DANIEL PEREZ", "SERGIO ACOSTA", "DIEGO MENDIETA", "DIEGO FORERO", "ERIKA GAITAN", "DUMAR NUÑEZ", "DANIEL HERNANDEZ", "JULIETH REYES", "MAURY RAMIREZ", "ANGIE CASTILLO", "MARIA MERCHAN", "ANGELICA GOMEZ", "LUISA PEÑA", "ANGIE GUTIERREZ", "NOHOR CASTRO", "BRIGITH ACEVEDO", "ANGIE GARCIA", "FANNY ROBLES", "ANGIE ACOSTA", "SAREN BUITRAGO", "PAOLA MACANA", "SEBASTIAN RODRIGUEZ", "Daniela Neiza", "CAMILA GARCIA", "ERIKA GUERRERO", "KAREN RAMIREZ", "CARLOS ROJAS", "LEIDY VANESA", "CAROL PALACIOS", "Juliana Vargas", "DUVAN FORERO", "VALENTINA GUILLEN", "LEIDI CAMARGO", "KAREN RIQUETT", "ANDREA DIAZ", "WENDY SALAZAR"
-];
+async function ordenaryfiltrar(dato) {
+    // ordenar por rol 
+    dato.sort(function (a, b) {
+        if (a.rol > b.rol) {
+            return 1;
+        }
+        if (a.rol < b.rol) {
+            return -1;
+        }
+        return 0;
+    });
 
-const rolesAsignados = nombresApellidos.map((nombre, indice) => {
-    const rol = indice < 41 ? 'COORDINADOR' : 'JEFE DE OFICINA';
-    return { nombre, rol };
-});
+    // Quitar ADMIN, BOT, COMERCIALIZADORA, GERENCIA
 
+    dato = dato.filter((doc) => {
+        return doc.rol !== "ADMIN" 
+        && doc.rol !== "BOT" 
+        && doc.rol !== "COMERCIALIZADORA" 
+        && doc.rol !== "GERENCIA" 
+        && doc.rol !== "CONTRATACIONSELECCIONGENERAL" 
+        && doc.rol !== "RECEPCION"
+        && doc.rol !== "SIN-ASIGNAR"
+        && doc.rol !== "TESORERIA"
+        && doc.rol !== "TIENDA";
+    });
+
+    // pegar primer nombre y primer apellido, colocar tambien el rol en un nuevo array para enviar
+    let datosFinales = [];
+    let nombreCompleto = "";
+    dato.forEach((doc) => {
+        nombreCompleto = doc.primer_nombre + " " + doc.primer_apellido;
+        datosFinales.push({
+            "nombre": nombreCompleto,
+            "rol": doc.rol
+        });
+    });    
+
+    return datosFinales;
+}
+
+async function datosUsuarios() {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/usuarios/usuarios';
+
+    try {
+        const response = await fetch(urlcompleta, {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+
+            return responseData;
+        } else {
+            throw new Error('Error en la petición GET');
+        }
+    } catch (error) {
+        console.error('Error en la petición HTTP GET');
+        console.error(error);
+        throw error; // Propaga el error para que se pueda manejar fuera de la función
+    }
+}
 
 coodinador.addEventListener('click', async () => {
 
     let fechaInicio = document.getElementById("fechaInicio").value;
     let fechaFin = document.getElementById("fechaFin").value;
+    let usuarios = await datosUsuarios();
+
+
+    let rolesAsignados = await ordenaryfiltrar(usuarios);
+    console.log(usuarios);
+
+    let nombresApellidos = [];
+    rolesAsignados.forEach((doc) => {
+        nombresApellidos.push(doc.nombre);
+    });
 
     if (fechaInicio == "") {
         aviso("Debe seleccionar las fechas", "warning");
@@ -142,9 +214,6 @@ coodinador.addEventListener('click', async () => {
             datosAgrupados[key].push(item);
         });
 
-        console.log(datosAgrupados);
-
-
         // agrupar por generadoPor sumar los montos
         let datosFinalesFechaGeneradoPor = [];
         let datosFinalesFechaGeneradoPorSuma = [];
@@ -186,8 +255,6 @@ coodinador.addEventListener('click', async () => {
             });
         });
 
-        console.log(datosFinalesFechaGeneradoPorSuma)
-
         let datosFinalesFechaGeneradoPorSumaRol = [];
         let nombresProcesados = new Set();
 
@@ -204,7 +271,6 @@ coodinador.addEventListener('click', async () => {
                 }
             });
         });
-        console.log(datosFinalesFechaGeneradoPorSumaRol)
 
         // Crear un libro Excel
         const wb = XLSX.utils.book_new();

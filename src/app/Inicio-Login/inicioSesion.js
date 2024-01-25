@@ -5,15 +5,15 @@ import { urlBack, usuarioR } from "../models/base.js";
 const signInform = document.querySelector('#signIn-form');
 
 
-const icon = document.querySelector(".bx"), 
-        pas = document.getElementById("signIn-password")
+const icon = document.querySelector(".bx"),
+    pas = document.getElementById("signIn-password")
 icon.addEventListener("click", e => {
-    if(pas.type === "password"){
+    if (pas.type === "password") {
         pas.type = "text";
         icon.classList.remove('bx-show-alt')
         icon.classList.add("bx-hide")
     }
-    else{
+    else {
         pas.type = "password"
         icon.classList.remove('bc-hide')
         icon.classList.add('bx-show-alt')
@@ -32,6 +32,7 @@ signInform.addEventListener('submit', async (e) => {
     localStorage.setItem('sede', values.sucursalde);
     localStorage.setItem('estadoSolicitudes', values.EstadoSolicitudes);
     localStorage.setItem('estadoQuincena', values.EstadoQuincena);
+    localStorage.setItem('correo_electronico', values.correo_electronico);
 
     if (values.rol == 'TESORERIA') {        
         window.location.href = "../Tesorero/tesorero.html";
@@ -91,7 +92,7 @@ async function fetchData() {
         }
         return null; // Si no hay valores o hay errores, devuelve null
     } catch (error) {
-        aviso("Contecta el vpn","warning")
+        aviso("Contecta el vpn", "warning")
         console.error(error);
         return null; // En caso de error, devuelve null
     }

@@ -16,6 +16,8 @@ const perfil = document.querySelector('#perfil');
 // Capturar el PERFIL y el USERNAME del local storage
 const perfilLocal = localStorage.getItem("perfil");
 const usernameLocal = localStorage.getItem("username");
+const correo = localStorage.getItem("correo_electronico");
+
 //Muestra en la parte superior el nombre y el perfil
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
@@ -33,7 +35,7 @@ numemoroM.addEventListener('keyup', (e) => {
     }
 });
 
-if (usernameLocal == "YENY SOTELO" || "HEIDY TORRES"){
+if (correo == "a.sotelotualianza@gmail.com" || correo == "contaduria.rtc@gmail.com"){
     mercado.style.display = "inline-block"
 }
 else{

@@ -842,11 +842,21 @@ archivoActualizarSaldos.addEventListener('change', async () => {
             over.style.display = "block";
             loader.style.display = "block";
 
-            // Divide los datos en lotes de 200
-            for (let i = 0; i < datosFinales.length; i += 100) {
-                const lote = datosFinales.slice(i, i + 100);
-                await procesarLote(lote);
+            const batchSize = 1500;
+            const chuncks = [];
+
+            console.log('Datos a actualizar:', datosFinales);
+
+            // Divide los datos en lotes de 1500
+            for (let i = 0; i < datosFinales.length; i += batchSize) {
+                chuncks.push(datosFinales.slice(i, i + batchSize));
             }
+
+            console.log('Chuncks:', chuncks);
+
+            await ActualizarEm(chuncks);
+
+            exportarCedulasAExcel();
 
             // Ocultar elementos al finalizar
             over.style.display = "none";
@@ -858,71 +868,73 @@ archivoActualizarSaldos.addEventListener('change', async () => {
             // Generar número aleatorio con la inicial 'T'
             const numero = Math.floor(Math.random() * (999999 - 100000)) + 100000;
             const codigo = "T" + numero;
+            // actualizar historial con fecha y hora
+            // fecha con hora
+            const fecha = new Date().toLocaleString();
+            const aux = fecha.replace(/\//g, "-");            
 
-            await historialModificaciones("Actualizar saldos", codigo);
+            await historialModificaciones("Actualizar saldos" + aux , codigo);
+
+
         };
-
         reader.readAsBinaryString(archivo);
+
     } else {
         // El usuario canceló la actualización de saldos o cerró el diálogo
         aviso("No se ha actualizado ningún saldo de algún empleado", "success");
     }
 });
 
-async function procesarLote(lote) {
-    // Aquí debes implementar la lógica para procesar cada elemento del lote
-    // En este ejemplo, simplemente se llama a la función ActualizarEm para cada elemento
-    for (const elemento of lote) {
-        await ActualizarEm(elemento.cedula, elemento.saldo);
-        await sleep(100); // Esperar 1 segundo antes de procesar el siguiente elemento
-    }
-}
-
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function ActualizarEm(cedulaEmpleado, valor) {
+let cedulasConErrores = [];
+
+async function ActualizarEm(datos) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
 
-    const urlcompleta = urlBack.url + '/Datosbase/actualizarSaldos/' + cedulaEmpleado;
-    try {
-        fetch(urlcompleta, {
-            method: 'POST',
-            body: JSON.stringify({
-                saldos: valor,
-                jwt: jwtToken
+    for (const chunck of datos) {
+        for (const elemento of chunck) {
+            const urlcompleta = urlBack.url + '/Datosbase/actualizarSaldos/' + elemento.cedula;
+            try {
+                const response = await fetch(urlcompleta, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        saldos: elemento.saldo,
+                        jwt: jwtToken
+                    })
+                });
 
-            })
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();// aca metes los datos uqe llegan del servidor si necesitas un dato en especifico me dices
-                    //muchas veces mando un mensaje de sucess o algo asi para saber que todo salio bien o mal
-                } else {
-                    throw new Error('Error en la petición POST');
+                if (!response.ok) {
+                    throw new Error(`Respuesta no exitosa: ${response.status}`);
                 }
-            })
-            .then(responseData => {
+
+                const responseData = await response.json();
                 if (responseData.message == "error") {
-                    aviso("No se ha podido actualizar el empleado con cédula: " + cedulaEmpleado, "warning");
+                    throw new Error('Error en la respuesta del servidor');
                 }
-                return
-            })
-            .catch(error => {
-                //console.error('Error:', error);
-                console.log(cedulaEmpleado)
-
-
-            });
-
-    } catch (error) {
-        console.error('Error en la petición HTTP POST');
-        console.error(error);
+            } catch (error) {
+                console.error('Error:', error);
+                cedulasConErrores.push(elemento.cedula);
+            }
+        }
     }
 
+    console.log('Cédulas con errores:', cedulasConErrores);
+}
+
+// Función para exportar las cédulas a Excel
+function exportarCedulasAExcel() {
+    console.log('Cédulas con errores en funcion:', cedulasConErrores);
+    const worksheet = XLSX.utils.aoa_to_sheet([["Cédula"], ...cedulasConErrores.map(cedula => [cedula])]);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Errores");
+
+    // Exportar el workbook como XLSX
+    XLSX.writeFile(workbook, "CedulasConErrores.xlsx");
 }
 
 
