@@ -254,7 +254,6 @@ async function datosTCodigos() {
 
         if (response.ok) {
             const responseData = await response.json();
-            console.log(responseData);
             return responseData;
         } else {
             throw new Error('Error en la petición GET');
@@ -285,7 +284,6 @@ async function datosEmpleado(cedulaEmpleado) {
 
         if (response.ok) {
             const responseData = await response.json();
-            console.log(responseData);
             return responseData;
         } else {
             throw new Error('Error en la petición GET');
@@ -301,7 +299,6 @@ async function actualizar(codigo, cod, username, monto2, cuotas) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
-    console.log(jwtToken);
 
     const urlcompleta = urlBack.url + '/Codigo/jefedearea/actualizarCodigo/' + cod;
 
@@ -341,7 +338,6 @@ async function actualizarDatosBase(concepto, valor, cuotas, cedulaEmpleado) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
-    console.log(jwtToken);
 
     const urlcompleta = urlBack.url + '/Datosbase/jefedearea/actualizarprestamodescontar/' + cedulaEmpleado;
     if (concepto == 'Dinero_Autorizacion') {
@@ -407,7 +403,6 @@ async function actualizarDatosBase(concepto, valor, cuotas, cedulaEmpleado) {
         }
     }
     else if (concepto == 'Otro_Autorizacion') {
-        console.log('con2' + concepto);
         // quitar espacios en blanco a concepto
         concepto = concepto.replace(/\s/g, '');
         try {
@@ -446,7 +441,6 @@ async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo, codig
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
-    console.log(jwtToken);
     var dia = new Date().getDate();
     var mes = new Date().getMonth() + 1;
     var anio = new Date().getFullYear();
@@ -494,7 +488,6 @@ async function CambiarEstado(cod, valor, codigo) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
-    console.log(jwtToken);
 
     const urlcompleta = urlBack.url + '/Codigo/jefedearea/cambiarEstadoCodigo/' + cod;
     try {
@@ -532,7 +525,6 @@ async function ActualizarHistorial(codigo) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
-    console.log(jwtToken);
     const urlcompleta = urlBack.url + '/Historial/actualizarXcodigo/' + codigo;
     try {
         fetch(urlcompleta, {
@@ -583,8 +575,7 @@ function esCodigoValido(fechaGeneradoStr) {
 
 let isFunctionExecuting = false; // Variable para rastrear si la función está en ejecución
 
-
-boton.addEventListener('dblclick', async (e) => {
+boton.addEventListener('click', async (e) => {
     e.preventDefault();
 
     if (isFunctionExecuting) {
@@ -612,26 +603,15 @@ boton.addEventListener('dblclick', async (e) => {
     }
     else {
         const aux = await datosTCodigos();
-        console.log(aux.codigo);
-        let aux2 = await datosEmpleado(cedulaEmpleado);
-        console.log(aux2);
-        
-        console.log(aux2.datosbase[0]);
+        let aux2 = await datosEmpleado(cedulaEmpleado);        
         let usuario = aux2.datosbase[0];
-        console.log(usuario);
         const cod = obtenerCodigo(codigoP, aux.codigo);
 
         if (aux2.datosbase == "No se encontró el registro para el ID proporcionado") {
-            console.log("No existe");
             aviso('Ups no se pueden generar prestamo, el empleado no existe', 'error');
             return;    
-        }
-        
-        /*if (!verificarCodigo(codigoP, aux.codigo)) {
-            aviso('El codigo no existe', 'error');
-            return;
-        }*/
-        
+        }        
+
         if (!verificarCodigoEstado(codigoP, aux.codigo)) {
             isFunctionExecuting = false;
             aviso('El codigo ya fue usado', 'error');
@@ -652,10 +632,14 @@ boton.addEventListener('dblclick', async (e) => {
             aviso('El codigo no es valido solo se admiten prestamos', 'error');
             return;
         }
-        if (!verificaCondiciones(usuario, nuevovalor) == true) {
-            isFunctionExecuting = false;
-            return;
+
+        if (!cod.codigo.startsWith("OT")){
+            if (!verificaCondiciones(usuario, nuevovalor) == true) {
+                isFunctionExecuting = false;
+                return;
+            }
         }
+
         if (valor == "") {
             isFunctionExecuting = false;
             aviso('Ups no se pueden generar mercado, el monto no puede estar vacio', 'error');
@@ -674,14 +658,6 @@ boton.addEventListener('dblclick', async (e) => {
             aviso('Ups no se pueden generar mercado, las cuotas no pueden ser mayor a 4', 'error');
             return;
         }
-
-        if (!esCodigoValido(cod.fechaGenerado)) {
-            isFunctionExecuting = false;
-            aviso('El codigo ya expiro', 'error');
-            return;
-        }
-
-
 
 
         else {

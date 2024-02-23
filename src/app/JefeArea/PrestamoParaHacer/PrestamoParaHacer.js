@@ -407,10 +407,11 @@ boton.addEventListener('click', async (e) => {
         let tipo = document.querySelector('#tipo').value;
 
         let cuotasAux = cuotas;
-
-        if (!verificaCondiciones(datos, nuevovalor) == true) {
-            isFunctionExecuting = false;
-            return;
+        if (tipo != "Otro"){
+            if (!verificaCondiciones(datos, nuevovalor) == true) {
+                isFunctionExecuting = false;
+                return;
+            }
         }
 
         if (!verificaSelect(formaPago)) {
