@@ -99,7 +99,6 @@ async function datosTComercio() {
 
         if (response.ok) {
             const responseData = await response.json();
-            console.log(responseData);
             return responseData;
         } else {
             throw new Error('Error en la petición GET');
@@ -114,7 +113,6 @@ async function datosTComercio() {
 let datosComercializadoraGeneral = [];
 datosComercializadoraGeneral = await datosTComercio();
 let miArray = datosComercializadoraGeneral.comercio;
-console.log(miArray);
 
 // ordernar por fecha 
 miArray.sort(function (a, b) {
@@ -127,29 +125,55 @@ miArray.sort(function (a, b) {
     return 0;
 });
 
-miArray.forEach((p) => {
-    if (p.fechaRecibida == null) {
-        p.fechaRecibida = "";
-    }
-    if (p.PersonaEnvia == usernameLocal) {
-        if (p.cantidadRecibida != p.cantidadTotalVendida || p.cantidadEnvio != p.cantidadRecibida) {
-            tabla.innerHTML += `
-        <tr>
-            <td>${p.codigo}</td>
-            <td>${p.concepto}</td>
-            <td>${p.destino}</td>
-            <td>${p.cantidadEnvio}</td>
-            <td>${p.cantidadRecibida}</td>
-            <td>${p.valorUnidad}</td>
-            <td>${p.cantidadTotalVendida}</td>
-            <td>${p.PersonaEnvia}</td>
-            <td>${p.PersonaRecibe}</td>
-            <td>${p.fechaEnviada}</td>
-            <td>${p.fechaRecibida}</td>
-        </tr>
-    `}
-    }
-});
+// Función para cargar los datos en la tabla
+function cargarDatosEnTabla() {
+    console.log(miArray)
+    miArray.forEach((p) => {
+        if (p.fechaRecibida == null) {
+            p.fechaRecibida = "";
+        }
+        if (p.PersonaEnvia == usernameLocal) {
+            if (p.cantidadRecibida != p.cantidadTotalVendida || p.cantidadEnvio != p.cantidadRecibida) {
+                tabla.innerHTML += `
+            <tr>
+                <td>${p.codigo}</td>
+                <td>${p.concepto}</td>
+                <td>${p.destino}</td>
+                <td>${p.cantidadEnvio}</td>
+                <td>${p.cantidadRecibida}</td>
+                <td>${p.valorUnidad}</td>
+                <td>${p.cantidadTotalVendida}</td>
+                <td>${p.PersonaEnvia}</td>
+                <td>${p.PersonaRecibe}</td>
+                <td>${p.fechaEnviada}</td>
+                <td>${p.fechaRecibida}</td>
+            </tr>
+        `}
+        }
+    });
+}
+
+function inicializarFiltrado() {
+    var inputFiltro = document.getElementById('filtroBusqueda');
+    inputFiltro.addEventListener('input', function() {
+        var valorBusqueda = this.value.toLowerCase();
+        var filasTabla = document.querySelectorAll('.tabla-contenido tbody tr');
+        
+        filasTabla.forEach(function(fila) {
+            var textoFila = fila.textContent || fila.innerText;
+            var coincide = textoFila.toLowerCase().includes(valorBusqueda);
+            fila.style.display = coincide ? '' : 'none';
+        });
+    });
+}
+
+
+cargarDatosEnTabla();
+inicializarFiltrado();
+
+
+
+
 
 let datos = [];
 datos = miArray
@@ -204,11 +228,6 @@ agrupado.forEach((p) => {
     p.resultado = Math.abs(p.cantidadEnvio - aux); // Restamos las cantidades sumadas anteriormente
     let cantidad =   Math.abs(parseInt(p.cantidadEnvio) - parseInt(p.cantidadRecibida))
 
-    console.log(p.destino)
-    console.log(p.concepto)
-    console.log(p.cantidadEnvio)
-    console.log(aux)
-    console.log("------------------")
     tabla2.innerHTML += `
         <tr>
             <td>${p.concepto}</td>            

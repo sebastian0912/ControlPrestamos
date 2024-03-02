@@ -490,10 +490,8 @@ async function datosComercializadora(codigo, listaC) {
         if (listaC[i].codigo == codigo) {
             return listaC[i];
         }
-        }        
     }
-
-
+}
 
 async function actualizar(codigo, cod, username, monto2, cuotas2) {
     var body = localStorage.getItem('key');
@@ -728,28 +726,26 @@ async function ActualizarHistorial(codigo) {
     }
 }
 
-function esCodigoValido(fechaGeneradoStr) {
-    const hoy = new Date(); // Obtiene la fecha actual
-    const fechaGenerado = new Date(fechaGeneradoStr);
-    const diaGenerado = fechaGenerado.getDate();
-    const diaLimite = diaGenerado <= 13 ? 27 : 13;
-
-    if (diaGenerado <= diaLimite || diaGenerado === 13) {
-        // El código es válido
-        return true;
-    } else {
-        // El código no es válido
-        return false;
-    }
-}
-
 let isFunctionExecuting = false; // Variable para rastrear si la función está en ejecución
 
+
+async function verificarDatosComercializadora(codigo, datosArreglo) {
+    if (codigo === "") return { valorUnidad: 0, concepto: "", cantidadTotalVendida: 0 }; // Retorna un objeto vacío si el código está vacío
+    const datos = await datosComercializadora(codigo, datosArreglo);
+    return datos || { valorUnidad: 0, concepto: "", cantidadTotalVendida: 0 }; // Retorna los datos o un objeto vacío si son undefined
+}
+
+function validarInventario(datosProducto, sumaCantidad, numeroProducto) {
+    if (sumaCantidad > datosProducto.cantidadRecibida) {
+        //throw new Error(`No se puede cargar el mercado del producto #${numeroProducto} porque la suma de la cantidad supera el inventario disponible. Lo máximo a sacar es ${datosProducto.cantidadRecibida - datosProducto.cantidadTotalVendida}`);
+        aviso("No se puede cargar el mercado del producto " + numeroProducto + " porque la suma de la cantidad supera el inventario disponible. Lo máximo a sacar es " + datosProducto.cantidadRecibida - datosProducto.cantidadTotalVendida, "error");
+    }
+
+}
 
 // darle click al boton para que se ejecute la funcion
 boton.addEventListener("click", async (e) => {
     if (isFunctionExecuting) {
-        // Puedes mostrar un mensaje o simplemente regresar sin hacer nada
         aviso('Se esta ejecutando la funcion', 'warning');
         return;
     }
@@ -759,248 +755,192 @@ boton.addEventListener("click", async (e) => {
 
     isFunctionExecuting = true; // Marcar la función como en ejecución
 
-    let cedula = document.querySelector("#cedula").value;
-    let codigoA = document.querySelector("#codigoA").value;
-    codigoA = codigoA.replace(/\s+/g, ''); // Esto quitará todos los espacios en blanco de 'codigo'
-
+    // Limpiar y obtener los valores de los inputs una sola vez
+    const cedula = document.querySelector("#cedula").value;
+    let codigoA = document.querySelector("#codigoA").value.replace(/\s+/g, ''); // Limpieza de espacios realizada una vez
     let cantidad = document.querySelector("#Cantidad").value;
     let cantidad2 = document.querySelector("#Cantidad2").value;
     let cantidad3 = document.querySelector("#Cantidad3").value;
     let cantidad4 = document.querySelector("#Cantidad4").value;
-    let codigo = document.querySelector("#codigo1").value;
-    let codigo2 = document.querySelector("#codigo2").value;
-    let codigo3 = document.querySelector("#codigo3").value;
-    let codigo4 = document.querySelector("#codigo4").value;
+    let codigo = document.querySelector("#codigo1").value.replace(/\s+/g, '');
+    let codigo2 = document.querySelector("#codigo2").value.replace(/\s+/g, '');
+    let codigo3 = document.querySelector("#codigo3").value.replace(/\s+/g, '');
+    let codigo4 = document.querySelector("#codigo4").value.replace(/\s+/g, '');
 
-    const aux = await datosTCodigos();
-    let CodigosMercado = aux.codigo;
-    let aux2 = await datosEmpleado(cedula);
-    let usuario = aux2.datosbase[0];
+    try {
+        const aux = await datosTCodigos();
+        let CodigosMercado = aux.codigo;
+        let aux2 = await datosEmpleado(cedula);
+        let usuario = aux2.datosbase[0];
 
-    if (aux2.datosbase == "No se encontró el registro para el ID proporcionado") {
-        over.style.display = "none";
-        loader.style.display = "none";
-        aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
-    }
-
-    datosComercializadoraGeneral = await datosTComercio();
-    let datosArreglo = datosComercializadoraGeneral.comercio;
-
-    codigo = codigo.replace(/\s+/g, ''); // Esto quitará todos los espacios en blanco de 'codigo'
-    codigo2 = codigoA.replace(/\s+/g, ''); // Esto quitará todos los espacios en blanco de 'codigo'
-    codigo3 = codigoA.replace(/\s+/g, ''); // Esto quitará todos los espacios en blanco de 'codigo'
-    codigo4 = codigoA.replace(/\s+/g, ''); // Esto quitará todos los espacios en blanco de 'codigo'
-
-    let datos = await datosComercializadora(codigo, datosArreglo);
-    let datos2 = await datosComercializadora(codigo2, datosArreglo);
-    let datos3 = await datosComercializadora(codigo3, datosArreglo);
-    let datos4 = await datosComercializadora(codigo4, datosArreglo);
-
-
-    let auxValorUnidad2 = 0;
-    let auxValorUnidad3 = 0;
-    let auxValorUnidad4 = 0;
-    let auxConcepto2 = "";
-    let auxConcepto3 = "";
-    let auxConcepto4 = "";
-
-    if (datos2 == undefined) {
-        datos2 = 0;
-    }
-    else {
-        auxValorUnidad2 = parseInt(datos2.valorUnidad);
-        auxConcepto2 = datos2.concepto;
-    }
-    if (datos3 == undefined) {
-        datos3 = 0;
-    }
-    else {
-        auxValorUnidad3 = parseInt(datos3.valorUnidad);
-        auxConcepto3 = datos3.concepto;
-    }
-    if (datos4 == undefined) {
-        datos4 = 0;
-    }
-    else {
-        auxValorUnidad4 = parseInt(datos4.valorUnidad);
-        auxConcepto4 = datos4.concepto;
-    }
-    if (cantidad2 == "") {
-        cantidad2 = 0;
-    }
-    if (cantidad3 == "") {
-        cantidad3 = 0;
-    }
-    if (cantidad4 == "") {
-        cantidad4 = 0;
-    }
-
-
-    let sumaVentas = parseInt(cantidad) * parseInt(datos.valorUnidad) + parseInt(cantidad2) * auxValorUnidad2 + parseInt(cantidad3) * auxValorUnidad3 + parseInt(cantidad4) * auxValorUnidad4;
-    console.log(sumaVentas);
-    let sumaCantidad = parseInt(cantidad) + parseInt(datos.cantidadTotalVendida);
-    let sumaCantidad2 = parseInt(cantidad2) + parseInt(datos2.cantidadTotalVendida);
-    let sumaCantidad3 = parseInt(cantidad3) + parseInt(datos3.cantidadTotalVendida);
-    let sumaCantidad4 = parseInt(cantidad4) + parseInt(datos4.cantidadTotalVendida);
-
-    let cod = obtenerCodigo(codigoA, CodigosMercado);
-
-    if (sumaCantidad > datos.cantidadRecibida) {
-        isFunctionExecuting = false;
-        over.style.display = "none";
-        loader.style.display = "none";
-        aviso("No se puede cargar el mercado del producto #1 porque la suma de la cantidad supera el inventario disponible. Lo máximo a sacar es " + (datos.cantidadRecibida - datos.cantidadTotalVendida), "error");
-        return;
-    }
-
-    if (sumaCantidad2 > datos2.cantidadRecibida) {
-        isFunctionExecuting = false;
-        over.style.display = "none";
-        loader.style.display = "none";
-        aviso("No se puede cargar el mercado del producto #2 porque la suma de la cantidad supera el inventario disponible. Lo máximo a sacar es " + (datos2.cantidadRecibida - datos2.cantidadTotalVendida), "error");
-        return;
-    }
-
-    if (sumaCantidad3 > datos3.cantidadRecibida) {
-        isFunctionExecuting = false;
-        over.style.display = "none";
-        loader.style.display = "none";
-        aviso("No se puede cargar el mercado del producto #3 porque la suma de la cantidad supera el inventario disponible. Lo máximo a sacar es " + (datos3.cantidadRecibida - datos3.cantidadTotalVendida), "error");
-        return;
-    }
-
-    if (sumaCantidad4 > datos4.cantidadRecibida) {
-        isFunctionExecuting = false;
-        over.style.display = "none";
-        loader.style.display = "none";
-        aviso("No se puede cargar el mercado del producto #4 porque la suma de la cantidad supera el inventario disponible. Lo máximo a sacar es " + (datos4.cantidadRecibida - datos4.cantidadTotalVendida), "error");
-        return;
-    }
-
-    /*if (!esCodigoValido(cod.fechaGenerado)) {
-        aviso('El codigo ya expiro', 'error');
-        return;
-    }*/
-
-    if (!verificarCodigo(codigoA, CodigosMercado)) {
-        isFunctionExecuting = false;
-        over.style.display = "none";
-        loader.style.display = "none";
-        aviso("El codigo no existe", "error");
-        return;
-    }
-
-    if (!verificarCodigoEstado(codigoA, CodigosMercado)) {
-        isFunctionExecuting = false;
-        over.style.display = "none";
-        loader.style.display = "none";
-        aviso("El codigo ya fue usado", "error");
-        return
-    }
-
-    if (!verificarCedula(codigoA, cedula, CodigosMercado)) {
-        isFunctionExecuting = false;
-        over.style.display = "none";
-        loader.style.display = "none";
-        aviso("El codigo no pertenece a este empleado", "error");
-        return;
-    }
-
-    if (!verificarCodigoComercio(codigo, datosArreglo) == true) {
-        isFunctionExecuting = false;
-        over.style.display = "none";
-        loader.style.display = "none";
-        aviso("El codigo de la comercializadora no existe", "error");
-        return;
-    }
-
-    if (codigoA == "") {
-        isFunctionExecuting = false;
-        over.style.display = "none";
-        loader.style.display = "none";
-        aviso("Por favor ingrese el codigo de autorizacion generado por el coordinador", "error");
-        return;
-    }
-
-    if (verificarCodigo(codigoA, CodigosMercado) == true) {
-
-        if (codigoA.startsWith("MG")) {
-            if (!verificaMonto(sumaVentas, cod) == true) {
-                isFunctionExecuting = false;
-                over.style.display = "none";
-                loader.style.display = "none";
-                aviso("El monto supera el monto maximo permitido solicitado antes", "error");
-                return;
-            }
-        }
-        else {
-            if (!verificaCondiciones(usuario, sumaVentas) == true) {
-                over.style.display = "none";
-                loader.style.display = "none";
-                isFunctionExecuting = false;
-                return;
-            }
+        if (aux2.datosbase == "No se encontró el registro para el ID proporcionado") {
+            over.style.display = "none";
+            loader.style.display = "none";
+            aviso('Ups no se pueden generar mercado, el empleado no existe', 'error');
         }
 
-        if (obtenerCodigo(codigoA, CodigosMercado) == null) {
+        datosComercializadoraGeneral = await datosTComercio();
+        let datosArreglo = datosComercializadoraGeneral.comercio;
+
+        const datos = await datosComercializadora(codigo, datosArreglo);
+        const datos2 = await verificarDatosComercializadora(codigo2, datosArreglo);
+        const datos3 = await verificarDatosComercializadora(codigo3, datosArreglo);
+        const datos4 = await verificarDatosComercializadora(codigo4, datosArreglo);
+
+        // Convertir cantidades a números, asegurándose de que sean cero si están vacías
+        cantidad = cantidad === "" ? 0 : parseInt(cantidad);
+        cantidad2 = cantidad2 === "" ? 0 : parseInt(cantidad2);
+        cantidad3 = cantidad3 === "" ? 0 : parseInt(cantidad3);
+        cantidad4 = cantidad4 === "" ? 0 : parseInt(cantidad4);
+
+        const sumaVentas = parseInt(cantidad) * parseInt(datos.valorUnidad) +
+            parseInt(cantidad2) * datos2.valorUnidad +
+            parseInt(cantidad3) * datos3.valorUnidad +
+            parseInt(cantidad4) * datos4.valorUnidad;
+
+        // Asegúrate de que 'datos', 'datos2', 'datos3', y 'datos4' tengan los campos necesarios.
+        const sumaCantidad = parseInt(cantidad) + (datos.cantidadTotalVendida || 0);
+        const sumaCantidad2 = cantidad2 + (datos2.cantidadTotalVendida || 0);
+        const sumaCantidad3 = cantidad3 + (datos3.cantidadTotalVendida || 0);
+        const sumaCantidad4 = cantidad4 + (datos4.cantidadTotalVendida || 0);
+
+        const cod = obtenerCodigo(codigoA, CodigosMercado);
+
+        // Validaciones de inventario
+        validarInventario(datos, sumaCantidad, 1);
+        validarInventario(datos2, sumaCantidad2, 2);
+        validarInventario(datos3, sumaCantidad3, 3);
+        validarInventario(datos4, sumaCantidad4, 4);
+
+
+        if (!verificarCodigo(codigoA, CodigosMercado)) {
             isFunctionExecuting = false;
             over.style.display = "none";
             loader.style.display = "none";
-            aviso("El codigo de autorizacion no existe", "error");
+            aviso("El codigo no existe", "error");
             return;
         }
 
-        let codigAux = "MOH" + Math.floor(Math.random() * 1000000 + 1);
-        let concepto = datos.concepto;
-
-        if (auxConcepto2) {
-            concepto += "," + auxConcepto2;
+        if (!verificarCodigoEstado(codigoA, CodigosMercado)) {
+            isFunctionExecuting = false;
+            over.style.display = "none";
+            loader.style.display = "none";
+            aviso("El codigo ya fue usado", "error");
+            return
         }
 
-        if (auxConcepto3) {
-            concepto += "," + auxConcepto3;
+        if (!verificarCedula(codigoA, cedula, CodigosMercado)) {
+            isFunctionExecuting = false;
+            over.style.display = "none";
+            loader.style.display = "none";
+            aviso("El codigo no pertenece a este empleado", "error");
+            return;
         }
 
-        if (auxConcepto4) {
-            concepto += "," + auxConcepto4;
+        if (!verificarCodigoComercio(codigo, datosArreglo) == true) {
+            isFunctionExecuting = false;
+            over.style.display = "none";
+            loader.style.display = "none";
+            aviso("El codigo de la comercializadora no existe", "error");
+            return;
         }
 
-        // modificar en la tabla codigos el estado del codigo a false para que no pueda ser usado nuevamente
-        await CambiarEstado(cod.codigo, sumaVentas, codigAux);
-        await actualizar(codigAux, cod.codigo, usernameLocal, sumaVentas, 2);
-        await actualizarVentas(cantidad, codigo, usernameLocal);
-
-        if (codigo2 != "") {
-            await actualizarVentas(cantidad2, codigo2, usernameLocal);
+        if (codigoA == "") {
+            isFunctionExecuting = false;
+            over.style.display = "none";
+            loader.style.display = "none";
+            aviso("Por favor ingrese el codigo de autorizacion generado por el coordinador", "error");
+            return;
         }
-        if (codigo3 != "") {
-            await actualizarVentas(cantidad3, codigo3, usernameLocal);
+
+
+
+        if (verificarCodigo(codigoA, CodigosMercado) == true) {
+
+            if (codigoA.startsWith("MG")) {
+                if (!verificaMonto(sumaVentas, cod) == true) {
+                    isFunctionExecuting = false;
+                    over.style.display = "none";
+                    loader.style.display = "none";
+                    aviso("El monto supera el monto maximo permitido solicitado antes", "error");
+                    return;
+                }
+            }
+            else {
+                if (!verificaCondiciones(usuario, sumaVentas) == true) {
+                    over.style.display = "none";
+                    loader.style.display = "none";
+                    isFunctionExecuting = false;
+                    return;
+                }
+            }
+
+            if (obtenerCodigo(codigoA, CodigosMercado) == null) {
+                isFunctionExecuting = false;
+                over.style.display = "none";
+                loader.style.display = "none";
+                aviso("El codigo de autorizacion no existe", "error");
+                return;
+            }
+
+            let codigAux = "MOH" + Math.floor(Math.random() * 1000000 + 1);
+            let concepto = datos.concepto;
+
+            if (datos2) {
+                concepto += " , " + datos2.concepto;
+            }
+
+            if (datos3) {
+                concepto += " , " + datos3.concepto;
+            }
+
+            if (datos4) {
+                concepto += " , " + datos4.concepto;
+            }
+
+            // modificar en la tabla codigos el estado del codigo a false para que no pueda ser usado nuevamente
+            await CambiarEstado(cod.codigo, sumaVentas, codigAux);
+            await actualizar(codigAux, cod.codigo, usernameLocal, sumaVentas, 2);
+            await actualizarVentas(cantidad, codigo, usernameLocal);
+
+            if (codigo2 != "") {
+                await actualizarVentas(cantidad2, codigo2, usernameLocal);
+            }
+            if (codigo3 != "") {
+                await actualizarVentas(cantidad3, codigo3, usernameLocal);
+            }
+            if (codigo4 != "") {
+                await actualizarVentas(cantidad4, codigo4, usernameLocal);
+            }
+            await actualizarDatos(cedula, sumaVentas, 2);
+            await historialT(sumaVentas);
+            await escribirHistorial(cedula, sumaVentas, 2, "Compra tienda respecto a:" + concepto + " en " + sede, codigAux, cod.generadoPor);
+            await sleep(2000); // Pausa de 2 segundos
+            await ActualizarHistorial(codigAux);
+
+            over.style.display = "none";
+            loader.style.display = "none";
+
+            isFunctionExecuting = false;
+
+            let confirmacion = await avisoConfirmado('Acaba de pedir un mercado de ' + sumaVentas + ' su codigo es: ' + codigAux, 'success');
+
+            if (confirmacion) {
+                // recargar la pagina
+                location.reload();
+            }
+
         }
-        if (codigo4 != "") {
-            await actualizarVentas(cantidad4, codigo4, usernameLocal);
+        else {
+            isFunctionExecuting = false;
+            aviso("El codigo de autorizacion no existe", "error");
         }
-        await actualizarDatos(cedula, sumaVentas, 2);
-        await historialT(sumaVentas);
-        await escribirHistorial(cedula, sumaVentas, 2, "Compra tienda respecto a:" + concepto + " en " + sede, codigAux, cod.generadoPor);
-        await sleep(2000); // Pausa de 2 segundos
-        await ActualizarHistorial(codigAux);
+    } catch (error) {
 
-        over.style.display = "none";
-        loader.style.display = "none";
 
-        isFunctionExecuting = false;
-
-        let confirmacion = await avisoConfirmado('Acaba de pedir un mercado de ' + sumaVentas + ' su codigo es: ' + codigAux, 'success');
-
-        if (confirmacion) {
-            // recargar la pagina
-            location.reload();
-        }
     }
-    else {
-        isFunctionExecuting = false;
-        aviso("El codigo de autorizacion no existe", "error");
-    }
+
+
 
 });
 
