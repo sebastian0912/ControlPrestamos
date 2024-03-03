@@ -1,6 +1,6 @@
 {
   "name": "control_prestamos_tesoreria",
-  "version": "2.0.5",
+  "version": "2.0.7",
   "description": "Programa para control de prestamos a tesoreria",
   "GITHUB_TOKEN": "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",
   "main": "main.js",
