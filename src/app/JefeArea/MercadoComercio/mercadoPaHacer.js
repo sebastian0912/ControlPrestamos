@@ -545,48 +545,6 @@ formaPago.addEventListener('change', (e) => {
 });
 
 
-function obtenerCodigo(codigo, datos) {
-    let cod;
-    datos.forEach(doc => {
-        if (doc.codigo == codigo) {
-            cod = doc;
-        }
-    });
-    return cod;
-}
-
-async function datosTCodigos() {
-    var body = localStorage.getItem('key');
-    const obj = JSON.parse(body);
-    const jwtKey = obj.jwt;
-
-    const headers = {
-        'Authorization': jwtKey
-    };
-
-    const urlcompleta = urlBack.url + '/Codigo/codigos';
-
-    try {
-        const response = await fetch(urlcompleta, {
-            method: 'GET',
-            headers: headers,
-        });
-
-        if (response.ok) {
-            const responseData = await response.json();
-            console.log(responseData);
-            return responseData;
-        } else {
-            throw new Error('Error en la petición GET');
-
-        }
-    } catch (error) {
-        console.error('Error en la petición HTTP GET');
-        console.error(error);
-        throw error; // Propaga el error para que se pueda manejar fuera de la función
-    }
-}
-
 let isFunctionExecuting = false; // Variable para rastrear si la función está en ejecución
 
 

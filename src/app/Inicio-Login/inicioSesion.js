@@ -22,39 +22,51 @@ icon.addEventListener("click", e => {
 
 signInform.addEventListener('submit', async (e) => {
     e.preventDefault();
-
     const values = await fetchData();
-    console.log(values);
-
-    localStorage.setItem('idUsuario', values.numero_de_documento);
-    localStorage.setItem('perfil', values.rol);
-    localStorage.setItem('username', values.primer_nombre + ' ' + values.primer_apellido);
-    localStorage.setItem('sede', values.sucursalde);
-    localStorage.setItem('estadoSolicitudes', values.EstadoSolicitudes);
-    localStorage.setItem('estadoQuincena', values.EstadoQuincena);
-    localStorage.setItem('correo_electronico', values.correo_electronico);
-
-    if (values.rol == 'TESORERIA') {        
-        window.location.href = "../Tesorero/tesorero.html";
+    const user = await getUserbyUsername();
+    if (values.jwt === "Contraseña incorrecta") {
+        aviso('Contraseña incorrecta', 'error');
+        return;
     }
-    if (values.EstadoQuincena == false) {
-        aviso('No puedes ingresar, ya se ha cerrado la quincena', 'error');
+
+    else if (values.jwt === "Usuario no encontrado") {
+        aviso('Usuario no encontrado', 'error');
+        return;
     }
-    else {
-        if (values.rol == 'GERENCIA') {           
-            window.location.href = "../Gerencia/gerencia.html";
-        } else if (values.rol == 'JEFE-DE-AREA') {
-            window.location.href = "../JefeArea/jefeArea.html";
-        } else if (values.rol == 'TIENDA') {
-            window.location.href = "../Tienda/InicioTienda.html";
-        } else if (values.rol == 'COORDINADOR') {
-            window.location.href = "../Coordinador/coordinador.html";
-        } else if (values.rol == 'COMERCIALIZADORA') {
-            window.location.href = "../Comercializadora/comercializadora.html";
-        } else if (values.rol == 'ADMIN') {
-            window.location.href = "../Administrador/editar.html";
-        } else {
-            aviso('No tienes acceso todavia, comunicate con el administrador', 'error');
+
+    else if (values.message === 'success') {
+        const user = await getUserbyUsername();
+
+        localStorage.setItem('idUsuario', user.numero_de_documento);
+        localStorage.setItem('perfil', user.rol);
+        localStorage.setItem('username', user.primer_nombre + ' ' + user.primer_apellido);
+        localStorage.setItem('sede', user.sucursalde);
+        localStorage.setItem('estadoSolicitudes', user.EstadoSolicitudes);
+        localStorage.setItem('estadoQuincena', user.EstadoQuincena);
+        localStorage.setItem('correo_electronico', user.correo_electronico);
+
+        if (user.rol == 'TESORERIA') {
+            window.location.href = "../Tesorero/tesorero.html";
+        }
+        if (user.EstadoQuincena == false) {
+            aviso('No puedes ingresar, ya se ha cerrado la quincena', 'error');
+        }
+        else {
+            if (user.rol == 'GERENCIA') {
+                window.location.href = "../Gerencia/gerencia.html";
+            } else if (user.rol == 'JEFE-DE-AREA') {
+                window.location.href = "../JefeArea/jefeArea.html";
+            } else if (user.rol == 'TIENDA') {
+                window.location.href = "../Tienda/InicioTienda.html";
+            } else if (user.rol == 'COORDINADOR') {
+                window.location.href = "../Coordinador/coordinador.html";
+            } else if (user.rol == 'COMERCIALIZADORA') {
+                window.location.href = "../Comercializadora/comercializadora.html";
+            } else if (user.rol == 'ADMIN') {
+                window.location.href = "../Administrador/editar.html";
+            } else {
+                aviso('No tienes acceso todavia, comunicate con el administrador', 'error');
+            }
         }
     }
 });
@@ -85,10 +97,7 @@ async function fetchData() {
         const obj = JSON.parse(body);
 
         if (responseBody != null && obj.jwt != null) {
-            const values = await getUserbyUsername(responseBody);
-            if (values != null) {
-                return values; // Devuelve el valor de 'values'
-            }
+            return obj;
         }
         return null; // Si no hay valores o hay errores, devuelve null
     } catch (error) {
