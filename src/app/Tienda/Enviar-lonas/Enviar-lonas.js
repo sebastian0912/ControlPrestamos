@@ -217,7 +217,7 @@ boton.addEventListener('click', async (e) => {
     const nuevovalor = valorUnidad.replace(/\,/g, '');
     const otro2 = document.querySelector('#otro2').value;
     let miSelect = document.querySelector('#miSelect').value;
-
+    let miSelect2 = document.querySelector('#miSelect2').value;
     if (otro2 != "") {
         miSelect2 = otro2;
     }
@@ -230,7 +230,7 @@ boton.addEventListener('click', async (e) => {
 
     let uid = Math.floor(Math.random() * 10000000);;
 
-    await enviarLona(uid, miSelect, "", cantidad, nuevovalor, usernameLocal, "", "");
+    await enviarLona(uid, miSelect, miSelect2, cantidad, nuevovalor, usernameLocal, "", "");
 
 
     aviso("Se ha cargado la informacion exitosamente, el codigo es: " + uid, "success");
