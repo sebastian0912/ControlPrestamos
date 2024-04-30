@@ -627,9 +627,9 @@ input2.addEventListener('change', async () => {
 
 async function datosCarol2(datos) {
     let errores = [];
-    
+
     console.log(datos);
-    
+
     for (const doc of datos) {
         console.log('Procesando documento:', doc);
 
@@ -639,36 +639,27 @@ async function datosCarol2(datos) {
 
             if (aux2.datosbase == "No se encontró el registro para el ID proporcionado") {
                 errores.push({ Cedula: doc[0], Razon: 'Empleado no existe' });
-            }
-            
-            else {
+            } else {
                 let concepto = 'Compra tienda Ferias';
-    
-                // generar codigo solo numeros aleatorios
                 let codigoAux = 'MOH' + Math.floor(Math.random() * 1000000);
     
                 await escribirHistorial(doc[0], doc[1], 2, concepto, codigoAux, "CAROL PALACIOS");
-                await sleep(2000); // Pausa de 2 segundos
+                await sleep(2000);
                 await ActualizarHistorial(codigoAux);
                 await historialT(doc[1]);
                 await actualizarDatosBase(concepto, doc[1], 2, doc[0]);
-    
             }
-            
-            await exportarErroresAExcel(errores);
-            let confirmacion = await avisoConfirmado('Termino de subir el archivo', "success");
-
-            
-            if (confirmacion) {
-                // recargar la pagina
-                location.reload();
-            }
-            
-            
         } catch (error) {
             console.error('Error procesando el documento:', doc, 'Error:', error);
             errores.push({ cedula: doc[0], razon: 'Error durante el procesamiento' });
         }
+    }
+
+    await exportarErroresAExcel(errores);
+    let confirmacion = await avisoConfirmado('Termino de subir el archivo', "success");
+
+    if (confirmacion) {
+        location.reload();
     }
 }
 
