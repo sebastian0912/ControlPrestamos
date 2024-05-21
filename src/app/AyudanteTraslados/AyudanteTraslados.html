@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../reset.css" />
+    <link rel="stylesheet" href="AyudanteTraslados.css" />
+
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal@4/minimal.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+
+
+
+    <script defer src="../logOut.js" type="module"></script>
+    <script defer src="AyudanteTraslados.js" type="module"></script>
+
+
+</head>
+
+<body>
+
+    <div class="opciones">
+        <ul class="lista-Opciones">
+
+            <li>
+                <a href="./AyudanteTraslados.html">
+                    <img src="../assets/pagina-de-inicio.png" alt="logo" class="logo" />
+                    <p> Inicio </p>
+                </a>
+            </li>
+
+            <li>
+                <a href="./TrasladosEnProceso/AyudanteTraslados.html">
+                    <img src="../assets/planificacion.png" alt="logo" class="logo" />
+                    <p> Traslados en proceso </p>
+                </a>
+            </li>
+
+            <li>
+                <a href="./ListaCorreos/AyudanteTraslados.html">
+                    <img src="../assets/correo-electronico.png" alt="logo" class="logo" />
+                    <p> Listado de correos </p>
+                </a>
+            </li>
+
+            <li id="logout">
+                <a href="../Inicio-Login/index.html">
+                    <img src="../assets/cerrar-sesion.png" alt="logo" class="logo" />
+                    <p>Cerrar Sesión</p>
+                </a>
+            </li>
+
+            <h1 class="diasT"> Días restantes antes de fecha cierre de novedades de nómina </h1>
+            <span class="dias" id="diasRestantes"></span>
+
+            <h1 class="diasT"> Días restantes antes de liquidación </h1>
+            <span class="dias" id="diasLi"></span>
+
+        </ul>
+
+
+
+    </div>
+
+    <header>
+        <div class="cajontitulo">
+            <h1 class="titulo">Bienvenido</h1>
+        </div>
+        <div class="perfil">
+            <h1 clas class="titulo">Hola, <span id="username"></span></h1>
+            <h1 id="perfil" class="titulo"></h1>
+        </div>
+    </header>
+
+    <a href="../CambioContrase/cambio.html" style="margin-left: -120px;">
+        <h1 class="titulo">Cambiar contraseña</h1>
+    </a>
+
+
+    <div class="contenido">
+        
+    </div>
+    
+</body>
+
+</html>

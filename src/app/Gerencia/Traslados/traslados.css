@@ -9,6 +9,8 @@ body {
     font-family: 'Poppins', sans-serif;
 }
 
+
+
 h1 {
     margin: 0;
     padding: 0;
@@ -57,13 +59,14 @@ li {
     list-style: none;
     height: 30px;
     width: 100%;
-    padding: 20px 10px 10px 30px;
+    padding: 20px 0 10px 30px;
     display: flex;
     align-items: center;
     cursor: pointer;
+
 }
 
-li:nth-child(3) {
+li:nth-child(10) {
     background: #bbd0ff;
     color: #000000;
     transform: scale(1.1);
@@ -121,7 +124,7 @@ header {
 
 .cajontitulo .titulo {
     float: left;
-    padding-left: 80px;
+    padding-left: 50px;
     padding-top: 20px;
     font-size: 25pt;
     font-weight: 600;
@@ -149,36 +152,72 @@ span {
     flex-direction: column;
 }
 
+
+.titulo-Opciones {
+    padding-left: 20px;
+    font-size: 12pt;
+    margin-top: 10px;
+}
+
+
 .cuadroTexto {
     width: 800px;
-    height: 400px;
+    height: auto;
     background: #ffffff;
-    margin: 50px 0 0 80px;
+    margin: 0px 0 150px 80px;
     border-radius: 15px;
     box-shadow: 0px 0px 12px 8px rgba(0, 0, 0, 0.1);
     font-size: 16pt;
     font-weight: 700;
+    padding-bottom: 50px;
+    padding-left: 50px;
 }
 
-
-.valor {
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
+.cajaCedula {
+    margin: 0px 0 20px 30px;
 }
 
-
-.valor .titulo {
-    margin: 5px 50px 30px 30px;
+.cajaCedula .titulo {
+    margin: 30px 20px 30px 0;
     float: left;
 }
 
-select {
+
+.input {
     font-family: 'Poppins', sans-serif;
+    width: 500px;
+    height: 40px;
+    padding: 5px;
     font-size: 16px;
-    margin: 0 50px 20px 30px;
-    width: 240px;
-    height: 50px;
+    border-width: 0px;
+    border-color: #cccccc;
+    background-color: #ffffff;
+    border-style: solid;
+    border-radius: 11px;
+    box-shadow: 0px 0px 5px rgba(66, 66, 66, 0.75);
+    margin: 50px 20px 0 0;
+}
+
+.input:focus {
+    outline: none;
+}
+
+.valor {
+    flex: 1 100%;
+    width: 1000px;
+    height: auto;
+    text-align: center;
+    margin-left: -150px;
+}
+
+.cajaCedula .input2:nth-of-type(1){
+    margin-left: 25px;
+    float: left;    
+}
+
+.cajaCedula .input2:nth-of-type(2){
+    margin-left: -18px;
+    float: left;    
 }
 
 .input2 {
@@ -193,7 +232,7 @@ select {
     border-style: solid;
     border-radius: 11px;
     box-shadow: 0px 0px 5px rgba(66, 66, 66, 0.75);
-    margin: 0 50px 20px 30px;
+    margin: 0 50px 0 -25px;
     position: relative;
 }
 
@@ -214,67 +253,4 @@ select {
     transition: 1000ms;
     cursor: pointer;
     font-family: 'Poppins', sans-serif;
-    margin: 20px 0 0 30px;
-    width: 71%;
-
-}
-
-
-
-
-
-/*loader*/
-
-.loader-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    z-index: 9999;
-}
-
-
-.cajaloader {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 10000;
-
-}
-
-
-.custom-loader {
-    width: 100px;
-    height: 100px;
-    display: grid;
-    border-radius: 50%;
-    background: conic-gradient(#1157fb 25%, #E4E4ED 0 50%, #8CD50A 0 75%, #1157fb 0);
-    animation: s2 4s infinite linear;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-}
-
-.custom-loader::before,
-.custom-loader::after {
-    content: "";
-    grid-area: 1/1;
-    margin: 15%;
-    border-radius: 50%;
-    background: inherit;
-    animation: inherit;
-}
-
-.custom-loader::after {
-    margin: 25%;
-    animation-duration: 6s;
-}
-
-@keyframes s2 {
-    100% {
-        transform: rotate(1turn)
-    }
 }

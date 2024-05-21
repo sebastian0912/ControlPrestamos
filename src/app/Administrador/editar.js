@@ -1,6 +1,6 @@
 
 import { urlBack } from "../models/base.js";
-import { aviso } from "../Avisos/avisos.js";
+import { aviso, avisoConfirmado } from "../Avisos/avisos.js";
 
 // capturar el id del usuario logeado del input
 const idUsuario = localStorage.getItem("idUsuario");
@@ -17,6 +17,17 @@ const usernameLocal = localStorage.getItem("username");
 //Muestra en la parte superior el nombre y el perfil
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
+
+
+const over = document.querySelector('#overlay');
+const loader = document.querySelector('#loader');
+if (over) {
+    console.log("----");
+}
+if (loader) {
+    console.log("----2");
+}
+
 
 // Obtén la fecha actual
 var ahora = new Date();
@@ -239,4 +250,325 @@ editar.addEventListener('change', async (e) => {
     });
 }
 );
+
+
+
+async function exportarErroresAExcel(errores) {
+    // Crear una hoja de cálculo a partir de un arreglo de objetos
+    const worksheet = XLSX.utils.json_to_sheet(errores);
+
+    // Crear un nuevo libro de trabajo y añadir la hoja de cálculo
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Errores");
+
+    // Generar el archivo Excel y forzar la descarga en el navegador
+    XLSX.writeFile(workbook, "ErroresSubidaMasiva.xlsx");
+}
+
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+/*---------------------------------------------------------*/
+
+let input2 = document.getElementById('subidaMasiva2');
+
+input2.addEventListener('change', async () => {
+
+    const file = input2.files[0];
+    const reader = new FileReader();
+    over.style.display = 'block';
+    loader.style.display = 'block';
+
+    let datosFinales = [];
+
+    reader.onload = (event) => {
+        const fileContent = event.target.result;
+        const workbook = XLSX.read(fileContent, { type: 'binary' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+        for (let i = 1; i < rows.length; i++) {
+            datosFinales.push({
+                correo: rows[i][0],
+                contrasena: rows[i][1]
+            });
+        }
+
+        console.log('Datos cargados desde Excel:', datosFinales);
+
+        subidaMasivaCorreos(datosFinales);
+    };
+
+    reader.readAsBinaryString(file);
+});
+
+
+async function subidaMasivaCorreos(datos) {
+    console.log('Enviando datos masivos:', datos);
+
+    try {
+        var body = localStorage.getItem('key');
+        const obj = JSON.parse(body);
+        const jwtToken = obj.jwt;
+
+        const urlcompleta = urlBack.url + '/traslados/cargar-correos-raul';
+
+        const response = await fetch(urlcompleta, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': jwtToken
+            },
+            body: JSON.stringify({
+                datos: datos,  // Envía el array completo
+                jwt: jwtToken
+            })
+        });
+
+        // Manojo de la respuesta aquí si es necesario
+
+        if (!response.ok) {
+            aviso('Sucedio algun error', 'error');
+        }
+        over.style.display = 'none';
+        loader.style.display = 'none';
+        
+        let confirmacion = await avisoConfirmado('Termino de subir el archivo', "success");
+
+        if (confirmacion) {
+            location.reload();
+        }
+
+    } catch (error) {
+        console.error('Error al enviar los datos masivos:', error);
+    }
+}
+
+
+
+/* subida masiva de cedulas */
+
+let input3 = document.getElementById('subidaMasiva3');
+
+input3.addEventListener('change', async (e) => {
+    const files = e.target.files;
+    if (files.length) {
+        const file = files[0];
+        const reader = new FileReader();
+
+        // Mostrar elementos de carga
+        loader.style.display = 'block';
+        over.style.display = 'block';
+
+        reader.onload = async (event) => {
+            const arrayBuffer = event.target.result;
+            const data = new Uint8Array(arrayBuffer);
+            const workbook = XLSX.read(data, { type: 'array', cellDates: true, cellNF: false, cellText: false });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+
+            // Convertir la hoja de trabajo en un arreglo de arreglos
+            const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false });
+
+            const claves = ["cedula", "cedula_escaneada_delante"];
+
+            // Procesar cada fila y asignar los valores a las claves correspondientes
+            const datosFinales = rows.map((row, index) => {
+                // Ignorar las primeras cuatro filas y comenzar a leer desde la quinta fila
+                if (index >= 1) {
+                    let modifiedRow = {};
+                    row.forEach((cell, idx) => {
+                        if (idx < claves.length) {
+                            modifiedRow[claves[idx]] = cell !== null ? cell : 'N/A';
+                        }
+                    });
+                    return modifiedRow;
+                }
+            }).filter(row => row !== undefined);  // Filtrar las filas no definidas (antes de la quinta fila)
+
+            console.log('Datos cargados desde Excel:', datosFinales);
+
+            // Aquí puedes hacer algo con datosFinales, como almacenarlo o procesarlo
+            await subidaMasivaCedulas(datosFinales);
+
+        };
+
+        reader.readAsArrayBuffer(file);
+    }
+});
+
+
+async function subidaMasivaCedulas(datosFinales) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const urlcompleta = urlBack.url + '/traslados/cargar-cedulas';
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body: JSON.stringify(
+                {
+                    datos: datosFinales,
+                    mensaje: "muchos",
+                    jwt: jwtKey
+                }
+            ),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la petición POST');
+                }
+                return response.json(); // Si la respuesta está OK, la convertimos a JSON
+            })
+            .then(async data => { // Aquí modificamos para que la función sea directamente asíncrona.
+                document.getElementById('successSound').play();
+                over.style.display = "none";
+                loader.style.display = "none";
+                console.log('Respuesta del servidor:', data); // Imprime la respuesta ya convertida a JSON
+                let aviso = await avisoConfirmado("Datos guardados correctamente", "success");
+                if (aviso) {
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('errorSound').play();
+                over.style.display = "none";
+                loader.style.display = "none";
+                aviso("Error al guardar los datos", "error");
+
+            });
+
+    } catch (error) {
+        console.error('Error capturado en el bloque try-catch:', error);
+    }
+}
+
+
+let input4 = document.getElementById('subidaMasiva4');
+
+input4.addEventListener('change', async (e) => {
+    const files = e.target.files;
+    if (files.length) {
+        const file = files[0];
+        const reader = new FileReader();
+
+        // Mostrar elementos de carga
+        loader.style.display = 'block';
+        over.style.display = 'block';
+
+        reader.onload = async (event) => {
+            const arrayBuffer = event.target.result;
+            const data = new Uint8Array(arrayBuffer);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+
+            // Convertir la hoja de trabajo en un arreglo de arreglos
+            const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false, blankrows: false });
+
+            const claves = [
+                "codigoTraslado", "solicitudTraslado", "cedulas", "nCC2", "estadoEspera",
+                "epsTrasladar", "asignacionCorreo", "responsable", "estadoTraslado", "observacionEstado",
+                "numeroRadicado", "fechaEfectividad", "cantidadBeneficiarios", "codigo4", "nombreCarnet",
+                "fechaNacimiento", "fechaExpedicionCC", "telefonoMovil", "sexo", "rh", "ciudadResidencia",
+                "direccionResidencia", "municipioExpedicionCC", "departamentoExpedicionCC", "lugarNacimientoMunicipio",
+                "lugarNacimientoDepartamento", "ultimaActualizacion"
+            ];
+
+            // Procesar cada fila y asignar los valores a las claves correspondientes
+            const datosFinales = rows.map((row, index) => {
+                if (index >= 1) {  // Asumiendo que la primera fila contiene los encabezados
+                    let modifiedRow = {};
+                    row.forEach((cell, idx) => {
+                        let value = cell !== undefined ? cell : 'N/A'; // Manejo de celdas indefinidas
+
+                        // Convertir números de serie de Excel a fechas para las columnas específicas
+                        if (idx === 11 || idx === 26) { // Indices de 'fechaEfectividad' y 'ultimaActualizacion'
+                            if (typeof value === 'number') {
+                                const date = new Date(Date.UTC(0, 0, value - 1));
+                                value = date.toISOString().split('T')[0];
+                            }
+                        }
+
+                        if (idx < claves.length) {
+                            modifiedRow[claves[idx]] = value;
+                        }
+                    });
+                    return modifiedRow;
+                }
+            }).filter(row => row !== undefined); // Filtrar filas no definidas (e.g., filas vacías)
+
+            console.log('Datos cargados desde Excel:', datosFinales);
+
+            // Aquí puedes hacer algo con datosFinales, como almacenarlo o procesarlo
+            await subidaMasivaBase(datosFinales);
+        };
+
+        reader.readAsArrayBuffer(file);
+    }
+});
+
+
+
+
+
+async function subidaMasivaBase(datosFinales) {
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+    const urlcompleta = urlBack.url + '/traslados/subida-masiva-traslados';
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',
+            body: JSON.stringify(
+                {
+                    datos: datosFinales,
+                    mensaje: "muchos",
+                    jwt: jwtKey
+                }
+            ),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la petición POST');
+                }
+                return response.json(); // Si la respuesta está OK, la convertimos a JSON
+            })
+            .then(async data => { // Aquí modificamos para que la función sea directamente asíncrona.
+                document.getElementById('successSound').play();
+                over.style.display = "none";
+                loader.style.display = "none";
+                console.log('Respuesta del servidor:', data); // Imprime la respuesta ya convertida a JSON
+                let aviso = await avisoConfirmado("Datos guardados correctamente", "success");
+                if (aviso) {
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('errorSound').play();
+                over.style.display = "none";
+                loader.style.display = "none";
+                aviso("Error al guardar los datos", "error");
+
+            });
+
+    } catch (error) {
+        console.error('Error capturado en el bloque try-catch:', error);
+    }
+}
+
+
 

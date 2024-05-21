@@ -22,6 +22,10 @@ else{
     mercado.style.display = "none"
 }
 
+if (correo == "contaduria.rtc@gmail.com"){
+    traslados.style.display = "inline-block"
+}
+
 //Muestra en la parte superior el nombre y el perfil
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;

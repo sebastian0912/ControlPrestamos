@@ -64,7 +64,11 @@ signInform.addEventListener('submit', async (e) => {
                 window.location.href = "../Comercializadora/comercializadora.html";
             } else if (user.rol == 'ADMIN') {
                 window.location.href = "../Administrador/editar.html";
-            } else {
+            } 
+            else if (user.rol == 'TRASLADOS') {
+                window.location.href = "../AyudanteTraslados/AyudanteTraslados.html";
+            }
+            else {
                 aviso('No tienes acceso todavia, comunicate con el administrador', 'error');
             }
         }

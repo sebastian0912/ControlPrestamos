@@ -231,3 +231,99 @@ editar.addEventListener('change', async (e) => {
 }
 );
 
+
+
+async function exportarErroresAExcel(errores) {
+    // Crear una hoja de cálculo a partir de un arreglo de objetos
+    const worksheet = XLSX.utils.json_to_sheet(errores);
+
+    // Crear un nuevo libro de trabajo y añadir la hoja de cálculo
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Errores");
+
+    // Generar el archivo Excel y forzar la descarga en el navegador
+    XLSX.writeFile(workbook, "ErroresSubidaMasiva.xlsx");
+}
+
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+/*---------------------------------------------------------*/
+
+let input2 = document.getElementById('subidaMasiva2');
+
+input2.addEventListener('change', async () => {
+
+    const file = input2.files[0];
+    const reader = new FileReader();
+
+    let datosFinales = [];
+
+    reader.onload = (event) => {
+        const fileContent = event.target.result;
+        const workbook = XLSX.read(fileContent, { type: 'binary' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+        // Comienza a leer desde la quinta fila
+        for (let i = 1; i < rows.length; i++) {
+            datosFinales.push([rows[i][0], rows[i][1]]);
+        }
+
+        console.log('Datos cargados desde Excel:', datosFinales);
+
+        subidaMasivaCorreos(datosFinales);
+    };
+
+    reader.readAsBinaryString(file);
+});
+
+
+async function subidaMasivaCorreos(datos) {
+    console.log(datos);
+
+    for (const doc of datos) {
+        console.log('Procesando documento:', doc);
+
+        try {
+            var body = localStorage.getItem('key');
+            const obj = JSON.parse(body);
+            const jwtToken = obj.jwt;
+
+            console.log('jwtToken:', jwtToken);
+
+            const urlcompleta = urlBack.url + '/traslados/cargar-correos-raul';
+
+            const response = await fetch(urlcompleta, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': jwtToken
+                },
+                body: JSON.stringify({
+                    datos: [{  // Envía un array con objetos que incluyan correo y contraseña
+                        correo: doc[0],
+                        contrasena: doc[1],
+                    }],
+                    jwt: jwtToken  // Verifica si realmente necesitas enviar el JWT en el cuerpo
+                })
+            });
+
+            // Manojo de la respuesta aquí si es necesario
+
+        } catch (error) {
+            console.error('Error procesando el documento:', doc, 'Error:', error);
+        }
+    }
+
+    let confirmacion = await avisoConfirmado('Termino de subir el archivo', "success");
+
+    if (confirmacion) {
+        location.reload();
+    }
+}
+
+

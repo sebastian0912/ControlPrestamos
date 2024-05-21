@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../reset.css" />
+    <link rel="stylesheet" href="AyudanteTraslados.css" />
+
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal@4/minimal.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+
+
+
+    <script defer src="../../logOut2.js" type="module"></script>
+    <script defer src="AyudanteTraslados.js" type="module"></script>
+
+
+</head>
+
+<body>
+
+    <div class="opciones">
+        <ul class="lista-Opciones">
+
+            <li>
+                <a href="../AyudanteTraslados.html">
+                    <img src="../../assets/pagina-de-inicio.png" alt="logo" class="logo" />
+                    <p> Inicio </p>
+                </a>
+            </li>
+
+            <li>
+                <a href="./AyudanteTraslados.html">
+                    <img src="../../assets/planificacion.png" alt="logo" class="logo" />
+                    <p> Traslados en proceso </p>
+                </a>
+            </li>
+
+            <li>
+                <a href="../ListaCorreos/AyudanteTraslados.html">
+                    <img src="../../assets/correo-electronico.png" alt="logo" class="logo" />
+                    <p> Listado de correos </p>
+                </a>
+            </li>
+
+            <li id="logout">
+                <a href="../Inicio-Login/index.html">
+                    <img src="../../assets/cerrar-sesion.png" alt="logo" class="logo" />
+                    <p>Cerrar Sesión</p>
+                </a>
+            </li>
+
+
+        </ul>
+
+
+
+    </div>
+
+    <header>
+        <div class="cajontitulo">
+            <h1 class="titulo">Bienvenido</h1>
+        </div>
+        <div class="perfil">
+            <h1 clas class="titulo">Hola, <span id="username"></span></h1>
+            <h1 id="perfil" class="titulo"></h1>
+        </div>
+    </header>
+
+    <a href="../CambioContrase/cambio.html" style="margin-left: -120px;">
+        <h1 class="titulo">Cambiar contraseña</h1>
+    </a>
+
+
+    <div class="contenido">
+
+        <div class="tabla">
+            <button class="btn-escoger" style="width: 200px; float: right;" id="asignar">Auto Asignar </button>
+
+            <table class="tabla-contenido" id="tablaTraslados">
+                <thead>
+                    <tr>
+                        <th>Codigo Traslado</th>
+                        <th>Estado</th>
+                        <th>Numero cedula</th>
+                        <th>Solicitud Traslado</th>
+                        <th>Imagen Cedula </th>
+                        <th>Correo</th>
+                        <th>EPS a trasladar</th>
+                        <th>Accion</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla"> </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="overlay"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); z-index:99;">
+    </div>
+    <div id="infoBox"
+        style=" display: none; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); background-color: white; padding: 50px; box-shadow: 0 0 10px rgba(0,0,0,0.5); z-index: 100; width: 900px; ">
+        <h2>Cambiar Estado</h2>
+        <select id="estadoSelect" name="estado" class="input2" style="margin-top: 20px; margin-left: 2px;">
+            <option value="En proceso">En proceso</option>
+            <option value="Personal Activo EPS Adress">Personal Activo EPS Adress</option>
+            <option value="No cumple tiempo EPS Activa">No cumple tiempo EPS Activa</option>
+            <option value="Persona Regimen Subsidiado">Persona Regimen Subsidiado</option>
+            <option value="Falta Informacion">Falta Información</option>
+            <option value="Ya Registrado SAT">Ya Registrado SAT</option>
+            <option value="Validar 24 Horas">Validar 24 Horas</option>
+            <option value="Validar 10 Horas">Validar 10 Horas</option>
+            <option value="Validar Dias">Validar Días</option>
+            <option value="Reporte en la EPS">Reporte en la EPS</option>
+            <option value="No se encuentra en ADRES">No se encuentra en ADRES</option>
+            <option value="Retirado">Retirado</option>
+            <option value="segundo cotizante">Segundo cotizante</option>
+            <option value="Espera Aceptacion">Espera Aceptación</option>
+            <option value="Otro">Otro</option>
+        </select>
+
+        <!-- Campos adicionales para "Espera Aceptación" -->
+        <div id="esperaAceptacionCampos" style="display: none;">
+            <input type="date" id="fechaConfirmacion" placeholder="Fecha de confirmación" class="input2">
+            <input type="text" id="numeroRadicado" placeholder="Número de radicado" class="input2">
+            <input type="number" id="numeroBeneficiarios" placeholder="Número de beneficiarios" class="input2">
+            <select id="epsTraslado" class="input2">
+                <option value="Salud Total">Salud Total</option>
+                <option value="Nueva Eps">Nueva Eps</option>
+            </select>
+        </div>
+
+        <input id="observaciones" placeholder="Observaciones" class="input2" style="margin-left: 2px;"></input>
+
+        <button id="guardarEstado" style="margin-top: 20px;">Guardar</button>
+
+        <button id="cerrarInfoBox">Cerrar</button>
+    </div>
+
+    <div id="overlay2"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); z-index:99;">
+    </div>
+    <div id="infoBox2"
+        style=" display: none; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); background-color: white; padding: 50px; box-shadow: 0 0 10px rgba(0,0,0,0.5); z-index: 100; width: 80vw; height: 45vh; ">
+        <h2>Informacion del trabajador</h2>
+
+        <div class="tabla" style="margin-bottom: 120px;">
+            <table class="tabla-contenido">
+                <thead>
+                    <tr>
+                        <th>Número de Identificación Trabajador 6</th>
+                        <th>Primer Apellido 7</th>
+                        <th>Segundo Apellido 8</th>
+                        <th>Primer Nombre 9</th>
+                        <th>Segundo Nombre</th>
+                        <th>Fecha de Nacimiento (DD/MM/AAAA) 10</th>
+                        <th>Sexo (F - M)</th>
+                        <th>Estado civil (SO-UL - CA-SE-VI)</th>
+                        <th>Dirección de residencia 11</th>
+                        <th>Barrio</th>
+                        <th>Teléfono móvil 12</th>
+                        <th>Correo electrónico E-mail</th>
+                        <th>Ciudad de Residencia</th>
+                        <th>Fecha Expedición CC</th>
+                        <th>Municipio Expedición CC</th>
+                        <th>Departamento Expedición CC</th>
+                        <th>Lugar de Nacimiento Municipio</th>
+                        <th>Lugar de Nacimiento Departamento</th>
+                        <th>Rh</th>
+                        <th>Zurdo/Diestro</th>
+                        <th>EPS 13</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla2"> </tbody>
+            </table>
+        </div>
+
+
+        <button id="cerrarInfoBox2">Cerrar</button>
+    </div>
+
+    <div id="overlay3"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); z-index:99;">
+    </div>
+    <div id="infoBox3"
+        style=" display: none; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); background-color: white; padding: 50px; box-shadow: 0 0 10px rgba(0,0,0,0.5); z-index: 100; width: 60vw; height: 60vh; ">
+        <h2>Informacion de los traslados</h2>
+
+        <div class="tabla" style="margin-bottom: 120px; width: 50vw;" >
+            <table class="tabla-contenido">
+                <thead>
+                    <tr>
+                        <th>N° CC 2</th>
+                        <th>Traslado</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla3"> </tbody>
+            </table>
+        </div>
+
+
+        <button id="cerrarInfoBox3">Cerrar</button>
+    </div>
+
+
+</body>
+
+</html>

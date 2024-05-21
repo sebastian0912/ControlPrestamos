@@ -8,6 +8,8 @@
 
     <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal@4/minimal.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+
 
     <script defer src="../logOut.js" type="module"></script>
     <script defer src="./editarsede.js" type="module"></script>
@@ -42,9 +44,15 @@
 
             <li>
                 <a href="./editarSede.html">
-                    <img src="../assets/editar2.png" alt="logo" class="logo" />
+                    <img src="../assets/sede.png" alt="logo" class="logo" />
                     <p>Editar Sede</p>
                 </a>
+            </li>
+            
+            <li id="raul">
+                <input type="file" id="subidaMasiva2" class="boton" style="cursor: pointer;" />
+                <img src="../assets/subir-archivo.png" alt="logo" class="logo" />
+                <p style="float: right;"> Subida Masiva correos traslados</p>
             </li>
 
             <li id="logout">

@@ -1,0 +1,433 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,300;0,600;1,400;1,900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,300;0,1000;1,1000&display=swap");
+
+body {
+  background-size: 100%;
+  min-height: 100vh;
+  background: linear-gradient(120deg, #eeeeee 50%, #febb2e 40%);
+  background-repeat: no-repeat;
+  font-family: "Poppins", sans-serif;
+}
+
+h1 {
+  margin: 0;
+  padding: 0;
+}
+
+.diasT {
+  width: 100%;
+  margin: 20px 0 10px 30px;
+  font-family: "Nunito Sans", sans-serif;
+  font-size: 14pt;
+  font-weight: 400;
+}
+
+.dias {
+  text-align: justify;
+  margin: 0px 0 10px 120px;
+  font-family: "Nunito Sans", sans-serif;
+  font-size: 16pt;
+  font-weight: 600;
+}
+
+a {
+  text-decoration: none;
+  color: #000000;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.opciones {
+  width: 25%;
+  height: 100%;
+  position: relative;
+  float: left;
+}
+
+.lista-Opciones {
+  margin: 100px 0 0 50px;
+}
+
+li {
+  list-style: none;
+  height: 30px;
+  width: 100%;
+  padding: 20px 0 10px 30px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+li:nth-child(2) {
+  background: #bbd0ff;
+  color: #000000;
+  transform: scale(1.1);
+  border-left: #1157fb 8px solid;
+}
+
+li:hover {
+  background: #bbd0ff;
+  color: #000000;
+  transform: scale(1.1);
+  border-left: #1157fb 8px solid;
+}
+
+.p {
+  margin: 0;
+  /* Ajusta según sea necesario */
+  padding: 0;
+  /* Ajusta según sea necesario */
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  padding: 0 10px 0 0;
+  margin-top: -10px;
+}
+
+.boton {
+  position: absolute;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+header {
+  margin-top: 0px;
+  height: 50px;
+  width: 74%;
+  float: right;
+}
+
+.titulo {
+  flex: 1 1 100%;
+  padding: 20px 20px 0px 0px;
+  text-align: right;
+  color: #000000;
+}
+
+.cajontitulo {
+  height: 50px;
+  width: 60%;
+  float: left;
+}
+
+.cajontitulo .titulo {
+  float: left;
+  padding-left: 80px;
+  padding-top: 20px;
+  font-size: 25pt;
+  font-weight: 600;
+  /*font-style: italic;*/
+}
+
+span {
+  font-weight: 600;
+}
+
+.titulo:nth-of-type(2) {
+  font-size: 10pt;
+  font-weight: 500;
+  margin-top: -15px;
+  font-style: italic;
+}
+
+.contenido {
+  width: 74%;
+  height: 100%;
+  float: right;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+}
+
+.cuadro {
+  width: 250px;
+  height: 150px;
+  background: #ffffff;
+  margin: 50px 0 0 80px;
+  border-radius: 15px;
+  box-shadow: 0px 0px 12px 8px rgba(0, 0, 0, 0.1);
+  font-size: 16pt;
+  font-weight: 700;
+}
+
+.titulo-Opciones {
+  padding-left: 20px;
+  font-size: 12pt;
+  margin-top: 10px;
+}
+
+.cuadroTexto {
+  width: 900px;
+  height: 300px;
+  background: #ffffff;
+  margin: 50px 0 0 80px;
+  border-radius: 15px;
+  box-shadow: 0px 0px 12px 8px rgba(0, 0, 0, 0.1);
+  font-size: 16pt;
+  font-weight: 700;
+}
+
+.cajaCedula {
+  margin: 0px 0 20px 30px;
+}
+
+.cajaCedula .titulo {
+  margin-top: 30px;
+  float: left;
+}
+
+.input {
+  font-family: "Poppins", sans-serif;
+  width: 500px;
+  height: 40px;
+  padding: 5px;
+  font-size: 16px;
+  border-width: 0px;
+  border-color: #cccccc;
+  background-color: #ffffff;
+  border-style: solid;
+  border-radius: 11px;
+  box-shadow: 0px 0px 5px rgba(66, 66, 66, 0.75);
+  margin: 50px 20px 0 0;
+}
+
+.input:focus {
+  outline: none;
+}
+
+.valor {
+  flex: 1 100%;
+  height: auto;
+  text-align: center;
+  margin-left: -150px;
+}
+
+.input2 {
+  font-family: "Poppins", sans-serif;
+  width: 230px;
+  height: 40px;
+  padding: 5px;
+  font-size: 16px;
+  border-width: 0px;
+  border-color: #cccccc;
+  background-color: #ffffff;
+  border-style: solid;
+  border-radius: 11px;
+  box-shadow: 0px 0px 5px rgba(66, 66, 66, 0.75);
+  margin: 0 50px 0 -25px;
+  position: relative;
+}
+
+.input2:focus {
+  outline: none;
+}
+
+.btn {
+  height: 50px;
+  font-weight: 600;
+  font-size: 16px;
+  color: #fff;
+  background-color: #0066cc;
+  padding: 10px 30px;
+  border: 2px solid #0066cc;
+  box-shadow: rgb(0, 0, 0) 0px 0px 0px 0px;
+  border-radius: 50px;
+  transition: 1000ms;
+  cursor: pointer;
+  font-family: "Poppins", sans-serif;
+  margin: 40px 0px -40px 630px;
+}
+
+.tabla {
+  width: 65vw;
+  height: 80vh;
+  overflow: auto;
+  max-height: 50%;
+  background: #ffffff;
+  margin: 20px 0 0 80px;
+  border-radius: 15px;
+  box-shadow: 0px 0px 12px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tabla-contenido {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-family: "Nunito Sans", sans-serif;
+  font-size: 12pt;
+}
+
+.tabla-contenido tr:nth-child(even) {
+  background-color: #f2f2f2;
+  /* color para filas pares */
+}
+
+.tabla-contenido tr:nth-child(odd) {
+  background-color: #cccccc;
+  /* color para filas impares */
+}
+
+
+
+th {
+  border-bottom: #b9b9b9 1px solid;
+  padding: 15px;
+  background: #5e6a75;
+  color: #ffffff;
+  font-weight: 400;
+}
+
+tr {
+  height: 40px;
+  text-align: center;
+}
+
+
+.tabla-contenido th, .tabla-contenido td {
+    text-align: center;  
+    vertical-align: middle; 
+    padding: 8px;     
+}
+
+.tabla-contenido tr td:nth-child(5) {
+  max-width: 200px;
+  overflow: hidden; /* Mantiene oculto cualquier contenido que desborde el tamaño de la celda */
+  text-overflow: clip; /* Elimina los puntos suspensivos y muestra todo el texto hasta el límite del área visible */
+  white-space: normal; /* Permite que el texto se ajuste y se baje a líneas adicionales si es necesario */
+  
+}
+
+
+select {
+  width: auto;
+  height: 30px;
+  padding: 5px;
+  font-size: 16px;
+  border-width: 0px;
+  border-color: #cccccc;
+  background-color: #ffffff;
+  border-style: solid;
+  border-radius: 11px;
+  box-shadow: 0px 0px 5px rgba(66, 66, 66, 0.75);
+  margin: 20px 20px 0 0;
+}
+
+.oculto {
+    display: none;
+}
+
+
+button {
+  padding: 10px 20px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin: 10px 0 10px 0;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: default;
+}
+
+
+
+
+#infoBox {
+    display: none; /* inicialmente oculto */
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    width: 40%; /* puedes ajustar esto según la anchura deseada */
+    border-radius: 8px; /* bordes redondeados */
+    box-sizing: border-box; /* incluye padding y border en el ancho y alto */
+}
+
+#overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+}
+
+.input2 {
+    display: block;
+    width: 100%; /* hace que los inputs ocupen todo el ancho del contenedor */
+    padding: 8px;
+    margin-top: 10px; /* espacio entre campos */
+    box-sizing: border-box; /* incluye padding y border en el ancho y alto */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#esperaAceptacionCampos {
+    margin-top: 20px; /* espacio adicional cuando los campos adicionales son visibles */
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #0056b3;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+    display: block; /* asegura que los botones no estén en la misma línea */
+    width: 100%; /* los botones ocupan todo el ancho */
+}
+
+button:hover {
+    background-color: #003d82;
+}
+
+button:disabled {
+    background-color: #ccc;
+    cursor: default;
+}
+
+
+h2 {
+    text-align: center; /* centra el título en el modal */
+}
+
+
+
+
+
+
+
+
+
+#esperaAceptacionCampos input, #esperaAceptacionCampos select {
+    display: block;
+    margin: 10px 0;
+}
+
+#infoBox textarea {
+    width: 100%;
+    height: 100px;
+    margin-top: 10px;
+}

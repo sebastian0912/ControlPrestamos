@@ -42,7 +42,7 @@ a {
 
 
 .opciones {
-    width: 20%;
+    width: 25%;
     height: 100%;
     position: relative;
     float: left;
@@ -57,10 +57,11 @@ li {
     list-style: none;
     height: 30px;
     width: 100%;
-    padding: 20px 10px 10px 30px;
+    padding: 20px 0 10px 30px;
     display: flex;
     align-items: center;
     cursor: pointer;
+
 }
 
 li:nth-child(3) {
@@ -102,7 +103,7 @@ li:hover {
 header {
     margin-top: 0px;
     height: 50px;
-    width: 80%;
+    width: 74%;
     float: right;
 }
 
@@ -141,7 +142,7 @@ span {
 
 
 .contenido {
-    width: 80%;
+    width: 74%;
     height: 100%;
     float: right;
     display: flex;
@@ -149,9 +150,9 @@ span {
     flex-direction: column;
 }
 
-.cuadroTexto {
-    width: 800px;
-    height: 400px;
+.cuadro {
+    width: 250px;
+    height: 150px;
     background: #ffffff;
     margin: 50px 0 0 80px;
     border-radius: 15px;
@@ -160,25 +161,59 @@ span {
     font-weight: 700;
 }
 
-
-.valor {
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
+.titulo-Opciones {
+    padding-left: 20px;
+    font-size: 12pt;
+    margin-top: 10px;
 }
 
 
-.valor .titulo {
-    margin: 5px 50px 30px 30px;
+.cuadroTexto {
+    width: 800px;
+    height: 300px;
+    background: #ffffff;
+    margin: 50px 0 0 80px;
+    border-radius: 15px;
+    box-shadow: 0px 0px 12px 8px rgba(0, 0, 0, 0.1);
+    font-size: 16pt;
+    font-weight: 700;
+}
+
+.cajaCedula {
+    margin: 0px 0 20px 30px;
+}
+
+.cajaCedula .titulo {
+    margin-top: 30px;
     float: left;
 }
 
-select {
+
+
+.input {
     font-family: 'Poppins', sans-serif;
+    width: 500px;
+    height: 40px;
+    padding: 5px;
     font-size: 16px;
-    margin: 0 50px 20px 30px;
-    width: 240px;
-    height: 50px;
+    border-width: 0px;
+    border-color: #cccccc;
+    background-color: #ffffff;
+    border-style: solid;
+    border-radius: 11px;
+    box-shadow: 0px 0px 5px rgba(66, 66, 66, 0.75);
+    margin: 50px 20px 0 0;
+}
+
+.input:focus {
+    outline: none;
+}
+
+.valor {
+    flex: 1 100%;
+    height: auto;
+    text-align: center;
+    margin-left: -150px;
 }
 
 .input2 {
@@ -193,7 +228,7 @@ select {
     border-style: solid;
     border-radius: 11px;
     box-shadow: 0px 0px 5px rgba(66, 66, 66, 0.75);
-    margin: 0 50px 20px 30px;
+    margin: 0 50px 0 -25px;
     position: relative;
 }
 
@@ -214,67 +249,80 @@ select {
     transition: 1000ms;
     cursor: pointer;
     font-family: 'Poppins', sans-serif;
-    margin: 20px 0 0 30px;
-    width: 71%;
-
+    margin: 40px 0px -40px 630px;
+    
 }
 
 
+.tabla {
+    width: 800px;
+    height: 600px;
+    overflow: auto;
+    max-height: 50%;
+    background: #ffffff;
+    margin: 50px 0 0 80px;
+    border-radius: 15px;
+    box-shadow: 0px 0px 12px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
 
-
-
-/*loader*/
-
-.loader-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
+.tabla-contenido {
     width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    z-index: 9999;
+    margin: 0;
+    border-collapse: collapse;
+    border-spacing: 0;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 12pt;
+    text-align: center;
+    text-align: center;
+}
+
+.tabla-contenido tr:nth-child(even) {
+    background-color: #f2f2f2;
+    /* color para filas pares */
+}
+
+.tabla-contenido tr:nth-child(odd) {
+    background-color: #cccccc;
+    /* color para filas impares */
+}
+
+th,
+td {
+    vertical-align: middle;
+}
+
+th {
+    border-bottom: #b9b9b9 1px solid;
+    padding: 15px;
+    background: #5e6a75;
+    color: #ffffff;
+    font-weight: 400;
+}
+
+tr {
+    height: 40px;
+    text-align: center;
+
 }
 
 
-.cajaloader {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 10000;
-
-}
-
-
-.custom-loader {
-    width: 100px;
-    height: 100px;
-    display: grid;
-    border-radius: 50%;
-    background: conic-gradient(#1157fb 25%, #E4E4ED 0 50%, #8CD50A 0 75%, #1157fb 0);
-    animation: s2 4s infinite linear;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-}
-
-.custom-loader::before,
-.custom-loader::after {
-    content: "";
-    grid-area: 1/1;
-    margin: 15%;
-    border-radius: 50%;
-    background: inherit;
-    animation: inherit;
-}
-
-.custom-loader::after {
-    margin: 25%;
-    animation-duration: 6s;
-}
-
-@keyframes s2 {
-    100% {
-        transform: rotate(1turn)
-    }
-}
+button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin: 10px 0 10px 0;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  
+  button:disabled {
+    background-color: #ccc;
+    cursor: default;
+  }

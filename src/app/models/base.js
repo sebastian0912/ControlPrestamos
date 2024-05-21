@@ -44,7 +44,7 @@ export let usuarioR = {
     avatar: '',  // nuevo
     empladode: '', // se mantiene es sede
     sucursalde: '', // se mantiene es sede
-    rol: 'JEFE-DE-AREA', // se mantiene
+    rol: 'SIN-ASIGNAR', // se mantiene
     sucursalde: 'FACA_CENTRO', // se mantiene es sede
     password: '', // se mantiene
     username: '', // se mantiene

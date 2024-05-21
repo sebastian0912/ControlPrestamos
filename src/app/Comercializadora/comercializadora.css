@@ -307,3 +307,33 @@ tr {
 .input2:focus {
   outline: none;
 }
+
+
+
+
+
+
+
+
+
+
+
+#infoBox2 {
+  display: none;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px; /* Ajustado de 50px para permitir más espacio */
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  z-index: 100;
+  width: 900px; /* Asegúrate de que esto se ajusta a tus necesidades */
+  overflow-x: auto; /* Habilita el desplazamiento horizontal */
+}
+
+#infoBox2 .tabla-contenido {
+  width: 100%; /* La tabla ocupa el 100% del contenedor */
+  max-width: 100%; /* Evita que la tabla se desborde */
+  border-collapse: collapse; /* Para unir las celdas y evitar espacios */
+}

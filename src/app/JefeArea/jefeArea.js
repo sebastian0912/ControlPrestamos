@@ -452,6 +452,152 @@ function s2ab(s) {
     return buf;
 }
 
+
+
+let contracion = document.getElementById("contratacion");
+
+contracion.addEventListener('change', async () => {
+    const file = input.files[0];
+    const reader = new FileReader();
+
+    let datosFinales = [];
+
+    reader.onload = (event) => {
+        const fileContent = event.target.result;
+        const workbook = XLSX.read(new Uint8Array(fileContent), { type: 'array', cellDates: true });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+        // Obtiene el rango de la hoja
+        const range = XLSX.utils.decode_range(sheet['!ref']);
+
+        for (let rowNum = 1; rowNum <= range.e.r; rowNum++) {
+            let rowData = [];
+            for (let colNum = range.s.c; colNum <= range.e.c; colNum++) {
+                // Obtiene la celda en la posición actual
+                const cellRef = XLSX.utils.encode_cell({ r: rowNum, c: colNum });
+                const cell = sheet[cellRef];
+
+                // Formatea la fecha si la celda es una fecha
+                let cellText = "";
+                if (cell && cell.t === 'd') {
+                    cellText = cell.v.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                } else {
+                    cellText = cell ? `${cell.w || cell.v}` : "";
+                }
+
+                // Agrega el texto de la celda al array de datos finales
+                rowData.push(cellText);
+            }
+            datosFinales.push(rowData);
+        }
+
+        console.log('Datos cargados desde Excel:', datosFinales);
+
+        over.style.display = "block";
+        loader.style.display = "block";
+
+        guardarDatos(datosFinales);
+    };
+
+    reader.readAsArrayBuffer(file);
+});
+
+
+
+
+async function exportarErroresAExcel2(errores) {
+    // Mapear los datos de errores a un nuevo array con el mismo formato pero con el motivo constante
+    const erroresConMotivo = errores.map(error => ({
+        Registro: error.registro,
+        Error: error.error,
+        Motivo: 'El campo tiene un formato no permitido'
+    }));
+
+    // Crear un nuevo libro de trabajo
+    const workbook = XLSX.utils.book_new();
+
+    // Crear una hoja de cálculo a partir de los datos de errores con el motivo constante
+    const worksheet = XLSX.utils.json_to_sheet(erroresConMotivo);
+
+    // Definir el encabezado de la hoja de cálculo
+    worksheet['A1'] = { v: 'Registro', t: 's' };
+    worksheet['C1'] = { v: 'Error', t: 's' };
+    worksheet['D1'] = { v: 'Motivo', t: 's' };
+
+    // Agregar la hoja de cálculo al libro de trabajo
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Errores');
+
+    // Generar el archivo Excel
+    XLSX.writeFile(workbook, 'ErroresSubidaMasivaBaseContratacion.xlsx');
+}
+
+
+
+
+async function guardarDatos(datosFinales) {
+
+    var body = localStorage.getItem('key');
+    const obj = JSON.parse(body);
+    const jwtKey = obj.jwt;
+
+
+    const bodyData = {
+        jwt: jwtKey,
+        mensaje: "muchos",
+        datos: datosFinales
+    };
+
+    const headers = {
+        'Authorization': jwtKey
+    };
+
+    const urlcompleta = urlBack.url + '/contratacion/subidadeusuariosarchivoexcel';
+    try {
+        fetch(urlcompleta, {
+            method: 'POST',// para el resto de peticiónes HTTP le cambias a GET, POST, PUT, DELETE, etc.
+            body: JSON.stringify(bodyData),// Aquí va el body de tu petición tiene que ser asi en json para que el back lo pueda leer y procesar y hay algun problema me dices
+
+        })
+            .then(async response => {
+                if (response.ok) {
+                    const responseData = await response.json(); // Asegurándonos de esperar la promesa
+                    await sleep(1000);
+                    await exportarErroresAExcel2(responseData.errores);
+                    console.log('Respuesta:', responseData);
+                    document.getElementById('successSound').play();
+                    over.style.display = "none";
+                    loader.style.display = "none";
+                    let aviso = await avisoConfirmado("Datos guardados correctamente", "success");
+                    if (aviso) {
+                        location.reload();
+                    }
+                    return responseData;
+                } else {
+                    document.getElementById('errorSound').play();
+                    aviso("Error al guardar los datos", "error");
+                    throw new Error('Error en la petición POST');
+                }
+            })
+            .then(responseData => {
+                // Aquí puedes manejar `responseData` si es necesario
+                document.getElementById('successSound').play();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('errorSound').play();
+            });
+
+    } catch (error) {
+        console.error('Error en la petición HTTP PUT');
+        console.error(error);
+    }
+
+
+}
+
+
+
+
 /*Inabilitar permisos*/
 document.getElementById("myonoffswitch").addEventListener("click", async function (event) {
 
@@ -642,7 +788,7 @@ async function datosCarol2(datos) {
             } else {
                 let concepto = 'Compra tienda Ferias';
                 let codigoAux = 'MOH' + Math.floor(Math.random() * 1000000);
-    
+
                 await escribirHistorial(doc[0], doc[1], 2, concepto, codigoAux, "CAROL PALACIOS");
                 await sleep(2000);
                 await ActualizarHistorial(codigoAux);
