@@ -71,11 +71,14 @@ function cerrarInfoBox(over, info) {
 asignar.addEventListener('click', asignarTraslado);
 
 async function asignarTraslado() {
+    
     const jwtKey = JSON.parse(localStorage.getItem('key')).jwt;
+
     const headers = {
         'Authorization': 'Bearer ' + jwtKey,
         'Content-Type': 'application/json'
     };
+
     const urlCompleta = urlBack.url + '/traslados/actualizar_datos/';
 
     let traslados = await datosTraslados();
@@ -251,7 +254,7 @@ async function iniciar() {
         // Año actual para filtrar traslados relevantes
         const anoActual = new Date().getFullYear();
         let trasladosFiltrados = await buscarTrasladosFiltro(usernameLocal, anoActual);
-
+        console.log('Traslados filtrados:', trasladosFiltrados);
         // Limpiar tabla antes de agregar nuevas filas
         tabla.innerHTML = '';
 
