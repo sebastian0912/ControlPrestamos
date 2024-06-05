@@ -22,14 +22,14 @@ const correo = localStorage.getItem("correo_electronico");
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
 
-if (correo == "a.sotelotualianza@gmail.com" || correo == "contaduria.rtc@gmail.com"){
+if (correo == "a.sotelotualianza@gmail.com" || correo == "contaduria.rtc@gmail.com") {
     mercado.style.display = "inline-block"
 }
-else{
+else {
     mercado.style.display = "none"
 }
 
-if (correo == "contaduria.rtc@gmail.com"){
+if (correo == "contaduria.rtc@gmail.com") {
     traslados.style.display = "inline-block"
 }
 
@@ -113,9 +113,21 @@ document.querySelector('#guardar').addEventListener('click', async () => {
     let nombresResponsables = [];
     let datosUsuarios = [];  // Array para almacenar los datos de los usuarios
 
-    for (let i = 0; i < numero; i++) {
+    let usuarios = await listaUsuarios();
+
+    const numerosTraslados = usuarios
+        .map(usuario => usuario.correo_electronico) // Obtener solo los correos electrónicos
+        .filter(correo => correo.startsWith('traslados')) // Filtrar correos que comienzan con 'traslados'
+        .map(correo => parseInt(correo.match(/traslados(\d+)/)[1])) // Extraer los números de los correos
+        .filter(numero => !isNaN(numero)); // Filtrar valores no numéricos
+
+    const maxNumero = numerosTraslados.length > 0 ? Math.max(...numerosTraslados) : null;
+
+    console.log('El número más grande es:', maxNumero);    
+
+    for (let i = 0+maxNumero; i < numero+maxNumero; i++) {
         try {
-            let userId = parseInt(document.getElementById(`inputUsuario_${i}`).value.split(' - ')[1], 10);
+            let userId = parseInt(document.getElementById(`inputUsuario_${i-maxNumero}`).value.split(' - ')[1], 10);
             console.log('ID del usuario:', userId);
             let user = await obtenerUsuarioPorId(String(userId));
             console.log('Usuario encontrado:', user);

@@ -14,6 +14,9 @@ const uid = localStorage.getItem("idUsuario");
 //Muestra en la parte superior el nombre y el perfil
 titulo.innerHTML = usernameLocal;
 perfil.innerHTML = perfilLocal;
+const over = document.querySelector('#overlay');
+const loader = document.querySelector('#loader');
+
 
 await crearTienda(uid);
 const correo = localStorage.getItem("correo_electronico");
@@ -454,10 +457,10 @@ function s2ab(s) {
 
 
 
-let contracion = document.getElementById("contratacion");
+let contratacion = document.getElementById("contratacion");
 
-contracion.addEventListener('change', async () => {
-    const file = input.files[0];
+contratacion.addEventListener('change', async () => {
+    const file = contratacion.files[0];
     const reader = new FileReader();
 
     let datosFinales = [];
@@ -617,6 +620,8 @@ document.getElementById("myonoffswitch").addEventListener("click", async functio
 
 let input = document.getElementById('subidaMasiva');
 input.addEventListener('change', async () => {
+    over.style.display = "block";
+    loader.style.display = "block";
 
     const file = input.files[0];
     const reader = new FileReader();
@@ -643,6 +648,9 @@ input.addEventListener('change', async () => {
         console.log('Datos cargados desde Excel:', datosFinales);
 
         datosCarol(datosFinales);
+
+        over.style.display = "none";
+        loader.style.display = "none";
     };
 
     reader.readAsBinaryString(file);

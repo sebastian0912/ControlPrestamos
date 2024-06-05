@@ -20,6 +20,11 @@
 </head>
 
 <body>
+    <audio id="successSound"
+        src="../assets/Sounds/depositphotos_425986708-track-app-interface-button-notification.mp3"></audio>
+    <audio id="errorSound" src="../assets/Sounds/negative_beeps-6008.mp3"></audio>
+
+    <div id="overlay" class="loader-overlay" style="display: none;"></div>
 
     <div class="opciones">
         <ul class="lista-Opciones">
@@ -92,7 +97,7 @@
                 <p style="float: right;"> Subida Masiva Carol Sin Codigo</p>
             </li>
 
-            <li >
+            <li>
                 <input type="file" id="contratacion" class="boton" style="cursor: pointer;" />
                 <img src="../assets/subir-archivo.png" alt="logo" class="logo" />
                 <p style="float: right;"> Subida Masiva Contratación</p>
@@ -143,7 +148,14 @@
 
 
     <div class="contenido">
-        <div  style="display: flex; width: 80%; height: auto; margin-left: 80px;"  >
+
+        <div id="loader" class="cajaloader" style="display: none;">
+            <h1 id="cont" class="contador" style="display: none;"></h1>
+            <div class="custom-loader"></div>
+        </div>
+
+
+        <div style="display: flex; width: 80%; height: auto; margin-left: 80px;">
 
             <button class="btn" id="HistorialDe" style="width: 250px;"> Descargar Excel </button>
         </div>
