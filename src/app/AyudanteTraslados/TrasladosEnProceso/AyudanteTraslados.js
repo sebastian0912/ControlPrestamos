@@ -80,12 +80,19 @@ function cerrarInfoBox(over, info) {
 asignar.addEventListener("click", asignarTraslado);
 
 async function asignarTraslado() {
-    const jwtKey = JSON.parse(localStorage.getItem('key')).jwt;
-    const headers = {
-        'Authorization': 'Bearer ' + jwtKey,
-        'Content-Type': 'application/json'
-    };
-    const urlCompleta = urlBack.url + '/traslados/actualizar_datos/';
+  console.log("Asignar traslado"+  cont);
+
+  if (cont <= 0) {
+    aviso("Acaba primero con los traslados que tienes pendientes", "warning");
+    return;
+  }
+
+  const jwtKey = JSON.parse(localStorage.getItem("key")).jwt;
+  const headers = {
+    Authorization: "Bearer " + jwtKey,
+    "Content-Type": "application/json",
+  };
+  const urlCompleta = urlBack.url + "/traslados/actualizar_datos/";
 
   let traslados = await datosTraslados();
   console.log("Traslados:", traslados);
