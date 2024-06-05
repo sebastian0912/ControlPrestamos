@@ -203,6 +203,21 @@ let datosComercializadoraGeneral = [];
 datosComercializadoraGeneral = await datosTComercio();
 let datosArreglo = datosComercializadoraGeneral.comercio;
 
+// ordenar por fechaRecibida de mas reciente a mas nuevo formato 2023-12-14
+datosArreglo.sort((a, b) => {
+    if (a.fechaRecibida < b.fechaRecibida) {
+        return 1;
+    }
+    if (a.fechaRecibida > b.fechaRecibida) {
+        return -1;
+    }
+    return 0;
+});
+
+
+     
+
+
 datosArreglo.forEach((p) => {
     if (p.destino == sede && p.cantidadRecibida != p.cantidadTotalVendida) {
         tabla.innerHTML += `

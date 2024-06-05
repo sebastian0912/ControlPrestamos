@@ -80,19 +80,12 @@ function cerrarInfoBox(over, info) {
 asignar.addEventListener("click", asignarTraslado);
 
 async function asignarTraslado() {
-  console.log("Asignar traslado"+  cont);
-
-  if (cont <= 0) {
-    aviso("Acaba primero con los traslados que tienes pendientes", "warning");
-    return;
-  }
-
-  const jwtKey = JSON.parse(localStorage.getItem("key")).jwt;
-  const headers = {
-    Authorization: "Bearer " + jwtKey,
-    "Content-Type": "application/json",
-  };
-  const urlCompleta = urlBack.url + "/traslados/actualizar_datos/";
+    const jwtKey = JSON.parse(localStorage.getItem('key')).jwt;
+    const headers = {
+        'Authorization': 'Bearer ' + jwtKey,
+        'Content-Type': 'application/json'
+    };
+    const urlCompleta = urlBack.url + '/traslados/actualizar_datos/';
 
   let traslados = await datosTraslados();
   console.log("Traslados:", traslados);
@@ -267,16 +260,13 @@ async function cargarYMostrarDatosEstados(datosExtraidos) {
 }
 
 async function iniciar() {
-  try {
-    // Año actual para filtrar traslados relevantes
-    const anoActual = new Date().getFullYear();
-    let trasladosFiltrados = await buscarTrasladosFiltro(
-      usernameLocal,
-      anoActual
-    );
+    try {
+        // Año actual para filtrar traslados relevantes
+        const anoActual = new Date().getFullYear();
+        let trasladosFiltrados = await buscarTrasladosFiltro(usernameLocal, anoActual);
 
-    // Limpiar tabla antes de agregar nuevas filas
-    tabla.innerHTML = "";
+        // Limpiar tabla antes de agregar nuevas filas
+        tabla.innerHTML = '';
 
     // Crear filas de traslados en la tabla
     trasladosFiltrados
