@@ -305,6 +305,130 @@ input2.addEventListener('change', async () => {
     reader.readAsBinaryString(file);
 });
 
+/*
+
+let input2 = document.getElementById('subidaMasiva2');
+
+input2.addEventListener('change', async () => {
+
+    const file = input2.files[0];
+    const reader = new FileReader();
+    over.style.display = 'block';
+    loader.style.display = 'block';
+
+    let datosFinales = [];
+
+    reader.onload = (event) => {
+        const fileContent = event.target.result;
+        const workbook = XLSX.read(fileContent, { type: 'binary' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+        for (let i = 1; i < rows.length; i++) {
+            let marcaTemporal = rows[i][5];
+            if (marcaTemporal) {
+                if (typeof marcaTemporal === 'string') {
+                    marcaTemporal = formatDate(marcaTemporal);
+                } else if (typeof marcaTemporal === 'number') {
+                    marcaTemporal = excelDateToJSDate(marcaTemporal);
+                } else {
+                    console.warn(`Invalid marcaTemporal value at row ${i + 1}:`, marcaTemporal);
+                    marcaTemporal = null;  // O asigna un valor por defecto si es necesario
+                }
+            }
+
+            datosFinales.push({
+                correo: rows[i][0],
+                contrasena: rows[i][1],
+                codigo: rows[i][2],
+                responsable: rows[i][3],
+                observacion: rows[i][4],
+                marcaTemporal: marcaTemporal
+            });
+        }
+
+        console.log('Datos cargados desde Excel:', datosFinales);
+
+        subidaMasivaCorreos(datosFinales);
+    };
+
+    reader.readAsBinaryString(file);
+});
+
+// Función para formatear la fecha si es necesario
+function formatDate(fecha) {
+    try {
+        const [day, month, yearAndTime] = fecha.split('/');
+        const [year, time] = yearAndTime.split(' ');
+        return `${year}-${month}-${day} ${time}`;
+    } catch (error) {
+        console.error('Error formatting date:', error);
+        return fecha;  // Devuelve la fecha original en caso de error
+    }
+}
+
+// Función para convertir fechas numéricas de Excel a fechas JS
+function excelDateToJSDate(serial) {
+    const utc_days = Math.floor(serial - 25569);
+    const utc_value = utc_days * 86400;
+    const date_info = new Date(utc_value * 1000);
+
+    const fractional_day = serial - Math.floor(serial) + 0.0000001;
+    let total_seconds = Math.floor(86400 * fractional_day);
+
+    const seconds = total_seconds % 60;
+    total_seconds -= seconds;
+
+    const hours = Math.floor(total_seconds / (60 * 60));
+    const minutes = Math.floor(total_seconds / 60) % 60;
+
+    return `${date_info.getFullYear()}-${(date_info.getMonth() + 1).toString().padStart(2, '0')}-${date_info.getDate().toString().padStart(2, '0')} ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+
+async function subidaMasivaCorreos(datos) {
+    console.log('Enviando datos masivos:', datos);
+
+    try {
+        var body = localStorage.getItem('key');
+        const obj = JSON.parse(body);
+        const jwtToken = obj.jwt;
+
+        const urlcompleta = urlBack.url + '/traslados/generalCorreos';
+
+        const response = await fetch(urlcompleta, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': jwtToken
+            },
+            body: JSON.stringify({
+                datos: datos,  // Envía el array completo
+                jwt: jwtToken
+            })
+        });
+
+        // Manojo de la respuesta aquí si es necesario
+
+        if (!response.ok) {
+            aviso('Sucedio algun error', 'error');
+        }
+        over.style.display = 'none';
+        loader.style.display = 'none';
+        
+        let confirmacion = await avisoConfirmado('Termino de subir el archivo', "success");
+
+        if (confirmacion) {
+            location.reload();
+        }
+
+    } catch (error) {
+        console.error('Error al enviar los datos masivos:', error);
+    }
+}
+
+*/ 
+
 
 async function subidaMasivaCorreos(datos) {
     console.log('Enviando datos masivos:', datos);
