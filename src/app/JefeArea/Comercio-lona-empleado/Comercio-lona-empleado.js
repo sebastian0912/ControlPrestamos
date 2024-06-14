@@ -216,7 +216,7 @@ datosArreglo.sort((a, b) => {
 
 
      
-
+console.log(datosArreglo);
 
 datosArreglo.forEach((p) => {
     if (p.destino == sede && p.cantidadRecibida != p.cantidadTotalVendida) {

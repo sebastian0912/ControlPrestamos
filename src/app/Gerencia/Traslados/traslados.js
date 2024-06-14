@@ -127,7 +127,7 @@ document.querySelector('#guardar').addEventListener('click', async () => {
 
     for (let i = 0+maxNumero; i < numero+maxNumero; i++) {
         try {
-            let userId = parseInt(document.getElementById(`inputUsuario_${i-maxNumero}`).value.split(' - ')[1], 10);
+            let userId = document.getElementById(`inputUsuario_${i-maxNumero}`).value.split(' - ')[1];
             console.log('ID del usuario:', userId);
             let user = await obtenerUsuarioPorId(String(userId));
             console.log('Usuario encontrado:', user);
