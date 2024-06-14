@@ -24,7 +24,7 @@ const loader = document.querySelector("#loader");
 
 
 // Capturar elementos HTML importantes
-const  numeroTraslados = document.querySelector("#numeroTraslados");
+const numeroTraslados = document.querySelector("#numeroTraslados");
 
 
 // Funciones para obtener datos de traslados y correos
@@ -80,7 +80,7 @@ function cerrarInfoBox(over, info) {
 asignar.addEventListener("click", asignarTraslado);
 
 async function asignarTraslado() {
-  console.log("Asignar traslado"+  cont);
+  console.log("Asignar traslado" + cont);
 
   if (cont <= 0) {
     aviso("Acaba primero con los traslados que tienes pendientes", "warning");
@@ -267,70 +267,72 @@ async function cargarYMostrarDatosEstados(datosExtraidos) {
 }
 
 async function iniciar() {
-    try {
-        // Año actual para filtrar traslados relevantes
-        const anoActual = new Date().getFullYear();
-        let trasladosFiltrados = await buscarTrasladosFiltro(usernameLocal, anoActual);
+  try {
+    // Current year to filter relevant transfers
+    const anoActual = new Date().getFullYear();
+    let trasladosFiltrados = await buscarTrasladosFiltro(usernameLocal, anoActual);
 
-        // Limpiar tabla antes de agregar nuevas filas
-        tabla.innerHTML = '';
+    // Clear the table before adding new rows
+    tabla.innerHTML = '';
 
-    // Crear filas de traslados en la tabla
+    // Create rows for transfers in the table, sorted from largest to smallest
     trasladosFiltrados
-      .sort((a, b) => a.codigo_traslado - b.codigo_traslado)
+      .sort((a, b) => b.codigo_traslado - a.codigo_traslado)
       .forEach((traslado) => crearFilaTraslado(traslado, null, tabla));
 
-    // Añadir escuchadores de eventos, si necesario
+    // Add event listeners, if necessary
     addEventListeners();
   } catch (error) {
-    console.error("Error al iniciar la aplicación:", error);
+    console.error("Error initializing the application:", error);
   }
 }
+
 let cont = 5;
 
 function crearFilaTraslado(traslado, correos, tabla) {
   const tr = document.createElement("tr");
-  console.log("Traslado:", traslado);
 
   if (traslado.estado_del_traslado !== "Aceptado" && traslado.estado_del_traslado !== "Validar 24 Horas"
-      &&  traslado.estado_del_traslado !== "No se encuentra en ADRES" &&  traslado.estado_del_traslado !== "segundo cotizante"
-  ) {  
+    && traslado.estado_del_traslado !== "No se encuentra en ADRES" && traslado.estado_del_traslado !== "segundo cotizante") {
     cont--;
   }
 
-  // el traslado.estado_del_traslado eliminarlo del arreglo si es Aceptado
-  if (traslado.estado_del_traslado === "Aceptado" 
-  ) {
+  // If the state of the transfer is "Aceptado", do not include it in the table
+  if (traslado.estado_del_traslado === "Aceptado") {
     return;
   }
-  
 
-  console.log("Contador:", traslado.estado_del_traslado);
+
+  // Check if solicitud_traslado is a Google Drive link or a direct PDF link
+  let pdfLink;
+  if (traslado.solicitud_traslado.includes("drive.google.com")) {
+    pdfLink = traslado.solicitud_traslado;
+  } else {
+    pdfLink = `path/to/pdf/${traslado.solicitud_traslado}`;
+  }
 
   tr.innerHTML = `
-        <td>${traslado.codigo_traslado}</td>
-        <td>${traslado.estado_del_traslado}</td>
-
-        <td>${traslado.numero_cedula}</td>
-        <td><a style="  text-decoration:underline; color: blue" href="#" class="ver-pdf" data-pdf="${
-          traslado.solicitud_traslado
-        }">Ver PDF</a></td>
-        <td><a style="  text-decoration:underline; color: blue" href="${
-          traslado.numero_cc2 || "No disponible"
-        }" target="_blank">${traslado.numero_cc2 || "No disponible"}</a></td>
-        <td>${traslado.asignacion_correo}</td>
-        <td>${traslado.eps_a_trasladar}</td>
-        <td>
-            <button class="btn-cambiar-estado">Cambiar Estado</button>
-            <button class="btn-ver-trabajador">Ver Trabajador</button>
-            <button class="btn-estados">Estados</button>
-            <button class="btn-correo">Cambiar correo</button>
-
-        </td>
-    `;
+    <td>${traslado.codigo_traslado}</td>
+    <td>${traslado.estado_del_traslado}</td>
+    <td>${traslado.numero_cedula}</td>
+    <td><a style="text-decoration:underline; color: blue" href="${pdfLink}" target="_blank">Ver PDF</a></td>
+    <td>
+      <a style="text-decoration:underline; color: blue" 
+        href="${traslado.cedulas || 'No disponible'}" 
+        target="_blank">
+        ${traslado.cedulas ? 'Ver PDF Cédula' : 'No disponible'}
+      </a>
+    </td>
+    <td>${traslado.asignacion_correo}</td>
+    <td>${traslado.eps_a_trasladar}</td>
+    <td>
+      <button class="btn-cambiar-estado">Cambiar Estado</button>
+      <button class="btn-ver-trabajador">Ver Trabajador</button>
+      <button class="btn-estados">Estados</button>
+      <button class="btn-correo">Cambiar correo</button>
+    </td>
+  `;
   tabla.appendChild(tr);
-  console.log("Contador:", cont);
-
 
   numeroTraslados.textContent = cont;
 }
@@ -602,14 +604,14 @@ function cambiarEstadoTraslado(
         "success"
       );
       if (aviso) {
-          location.reload();
+        location.reload();
       }
     })
     .catch((error) => {
       console.error("Error en la petición HTTP POST", error);
       let aviso = aviso("Error al actualizar el estado del traslado", "error");
       if (aviso) {
-          location.reload();
+        location.reload();
       }
     });
 

@@ -265,15 +265,11 @@ span {
 
 .tabla-contenido tr:nth-child(even) {
   background-color: #f2f2f2;
-  /* color para filas pares */
 }
 
 .tabla-contenido tr:nth-child(odd) {
   background-color: #cccccc;
-  /* color para filas impares */
 }
-
-
 
 th {
   border-bottom: #b9b9b9 1px solid;
@@ -281,27 +277,29 @@ th {
   background: #5e6a75;
   color: #ffffff;
   font-weight: 400;
+  text-align: center; 
 }
 
 tr {
   height: 40px;
+  text-align: center; 
+
+}
+
+.tabla-contenido th, .tabla-contenido td {
+  text-align: center;  
+  vertical-align: middle; 
+  padding: 8px;     
+}
+
+.tabla-contenido tr td:nth-child(5) {
+  word-wrap: break-word; 
+  overflow-wrap: break-word; 
+  white-space: normal; 
   text-align: center;
 }
 
 
-.tabla-contenido th, .tabla-contenido td {
-    text-align: center;  
-    vertical-align: middle; 
-    padding: 8px;     
-}
-
-.tabla-contenido tr td:nth-child(5) {
-  max-width: 200px;
-  overflow: hidden; /* Mantiene oculto cualquier contenido que desborde el tamaño de la celda */
-  text-overflow: clip; /* Elimina los puntos suspensivos y muestra todo el texto hasta el límite del área visible */
-  white-space: normal; /* Permite que el texto se ajuste y se baje a líneas adicionales si es necesario */
-  
-}
 
 
 select {
