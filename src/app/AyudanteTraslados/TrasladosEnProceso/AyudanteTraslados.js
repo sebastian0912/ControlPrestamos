@@ -14,13 +14,13 @@ const usernameLocal = localStorage.getItem("username");
 const estado = localStorage.getItem("estadoSolicitudes");
 const uid = localStorage.getItem("idUsuario");
 const correo = localStorage.getItem("correo_electronico");
+const over = document.querySelector('#overlay');
+const loader = document.querySelector('#loader');
 
 // Mostrar en la interfaz el nombre y perfil del usuario
 titulo.textContent = usernameLocal;
 perfil.textContent = perfilLocal;
 
-const over = document.querySelector("#overlay");
-const loader = document.querySelector("#loader");
 
 
 // Capturar elementos HTML importantes
@@ -80,7 +80,9 @@ function cerrarInfoBox(over, info) {
 asignar.addEventListener("click", asignarTraslado);
 
 async function asignarTraslado() {
-  console.log("Asignar traslado"+  cont);
+  over.style.display = "block";
+  loader.style.display = "block";
+  console.log("Asignando traslado");
 
   if (cont <= 0) {
     aviso("Acaba primero con los traslados que tienes pendientes", "warning");
@@ -95,9 +97,7 @@ async function asignarTraslado() {
   const urlCompleta = urlBack.url + "/traslados/actualizar_datos/";
 
   let traslados = await datosTraslados();
-  console.log("Traslados:", traslados);
   let correos = await datosCorreos(usernameLocal);
-  console.log("Correos:", correos);
 
   // Verificar si hay traslados sin responsable
   const trasladosSinResponsable = traslados.filter(
@@ -110,7 +110,7 @@ async function asignarTraslado() {
 
   // Verificar si hay correos sin asignar si codigo_traslado
   const correosSinAsignar = correos.filter((correo) => !correo.codigo_traslado);
-  console.log("Correos sin asignar:", correosSinAsignar);
+
   if (correosSinAsignar.length === 0) {
     aviso("No hay correos disponibles", "warning");
     return;
@@ -142,6 +142,10 @@ async function asignarTraslado() {
     });
 
     if (response.ok) {
+      document.getElementById('successSound').play();
+      over.style.display = "none";
+      loader.style.display = "none";
+
       const responseData = await response.json();
       console.log(responseData);
       let aviso = avisoConfirmado("Correo asignado correctamente", "success");
@@ -150,6 +154,10 @@ async function asignarTraslado() {
       }
       return responseData;
     } else {
+      document.getElementById('errorSound').play();
+      over.style.display = "none";
+      loader.style.display = "none";
+      aviso("Error al asignar traslado", "error");
       throw new Error("Error en la petición POST");
     }
   } catch (error) {
@@ -201,8 +209,6 @@ async function cargarYMostrarDatos(cedulaEm, traslado) {
 
   let cont = 0;
 
-  console.log("Datos extraidos:", datosExtraidos);
-
   datosExtraidos.data.forEach((p) => {
     tabla.innerHTML = "";
     tabla.insertAdjacentHTML(
@@ -247,7 +253,6 @@ async function cargarYMostrarDatosEstados(datosExtraidos) {
     return;
   }
 
-  console.log("Datos extraidos:", datosExtraidos);
 
   tabla.innerHTML = "";
 
@@ -267,30 +272,30 @@ async function cargarYMostrarDatosEstados(datosExtraidos) {
 }
 
 async function iniciar() {
-    try {
-        // Año actual para filtrar traslados relevantes
-        const anoActual = new Date().getFullYear();
-        let trasladosFiltrados = await buscarTrasladosFiltro(usernameLocal, anoActual);
+  try {
+      // Año actual para filtrar traslados relevantes
+      const anoActual = new Date().getFullYear();
+      let trasladosFiltrados = await buscarTrasladosFiltro(usernameLocal, anoActual);
 
-        // Limpiar tabla antes de agregar nuevas filas
-        tabla.innerHTML = '';
+      // Limpiar tabla antes de agregar nuevas filas
+      tabla.innerHTML = '';
 
-    // Crear filas de traslados en la tabla
-    trasladosFiltrados
-      .sort((a, b) => a.codigo_traslado - b.codigo_traslado)
-      .forEach((traslado) => crearFilaTraslado(traslado, null, tabla));
+      // Crear filas de traslados en la tabla
+      trasladosFiltrados
+        .sort((a, b) => b.codigo_traslado - a.codigo_traslado) // Ordenar de mayor a menor
+        .forEach((traslado) => crearFilaTraslado(traslado, null, tabla));
 
-    // Añadir escuchadores de eventos, si necesario
-    addEventListeners();
+      // Añadir escuchadores de eventos, si necesario
+      addEventListeners();
   } catch (error) {
-    console.error("Error al iniciar la aplicación:", error);
+      console.error("Error al iniciar la aplicación:", error);
   }
 }
+
 let cont = 5;
 
 function crearFilaTraslado(traslado, correos, tabla) {
   const tr = document.createElement("tr");
-  console.log("Traslado:", traslado);
 
   if (traslado.estado_del_traslado !== "Aceptado" && traslado.estado_del_traslado !== "Validar 24 Horas"
       &&  traslado.estado_del_traslado !== "No se encuentra en ADRES" &&  traslado.estado_del_traslado !== "segundo cotizante"
@@ -304,9 +309,6 @@ function crearFilaTraslado(traslado, correos, tabla) {
     return;
   }
   
-
-  console.log("Contador:", traslado.estado_del_traslado);
-
   tr.innerHTML = `
         <td>${traslado.codigo_traslado}</td>
         <td>${traslado.estado_del_traslado}</td>
@@ -329,7 +331,6 @@ function crearFilaTraslado(traslado, correos, tabla) {
         </td>
     `;
   tabla.appendChild(tr);
-  console.log("Contador:", cont);
 
 
   numeroTraslados.textContent = cont;
@@ -364,7 +365,6 @@ async function traerTrasladoCedula(cedula) {
 }
 
 async function buscarTrasladosFiltro(responsable, ano) {
-  console.log("Responsable:", responsable, "Año:", ano); // Añade esto para verificar los valores que se envían
 
   // Construye la URL con los parámetros de la consulta
   let url =

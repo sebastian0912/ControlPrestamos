@@ -20,6 +20,12 @@
 </head>
 
 <body>
+    <audio id="successSound"
+    src="../../assets/Sounds/depositphotos_425986708-track-app-interface-button-notification.mp3"></audio>
+  <audio id="errorSound" src="../../assets/Sounds/negative_beeps-6008.mp3"></audio>
+
+  <div id="overlay" class="loader-overlay" style="display: none;"></div>
+
 
     <div class="opciones">
         <ul class="lista-Opciones">
@@ -75,7 +81,10 @@
 
 
     <div class="contenido">
-
+        <div id="loader" class="cajaloader" style="display: none;">
+            <h1 id="cont" class="contador" style="display: none;"></h1>
+            <div class="custom-loader"></div>
+          </div>
         <div class="tabla">
             <button class="btn-escoger" style="width: 200px; float: right;" id="asignar">Auto Asignar </button>
 
