@@ -7,6 +7,7 @@ const perfil = document.querySelector('#perfil');
 const diasRestantes = document.querySelector('#diasRestantes');  // Asegúrate de tener este elemento en tu HTML
 const diasLi = document.querySelector('#diasLi');  // Asegúrate de tener este elemento en tu HTML
 const tabla = document.querySelector('#tabla');  // Asegúrate de que este ID esté en tu tabla HTML
+const buscador = document.querySelector('#buscador');
 
 // Captura de datos desde localStorage
 const perfilLocal = localStorage.getItem("perfil");
@@ -63,13 +64,20 @@ async function actualizarObservacion(correo, observacion, codigo_traslado) {
     }
 }
 
-
-
 async function iniciar() {
     let correos = await datosCorreos(usernameLocal);
     console.log("Correos:", correos);  // Verifica la estructura de los correos
     correos = correos.filter(correo => correo.codigo_traslado != null);
+    
+    mostrarCorreos(correos);
 
+    // Añadir escuchadores de eventos
+    addEventListeners();
+    buscador.addEventListener('input', () => filtrarCorreos(correos, buscador.value));
+}
+
+function mostrarCorreos(correos) {
+    tabla.innerHTML = ''; // Limpiar tabla antes de agregar nuevas filas
     correos.forEach(correo => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -79,10 +87,14 @@ async function iniciar() {
             <td><span class="observacion-texto">${correo.observacion || ''}</span><input type="text" value="${correo.observacion || ''}" class="input-observacion" style="display:none;"></td>
             <td><button class="editar-observacion">Editar</button><button class="guardar" style="display:none;">Guardar</button></td>
         `;
-        document.getElementById('tabla').appendChild(tr);
+        tabla.appendChild(tr);
     });
+}
 
-    addEventListeners();
+function filtrarCorreos(correos, termino) {
+    const correosFiltrados = correos.filter(correo => correo.correo.toLowerCase().includes(termino.toLowerCase()));
+    mostrarCorreos(correosFiltrados);
+    addEventListeners(); // Vuelve a añadir los event listeners después de filtrar
 }
 
 function addEventListeners() {
@@ -101,7 +113,7 @@ function addEventListeners() {
             const tr = button.closest('tr');
             const correo = tr.cells[0].textContent.trim();
             const observacion = tr.querySelector('.input-observacion').value.trim();
-    
+
             try {
                 const result = await actualizarObservacion(correo, observacion, tr.cells[2].textContent);
                 console.log('Observación actualizada:', result);
@@ -117,10 +129,6 @@ function addEventListeners() {
             }
         });
     });
-    
 }
-
-
-
 
 iniciar();
