@@ -283,7 +283,6 @@ async function datosCorreos2(usernameLocal) {
 
 
 let correosAux = await datosCorreos2(usernameLocal);
-console.log("Correos:", correosAux);  // Verifica la estructura de los correos
 
 
 async function crearFilaTraslado(traslado, correos, tabla) {
@@ -308,7 +307,6 @@ async function crearFilaTraslado(traslado, correos, tabla) {
   }
   // buscar contraseña con el correo en correos 
   let contrasena = "";
-  console.log("Correos:", correosAux);
   correosAux.forEach(correo => {
     if (correo.correo === traslado.asignacion_correo) {
       contrasena = correo.contrasena;
