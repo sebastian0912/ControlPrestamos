@@ -14,13 +14,13 @@ const usernameLocal = localStorage.getItem("username");
 const estado = localStorage.getItem("estadoSolicitudes");
 const uid = localStorage.getItem("idUsuario");
 const correo = localStorage.getItem("correo_electronico");
+const over = document.querySelector('#overlay');
+const loader = document.querySelector('#loader');
 
 // Mostrar en la interfaz el nombre y perfil del usuario
 titulo.textContent = usernameLocal;
 perfil.textContent = perfilLocal;
 
-const over = document.querySelector("#overlay");
-const loader = document.querySelector("#loader");
 
 
 // Capturar elementos HTML importantes
@@ -80,7 +80,9 @@ function cerrarInfoBox(over, info) {
 asignar.addEventListener("click", asignarTraslado);
 
 async function asignarTraslado() {
-  console.log("Asignar traslado" + cont);
+  over.style.display = "block";
+  loader.style.display = "block";
+  console.log("Asignando traslado");
 
   if (cont <= 0) {
     aviso("Acaba primero con los traslados que tienes pendientes", "warning");
@@ -93,7 +95,6 @@ async function asignarTraslado() {
     "Content-Type": "application/json",
   };
   const urlCompleta = urlBack.url + "/traslados/actualizar_datos/";
-
   // Obtener el número de cédula del traslado seleccionado
 
   const data = {
@@ -110,6 +111,10 @@ async function asignarTraslado() {
     });
 
     if (response.ok) {
+      document.getElementById('successSound').play();
+      over.style.display = "none";
+      loader.style.display = "none";
+
       const responseData = await response.json();
       console.log(responseData);
       let aviso = avisoConfirmado("Correo asignado correctamente", "success");
@@ -118,6 +123,10 @@ async function asignarTraslado() {
       }
       return responseData;
     } else {
+      document.getElementById('errorSound').play();
+      over.style.display = "none";
+      loader.style.display = "none";
+      aviso("Error al asignar traslado", "error");
       throw new Error("Error en la petición POST");
     }
   } catch (error) {
@@ -169,8 +178,6 @@ async function cargarYMostrarDatos(cedulaEm, traslado) {
 
   let cont = 0;
 
-  console.log("Datos extraidos:", datosExtraidos);
-
   datosExtraidos.data.forEach((p) => {
     tabla.innerHTML = "";
     tabla.insertAdjacentHTML(
@@ -215,7 +222,6 @@ async function cargarYMostrarDatosEstados(datosExtraidos) {
     return;
   }
 
-  console.log("Datos extraidos:", datosExtraidos);
 
   tabla.innerHTML = "";
 
@@ -236,22 +242,22 @@ async function cargarYMostrarDatosEstados(datosExtraidos) {
 
 async function iniciar() {
   try {
-    // Current year to filter relevant transfers
-    const anoActual = new Date().getFullYear();
-    let trasladosFiltrados = await buscarTrasladosFiltro(usernameLocal, anoActual);
+      // Año actual para filtrar traslados relevantes
+      const anoActual = new Date().getFullYear();
+      let trasladosFiltrados = await buscarTrasladosFiltro(usernameLocal, anoActual);
 
-    // Clear the table before adding new rows
-    tabla.innerHTML = '';
+      // Limpiar tabla antes de agregar nuevas filas
+      tabla.innerHTML = '';
 
-    // Create rows for transfers in the table, sorted from largest to smallest
-    trasladosFiltrados
-      .sort((a, b) => b.codigo_traslado - a.codigo_traslado)
-      .forEach((traslado) => crearFilaTraslado(traslado, null, tabla));
+      // Crear filas de traslados en la tabla
+      trasladosFiltrados
+        .sort((a, b) => b.codigo_traslado - a.codigo_traslado) // Ordenar de mayor a menor
+        .forEach((traslado) => crearFilaTraslado(traslado, null, tabla));
 
-    // Add event listeners, if necessary
-    addEventListeners();
+      // Añadir escuchadores de eventos, si necesario
+      addEventListeners();
   } catch (error) {
-    console.error("Error initializing the application:", error);
+      console.error("Error al iniciar la aplicación:", error);
   }
 }
 
@@ -365,7 +371,6 @@ async function traerTrasladoCedula(cedula) {
 }
 
 async function buscarTrasladosFiltro(responsable, ano) {
-  console.log("Responsable:", responsable, "Año:", ano); // Añade esto para verificar los valores que se envían
 
   // Construye la URL con los parámetros de la consulta
   let url =
