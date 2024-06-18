@@ -94,42 +94,10 @@ async function asignarTraslado() {
   };
   const urlCompleta = urlBack.url + "/traslados/actualizar_datos/";
 
-  let traslados = await datosTraslados();
-  console.log("Traslados:", traslados);
-  let correos = await datosCorreos(usernameLocal);
-  console.log("Correos:", correos);
-
-  // Verificar si hay traslados sin responsable
-  const trasladosSinResponsable = traslados.filter(
-    (traslado) => !traslado.responsable
-  );
-  if (trasladosSinResponsable.length === 0) {
-    aviso("No hay traslados disponibles", "warning");
-    return;
-  }
-
-  // Verificar si hay correos sin asignar si codigo_traslado
-  const correosSinAsignar = correos.filter((correo) => !correo.codigo_traslado);
-  console.log("Correos sin asignar:", correosSinAsignar);
-  if (correosSinAsignar.length === 0) {
-    aviso("No hay correos disponibles", "warning");
-    return;
-  }
-
-  // Seleccionar un traslado sin responsable
-  const trasladoSinResponsable = trasladosSinResponsable[0];
-
-  // Seleccionar un correo sin asignar
-  const correoSinAsignar = correosSinAsignar[0];
-
   // Obtener el número de cédula del traslado seleccionado
-  const numeroCedula = trasladoSinResponsable.numero_cedula;
 
   const data = {
-    codigo_traslado: trasladoSinResponsable.codigo_traslado,
-    correo: correoSinAsignar.correo,
     responsable: usernameLocal,
-    numero_cedula: numeroCedula,
   };
 
   console.log("Enviando datos:", data);
@@ -289,7 +257,30 @@ async function iniciar() {
 
 let cont = 5;
 
-function crearFilaTraslado(traslado, correos, tabla) {
+async function datosCorreos2(usernameLocal) {
+  const jwtKey = JSON.parse(localStorage.getItem('key')).jwt;
+  const headers = {
+      'Authorization': 'Bearer ' + jwtKey,
+      'Content-Type': 'application/json'
+  };
+  const urlCompleta = urlBack.url + '/traslados/traer_todo_correos_raul?responsable=' + encodeURIComponent(usernameLocal);
+
+  try {
+      const response = await fetch(urlCompleta, { method: 'GET', headers: headers });
+      if (!response.ok) throw new Error('Error en la petición GET');
+      return await response.json();
+  } catch (error) {
+      console.error('Error en la petición HTTP GET', error);
+      throw error;
+  }
+}
+
+
+let correosAux = await datosCorreos2(usernameLocal);
+console.log("Correos:", correosAux);  // Verifica la estructura de los correos
+
+
+async function crearFilaTraslado(traslado, correos, tabla) {
   const tr = document.createElement("tr");
 
   if (traslado.estado_del_traslado !== "Aceptado" && traslado.estado_del_traslado !== "Validar 24 Horas"
@@ -302,7 +293,6 @@ function crearFilaTraslado(traslado, correos, tabla) {
     return;
   }
 
-
   // Check if solicitud_traslado is a Google Drive link or a direct PDF link
   let pdfLink;
   if (traslado.solicitud_traslado.includes("drive.google.com")) {
@@ -310,6 +300,14 @@ function crearFilaTraslado(traslado, correos, tabla) {
   } else {
     pdfLink = `path/to/pdf/${traslado.solicitud_traslado}`;
   }
+  // buscar contraseña con el correo en correos 
+  let contrasena = "";
+  console.log("Correos:", correosAux);
+  correosAux.forEach(correo => {
+    if (correo.correo === traslado.asignacion_correo) {
+      contrasena = correo.contrasena;
+    }
+  });
 
   tr.innerHTML = `
     <td>${traslado.codigo_traslado}</td>
@@ -324,6 +322,7 @@ function crearFilaTraslado(traslado, correos, tabla) {
       </a>
     </td>
     <td>${traslado.asignacion_correo}</td>
+    <td>${contrasena}</td>
     <td>${traslado.eps_a_trasladar}</td>
     <td>
       <button class="btn-cambiar-estado">Cambiar Estado</button>
