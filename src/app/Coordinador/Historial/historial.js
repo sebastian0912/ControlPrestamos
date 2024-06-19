@@ -151,7 +151,6 @@ boton.addEventListener('click', async (e) => {
     if (aux.datosbase == "No se encontró el registro para el ID proporcionado") {
         console.log("No existe");
         aviso('Este usuario no existe, esta retirado o no pertenece a la empresa', 'warning');    
-        return;
     }
     
     if (datosExtraidos.historial.length == 0) {

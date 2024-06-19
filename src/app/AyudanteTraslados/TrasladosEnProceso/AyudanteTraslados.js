@@ -95,8 +95,6 @@ async function asignarTraslado() {
     "Content-Type": "application/json",
   };
   const urlCompleta = urlBack.url + "/traslados/actualizar_datos/";
-  // Obtener el número de cédula del traslado seleccionado
-
   const data = {
     responsable: usernameLocal,
   };
@@ -112,29 +110,41 @@ async function asignarTraslado() {
 
     if (response.ok) {
       document.getElementById('successSound').play();
+      const responseData = await response.json();
+      console.log(responseData);
+
       over.style.display = "none";
       loader.style.display = "none";
 
-      const responseData = await response.json();
-      console.log(responseData);
-      let aviso = avisoConfirmado("Correo asignado correctamente", "success");
-      if (aviso) {
-        location.reload();
+      if (responseData.correo_status === "Correo actualizado correctamente." && 
+          responseData.traslado_status === "Traslado actualizado correctamente.") {
+        avisoConfirmado("Correo y traslado asignados correctamente", "success");
+      } else if (responseData.correo_status === "Correo actualizado correctamente.") {
+        avisoConfirmado("Correo asignado correctamente", "success");
+      } else if (responseData.traslado_status === "Traslado actualizado correctamente.") {
+        avisoConfirmado("Traslado asignado correctamente", "success");
+      } else {
+        aviso("No se pudo asignar el correo o el traslado", "warning");
       }
+
+      location.reload();
       return responseData;
     } else {
       document.getElementById('errorSound').play();
       over.style.display = "none";
       loader.style.display = "none";
-      aviso("Error al asignar traslado", "error");
-      throw new Error("Error en la petición POST");
+      const responseData = await response.json();
+      aviso("Error al asignar traslado: " + responseData.error, "error");
+      console.log("response", responseData.error);
     }
   } catch (error) {
-    console.error("Error en la petición HTTP POST");
-    console.error(error);
+    aviso( error.message, "error");
     throw error;
   }
 }
+
+
+
 
 async function traerAusentismosCedula(cedula) {
   var body = localStorage.getItem("key");
@@ -242,22 +252,22 @@ async function cargarYMostrarDatosEstados(datosExtraidos) {
 
 async function iniciar() {
   try {
-      // Año actual para filtrar traslados relevantes
-      const anoActual = new Date().getFullYear();
-      let trasladosFiltrados = await buscarTrasladosFiltro(usernameLocal, anoActual);
+    // Año actual para filtrar traslados relevantes
+    const anoActual = new Date().getFullYear();
+    let trasladosFiltrados = await buscarTrasladosFiltro(usernameLocal, anoActual);
 
-      // Limpiar tabla antes de agregar nuevas filas
-      tabla.innerHTML = '';
+    // Limpiar tabla antes de agregar nuevas filas
+    tabla.innerHTML = '';
 
-      // Crear filas de traslados en la tabla
-      trasladosFiltrados
-        .sort((a, b) => b.codigo_traslado - a.codigo_traslado) // Ordenar de mayor a menor
-        .forEach((traslado) => crearFilaTraslado(traslado, null, tabla));
+    // Crear filas de traslados en la tabla
+    trasladosFiltrados
+      .sort((a, b) => b.codigo_traslado - a.codigo_traslado) // Ordenar de mayor a menor
+      .forEach((traslado) => crearFilaTraslado(traslado, null, tabla));
 
-      // Añadir escuchadores de eventos, si necesario
-      addEventListeners();
+    // Añadir escuchadores de eventos, si necesario
+    addEventListeners();
   } catch (error) {
-      console.error("Error al iniciar la aplicación:", error);
+    console.error("Error al iniciar la aplicación:", error);
   }
 }
 
@@ -266,18 +276,18 @@ let cont = 5;
 async function datosCorreos2(usernameLocal) {
   const jwtKey = JSON.parse(localStorage.getItem('key')).jwt;
   const headers = {
-      'Authorization': 'Bearer ' + jwtKey,
-      'Content-Type': 'application/json'
+    'Authorization': 'Bearer ' + jwtKey,
+    'Content-Type': 'application/json'
   };
   const urlCompleta = urlBack.url + '/traslados/traer_todo_correos_raul?responsable=' + encodeURIComponent(usernameLocal);
 
   try {
-      const response = await fetch(urlCompleta, { method: 'GET', headers: headers });
-      if (!response.ok) throw new Error('Error en la petición GET');
-      return await response.json();
+    const response = await fetch(urlCompleta, { method: 'GET', headers: headers });
+    if (!response.ok) throw new Error('Error en la petición GET');
+    return await response.json();
   } catch (error) {
-      console.error('Error en la petición HTTP GET', error);
-      throw error;
+    console.error('Error en la petición HTTP GET', error);
+    throw error;
   }
 }
 
