@@ -139,7 +139,7 @@ async function historialModificaciones(concepto, cod) {
                 }
             })
             .then(responseData => {
-                console.log('Respuesta:', responseData);
+                //console.log('Respuesta:', responseData);
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -718,6 +718,10 @@ function verificaInfo(datos) {
 }
 
 eliminar.addEventListener('change', async () => {
+    // Mostrar elementos ocultos
+    over.style.display = "block";
+    loader.style.display = "block";
+
     const archivo = eliminar.files[0];
     const reader = new FileReader();
 
@@ -738,11 +742,8 @@ eliminar.addEventListener('change', async () => {
             }
         }
 
-        // Mostrar elementos ocultos
-        over.style.display = "block";
-        loader.style.display = "block";
 
-        console.log('Datos a eliminar:', datosFinales);
+
 
         const datos = await datosEliminar(datosFinales);
 
@@ -845,14 +846,10 @@ archivoActualizarSaldos.addEventListener('change', async () => {
             const batchSize = 1500;
             const chuncks = [];
 
-            console.log('Datos a actualizar:', datosFinales);
-
             // Divide los datos en lotes de 1500
             for (let i = 0; i < datosFinales.length; i += batchSize) {
                 chuncks.push(datosFinales.slice(i, i + batchSize));
             }
-
-            console.log('Chuncks:', chuncks);
 
             await ActualizarEm(chuncks);
 
@@ -922,13 +919,10 @@ async function ActualizarEm(datos) {
             }
         }
     }
-
-    console.log('Cédulas con errores:', cedulasConErrores);
 }
 
 // Función para exportar las cédulas a Excel
 function exportarCedulasAExcel() {
-    console.log('Cédulas con errores en funcion:', cedulasConErrores);
     const worksheet = XLSX.utils.aoa_to_sheet([["Cédula"], ...cedulasConErrores.map(cedula => [cedula])]);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Errores");
@@ -939,6 +933,9 @@ function exportarCedulasAExcel() {
 
 
 input.addEventListener('change', async () => {
+    loader.style.display = "block";
+    over.style.display = "block";
+    
     const file = input.files[0];
     const reader = new FileReader();
 
@@ -967,11 +964,8 @@ input.addEventListener('change', async () => {
             datosFinales.push(rowData);
         }
 
-        console.log('Datos cargados desde Excel:', datosFinales);
-
         // Llama a la función para procesar los datos (guardarDatos) si es necesario
-        loader.style.display = "block";
-        over.style.display = "block";
+
         guardarDatos(datosFinales);
 
     };
@@ -1000,7 +994,6 @@ input.addEventListener('change', async () => {
 
 
 async function guardarDatos(datosFinales) {
-    console.log('Datos a guardar:', datosFinales);
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtKey = obj.jwt;

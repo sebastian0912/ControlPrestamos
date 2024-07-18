@@ -141,7 +141,7 @@ extrae.addEventListener('click', async () => {
         ['', '', '', '', '', '', '', 'ANTERIOR', '', 'PARA DESCONTAR', '', '', '', '', '', '', '', '', '', 'PARA HACER', '', '', '', '', '', '', '', ''],
         ['CÓDIGO', 'CÉDULA', 'NOMBRE', 'INGRESO', 'TEMPORAL', 'FINCA', 'SALARIO', 'SALDOS', 'FONDOS', 'MERCADOS', 'CUOTAS MERCADOS', 'PRESTAMO PARA DESCONTAR', 'CUOTAS PRESTAMOS PARA DESCONTAR', 'CASINO', 'ANCHETAS', 'CUOTAS ANCHETAS', 'FONDO', 'CARNET', 'SEGURO FUNERARIO', 'PRESTAMO PARA HACER', 'CUOTAS PRESTAMO PARA HACER', 'ANTICIPO LIQUIDACIÓN', 'CUENTAS'],
     ];
-    console.log(datosExtraidos.datosbase);
+
     datosExtraidos.datosbase.forEach((doc) => {
         const docData = doc;
         let fechaIngreso;
@@ -235,7 +235,6 @@ async function datosTCodigos() {
 
         if (response.ok) {
             const responseData = await response.json();
-            console.log(responseData);
             return responseData;
         } else {
             throw new Error('Error en la petición GET');
@@ -251,7 +250,6 @@ extraeC.addEventListener('click', async () => {
     datosFinales = [];
 
     const aux = await datosTCodigos();
-    console.log(aux.codigo);
 
     aux.codigo.forEach((doc) => {
         if (doc.estado == true) {
@@ -314,7 +312,6 @@ async function datosT() {
 
         if (response.ok) {
             const responseData = await response.json();
-            console.log(responseData);
             return responseData;
         } else {
             throw new Error('Error en la petición GET');
@@ -329,7 +326,6 @@ async function datosT() {
 extraeT.addEventListener('click', async () => {
     const datosExtraidos = await datosT();
 
-    console.log(datosExtraidos);
 
     let excelData = [['Nombre De la Tienda', 'Monto Total', 'Numero de compras en la tienda']];
 
@@ -524,6 +520,10 @@ function verificaInfo(datos) {
 }
 
 eliminar.addEventListener('change', async () => {
+    // Mostrar elementos ocultos
+    over.style.display = "block";
+    loader.style.display = "block";
+
     const archivo = eliminar.files[0];
     const reader = new FileReader();
 
@@ -543,12 +543,6 @@ eliminar.addEventListener('change', async () => {
                 datosFinales.push(cedula);
             }
         }
-
-        // Mostrar elementos ocultos
-        over.style.display = "block";
-        loader.style.display = "block";
-
-        console.log('Datos a eliminar:', datosFinales);
         
         const datos = await datosEliminar(datosFinales);
 
@@ -649,14 +643,11 @@ archivoActualizarSaldos.addEventListener('change', async () => {
             const batchSize = 1500;
             const chuncks = [];
 
-            console.log('Datos a actualizar:', datosFinales);
 
             // Divide los datos en lotes de 1500
             for (let i = 0; i < datosFinales.length; i += batchSize) {
                 chuncks.push(datosFinales.slice(i, i + batchSize));
             }
-
-            console.log('Chuncks:', chuncks);
 
             await ActualizarEm(chuncks);
 
@@ -727,12 +718,10 @@ async function ActualizarEm(datos) {
         }
     }
 
-    console.log('Cédulas con errores:', cedulasConErrores);
 }
 
 // Función para exportar las cédulas a Excel
 function exportarCedulasAExcel() {
-    console.log('Cédulas con errores en funcion:', cedulasConErrores);
     const worksheet = XLSX.utils.aoa_to_sheet([["Cédula"], ...cedulasConErrores.map(cedula => [cedula])]);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Errores");
@@ -770,7 +759,6 @@ input.addEventListener('change', async () => {
             datosFinales.push(rowData);
         }
 
-        console.log('Datos cargados desde Excel:', datosFinales);
 
         // Llama a la función para procesar los datos (guardarDatos) si es necesario
         loader.style.display = "block";
@@ -803,7 +791,6 @@ input.addEventListener('change', async () => {
 
 
 async function guardarDatos(datosFinales) {
-    console.log('Datos a guardar:', datosFinales);
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtKey = obj.jwt;
@@ -874,7 +861,6 @@ async function datosEmpleado(cedulaEmpleado) {
 
         if (response.ok) {
             const responseData = await response.json();
-            console.log(responseData);
             return responseData;
         } else {
             throw new Error('Error en la petición GET');
@@ -893,16 +879,13 @@ boton.addEventListener('click', async (e) => {
     const cedulaEmpleado = document.querySelector('#cedula').value;
 
     const datosExtraidos = await datosH(cedulaEmpleado);
-    console.log(datosExtraidos);
 
     let aux = await datosEmpleado(cedulaEmpleado);
-    console.log(aux.datosbase[0]);
     let datos = aux.datosbase[0];
 
     // datos.ingreso tiene el formato dd-mm-aa usar split para separarlos
 
     if (aux.datosbase == "No se encontró el registro para el ID proporcionado") {
-        console.log("No existe");
         aviso('Este usuario no existe, esta retirado o no pertenece a la empresa', 'warning');
     }
 
@@ -941,12 +924,10 @@ boton.addEventListener('click', async (e) => {
 
 valoresEnCero.addEventListener('click', async () => {
     const resultado = await avisoConfirmacionAc2();
-    console.log("empezo");
     if (resultado) {
         var body = localStorage.getItem('key');
         const obj = JSON.parse(body);
         const jwtToken = obj.jwt;
-        console.log(jwtToken);
 
         const urlcompleta = urlBack.url + '/Datosbase/reiniciarValores';
 
@@ -963,7 +944,6 @@ valoresEnCero.addEventListener('click', async () => {
             })
                 .then(response => {
                     if (response.ok) {
-                        console.log("termino");
                         document.getElementById('successSound').play();
                         return response.json();
                     } else {
@@ -971,8 +951,6 @@ valoresEnCero.addEventListener('click', async () => {
                     }
                 })
                 .then(responseData => {
-
-                    console.log('Respuesta:', responseData);
                     document.getElementById('successSound').play();
                     // Ocultar elementos después de completar la operación
                     over.style.display = "none";
@@ -1024,7 +1002,6 @@ async function THistorial() {
 
         if (response.ok) {
             const responseData = await response.json();
-            console.log(responseData);
             return responseData;
         } else {
             throw new Error('Error en la petición GET');
@@ -1037,7 +1014,7 @@ async function THistorial() {
 }
 
 extraeHistorialT.addEventListener('click', async () => {
-    console.log("entro");
+
     const datosExtraidos = await THistorial();
     if (datosExtraidos.historial.length == 0) {
         aviso("No hay registros de compras realizadas en las tiendas", "warning");

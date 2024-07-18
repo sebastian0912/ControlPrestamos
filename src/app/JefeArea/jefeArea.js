@@ -189,7 +189,6 @@ async function crearTienda(cedula) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
-    console.log(jwtToken);
 
     const urlcompleta = urlBack.url + '/Tienda/guardartienda';
 
@@ -212,7 +211,6 @@ async function crearTienda(cedula) {
                 }
             })
             .then(responseData => {
-                console.log('Respuesta:', responseData);
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -264,7 +262,6 @@ async function estadoSoli(checked) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
-    console.log(jwtToken);
 
     const urlcompleta = urlBack.url + '/usuarios/coordinador/cambioSolicitudes';
 
@@ -286,7 +283,7 @@ async function estadoSoli(checked) {
                 }
             })
             .then(responseData => {
-                console.log('Respuesta:', responseData);
+                //console.log('Respuesta:', responseData);
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -301,7 +298,6 @@ async function estadoSoli(checked) {
 
 
 HistorialDe.addEventListener("click", async function () {
-    console.log("Historial de entregas");
     let arrayaux, arrayHistorial = [];
     arrayaux = await THistorial();
 
@@ -311,8 +307,6 @@ HistorialDe.addEventListener("click", async function () {
             arrayHistorial.push(h);
         }
     });
-
-    console.log(arrayHistorial);
 
     // Crear un objeto para agrupar los datos por fecha
     const historialPorFecha = {};
@@ -460,8 +454,12 @@ function s2ab(s) {
 let contratacion = document.getElementById("contratacion");
 
 contratacion.addEventListener('change', async () => {
+    over.style.display = "block";
+    loader.style.display = "block";
+
     const file = contratacion.files[0];
     const reader = new FileReader();
+
 
     let datosFinales = [];
 
@@ -494,10 +492,7 @@ contratacion.addEventListener('change', async () => {
             datosFinales.push(rowData);
         }
 
-        console.log('Datos cargados desde Excel:', datosFinales);
 
-        over.style.display = "block";
-        loader.style.display = "block";
 
         guardarDatos(datosFinales);
     };
@@ -566,7 +561,6 @@ async function guardarDatos(datosFinales) {
                     const responseData = await response.json(); // Asegurándonos de esperar la promesa
                     await sleep(1000);
                     await exportarErroresAExcel2(responseData.errores);
-                    console.log('Respuesta:', responseData);
                     document.getElementById('successSound').play();
                     over.style.display = "none";
                     loader.style.display = "none";
@@ -645,8 +639,6 @@ input.addEventListener('change', async () => {
             datosFinales.push(rowData);
         }
 
-        console.log('Datos cargados desde Excel:', datosFinales);
-
         datosCarol(datosFinales);
 
         over.style.display = "none";
@@ -662,32 +654,25 @@ async function datosCarol(datos) {
 
     for (const doc of datos) {
         try {
-            console.log('Procesando documento:', doc);
             let aux2 = await datosEmpleado(doc[0]);
-            console.log('Datos del empleado obtenidos:', aux2);
 
             const cod = obtenerCodigo(doc[2], datos3);
             let codigoP = doc[2];
 
             if (aux2.datosbase == "No se encontró el registro para el ID proporcionado") {
                 errores.push({ cedula: doc[0], razon: 'Empleado no existe' });
-                console.log('Empleado no existe');
             }
             else if (!verificarCodigo(codigoP, datos3)) {
                 errores.push({ cedula: doc[0], razon: 'Código no existe' });
-                console.log('Codigo no existe');
             }
             else if (!verificarCodigoEstado(codigoP, datos3)) {
                 errores.push({ cedula: doc[0], razon: 'Código ya fue usado' })
-                console.log('Codigo ya fue usado');
             }
             else if (!verificarCedula(codigoP, doc[0], datos3)) {
                 errores.push({ cedula: doc[0], razon: 'El codigo no pertenece a este empleado' })
-                console.log('El codigo no pertenece a este empleado');
             }
             else if (verificaSiesUnPrestamo(codigoP)) {
                 errores.push({ cedula: doc[0], razon: 'El codigo no es valido solo se admiten mercados' })
-                console.log('El codigo no es valido solo se admiten mercados');
             }
 
             let concepto = 'Compra tienda de Señor Luis';
@@ -705,7 +690,6 @@ async function datosCarol(datos) {
                 await actualizarDatosBase(concepto, doc[1], 2, doc[0]);
             }
 
-            console.log('Llega');
 
             let confirmacion = await avisoConfirmado('Termino de subir el archivo', "success");
 
@@ -715,7 +699,6 @@ async function datosCarol(datos) {
                 // recargar la pagina
                 location.reload();
             }
-            console.log('Documento procesado:', doc);
 
         } catch (error) {
             console.error('Error procesando el documento:', doc, 'Error:', error);
@@ -747,6 +730,8 @@ function sleep(ms) {
 
 let input2 = document.getElementById('subidaMasiva2');
 input2.addEventListener('change', async () => {
+    over.style.display = "block";
+    loader.style.display = "block";
 
     const file = input2.files[0];
     const reader = new FileReader();
@@ -770,9 +755,10 @@ input2.addEventListener('change', async () => {
             datosFinales.push(rowData);
         }
 
-        console.log('Datos cargados desde Excel:', datosFinales);
 
         datosCarol2(datosFinales);
+        over.style.display = "none";
+        loader.style.display = "none";
     };
 
     reader.readAsBinaryString(file);
@@ -782,14 +768,12 @@ input2.addEventListener('change', async () => {
 async function datosCarol2(datos) {
     let errores = [];
 
-    console.log(datos);
+
 
     for (const doc of datos) {
-        console.log('Procesando documento:', doc);
 
         try {
             let aux2 = await datosEmpleado(doc[0]);
-            console.log('Datos del empleado obtenidos:', aux2);
 
             if (aux2.datosbase == "No se encontró el registro para el ID proporcionado") {
                 errores.push({ Cedula: doc[0], Razon: 'Empleado no existe' });
@@ -840,6 +824,7 @@ async function datosTCodigosT() {
         });
 
         if (response.ok) {
+            
             const responseData = await response.json();
             return responseData;
         } else {
@@ -938,7 +923,6 @@ async function actualizar(codigo, cod, username, monto2, cuotas) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
-    console.log(jwtToken);
 
     const urlcompleta = urlBack.url + '/Codigo/jefedearea/actualizarCodigo/' + cod;
 
@@ -963,7 +947,7 @@ async function actualizar(codigo, cod, username, monto2, cuotas) {
                 }
             })
             .then(responseData => {
-                console.log('Respuesta:', responseData);
+                //console.log('Respuesta:', responseData);
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -978,7 +962,6 @@ async function actualizarDatosBase(concepto, valor, cuotas, cedulaEmpleado) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
-    console.log(jwtToken);
 
     const urlcompleta = urlBack.url + '/Datosbase/tienda/actualizarMercados/' + cedulaEmpleado;
 
@@ -1003,7 +986,7 @@ async function actualizarDatosBase(concepto, valor, cuotas, cedulaEmpleado) {
                 }
             })
             .then(responseData => {
-                console.log('Respuesta:', responseData);
+                //console.log('Respuesta:', responseData);
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -1018,7 +1001,6 @@ async function CambiarEstado(cod, valor, codigo) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
-    console.log(jwtToken);
 
     const urlcompleta = urlBack.url + '/Codigo/jefedearea/cambiarEstadoCodigo/' + cod;
     try {
@@ -1040,7 +1022,6 @@ async function CambiarEstado(cod, valor, codigo) {
             })
             .then(responseData => {
 
-                console.log('Respuesta:', responseData);
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -1057,7 +1038,6 @@ async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo, codig
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
-    console.log(jwtToken);
     var dia = new Date().getDate();
     var mes = new Date().getMonth() + 1;
     var anio = new Date().getFullYear();
@@ -1088,7 +1068,7 @@ async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo, codig
                 }
             })
             .then(responseData => {
-                console.log('Respuesta:', responseData);
+                //console.log('Respuesta:', responseData);
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -1105,7 +1085,6 @@ async function historialT(valor) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
-    console.log(jwtToken);
 
     const urlcompleta = urlBack.url + '/Tienda/actualizarTienda';
 
@@ -1129,7 +1108,7 @@ async function historialT(valor) {
                 }
             })
             .then(responseData => {
-                console.log('Respuesta:', responseData);
+                //console.log('Respuesta:', responseData);
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -1144,7 +1123,6 @@ async function ActualizarHistorial(codigo) {
     var body = localStorage.getItem('key');
     const obj = JSON.parse(body);
     const jwtToken = obj.jwt;
-    console.log(jwtToken);
     const urlcompleta = urlBack.url + '/Historial/actualizarXcodigo/' + codigo;
     try {
         fetch(urlcompleta, {
@@ -1165,7 +1143,7 @@ async function ActualizarHistorial(codigo) {
                 }
             })
             .then(responseData => {
-                console.log('Respuesta:', responseData);
+                //console.log('Respuesta:', responseData);
             })
             .catch(error => {
                 console.error('Error:', error);
