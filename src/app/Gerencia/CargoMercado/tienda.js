@@ -410,7 +410,6 @@ async function escribirHistorial(cedulaEmpleado, nuevovalor, cuotas, tipo, codig
         console.error('Error en la petición HTTP POST');
         console.error(error);
     }
-
 }
 
 async function historialT(valor, generadoPor) {
@@ -587,6 +586,7 @@ boton.addEventListener('click', async (e) => {
         await sleep(2000); // Pausa de 2 segundos
         await ActualizarHistorial(codigoAux);
         await sleep(1000); // Pausa de 2 segundos
+        
         await historialT(nuevovalor, cod.generadoPor);
         await actualizarDatosBase(concepto, nuevovalor, 2, cedulaEmpleado);
         isFunctionExecuting = false;

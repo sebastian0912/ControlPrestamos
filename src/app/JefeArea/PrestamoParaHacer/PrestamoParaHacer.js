@@ -268,11 +268,11 @@ function verificaCondiciones(datos, nuevovalor) {
         let mesActual = fechaActual.getMonth() + 1;
         let anioActual = fechaActual.getFullYear();
         if ((anioActual == anio) && ((parseInt(mesActual) - parseInt(mes)) >= 2)) {
-            if (parseInt(nuevovalor) >= 200001) {
+            if (parseInt(nuevovalor) >= 300001) {
                 aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
                 return false;
             }
-            else if ((sumaTotal + parseInt(nuevovalor)) >= 350001) {
+            else if ((sumaTotal + parseInt(nuevovalor)) >= 500001) {
                 aviso('Ups no se pueden generar prestamos, puede sacar maximo ' + (350000 - (sumaTotal)), 'error');
                 return false;
             }
@@ -281,11 +281,11 @@ function verificaCondiciones(datos, nuevovalor) {
             }
         }
         else if ((parseInt(anioActual) > parseInt(anio))) {
-            if (parseInt(nuevovalor) >= 200001) {
+            if (parseInt(nuevovalor) >= 300001) {
                 aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
                 return false;
             }
-            else if ((sumaTotal + parseInt(nuevovalor)) >= 350001) {
+            else if ((sumaTotal + parseInt(nuevovalor)) >= 500001) {
                 aviso('Ups no se pueden generar prestamos, puede sacar maximo ' + (350000 - (sumaTotal)), 'error');
                 return false;
             }
@@ -366,7 +366,7 @@ boton.addEventListener('click', async (e) => {
     if (aux.datosbase == "No se encontró el registro para el ID proporcionado") {
         console.log("No existe");
         aviso('Ups no se pueden generar prestamo, el empleado no existe', 'error');
-        return;    
+        return;
     }
 
     if (parseInt(datos.saldos) > 175000) {
@@ -379,7 +379,7 @@ boton.addEventListener('click', async (e) => {
         aviso('Ups no se pueden generar prestamos perteneces al fondo', 'error');
         return;
     }
-    
+
 
     boton.style.display = "none";
     cedula.style.display = "none";
@@ -400,18 +400,20 @@ boton.addEventListener('click', async (e) => {
         }
 
         isFunctionExecuting = true; // Marcar la función como en ejecución
-        
+
         let valor = document.querySelector('#valor').value;
         let nuevovalor = valor.replace(/\,/g, '');
         let cuotas = document.querySelector('#cuotas').value;
         let tipo = document.querySelector('#tipo').value;
 
         let cuotasAux = cuotas;
-        if (tipo != "Otro"){
+        if (tipo != "Otro") {
+
             if (!verificaCondiciones(datos, nuevovalor) == true) {
                 isFunctionExecuting = false;
                 return;
             }
+
         }
 
         if (!verificaSelect(formaPago)) {
@@ -478,7 +480,7 @@ boton.addEventListener('click', async (e) => {
 
         await escribirHistorial(cedulaEmpleado, nuevovalor, cuotasAux, concepto, codigoOH);
 
-        await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, cuotasAux, tipo, valor)
+        await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, cuotasAux, tipo, valor);
 
         if (datos.temporal.startsWith("Apoyo") || datos.temporal.startsWith("APOYO")) {
             empresa = "APOYO LABORAL TS SAS";
@@ -495,7 +497,7 @@ boton.addEventListener('click', async (e) => {
             NIT = "NIT 901602948"
             direcccion = "CRA 1 N 17-37 BRAZILIA"
         }
-        else{
+        else {
             empresa = "TU ALIANZA SAS";
             NIT = "NIT 900864596"
             direcccion = "Calle 7 N 4-49 MADRID'"
@@ -525,8 +527,6 @@ boton.addEventListener('click', async (e) => {
 
         docPdf.text('ASUNTO: CREDITO (PRESTAMO)', 10, 50);
         docPdf.setFont('Helvetica', 'normal');
-
-
 
         docPdf.text('Yo, ' + datos.nombre + ' mayor de edad,  identificado con la cedula de ciudadania No. '
             + datos.numero_de_documento + ' autorizo', 10, 55);

@@ -663,7 +663,9 @@ boton.addEventListener('click', async (e) => {
         let codigoAux = 'MOH' + Math.floor(Math.random() * 1000000);
 
         await CambiarEstado(codigoP, nuevovalor, codigoAux);
+
         await actualizar(codigoAux, codigoP, usernameLocal, nuevovalor, 2);
+        
         await escribirHistorial(cedulaEmpleado, nuevovalor, 2, concepto, codigoAux, cod.generadoPor);
         await sleep(2000); // Pausa de 2 segundos
         await ActualizarHistorial(codigoAux);

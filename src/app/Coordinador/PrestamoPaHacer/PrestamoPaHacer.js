@@ -253,11 +253,11 @@ function verificaCondiciones(datos, nuevovalor) {
         let mesActual = fechaActual.getMonth() + 1;
         let anioActual = fechaActual.getFullYear();
         if ((anioActual == anio) && ((parseInt(mesActual) - parseInt(mes)) >= 2)) {
-            if (parseInt(nuevovalor) >= 200001) {
+            if (parseInt(nuevovalor) >= 300001) {
                 aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
                 return false;
             }
-            else if ((sumaTotal + parseInt(nuevovalor)) >= 350001) {
+            else if ((sumaTotal + parseInt(nuevovalor)) >= 500001) {
                 aviso('Ups no se pueden generar prestamos, puede sacar maximo ' + (350000 - (sumaTotal)), 'error');
                 return false;
             }
@@ -266,11 +266,11 @@ function verificaCondiciones(datos, nuevovalor) {
             }
         }
         else if ((parseInt(anioActual) > parseInt(anio))) {
-            if (parseInt(nuevovalor) >= 200001) {
+            if (parseInt(nuevovalor) >= 300001) {
                 aviso('Ups no se pueden generar el prestamo que superas los 200.000', 'error');
                 return false;
             }
-            else if ((sumaTotal + parseInt(nuevovalor)) >= 350001) {
+            else if ((sumaTotal + parseInt(nuevovalor)) >= 500001) {
                 aviso('Ups no se pueden generar prestamos, puede sacar maximo ' + (350000 - (sumaTotal)), 'error');
                 return false;
             }
@@ -384,8 +384,6 @@ boton.addEventListener('click', async (e) => {
     //console.log(datos.nombre);
 
     datosPersona.innerHTML = datos.nombre;
-
-
 
     boton2.addEventListener('click', async (e) => {
         let valor = document.querySelector('#valor').value;

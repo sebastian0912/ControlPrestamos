@@ -147,7 +147,8 @@ datosArreglo.forEach((p) => {
     }
 });
 
-let datos2 = ["Pollo Suba",
+let datos2 = [
+    "Pollo Suba",
     "Pollo Luz Dary",
     "Embutidos Luz Dary",
     "Emb carmen",

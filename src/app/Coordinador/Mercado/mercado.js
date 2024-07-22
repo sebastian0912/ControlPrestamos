@@ -375,6 +375,7 @@ boton.addEventListener('click', async (e) => {
         console.log(nuevovalor)
         console.log(datos)
         console.log(verificaCondiciones(datos, nuevovalor))
+        
         if (!verificaCondiciones(datos, nuevovalor) == true) {
             return;
         }

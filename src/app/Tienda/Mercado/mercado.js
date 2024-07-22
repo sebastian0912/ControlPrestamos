@@ -406,8 +406,7 @@ boton.addEventListener('click', async (e) => {
                 return;
             }
         }
-
-
+        
         await escribirHistorial(cedulaEmpleado, nuevovalor, 2, 'Autorizacion de Mercado', codigoOH);
 
         await escribirCodigo(cedulaEmpleado, nuevovalor, codigoOH, valor)

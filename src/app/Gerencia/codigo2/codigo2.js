@@ -241,12 +241,8 @@ boton.addEventListener('click', async (e) => {
         console.log("No existe");
         aviso('Ups no se pueden generar prestamo, el empleado no existe', 'error');
         return;    
-    }
-    
-    if (parseInt(datos.fondos) > 0) {
-        aviso('Ups no se pueden generar prestamos perteneces al fondo', 'error');
-        return;
-    }
+    }    
+
     datosPersona.innerHTML = datos.nombre;
     
     boton.style.display = "none";
